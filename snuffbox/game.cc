@@ -74,12 +74,11 @@ void Game::NotifyEvent(GameEvents evt)
 //------------------------------------------------------------------------------------------------------
 int SNUFF_MAIN
 {
-	SharedPtr<Game> game = new Game(new PlatformWindow("Snuffbox D3D11 (Alpha)",800,600));
+	SharedPtr<Game> game = new Game(new PlatformWindow("Snuffbox D3D11 (Alpha)",1024,600));
 	game->MakeGlobal();
 	game->Initialise();
 
 	std::string result;
-	int test = 0;
 
 	while (game->started())
 	{
