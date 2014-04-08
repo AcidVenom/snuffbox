@@ -1,0 +1,183 @@
+#include "../../snuffbox/win32/win32_window.h"
+#include "../../snuffbox/logging.h"
+#include "../../snuffbox/environment.h"
+#include "../../snuffbox/game.h"
+#include <string>
+
+namespace snuffbox
+{
+	//---------------------------------------------------------------------------
+	Win32Window::Win32Window() : focussed_(false)
+	{
+		SNUFF_LOG_INFO("Constructed the window");
+	}
+
+	//---------------------------------------------------------------------------
+	Win32Window::Win32Window(const char* name, int w, int h, int x, int y) : focussed_(false)
+	{
+		params().x = x;
+		params().y = y;
+		params().w = w;
+		params().h = h;
+		params().name = name;
+
+
+		std::string paramX = x == SNUFF_WINDOW_CENTERED ? "centered" : std::to_string(params().x);
+		std::string paramY = y == SNUFF_WINDOW_CENTERED ? "centered" : std::to_string(params().y);
+
+		std::string paramW = std::to_string(params().w);
+		std::string paramH = std::to_string(params().h);
+
+		std::string strName = params().name;
+		std::string result = 
+			"Constructed a window with name: " + strName +
+			"\n\tParameters: " +
+			"\n\tWidth: " + paramW +
+			"\n\tHeight: " + paramH +
+			"\n\tX: " + paramX +
+			"\n\tY: " + paramY;
+
+		SNUFF_LOG_INFO(result.c_str());
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::Create()
+	{
+		WNDCLASSEXA wndClass;
+
+		ZeroMemory(&wndClass, sizeof(WNDCLASSEX));
+
+		wndClass.cbSize = sizeof(WNDCLASSEX);
+		wndClass.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+		wndClass.lpfnWndProc = WndProc;
+		wndClass.hInstance = static_cast<HINSTANCE>(GetModuleHandle(0));
+		wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wndClass.hbrBackground = (HBRUSH)BLACK_BRUSH;
+		wndClass.lpszClassName = SNUFF_WINDOW_CLASS;
+		wndClass.cbWndExtra = sizeof(void*);
+		wndClass.lpszMenuName = NULL;
+		wndClass.cbClsExtra = NULL;
+
+		if (!RegisterClassExA(&wndClass))
+		{
+			SNUFF_LOG_FATAL("Could not register window class!");
+			return;
+		}
+
+		RECT clientSize;
+		clientSize.left = clientSize.top = 0;
+		clientSize.right = params().w;
+		clientSize.bottom = params().h;
+
+		int style = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_MAXIMIZEBOX | WS_SIZEBOX;
+
+		AdjustWindowRect(&clientSize, style, FALSE);
+		unsigned int actualWidth = clientSize.right - clientSize.left;
+		unsigned int actualHeight = clientSize.bottom - clientSize.top;
+
+		params().x = params().x == SNUFF_WINDOW_CENTERED ? (GetSystemMetrics(SM_CXSCREEN) - actualWidth) / 2 : params().x;
+		params().y = params().y == SNUFF_WINDOW_CENTERED ? (GetSystemMetrics(SM_CYSCREEN) - actualHeight) / 2 : params().y;
+
+		auto name = params().name;
+
+		handle_ = CreateWindowExA(wndClass.style,wndClass.lpszClassName, params().name,
+			style, params().x, params().y, params().w, params().h, NULL, NULL,
+			wndClass.hInstance, this);
+		if (!handle_)
+		{
+			SNUFF_LOG_FATAL("Unable to open window!");
+			return;
+		}
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::Show()
+	{
+		ShowWindow(handle_, SW_SHOWNORMAL);
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::Destroy()
+	{
+		SNUFF_ASSERT_NOTNULL(handle_);
+		DestroyWindow(handle_);
+
+		std::string name = params().name;
+		std::string result = "Destroyed the window with name: " + name;
+		SNUFF_LOG_INFO(result.c_str());
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::OnSetFocus()
+	{
+		SNUFF_LOG_INFO("[WIN32] The window received focus");
+		focussed_ = true;
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::OnKillFocus()
+	{
+		SNUFF_LOG_INFO("[WIN32] The window lost focus");
+		focussed_ = false;
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::OnClose()
+	{
+		environment::game().NotifyEvent(GameEvents::kQuit);
+	}
+
+	//---------------------------------------------------------------------------
+	Win32Window::~Win32Window()
+	{
+		
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::ProcessMessages()
+	{
+		if (handle_ != nullptr)
+		{
+			HWND hwnd = static_cast<HWND>(handle_);
+			MSG msg;
+			while (PeekMessageA(&msg, hwnd, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessageA(&msg);
+			}
+		}
+	}
+
+	//---------------------------------------------------------------------------
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+	{
+		if (message == WM_CREATE)
+		{
+			SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)(((LPCREATESTRUCT)lParam)->lpCreateParams));
+			return DefWindowProcA(hWnd, message, wParam, lParam);
+		}
+
+		Win32Window *window = reinterpret_cast<Win32Window*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
+
+		switch (message)
+		{
+		case WM_SYSCOMMAND:
+			if (wParam == SC_KEYMENU && (lParam >> 16) <= 0)
+				return 0;
+			break;
+
+		case WM_SETFOCUS:
+			window->OnSetFocus();
+			break;
+
+		case WM_KILLFOCUS:
+			window->OnKillFocus();
+			break;
+
+		case WM_CLOSE:
+			window->OnClose();
+			break;
+		}
+		return DefWindowProcA(hWnd, message, wParam, lParam);
+	}
+}
