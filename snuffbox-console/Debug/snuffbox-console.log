@@ -1,0 +1,18 @@
+﻿Build started 4/9/2014 9:53:41 AM.
+     1>Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cc
+         main.cc
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Snuff\src\Debug\snuffbox-console.exe" /INCREMENTAL /NOLOGO "C:/Qt/Qt5/lib/*.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Snuff\src\Debug\snuffbox-console.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Snuff\src\Debug\snuffbox-console.lib" /MACHINE:X86 Debug\main.obj
+         Debug\notepad.obj
+     1>notepad.obj : error LNK2001: unresolved external symbol "public: virtual struct QMetaObject const * __thiscall Notepad::metaObject(void)const " (?metaObject@Notepad@@UBEPBUQMetaObject@@XZ)
+     1>notepad.obj : error LNK2001: unresolved external symbol "public: virtual void * __thiscall Notepad::qt_metacast(char const *)" (?qt_metacast@Notepad@@UAEPAXPBD@Z)
+     1>notepad.obj : error LNK2001: unresolved external symbol "public: virtual int __thiscall Notepad::qt_metacall(enum QMetaObject::Call,int,void * *)" (?qt_metacall@Notepad@@UAEHW4Call@QMetaObject@@HPAPAX@Z)
+     1>notepad.obj : error LNK2001: unresolved external symbol "public: static struct QMetaObject const Notepad::staticMetaObject" (?staticMetaObject@Notepad@@2UQMetaObject@@B)
+     1>C:\Snuff\src\Debug\snuffbox-console.exe : fatal error LNK1120: 4 unresolved externals
+     1>Done Building Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.30
