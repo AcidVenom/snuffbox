@@ -3,10 +3,6 @@
 #include "../snuffbox/environment.h"
 #include <string>
 
-#include <v8.h>
-
-using namespace v8;
-
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------
