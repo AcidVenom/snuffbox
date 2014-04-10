@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -107,7 +107,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ac29903476c91c02c01035feddf9f44bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
 <tr class="separator:ac29903476c91c02c01035feddf9f44bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e5196dbba1c6a65c8141108b2b93c75"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e5196dbba1c6a65c8141108b2b93c75"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#a1e5196dbba1c6a65c8141108b2b93c75">Game</a> (PlatformWindow *<a class="el" href="classsnuffbox_1_1_game.html#ae35b7be8fbdfbe4cc5a49c340b7105e0">window</a>)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#a1e5196dbba1c6a65c8141108b2b93c75">Game</a> (PlatformWindow *<a class="el" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">window</a>)</td></tr>
 <tr class="memdesc:a1e5196dbba1c6a65c8141108b2b93c75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct with a window. <br/></td></tr>
 <tr class="separator:a1e5196dbba1c6a65c8141108b2b93c75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3d112ca6e0e55150d2fdbc704474530"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae3d112ca6e0e55150d2fdbc704474530"></a>
@@ -126,10 +126,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#ad3b88fb61f44dbaaf88881cd77590958">Shutdown</a> ()</td></tr>
 <tr class="memdesc:ad3b88fb61f44dbaaf88881cd77590958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shuts the game down. <br/></td></tr>
 <tr class="separator:ad3b88fb61f44dbaaf88881cd77590958"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae35b7be8fbdfbe4cc5a49c340b7105e0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae35b7be8fbdfbe4cc5a49c340b7105e0"></a>
-<a class="el" href="classsnuffbox_1_1_shared_ptr.html">SharedPtr</a>&lt; PlatformWindow &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#ae35b7be8fbdfbe4cc5a49c340b7105e0">window</a> ()</td></tr>
-<tr class="memdesc:ae35b7be8fbdfbe4cc5a49c340b7105e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the window the game is running in. <br/></td></tr>
-<tr class="separator:ae35b7be8fbdfbe4cc5a49c340b7105e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff19ed260f04e70c8c2a61d271500154"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff19ed260f04e70c8c2a61d271500154"></a>
+PlatformWindow *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">window</a> ()</td></tr>
+<tr class="memdesc:aff19ed260f04e70c8c2a61d271500154"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the window the game is running in. <br/></td></tr>
+<tr class="separator:aff19ed260f04e70c8c2a61d271500154"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1ace018b9c60591d02d34b575e67f37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae1ace018b9c60591d02d34b575e67f37"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#ae1ace018b9c60591d02d34b575e67f37">started</a> ()</td></tr>
 <tr class="memdesc:ae1ace018b9c60591d02d34b575e67f37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns if the game is started or not. <br/></td></tr>
@@ -153,7 +153,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 8 2014 21:19:41 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 10 2014 23:50:24 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

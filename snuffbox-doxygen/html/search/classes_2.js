@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['platformwindowparams',['PlatformWindowParams',['../structsnuffbox_1_1_platform_window_params.html',1,'snuffbox']]]
+  ['iplatformwindow',['IPlatformWindow',['../classsnuffbox_1_1_i_platform_window.html',1,'snuffbox']]]
 ];

@@ -71,10 +71,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li class="current"><a href="functions.html"><span>All</span></a></li>
       <li><a href="functions_func.html"><span>Functions</span></a></li>
+      <li><a href="functions_vars.html"><span>Variables</span></a></li>
     </ul>
   </div>
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
+      <li><a href="#index_a"><span>a</span></a></li>
       <li><a href="#index_c"><span>c</span></a></li>
       <li><a href="#index_d"><span>d</span></a></li>
       <li><a href="#index_g"><span>g</span></a></li>
@@ -96,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -108,7 +110,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 <div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div>
 
+<h3><a class="anchor" id="index_a"></a>- a -</h3><ul>
+<li>allocatedMemory
+: <a class="el" href="structsnuffbox_1_1_allocated_memory.html#a0950edd703237dd9bc946a82463c2887">snuffbox::AllocatedMemory</a>
+</li>
+<li>AllocatedMemory()
+: <a class="el" href="structsnuffbox_1_1_allocated_memory.html#a6737b0bf2fc015ecf4fd80e3130d560b">snuffbox::AllocatedMemory</a>
+</li>
+<li>allocations
+: <a class="el" href="structsnuffbox_1_1_allocated_memory.html#a548ff93967d1bf9dc435e65501200051">snuffbox::AllocatedMemory</a>
+</li>
+</ul>
+
+
 <h3><a class="anchor" id="index_c"></a>- c -</h3><ul>
+<li>ConstructShared()
+: <a class="el" href="structsnuffbox_1_1_allocated_memory.html#a5445bb11a72374119295b955174ca943">snuffbox::AllocatedMemory</a>
+</li>
 <li>Create()
 : <a class="el" href="classsnuffbox_1_1_i_platform_window.html#a89ee9662088f169639e37551682a48ea">snuffbox::IPlatformWindow</a>
 , <a class="el" href="classsnuffbox_1_1_win32_window.html#abb9e8f647edcea6ba27106e957669879">snuffbox::Win32Window</a>
@@ -125,6 +143,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="classsnuffbox_1_1_ref_count.html#a5777549d4caba3f225fe1c4bc50ac4df">snuffbox::RefCount&lt; T &gt;</a>
 , <a class="el" href="classsnuffbox_1_1_win32_window.html#aa62da0a61e669e341ac6eae45572c758">snuffbox::Win32Window</a>
 </li>
+<li>Destruct()
+: <a class="el" href="structsnuffbox_1_1_allocated_memory.html#aaf31f5684b58389919ae0c5e314564b5">snuffbox::AllocatedMemory</a>
+</li>
 </ul>
 
 
@@ -133,7 +154,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classsnuffbox_1_1_game.html#ac29903476c91c02c01035feddf9f44bf">snuffbox::Game</a>
 </li>
 <li>get()
-: <a class="el" href="classsnuffbox_1_1_shared_ptr.html#a8e905bc2778ea582cc6b052ccfeec2c2">snuffbox::SharedPtr&lt; T &gt;</a>
+: <a class="el" href="classsnuffbox_1_1_shared_ptr.html#a457ce05b753fe1df6adc5edb9b2f9a8a">snuffbox::SharedPtr&lt; T &gt;</a>
 </li>
 </ul>
 
@@ -194,7 +215,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classsnuffbox_1_1_ref_count.html#a47d8b6e14dd15ae6301f2728517e743c">snuffbox::RefCount&lt; T &gt;</a>
 </li>
 <li>Reset()
-: <a class="el" href="classsnuffbox_1_1_shared_ptr.html#ae9748e1ebd5e34e2e184e621816d8497">snuffbox::SharedPtr&lt; T &gt;</a>
+: <a class="el" href="classsnuffbox_1_1_shared_ptr.html#afa6eb6fd99d2b3e9142573024afc83fc">snuffbox::SharedPtr&lt; T &gt;</a>
 </li>
 <li>ResetRaw()
 : <a class="el" href="classsnuffbox_1_1_shared_ptr.html#a4336a307b9853c827f1c672c4651f273">snuffbox::SharedPtr&lt; T &gt;</a>
@@ -234,17 +255,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classsnuffbox_1_1_win32_window.html#aa294cac178581af0fe71c98ac6de8d9e">snuffbox::Win32Window</a>
 </li>
 <li>window()
-: <a class="el" href="classsnuffbox_1_1_game.html#ae35b7be8fbdfbe4cc5a49c340b7105e0">snuffbox::Game</a>
+: <a class="el" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">snuffbox::Game</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_~"></a>- ~ -</h3><ul>
+<li>~AllocatedMemory()
+: <a class="el" href="structsnuffbox_1_1_allocated_memory.html#ad31b0fbc7e06d484c14de7156dd244af">snuffbox::AllocatedMemory</a>
+</li>
 <li>~Game()
 : <a class="el" href="classsnuffbox_1_1_game.html#ae3d112ca6e0e55150d2fdbc704474530">snuffbox::Game</a>
 </li>
 <li>~RefCount()
-: <a class="el" href="classsnuffbox_1_1_ref_count.html#a787d820c9fd6461b1a1607f658498449">snuffbox::RefCount&lt; T &gt;</a>
+: <a class="el" href="classsnuffbox_1_1_ref_count.html#a29a8fa7fdf3faf256bdf535d01434a16">snuffbox::RefCount&lt; T &gt;</a>
 </li>
 <li>~SharedPtr()
 : <a class="el" href="classsnuffbox_1_1_shared_ptr.html#ad8940a1b8cb67b76d5a626dbab64a04d">snuffbox::SharedPtr&lt; T &gt;</a>
@@ -256,7 +280,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 8 2014 21:19:41 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 10 2014 23:50:25 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -2,6 +2,7 @@
 #include "../../snuffbox/logging.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
+#include "../../snuffbox/memory/allocated_memory.h"
 #include <string>
 
 namespace snuffbox

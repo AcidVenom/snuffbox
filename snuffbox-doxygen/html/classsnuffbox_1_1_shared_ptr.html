@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,6 +94,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">snuffbox::SharedPtr&lt; T &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>A garbage collecting shared pointer, so memory management won't become a worry.  
+ <a href="classsnuffbox_1_1_shared_ptr.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="shared__ptr_8h_source.html">shared_ptr.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -115,18 +120,18 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_shared_ptr.html#ad8940a1b8cb67b76d5a626dbab64a04d">~SharedPtr</a> ()</td></tr>
 <tr class="memdesc:ad8940a1b8cb67b76d5a626dbab64a04d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br/></td></tr>
 <tr class="separator:ad8940a1b8cb67b76d5a626dbab64a04d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9961287bcae6ca51a38b2b562e7e3be6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9961287bcae6ca51a38b2b562e7e3be6"></a>
+<tr class="memitem:af29fda28fa33725f434e976b3f5422ac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af29fda28fa33725f434e976b3f5422ac"></a>
 <a class="el" href="classsnuffbox_1_1_shared_ptr.html">SharedPtr</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classsnuffbox_1_1_shared_ptr.html">SharedPtr</a> &amp;other)</td></tr>
-<tr class="separator:a9961287bcae6ca51a38b2b562e7e3be6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad840a9a7a7b36a457dac8d65bf1d5302"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad840a9a7a7b36a457dac8d65bf1d5302"></a>
+<tr class="separator:af29fda28fa33725f434e976b3f5422ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a404354d0383b64418ba39cafc64dcdad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a404354d0383b64418ba39cafc64dcdad"></a>
 <a class="el" href="classsnuffbox_1_1_shared_ptr.html">SharedPtr</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classsnuffbox_1_1_shared_ptr.html">SharedPtr</a> &amp;&amp;other)</td></tr>
-<tr class="separator:ad840a9a7a7b36a457dac8d65bf1d5302"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29e7a5e52d8c5e74d28adc28ff9a6e3b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29e7a5e52d8c5e74d28adc28ff9a6e3b"></a>
+<tr class="separator:a404354d0383b64418ba39cafc64dcdad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4de97a429cae28f4b35812e7b29e98de"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4de97a429cae28f4b35812e7b29e98de"></a>
 T *&#160;</td><td class="memItemRight" valign="bottom"><b>operator-&gt;</b> (void)</td></tr>
-<tr class="separator:a29e7a5e52d8c5e74d28adc28ff9a6e3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ababc077f3967c39d36db1d2f06831602"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ababc077f3967c39d36db1d2f06831602"></a>
+<tr class="separator:a4de97a429cae28f4b35812e7b29e98de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e7df8ecf6125698ef68e1b9291277bb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8e7df8ecf6125698ef68e1b9291277bb"></a>
 T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator*</b> (void)</td></tr>
-<tr class="separator:ababc077f3967c39d36db1d2f06831602"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a8e7df8ecf6125698ef68e1b9291277bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4aada4171efd1890571faf8e08f0a6e5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4aada4171efd1890571faf8e08f0a6e5"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="classsnuffbox_1_1_shared_ptr.html">SharedPtr</a>&lt; T &gt; &amp;other) const </td></tr>
 <tr class="separator:a4aada4171efd1890571faf8e08f0a6e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,18 +166,24 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_shared_ptr.html#a4336a307b9853c827f1c672c4651f273">ResetRaw</a> (T *ptr, <a class="el" href="classsnuffbox_1_1_ref_count.html">RefCount</a>&lt; T &gt; *ref)</td></tr>
 <tr class="memdesc:a4336a307b9853c827f1c672c4651f273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the shared pointer raw. <br/></td></tr>
 <tr class="separator:a4336a307b9853c827f1c672c4651f273"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e905bc2778ea582cc6b052ccfeec2c2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8e905bc2778ea582cc6b052ccfeec2c2"></a>
-T *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_shared_ptr.html#a8e905bc2778ea582cc6b052ccfeec2c2">get</a> ()</td></tr>
-<tr class="memdesc:a8e905bc2778ea582cc6b052ccfeec2c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the pointer of this shared pointer. <br/></td></tr>
-<tr class="separator:a8e905bc2778ea582cc6b052ccfeec2c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a457ce05b753fe1df6adc5edb9b2f9a8a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a457ce05b753fe1df6adc5edb9b2f9a8a"></a>
+T *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_shared_ptr.html#a457ce05b753fe1df6adc5edb9b2f9a8a">get</a> ()</td></tr>
+<tr class="memdesc:a457ce05b753fe1df6adc5edb9b2f9a8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the pointer of this shared pointer. <br/></td></tr>
+<tr class="separator:a457ce05b753fe1df6adc5edb9b2f9a8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename T&gt;<br/>
+class snuffbox::SharedPtr&lt; T &gt;</h3>
+
+<p>A garbage collecting shared pointer, so memory management won't become a worry. </p>
+<dl class="section author"><dt>Author</dt><dd>Daniël Konings </dd></dl>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Snuff/src/snuffbox/memory/<a class="el" href="shared__ptr_8h_source.html">shared_ptr.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 8 2014 21:19:41 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 10 2014 23:50:24 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

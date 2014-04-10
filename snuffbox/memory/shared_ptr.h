@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../snuffbox/logging.h"
+#include "../../snuffbox/logging.h"
+#include "../../snuffbox/memory/allocated_memory.h"
 
 namespace snuffbox
 {
@@ -25,13 +26,14 @@ namespace snuffbox
 		}
 
 		/// Default destructor
-		virtual ~RefCount(){}
+		~RefCount(){}
 
 		/// Destroys the associated pointer
 		inline void Destroy()
 		{
+			
 			SNUFF_ASSERT_NOTNULL(ptr_);
-			delete ptr_;
+			environment::memory().Destruct(ptr_);
 		}
 
 		/// Increases the reference count by one
@@ -53,7 +55,7 @@ namespace snuffbox
 	};
 
 	/**
-	* @class snuffbox::SharedPtr<T>
+	* @class snuffbox::SharedPtr
 	* @brief A garbage collecting shared pointer, so memory management won't become a worry
 	* @author Daniël Konings
 	*/

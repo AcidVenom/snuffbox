@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['increaseref',['IncreaseRef',['../classsnuffbox_1_1_ref_count.html#aab459934009e01d2859ae364098f8c80',1,'snuffbox::RefCount']]],
-  ['initialise',['Initialise',['../classsnuffbox_1_1_game.html#a3b1241b8c33b7c1711880b4e18ad9eb0',1,'snuffbox::Game']]]
+  ['game',['Game',['../classsnuffbox_1_1_game.html#ac29903476c91c02c01035feddf9f44bf',1,'snuffbox::Game::Game()'],['../classsnuffbox_1_1_game.html#a1e5196dbba1c6a65c8141108b2b93c75',1,'snuffbox::Game::Game(PlatformWindow *window)']]],
+  ['get',['get',['../classsnuffbox_1_1_shared_ptr.html#a457ce05b753fe1df6adc5edb9b2f9a8a',1,'snuffbox::SharedPtr']]]
 ];

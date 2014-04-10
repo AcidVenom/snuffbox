@@ -16,6 +16,9 @@
     <ClCompile Include="win32\win32_window.cc">
       <Filter>win32</Filter>
     </ClCompile>
+    <ClCompile Include="memory\allocated_memory.cc">
+      <Filter>memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -33,5 +36,8 @@
       <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="environment.h" />
+    <ClInclude Include="memory\allocated_memory.h">
+      <Filter>memory</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

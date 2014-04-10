@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Used for <a class="el" href="classsnuffbox_1_1_shared_ptr_3_01_t_01_4.html" title="A garbage collecting shared pointer, so memory management won&#39;t become a worry. ">snuffbox::SharedPtr&lt;T&gt;</a> to keep its references.  
+<p>Used for snuffbox::SharedPtr&lt;T&gt; to keep its references.  
  <a href="classsnuffbox_1_1_ref_count.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="shared__ptr_8h_source.html">shared_ptr.h</a>&gt;</code></p>
@@ -110,10 +110,10 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_ref_count.html#ae3d059a44d0fa179576f7953e8927f67">RefCount</a> (T *ptr)</td></tr>
 <tr class="memdesc:ae3d059a44d0fa179576f7953e8927f67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construction through pointer. <br/></td></tr>
 <tr class="separator:ae3d059a44d0fa179576f7953e8927f67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a787d820c9fd6461b1a1607f658498449"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a787d820c9fd6461b1a1607f658498449"></a>
-virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_ref_count.html#a787d820c9fd6461b1a1607f658498449">~RefCount</a> ()</td></tr>
-<tr class="memdesc:a787d820c9fd6461b1a1607f658498449"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br/></td></tr>
-<tr class="separator:a787d820c9fd6461b1a1607f658498449"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29a8fa7fdf3faf256bdf535d01434a16"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29a8fa7fdf3faf256bdf535d01434a16"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_ref_count.html#a29a8fa7fdf3faf256bdf535d01434a16">~RefCount</a> ()</td></tr>
+<tr class="memdesc:a29a8fa7fdf3faf256bdf535d01434a16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br/></td></tr>
+<tr class="separator:a29a8fa7fdf3faf256bdf535d01434a16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5777549d4caba3f225fe1c4bc50ac4df"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5777549d4caba3f225fe1c4bc50ac4df"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_ref_count.html#a5777549d4caba3f225fe1c4bc50ac4df">Destroy</a> ()</td></tr>
 <tr class="memdesc:a5777549d4caba3f225fe1c4bc50ac4df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the associated pointer. <br/></td></tr>
@@ -131,7 +131,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div class="textblock"><h3>template&lt;typename T&gt;<br/>
 class snuffbox::RefCount&lt; T &gt;</h3>
 
-<p>Used for <a class="el" href="classsnuffbox_1_1_shared_ptr_3_01_t_01_4.html" title="A garbage collecting shared pointer, so memory management won&#39;t become a worry. ">snuffbox::SharedPtr&lt;T&gt;</a> to keep its references. </p>
+<p>Used for snuffbox::SharedPtr&lt;T&gt; to keep its references. </p>
 <dl class="section author"><dt>Author</dt><dd>Daniël Konings </dd></dl>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Snuff/src/snuffbox/memory/<a class="el" href="shared__ptr_8h_source.html">shared_ptr.h</a></li>
@@ -139,7 +139,7 @@ class snuffbox::RefCount&lt; T &gt;</h3>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 8 2014 21:19:41 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 10 2014 23:50:24 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

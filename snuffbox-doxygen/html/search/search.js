@@ -7,16 +7,18 @@
 
 var indexSectionsWithContent =
 {
-  0: "cdgimnoprsuw~",
-  1: "giprsw",
-  2: "cdgimnoprsuw~"
+  0: "acdgimnoprsuw~",
+  1: "agiprsw",
+  2: "acdgimnoprsuw~",
+  3: "a"
 };
 
 var indexSectionNames =
 {
   0: "all",
   1: "classes",
-  2: "functions"
+  2: "functions",
+  3: "variables"
 };
 
 function convertToId(search)

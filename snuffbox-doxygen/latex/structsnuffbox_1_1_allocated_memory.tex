@@ -1,0 +1,50 @@
+\hypertarget{structsnuffbox_1_1_allocated_memory}{\section{snuffbox\-:\-:Allocated\-Memory Struct Reference}
+\label{structsnuffbox_1_1_allocated_memory}\index{snuffbox\-::\-Allocated\-Memory@{snuffbox\-::\-Allocated\-Memory}}
+}
+
+
+Contains information about the number of allocations and allocated memory, also checks for leaks on destruction.  
+
+
+
+
+{\ttfamily \#include $<$allocated\-\_\-memory.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structsnuffbox_1_1_allocated_memory_a6737b0bf2fc015ecf4fd80e3130d560b}{\hyperlink{structsnuffbox_1_1_allocated_memory_a6737b0bf2fc015ecf4fd80e3130d560b}{Allocated\-Memory} ()}\label{structsnuffbox_1_1_allocated_memory_a6737b0bf2fc015ecf4fd80e3130d560b}
+
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\hypertarget{structsnuffbox_1_1_allocated_memory_ad31b0fbc7e06d484c14de7156dd244af}{\hyperlink{structsnuffbox_1_1_allocated_memory_ad31b0fbc7e06d484c14de7156dd244af}{$\sim$\-Allocated\-Memory} ()}\label{structsnuffbox_1_1_allocated_memory_ad31b0fbc7e06d484c14de7156dd244af}
+
+\begin{DoxyCompactList}\small\item\em Default destructor (Checks for leaks) \end{DoxyCompactList}\item 
+\hypertarget{structsnuffbox_1_1_allocated_memory_a5445bb11a72374119295b955174ca943}{{\footnotesize template$<$typename T , typename... Args$>$ }\\T $\ast$ \hyperlink{structsnuffbox_1_1_allocated_memory_a5445bb11a72374119295b955174ca943}{Construct\-Shared} (Args \&\&...args)}\label{structsnuffbox_1_1_allocated_memory_a5445bb11a72374119295b955174ca943}
+
+\begin{DoxyCompactList}\small\item\em Constructs a shared pointer. \end{DoxyCompactList}\item 
+\hypertarget{structsnuffbox_1_1_allocated_memory_aaf31f5684b58389919ae0c5e314564b5}{{\footnotesize template$<$typename T $>$ }\\void \hyperlink{structsnuffbox_1_1_allocated_memory_aaf31f5684b58389919ae0c5e314564b5}{Destruct} (T $\ast$ptr)}\label{structsnuffbox_1_1_allocated_memory_aaf31f5684b58389919ae0c5e314564b5}
+
+\begin{DoxyCompactList}\small\item\em Destructs a pointer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structsnuffbox_1_1_allocated_memory_a548ff93967d1bf9dc435e65501200051}{unsigned int \hyperlink{structsnuffbox_1_1_allocated_memory_a548ff93967d1bf9dc435e65501200051}{allocations}}\label{structsnuffbox_1_1_allocated_memory_a548ff93967d1bf9dc435e65501200051}
+
+\begin{DoxyCompactList}\small\item\em The number of allocations of this allocator. \end{DoxyCompactList}\item 
+\hypertarget{structsnuffbox_1_1_allocated_memory_a0950edd703237dd9bc946a82463c2887}{size\-\_\-t \hyperlink{structsnuffbox_1_1_allocated_memory_a0950edd703237dd9bc946a82463c2887}{allocated\-Memory}}\label{structsnuffbox_1_1_allocated_memory_a0950edd703237dd9bc946a82463c2887}
+
+\begin{DoxyCompactList}\small\item\em The total allocated memory in bytes of this allocator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Contains information about the number of allocations and allocated memory, also checks for leaks on destruction. 
+
+\begin{DoxyAuthor}{Author}
+Daniël Konings 
+\end{DoxyAuthor}
+
+
+The documentation for this struct was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+C\-:/\-Snuff/src/snuffbox/memory/allocated\-\_\-memory.\-h\item 
+C\-:/\-Snuff/src/snuffbox/memory/allocated\-\_\-memory.\-cc\end{DoxyCompactItemize}

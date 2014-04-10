@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['sharedptr',['SharedPtr',['../classsnuffbox_1_1_shared_ptr.html#ab1de15b7502bcad3bd9c7bf82a2a98e7',1,'snuffbox::SharedPtr::SharedPtr()'],['../classsnuffbox_1_1_shared_ptr.html#a9b286960622fc23a06f6e2e8b2ed8663',1,'snuffbox::SharedPtr::SharedPtr(T *ptr)']]],
-  ['show',['Show',['../classsnuffbox_1_1_i_platform_window.html#a8572749f1909c64faa17492f8fe988d4',1,'snuffbox::IPlatformWindow::Show()'],['../classsnuffbox_1_1_win32_window.html#a9b691d7bc96d62cab570e25b12304ced',1,'snuffbox::Win32Window::Show()']]],
-  ['shutdown',['Shutdown',['../classsnuffbox_1_1_game.html#ad3b88fb61f44dbaaf88881cd77590958',1,'snuffbox::Game']]],
-  ['started',['started',['../classsnuffbox_1_1_game.html#ae1ace018b9c60591d02d34b575e67f37',1,'snuffbox::Game']]],
-  ['swap',['Swap',['../classsnuffbox_1_1_shared_ptr.html#a1e6b8170c9151ad4113f98b4e5e86b3d',1,'snuffbox::SharedPtr']]]
+  ['refcount',['RefCount',['../classsnuffbox_1_1_ref_count.html#a47d8b6e14dd15ae6301f2728517e743c',1,'snuffbox::RefCount::RefCount()'],['../classsnuffbox_1_1_ref_count.html#ae3d059a44d0fa179576f7953e8927f67',1,'snuffbox::RefCount::RefCount(T *ptr)']]],
+  ['reset',['Reset',['../classsnuffbox_1_1_shared_ptr.html#afa6eb6fd99d2b3e9142573024afc83fc',1,'snuffbox::SharedPtr::Reset()'],['../classsnuffbox_1_1_shared_ptr.html#ae9748e1ebd5e34e2e184e621816d8497',1,'snuffbox::SharedPtr::Reset(T *ptr, RefCount&lt; T &gt; *ref)']]],
+  ['resetraw',['ResetRaw',['../classsnuffbox_1_1_shared_ptr.html#a4336a307b9853c827f1c672c4651f273',1,'snuffbox::SharedPtr']]]
 ];

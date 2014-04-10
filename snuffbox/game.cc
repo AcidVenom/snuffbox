@@ -1,6 +1,11 @@
 #include "../snuffbox/game.h"
 #include "../snuffbox/win32/win32_window.h"
+#include "../snuffbox/environment.h"
 #include <string>
+
+#include <v8.h>
+
+using namespace v8;
 
 namespace snuffbox
 {
@@ -9,7 +14,7 @@ namespace snuffbox
 		namespace {
 			Game* globalInstance = nullptr;
 		}
-		bool has_display_device() { return globalInstance != nullptr; }
+		bool has_game() { return globalInstance != nullptr; }
 		Game& game()
 		{
 			SNUFF_ASSERT_NOTNULL(globalInstance);
@@ -74,11 +79,13 @@ void Game::NotifyEvent(GameEvents evt)
 //------------------------------------------------------------------------------------------------------
 int SNUFF_MAIN
 {
-	SharedPtr<Game> game = new Game(new PlatformWindow("Snuffbox D3D11 (Alpha)",1024,600));
+	AllocatedMemory memory;
+	SharedPtr<Game> game = environment::memory().ConstructShared<Game>(
+		environment::memory().ConstructShared<PlatformWindow>("Snuffbox Alpha (D3D11)",1024,600)
+		);
+
 	game->MakeGlobal();
 	game->Initialise();
-
-	std::string result;
 
 	while (game->started())
 	{

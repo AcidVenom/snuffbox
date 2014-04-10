@@ -44,7 +44,7 @@ namespace snuffbox
 		void Shutdown();
 
 		/// Returns the window the game is running in 
-		SharedPtr<PlatformWindow> window(){ return window_; }
+		PlatformWindow* window(){ return window_.get(); }
 
 		/// Returns if the game is started or not
 		bool started(){ return started_; }
@@ -59,5 +59,4 @@ namespace snuffbox
 		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
 		bool started_;	///< Is the game started yet?
 	};
-
 }

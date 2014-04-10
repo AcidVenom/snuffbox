@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['game',['Game',['../classsnuffbox_1_1_game.html',1,'snuffbox']]]
+  ['allocatedmemory',['AllocatedMemory',['../structsnuffbox_1_1_allocated_memory.html',1,'snuffbox']]]
 ];
