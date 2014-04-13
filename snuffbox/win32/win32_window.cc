@@ -46,18 +46,18 @@ namespace snuffbox
 	{
 		WNDCLASSEXA wndClass;
 
+    instance_ = GetModuleHandle(0);
+
 		ZeroMemory(&wndClass, sizeof(WNDCLASSEX));
 
 		wndClass.cbSize = sizeof(WNDCLASSEX);
 		wndClass.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
 		wndClass.lpfnWndProc = WndProc;
-		wndClass.hInstance = static_cast<HINSTANCE>(GetModuleHandle(0));
+    wndClass.hInstance = instance_;
 		wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wndClass.hbrBackground = (HBRUSH)BLACK_BRUSH;
 		wndClass.lpszClassName = SNUFF_WINDOW_CLASS;
 		wndClass.cbWndExtra = sizeof(void*);
-		wndClass.lpszMenuName = NULL;
-		wndClass.cbClsExtra = NULL;
 
 		if (!RegisterClassExA(&wndClass))
 		{
@@ -70,7 +70,7 @@ namespace snuffbox
 		clientSize.right = params().w;
 		clientSize.bottom = params().h;
 
-		int style = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_MAXIMIZEBOX | WS_SIZEBOX;
+    int style = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_MAXIMIZEBOX | WS_SIZEBOX;
 
 		AdjustWindowRect(&clientSize, style, FALSE);
 		unsigned int actualWidth = clientSize.right - clientSize.left;
@@ -82,7 +82,7 @@ namespace snuffbox
 		auto name = params().name;
 
 		handle_ = CreateWindowExA(wndClass.style,wndClass.lpszClassName, params().name,
-			style, params().x, params().y, params().w, params().h, NULL, NULL,
+      style, params().x, params().y, params().w, params().h, GetDesktopWindow(), NULL,
 			wndClass.hInstance, this);
 		if (!handle_)
 		{
@@ -94,7 +94,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------
 	void Win32Window::Show()
 	{
-		ShowWindow(handle_, SW_SHOWNORMAL);
+    ShowWindow(handle_, SW_SHOWNORMAL);
 	}
 
 	//---------------------------------------------------------------------------
@@ -102,6 +102,7 @@ namespace snuffbox
 	{
 		SNUFF_ASSERT_NOTNULL(handle_);
 		DestroyWindow(handle_);
+    UnregisterClassA(SNUFF_WINDOW_CLASS, instance_);
 
 		std::string name = params().name;
 		std::string result = "Destroyed the window with name: " + name;

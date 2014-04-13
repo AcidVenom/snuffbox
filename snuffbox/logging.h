@@ -11,7 +11,8 @@ namespace snuffbox
 		kDebug,
 		kSuccess,
 		kError,
-		kFatal
+		kFatal,
+    kWarning
 	};
 
 	inline const char* const SeverityToString(const LogSeverity& severity){
@@ -27,6 +28,8 @@ namespace snuffbox
 			return "ERROR";
 		case LogSeverity::kFatal:
 			return "FATAL";
+    case LogSeverity::kWarning:
+      return "WARNING";
 		default:
 			return "<UNKNOWN>";
 		}

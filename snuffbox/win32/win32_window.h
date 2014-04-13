@@ -49,6 +49,7 @@ namespace snuffbox
 
 	private:
 		HWND handle_; ///< The reference to the window handle used by this window
+    HINSTANCE instance_; ///< The reference to the hInstance
 		bool focussed_; ///< Check to see if the window is focussed or not
 	};
 

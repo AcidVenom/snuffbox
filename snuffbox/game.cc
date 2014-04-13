@@ -29,15 +29,13 @@ Game::Game(PlatformWindow* window) : started_(true)
 {
 	window_ = window;
   environment::globalInstance = this;
-
-  window_->Create();
-  window_->Show();
+  CoInitialize(0);
 }
 
 //------------------------------------------------------------------------------------------------------
 Game::~Game()
 {
-	
+  CoUninitialize();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -94,6 +92,13 @@ bool Game::CommandExists(const std::string& cmdLine, const char* option)
 }
 
 //------------------------------------------------------------------------------------------------------
+void Game::InitialiseWindow()
+{
+  window_->Create();
+  window_->Show();
+}
+
+//------------------------------------------------------------------------------------------------------
 void Game::NotifyEvent(GameEvents evt)
 {
 	switch (evt)
@@ -117,9 +122,11 @@ int SNUFF_MAIN
   game->ParseCommandLine();
   js_state_wrapper.Initialise();
 
+  game->InitialiseWindow();
+
 	while (game->started())
 	{
-		game->window()->ProcessMessages();
+  	game->window()->ProcessMessages();
 	}
 	return EXIT_SUCCESS;
 }

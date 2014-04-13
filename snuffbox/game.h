@@ -58,6 +58,9 @@ namespace snuffbox
 		/// Notify the game of an event
 		void NotifyEvent(GameEvents evt);
 
+    /// Initialises, creates and shows the window
+    void InitialiseWindow();
+
 	private:
 		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
 		bool started_;	///< Is the game started yet?

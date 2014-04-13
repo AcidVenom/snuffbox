@@ -4,6 +4,24 @@
 #include <algorithm>
 
 #define PRINT_RESULTS true
+#define JS_LOG(severity)                                  \
+bool first = true;                                        \
+for (int i = 0; i < args.Length(); i++) {                 \
+  v8::HandleScope handle_scope(args.GetIsolate());        \
+  if (first) {                                            \
+    first = false;                                        \
+  }                                                       \
+  v8::String::Utf8Value str(args[i]);                     \
+  log(severity, *str);                                    \
+}                                                         \
+
+#define JS_REGISTER_OBJECT_FUNCTIONS(obj,func)                                                          \
+for (unsigned int i = 0; i < ARRAYSIZE(func); ++i)                                                      \
+{                                                                                                       \
+  obj->Set(String::NewFromUtf8(isolate_, func[i].name), FunctionTemplate::New(isolate_, func[i].cb));   \
+}                                                                                                       \
+
+#define JS_REGISTER_GLOBAL(name) Handle<ObjectTemplate> obj = ObjectTemplate::New(environment::js_state_wrapper().isolate()); environment::js_state_wrapper().global()->Set(String::NewFromUtf8(isolate_, name), obj);
 
 namespace snuffbox
 {
@@ -24,17 +42,62 @@ namespace snuffbox
     }
   }
 
-  void JSStateWrapper::Log(const v8::FunctionCallbackInfo<v8::Value>& args)
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::JSLogDebug(const v8::FunctionCallbackInfo<v8::Value>& args)
   {
-
+    JS_LOG(LogSeverity::kDebug);
   }
 
   //---------------------------------------------------------------------------
-  Handle<Context> JSStateWrapper::CreateContext(Isolate* isolate)
+  void JSStateWrapper::JSLogInfo(const v8::FunctionCallbackInfo<v8::Value>& args)
   {
-    Handle<ObjectTemplate> global = ObjectTemplate::New(isolate);
+    JS_LOG(LogSeverity::kInfo);
+  }
 
-    return Context::New(isolate, NULL, global);
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::JSLogWarning(const v8::FunctionCallbackInfo<v8::Value>& args)
+  {
+    JS_LOG(LogSeverity::kWarning);
+  }
+
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::JSLogSuccess(const v8::FunctionCallbackInfo<v8::Value>& args)
+  {
+    JS_LOG(LogSeverity::kSuccess);
+  }
+
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::JSLogError(const v8::FunctionCallbackInfo<v8::Value>& args)
+  {
+    JS_LOG(LogSeverity::kError);
+  }
+
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::JSLogFatal(const v8::FunctionCallbackInfo<v8::Value>& args)
+  {
+    JS_LOG(LogSeverity::kFatal);
+  }
+
+  //---------------------------------------------------------------------------
+  Handle<Context> JSStateWrapper::CreateContext()
+  {
+    global_ = ObjectTemplate::New(isolate_);
+
+    JS_REGISTER_GLOBAL("Log");
+
+    JSFunctionRegister funcRegister[] =
+    {
+      JSFunctionRegister("debug", JSLogDebug),
+      JSFunctionRegister("info", JSLogInfo),
+      JSFunctionRegister("warning", JSLogWarning),
+      JSFunctionRegister("success", JSLogSuccess),
+      JSFunctionRegister("error", JSLogError),
+      JSFunctionRegister("fatal", JSLogFatal),
+    };
+    
+    JS_REGISTER_OBJECT_FUNCTIONS(obj, funcRegister);
+
+    return Context::New(isolate_, NULL, global_);
   }
 
   //---------------------------------------------------------------------------
@@ -49,9 +112,14 @@ namespace snuffbox
   void JSStateWrapper::Initialise()
   {
     HandleScope scope(isolate_);
-    Handle<Context> context = CreateContext(isolate_);
+    Handle<Context> context = CreateContext();
 
     SNUFF_XASSERT(!context.IsEmpty(), "Failed creating the JavaScript context!");
+    
+    /*Handle<Function> F = Handle<Function>::Cast(context->Global()->Get(String::NewFromUtf8(isolate_,"Log")));
+    Handle<Object> P = Handle<Object>::Cast(F->GetPrototype());
+    P = Handle<Object>::Cast(P->GetPrototype());
+    P->Set(String::NewFromUtf8(isolate_,"debug"), FunctionTemplate::New(isolate_,JSLog)->GetFunction(), None);*/
 
     context->Enter();
 

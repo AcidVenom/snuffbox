@@ -8,6 +8,17 @@ using namespace v8;
 namespace snuffbox
 {
   /**
+  * @struct snuffbox::JSFunctionRegister
+  * @brief A structure to hold a name and a function associated with it, use as an array
+  * @author Daniël Konings
+  */
+  struct JSFunctionRegister
+  {
+    JSFunctionRegister(const char* n, FunctionCallback f) : name(n), cb(f){}
+    const char* name;
+    FunctionCallback cb;
+  };
+  /**
   * @class snuffbox::JSStateWrapper
   * @brief Wraps the whole JavaScript state for use throughout the whole application
   * @author Daniël Konings
@@ -36,13 +47,34 @@ namespace snuffbox
     /// Initialises the JavaScript state
     void Initialise();
 
-    /// Creates the JavaScript context
-    Handle<Context> CreateContext(Isolate* isolate);
+    /// Returns the global handle
+    Handle<ObjectTemplate> global(){ return global_; }
 
-    void Log(const v8::FunctionCallbackInfo<v8::Value>& args);
+    /// Creates the JavaScript context
+    Handle<Context> CreateContext();
 
   private:
     Isolate* isolate_; ///< The JavaScript isolate created at startup
     std::string path_; ///< The source directory path
+    Handle<ObjectTemplate> global_; ///< The function registry
+
+  private:
+    /// JavaScript log debug
+    static void JSLogDebug(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+    /// JavaScript log info
+    static void JSLogInfo(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+    /// JavaScript log warning
+    static void JSLogWarning(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+    /// JavaScript log error
+    static void JSLogError(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+    /// JavaScript log fatal
+    static void JSLogFatal(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+    /// JavaScript log success
+    static void JSLogSuccess(const v8::FunctionCallbackInfo<v8::Value>& args);
   };
 }
