@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <string>
 
 namespace snuffbox
 {
@@ -47,6 +48,6 @@ namespace snuffbox
 #define SNUFF_LOG_SUCCESS(msg) snuffbox::log(snuffbox::LogSeverity::kSuccess,msg)
 #define SNUFF_LOG_ERROR(msg) snuffbox::log(snuffbox::LogSeverity::kError,msg)
 #define SNUFF_LOG_FATAL(msg) snuffbox::log(snuffbox::LogSeverity::kFatal,msg)
-#define SNUFF_XASSERT(expr,msg) if (!(expr)){SNUFF_LOG_FATAL("Snuffbox assertion!"); SNUFF_LOG_FATAL("----------------------"); SNUFF_LOG_FATAL(msg); OutputDebugStringA("\n"); do{__debugbreak();}while(true);}
-#define SNUFF_ASSERT(msg)	SNUFF_LOG_FATAL("Snuffbox assertion!"); SNUFF_LOG_FATAL("----------------------"); SNUFF_LOG_FATAL(msg); OutputDebugStringA("\n"); do{__debugbreak();}while(true)
+#define SNUFF_XASSERT(expr,msg) if (!(expr)){ std::string message = ##msg; std::string result = "\n\tSnuffbox assertion!\n\t----------------------\n\t" + message + "\n"; SNUFF_LOG_FATAL(result.c_str()); do{__debugbreak();}while(true);}
+#define SNUFF_ASSERT(msg)	std::string message = ##msg; std::string result = "\n\tSnuffbox assertion!\n\t----------------------\n\t" + message + "\n"; SNUFF_LOG_FATAL(result.c_str()); do{__debugbreak();}while(true)
 #define SNUFF_ASSERT_NOTNULL(ptr) SNUFF_XASSERT(ptr != nullptr, "Attempt to get a nullptr!")

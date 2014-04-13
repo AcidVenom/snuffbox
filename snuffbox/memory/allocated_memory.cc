@@ -6,10 +6,12 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	namespace environment
 	{
-		namespace {
+		namespace 
+    {
 			AllocatedMemory* globalInstance;
 		}
-		bool has_allocation() { return globalInstance != nullptr; }
+
+		bool has_memory() { return globalInstance != nullptr; }
 
 		AllocatedMemory& memory()
 		{
