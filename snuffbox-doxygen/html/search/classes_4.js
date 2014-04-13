@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['refcount',['RefCount',['../classsnuffbox_1_1_ref_count.html',1,'snuffbox']]],
-  ['refcount_3c_20platformwindow_20_3e',['RefCount&lt; PlatformWindow &gt;',['../classsnuffbox_1_1_ref_count.html',1,'snuffbox']]]
+  ['platformwindowparams',['PlatformWindowParams',['../structsnuffbox_1_1_platform_window_params.html',1,'snuffbox']]]
 ];

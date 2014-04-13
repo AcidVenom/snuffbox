@@ -114,10 +114,18 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#ae3d112ca6e0e55150d2fdbc704474530">~Game</a> ()</td></tr>
 <tr class="memdesc:ae3d112ca6e0e55150d2fdbc704474530"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br/></td></tr>
 <tr class="separator:ae3d112ca6e0e55150d2fdbc704474530"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b1241b8c33b7c1711880b4e18ad9eb0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b1241b8c33b7c1711880b4e18ad9eb0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#a3b1241b8c33b7c1711880b4e18ad9eb0">Initialise</a> ()</td></tr>
-<tr class="memdesc:a3b1241b8c33b7c1711880b4e18ad9eb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the game. <br/></td></tr>
-<tr class="separator:a3b1241b8c33b7c1711880b4e18ad9eb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26bd9839136e8b541199bf94ef723070"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26bd9839136e8b541199bf94ef723070"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#a26bd9839136e8b541199bf94ef723070">ParseCommandLine</a> ()</td></tr>
+<tr class="memdesc:a26bd9839136e8b541199bf94ef723070"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses the command line. <br/></td></tr>
+<tr class="separator:a26bd9839136e8b541199bf94ef723070"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef12e15d690ef593ff7c01cee5b6ae74"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef12e15d690ef593ff7c01cee5b6ae74"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#aef12e15d690ef593ff7c01cee5b6ae74">GetCommand</a> (const std::string &amp;cmdLine, const char *option)</td></tr>
+<tr class="memdesc:aef12e15d690ef593ff7c01cee5b6ae74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds a command. <br/></td></tr>
+<tr class="separator:aef12e15d690ef593ff7c01cee5b6ae74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d913921e1cbb2b2f5fe13e73208de6c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d913921e1cbb2b2f5fe13e73208de6c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#a9d913921e1cbb2b2f5fe13e73208de6c">CommandExists</a> (const std::string &amp;cmdLine, const char *option)</td></tr>
+<tr class="memdesc:a9d913921e1cbb2b2f5fe13e73208de6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a command exists. <br/></td></tr>
+<tr class="separator:a9d913921e1cbb2b2f5fe13e73208de6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c5373c68261c54aff03e6abe40fee52"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1c5373c68261c54aff03e6abe40fee52"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#a1c5373c68261c54aff03e6abe40fee52">Update</a> ()</td></tr>
 <tr class="memdesc:a1c5373c68261c54aff03e6abe40fee52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the game. <br/></td></tr>
@@ -138,10 +146,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#a36ec7d7e374dfed1acd2547f2f60e7ba">NotifyEvent</a> (GameEvents evt)</td></tr>
 <tr class="memdesc:a36ec7d7e374dfed1acd2547f2f60e7ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notify the game of an event. <br/></td></tr>
 <tr class="separator:a36ec7d7e374dfed1acd2547f2f60e7ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90c10a9e3d2d4c2ba8fb88609647ff79"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a90c10a9e3d2d4c2ba8fb88609647ff79"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsnuffbox_1_1_game.html#a90c10a9e3d2d4c2ba8fb88609647ff79">MakeGlobal</a> ()</td></tr>
-<tr class="memdesc:a90c10a9e3d2d4c2ba8fb88609647ff79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates the global pointer in the environment. <br/></td></tr>
-<tr class="separator:a90c10a9e3d2d4c2ba8fb88609647ff79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This is where all the magic happens. </p>
@@ -153,7 +157,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 10 2014 23:50:24 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Apr 13 2014 04:52:50 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

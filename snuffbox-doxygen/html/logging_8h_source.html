@@ -91,59 +91,60 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;Windows.h&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;</div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="keyword">namespace </span>snuffbox</div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;{</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;  <span class="keyword">enum</span> LogSeverity</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;  {</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    kInfo,</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    kDebug,</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    kSuccess,</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    kError,</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    kFatal</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  };</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> SeverityToString(<span class="keyword">const</span> LogSeverity&amp; severity){</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keywordflow">switch</span> (severity)</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    {</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kInfo:</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;INFO&quot;</span>;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kDebug:</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;DEBUG&quot;</span>;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kSuccess:</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;SUCCESS&quot;</span>;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kError:</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;ERROR&quot;</span>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kFatal:</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;FATAL&quot;</span>;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;&lt;UNKNOWN&gt;&quot;</span>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    }</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  }</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">void</span> log(<span class="keyword">const</span> LogSeverity&amp; severity, <span class="keyword">const</span> <span class="keywordtype">char</span>* msg)</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    OutputDebugStringA(<span class="stringliteral">&quot;[SNUFF]&quot;</span>);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    OutputDebugStringA(<span class="stringliteral">&quot;[&quot;</span>);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    OutputDebugStringA(SeverityToString(severity));</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    OutputDebugStringA(<span class="stringliteral">&quot;] &quot;</span>);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    OutputDebugStringA(msg); </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    OutputDebugStringA(<span class="stringliteral">&quot;\n&quot;</span>);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  }</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#define SNUFF_LOG_INFO(msg) snuffbox::log(snuffbox::LogSeverity::kInfo,msg)</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_LOG_DEBUG(msg) snuffbox::log(snuffbox::LogSeverity::kDebug,msg)</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_LOG_SUCCESS(msg) snuffbox::log(snuffbox::LogSeverity::kSuccess,msg)</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_LOG_ERROR(msg) snuffbox::log(snuffbox::LogSeverity::kError,msg)</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_LOG_FATAL(msg) snuffbox::log(snuffbox::LogSeverity::kFatal,msg)</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_XASSERT(expr,msg) if (!(expr)){SNUFF_LOG_FATAL(&quot;Snuffbox assertion!&quot;); SNUFF_LOG_FATAL(&quot;----------------------&quot;); SNUFF_LOG_FATAL(msg); OutputDebugStringA(&quot;\n&quot;); do{__debugbreak();}while(true);}</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_ASSERT(msg) SNUFF_LOG_FATAL(&quot;Snuffbox assertion!&quot;); SNUFF_LOG_FATAL(&quot;----------------------&quot;); SNUFF_LOG_FATAL(msg); OutputDebugStringA(&quot;\n&quot;); do{__debugbreak();}while(true)</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#define SNUFF_ASSERT_NOTNULL(ptr) SNUFF_XASSERT(ptr != nullptr, &quot;Attempt to get a nullptr!&quot;)</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span>snuffbox</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;{</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;  <span class="keyword">enum</span> LogSeverity</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  {</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    kInfo,</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    kDebug,</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    kSuccess,</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    kError,</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    kFatal</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  };</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">inline</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> SeverityToString(<span class="keyword">const</span> LogSeverity&amp; severity){</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keywordflow">switch</span> (severity)</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kInfo:</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;INFO&quot;</span>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kDebug:</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;DEBUG&quot;</span>;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kSuccess:</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;SUCCESS&quot;</span>;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kError:</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;ERROR&quot;</span>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">case</span> LogSeverity::kFatal:</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;FATAL&quot;</span>;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;&lt;UNKNOWN&gt;&quot;</span>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    }</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  }</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">void</span> log(<span class="keyword">const</span> LogSeverity&amp; severity, <span class="keyword">const</span> <span class="keywordtype">char</span>* msg)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    OutputDebugStringA(<span class="stringliteral">&quot;[SNUFF]&quot;</span>);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    OutputDebugStringA(<span class="stringliteral">&quot;[&quot;</span>);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    OutputDebugStringA(SeverityToString(severity));</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    OutputDebugStringA(<span class="stringliteral">&quot;] &quot;</span>);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    OutputDebugStringA(msg); </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    OutputDebugStringA(<span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;}</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#define SNUFF_LOG_INFO(msg) snuffbox::log(snuffbox::LogSeverity::kInfo,msg)</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_LOG_DEBUG(msg) snuffbox::log(snuffbox::LogSeverity::kDebug,msg)</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_LOG_SUCCESS(msg) snuffbox::log(snuffbox::LogSeverity::kSuccess,msg)</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_LOG_ERROR(msg) snuffbox::log(snuffbox::LogSeverity::kError,msg)</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_LOG_FATAL(msg) snuffbox::log(snuffbox::LogSeverity::kFatal,msg)</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_XASSERT(expr,msg) if (!(expr)){ std::string message = ##msg; std::string result = &quot;\n\tSnuffbox assertion!\n\t----------------------\n\t&quot; + message + &quot;\n&quot;; SNUFF_LOG_FATAL(result.c_str()); do{__debugbreak();}while(true);}</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SNUFF_ASSERT(msg) std::string message = ##msg; std::string result = &quot;\n\tSnuffbox assertion!\n\t----------------------\n\t&quot; + message + &quot;\n&quot;; SNUFF_LOG_FATAL(result.c_str()); do{__debugbreak();}while(true)</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#define SNUFF_ASSERT_NOTNULL(ptr) SNUFF_XASSERT(ptr != nullptr, &quot;Attempt to get a nullptr!&quot;)</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 10 2014 23:50:24 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Apr 13 2014 04:52:50 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
