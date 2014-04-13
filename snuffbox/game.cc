@@ -3,8 +3,6 @@
 #include "../snuffbox/js/js_state_wrapper.h"
 #include "../snuffbox/environment.h"
 
-#include <string>
-
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------
@@ -30,19 +28,16 @@ using namespace snuffbox;
 Game::Game(PlatformWindow* window) : started_(true)
 {
 	window_ = window;
+  environment::globalInstance = this;
+
+  window_->Create();
+  window_->Show();
 }
 
 //------------------------------------------------------------------------------------------------------
 Game::~Game()
 {
 	
-}
-
-//------------------------------------------------------------------------------------------------------
-void Game::Initialise()
-{
-	window_->Create();
-	window_->Show();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -61,9 +56,41 @@ void Game::Shutdown()
 }
 
 //------------------------------------------------------------------------------------------------------
-void Game::MakeGlobal()
+void Game::ParseCommandLine()
 {
-	environment::globalInstance = this;
+  std::string cmdLine = GetCommandLineA();
+
+  SNUFF_XASSERT(CommandExists(cmdLine, "-source-directory="),"Could not find '-source-directory' argument in the command line!\nYou have to specify a directory to work with.");
+
+  std::string path = GetCommand(cmdLine, "-source-directory=");
+  environment::js_state_wrapper().path() = path;
+}
+
+//------------------------------------------------------------------------------------------------------
+std::string Game::GetCommand(const std::string& cmdLine, const char* option)
+{
+  unsigned int pos = cmdLine.find(option) + strlen(option);
+  unsigned int len = strlen(cmdLine.c_str());
+  unsigned int start = len - pos;
+
+
+  std::string result = "";
+
+  for (auto it = cmdLine.c_str()+pos; *it; it++)
+  {
+    if (strcmp(it, " ") != 0 || strcmp(it, "\0") == 0)
+    {
+      result += it[0];
+    }
+  }
+
+  return result;
+}
+
+//------------------------------------------------------------------------------------------------------
+bool Game::CommandExists(const std::string& cmdLine, const char* option)
+{
+  return cmdLine.find(option) != std::string::npos;
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -87,8 +114,8 @@ int SNUFF_MAIN
 		environment::memory().ConstructShared<PlatformWindow>("Snuffbox Alpha (D3D11)",1024,600)
 		);
 
-	game->MakeGlobal();
-	game->Initialise();
+  game->ParseCommandLine();
+  js_state_wrapper.Initialise();
 
 	while (game->started())
 	{

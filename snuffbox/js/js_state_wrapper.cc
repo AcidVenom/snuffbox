@@ -1,9 +1,6 @@
 #include "../../snuffbox/js/js_state_wrapper.h"
 #include "../../snuffbox/logging.h"
 #include <fstream>
-#include <ostream>
-#include <iostream>
-#include <string>
 #include <algorithm>
 
 #define PRINT_RESULTS true
@@ -27,24 +24,53 @@ namespace snuffbox
     }
   }
 
+  void JSStateWrapper::Log(const v8::FunctionCallbackInfo<v8::Value>& args)
+  {
+
+  }
+
+  //---------------------------------------------------------------------------
+  Handle<Context> JSStateWrapper::CreateContext(Isolate* isolate)
+  {
+    Handle<ObjectTemplate> global = ObjectTemplate::New(isolate);
+
+    return Context::New(isolate, NULL, global);
+  }
+
   //---------------------------------------------------------------------------
   JSStateWrapper::JSStateWrapper()
   {
     isolate_ = Isolate::GetCurrent();
-    HandleScope scope(isolate_);
-    context_ = Context::New(isolate_);
-
-    Context::Scope context_scope(context_);
-
-    CompileAndRun("C:/Snuff/test/main.js");
-
+   
     environment::globalInstance = this;
+  }
+
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::Initialise()
+  {
+    HandleScope scope(isolate_);
+    Handle<Context> context = CreateContext(isolate_);
+
+    SNUFF_XASSERT(!context.IsEmpty(), "Failed creating the JavaScript context!");
+
+    context->Enter();
+
+    DWORD ftyp = GetFileAttributesA(path_.c_str());
+    if (ftyp == INVALID_FILE_ATTRIBUTES)
+    {
+      SNUFF_ASSERT("Source directory does not exist!");
+    }
+
+    std::string main_js = path_ + "\\main.js";
+    CompileAndRun(main_js.c_str());
+
+    context->Exit();
   }
 
   //---------------------------------------------------------------------------
   JSStateWrapper::~JSStateWrapper()
   {
-    
+
   }
 
   //---------------------------------------------------------------------------
@@ -62,7 +88,9 @@ namespace snuffbox
       while (fin >> std::noskipws >> ch) {
         src += ch;
       }
+      
       TryCatch try_catch;
+      
       Handle<Script> script = Script::Compile(String::NewFromUtf8(isolate_, src.c_str()), String::NewFromUtf8(isolate_, path));
       Handle<Value> res = script->Run();
 
@@ -89,19 +117,19 @@ namespace snuffbox
   //---------------------------------------------------------------------------
   void JSStateWrapper::GetException(TryCatch* try_catch)
   {
-    v8::HandleScope handle_scope(isolate_);
-    v8::String::Utf8Value exception(try_catch->Exception());
-    v8::Handle<v8::Message> message = try_catch->Message();
+    HandleScope handle_scope(isolate_);
+    String::Utf8Value exception(try_catch->Exception());
+    Handle<Message> message = try_catch->Message();
     
     std::string error = "";
     
     if (!message.IsEmpty()){
-      v8::String::Utf8Value sourceline(message->GetSourceLine());
+      String::Utf8Value sourceline(message->GetSourceLine());
       error += "\n\n";
 
       std::string srcline = *sourceline;
       
-      auto it = std::remove_if(std::begin(srcline), std::end(srcline), [](char c){return (c == '\t'); });
+      auto it = std::remove_if(std::begin(srcline), std::end(srcline), [](char c){ return (c == '\t'); });
       srcline.erase(it, std::end(srcline));
 
       error += srcline;
@@ -115,7 +143,7 @@ namespace snuffbox
       for (int i = start; i < end; i++) {
         error += "^";
       }
-      v8::String::Utf8Value stack_trace(try_catch->StackTrace());
+      String::Utf8Value stack_trace(try_catch->StackTrace());
 
       error += "\n\t";
       error += *stack_trace;

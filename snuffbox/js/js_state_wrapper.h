@@ -1,6 +1,7 @@
 #pragma once
 
 #include <v8.h>
+#include <string>
 
 using namespace v8;
 
@@ -23,8 +24,8 @@ namespace snuffbox
     /// Returns the JavaScript isolate created at startup
     Isolate* isolate(){ return isolate_; }
 
-    /// Returns the JavaScript context
-    Handle<Context>& context(){ return context_; }
+    /// Returns the source directory path
+    std::string& path(){ return path_; }
 
     /// Compiles and runs a JavaScript file
     void CompileAndRun(const char* path);
@@ -32,8 +33,16 @@ namespace snuffbox
     /// Returns an error of a TryCatch object
     void GetException(TryCatch* try_catch);
 
+    /// Initialises the JavaScript state
+    void Initialise();
+
+    /// Creates the JavaScript context
+    Handle<Context> CreateContext(Isolate* isolate);
+
+    void Log(const v8::FunctionCallbackInfo<v8::Value>& args);
+
   private:
     Isolate* isolate_; ///< The JavaScript isolate created at startup
-    Handle<Context> context_; ///< The JavaScript context
+    std::string path_; ///< The source directory path
   };
 }

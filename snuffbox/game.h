@@ -34,8 +34,14 @@ namespace snuffbox
 		/// Default destructor
 		~Game();
 
-		/// Initialises the game
-		void Initialise();
+    /// Parses the command line
+    void ParseCommandLine();
+    
+    /// Finds a command
+    std::string GetCommand(const std::string& cmdLine, const char* option);
+
+    /// Checks if a command exists
+    bool CommandExists(const std::string& cmdLine, const char* option);
 
 		/// Updates the game
 		void Update();
@@ -51,9 +57,6 @@ namespace snuffbox
 
 		/// Notify the game of an event
 		void NotifyEvent(GameEvents evt);
-
-		/// Creates the global pointer in the environment
-		void MakeGlobal();
 
 	private:
 		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
