@@ -115,11 +115,6 @@ namespace snuffbox
     Handle<Context> context = CreateContext();
 
     SNUFF_XASSERT(!context.IsEmpty(), "Failed creating the JavaScript context!");
-    
-    /*Handle<Function> F = Handle<Function>::Cast(context->Global()->Get(String::NewFromUtf8(isolate_,"Log")));
-    Handle<Object> P = Handle<Object>::Cast(F->GetPrototype());
-    P = Handle<Object>::Cast(P->GetPrototype());
-    P->Set(String::NewFromUtf8(isolate_,"debug"), FunctionTemplate::New(isolate_,JSLog)->GetFunction(), None);*/
 
     context->Enter();
 
