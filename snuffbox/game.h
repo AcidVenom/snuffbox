@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "../snuffbox/memory/shared_ptr.h"
 #include "../snuffbox/platform/definitions.h"
+#include "../snuffbox/js/js_state_wrapper.h"
 
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 
@@ -22,7 +23,7 @@ namespace snuffbox
 	* @brief This is where all the magic happens
 	* @author Daniël Konings
 	*/
-	class Game
+	class Game : public JSObject
 	{
 	public:
 		/// Default constructor
@@ -64,5 +65,12 @@ namespace snuffbox
 	private:
 		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
 		bool started_;	///< Is the game started yet?
+
+	public:
+		JS_NAME(Game);
+		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions
+
+	private:
+		static void JSInit(JS_ARGS);	///< Creates a new instance of this object
 	};
 }

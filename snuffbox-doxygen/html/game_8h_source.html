@@ -93,62 +93,75 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;Windows.h&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;../snuffbox/memory/shared_ptr.h&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;../snuffbox/platform/definitions.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span>snuffbox</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;{</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">enum</span> GameEvents</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  {</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    kQuit </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  };</div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="classsnuffbox_1_1_game.html">   25</a></span>&#160;  <span class="keyword">class </span><a class="code" href="classsnuffbox_1_1_game.html">Game</a></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classsnuffbox_1_1_game.html#ac29903476c91c02c01035feddf9f44bf">Game</a>();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="classsnuffbox_1_1_game.html#ac29903476c91c02c01035feddf9f44bf">Game</a>(PlatformWindow* <a class="code" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">window</a>);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classsnuffbox_1_1_game.html#ae3d112ca6e0e55150d2fdbc704474530">~Game</a>();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#a26bd9839136e8b541199bf94ef723070">ParseCommandLine</a>();</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::string <a class="code" href="classsnuffbox_1_1_game.html#aef12e15d690ef593ff7c01cee5b6ae74">GetCommand</a>(<span class="keyword">const</span> std::string&amp; cmdLine, <span class="keyword">const</span> <span class="keywordtype">char</span>* option);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classsnuffbox_1_1_game.html#a9d913921e1cbb2b2f5fe13e73208de6c">CommandExists</a>(<span class="keyword">const</span> std::string&amp; cmdLine, <span class="keyword">const</span> <span class="keywordtype">char</span>* option);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#a1c5373c68261c54aff03e6abe40fee52">Update</a>();</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#ad3b88fb61f44dbaaf88881cd77590958">Shutdown</a>();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">   53</a></span>&#160;    PlatformWindow* <a class="code" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">window</a>(){ <span class="keywordflow">return</span> window_.<a class="code" href="classsnuffbox_1_1_shared_ptr.html#a457ce05b753fe1df6adc5edb9b2f9a8a">get</a>(); }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classsnuffbox_1_1_game.html#ae1ace018b9c60591d02d34b575e67f37">   56</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classsnuffbox_1_1_game.html#ae1ace018b9c60591d02d34b575e67f37">started</a>(){ <span class="keywordflow">return</span> started_; }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#a36ec7d7e374dfed1acd2547f2f60e7ba">NotifyEvent</a>(GameEvents evt);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="classsnuffbox_1_1_shared_ptr.html">SharedPtr&lt;PlatformWindow&gt;</a> window_; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">bool</span> started_;  </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  };</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;}</div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_a36ec7d7e374dfed1acd2547f2f60e7ba"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a36ec7d7e374dfed1acd2547f2f60e7ba">snuffbox::Game::NotifyEvent</a></div><div class="ttdeci">void NotifyEvent(GameEvents evt)</div><div class="ttdoc">Notify the game of an event. </div><div class="ttdef"><b>Definition:</b> game.cc:97</div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html"><div class="ttname"><a href="classsnuffbox_1_1_game.html">snuffbox::Game</a></div><div class="ttdoc">This is where all the magic happens. </div><div class="ttdef"><b>Definition:</b> game.h:25</div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_ad3b88fb61f44dbaaf88881cd77590958"><div class="ttname"><a href="classsnuffbox_1_1_game.html#ad3b88fb61f44dbaaf88881cd77590958">snuffbox::Game::Shutdown</a></div><div class="ttdeci">void Shutdown()</div><div class="ttdoc">Shuts the game down. </div><div class="ttdef"><b>Definition:</b> game.cc:50</div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_ae3d112ca6e0e55150d2fdbc704474530"><div class="ttname"><a href="classsnuffbox_1_1_game.html#ae3d112ca6e0e55150d2fdbc704474530">snuffbox::Game::~Game</a></div><div class="ttdeci">~Game()</div><div class="ttdoc">Default destructor. </div><div class="ttdef"><b>Definition:</b> game.cc:38</div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_a26bd9839136e8b541199bf94ef723070"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a26bd9839136e8b541199bf94ef723070">snuffbox::Game::ParseCommandLine</a></div><div class="ttdeci">void ParseCommandLine()</div><div class="ttdoc">Parses the command line. </div><div class="ttdef"><b>Definition:</b> game.cc:59</div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_aef12e15d690ef593ff7c01cee5b6ae74"><div class="ttname"><a href="classsnuffbox_1_1_game.html#aef12e15d690ef593ff7c01cee5b6ae74">snuffbox::Game::GetCommand</a></div><div class="ttdeci">std::string GetCommand(const std::string &amp;cmdLine, const char *option)</div><div class="ttdoc">Finds a command. </div><div class="ttdef"><b>Definition:</b> game.cc:70</div></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;../snuffbox/js/js_state_wrapper.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">namespace </span>snuffbox</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;{</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">enum</span> GameEvents</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  {</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    kQuit </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  };</div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classsnuffbox_1_1_game.html">   26</a></span>&#160;  <span class="keyword">class </span><a class="code" href="classsnuffbox_1_1_game.html">Game</a> : <span class="keyword">public</span> <a class="code" href="classsnuffbox_1_1_j_s_object.html">JSObject</a></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="classsnuffbox_1_1_game.html#ac29903476c91c02c01035feddf9f44bf">Game</a>();</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="classsnuffbox_1_1_game.html#ac29903476c91c02c01035feddf9f44bf">Game</a>(PlatformWindow* <a class="code" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">window</a>);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="classsnuffbox_1_1_game.html#ae3d112ca6e0e55150d2fdbc704474530">~Game</a>();</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#a26bd9839136e8b541199bf94ef723070">ParseCommandLine</a>();</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    std::string <a class="code" href="classsnuffbox_1_1_game.html#aef12e15d690ef593ff7c01cee5b6ae74">GetCommand</a>(<span class="keyword">const</span> std::string&amp; cmdLine, <span class="keyword">const</span> <span class="keywordtype">char</span>* option);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classsnuffbox_1_1_game.html#a9d913921e1cbb2b2f5fe13e73208de6c">CommandExists</a>(<span class="keyword">const</span> std::string&amp; cmdLine, <span class="keyword">const</span> <span class="keywordtype">char</span>* option);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#a1c5373c68261c54aff03e6abe40fee52">Update</a>();</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#ad3b88fb61f44dbaaf88881cd77590958">Shutdown</a>();</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">   54</a></span>&#160;    PlatformWindow* <a class="code" href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">window</a>(){ <span class="keywordflow">return</span> window_.<a class="code" href="classsnuffbox_1_1_shared_ptr.html#a457ce05b753fe1df6adc5edb9b2f9a8a">get</a>(); }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classsnuffbox_1_1_game.html#ae1ace018b9c60591d02d34b575e67f37">   57</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classsnuffbox_1_1_game.html#ae1ace018b9c60591d02d34b575e67f37">started</a>(){ <span class="keywordflow">return</span> started_; }</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#a36ec7d7e374dfed1acd2547f2f60e7ba">NotifyEvent</a>(GameEvents evt);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#a2691166254d3fc52ac1cf7feb1a2902b">InitialiseWindow</a>();</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="classsnuffbox_1_1_shared_ptr.html">SharedPtr&lt;PlatformWindow&gt;</a> window_; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">bool</span> started_;  </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    JS_NAME(<a class="code" href="classsnuffbox_1_1_game.html">Game</a>);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classsnuffbox_1_1_game.html#abfb0a8d3e56cf9450527fbd7990a22e8">RegisterJS</a>(JS_TEMPLATE); </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> JSInit(JS_ARGS);  </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  };</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_a36ec7d7e374dfed1acd2547f2f60e7ba"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a36ec7d7e374dfed1acd2547f2f60e7ba">snuffbox::Game::NotifyEvent</a></div><div class="ttdeci">void NotifyEvent(GameEvents evt)</div><div class="ttdoc">Notify the game of an event. </div><div class="ttdef"><b>Definition:</b> game.cc:101</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html"><div class="ttname"><a href="classsnuffbox_1_1_game.html">snuffbox::Game</a></div><div class="ttdoc">This is where all the magic happens. </div><div class="ttdef"><b>Definition:</b> game.h:26</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_a2691166254d3fc52ac1cf7feb1a2902b"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a2691166254d3fc52ac1cf7feb1a2902b">snuffbox::Game::InitialiseWindow</a></div><div class="ttdeci">void InitialiseWindow()</div><div class="ttdoc">Initialises, creates and shows the window. </div><div class="ttdef"><b>Definition:</b> game.cc:94</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_ad3b88fb61f44dbaaf88881cd77590958"><div class="ttname"><a href="classsnuffbox_1_1_game.html#ad3b88fb61f44dbaaf88881cd77590958">snuffbox::Game::Shutdown</a></div><div class="ttdeci">void Shutdown()</div><div class="ttdoc">Shuts the game down. </div><div class="ttdef"><b>Definition:</b> game.cc:47</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_ae3d112ca6e0e55150d2fdbc704474530"><div class="ttname"><a href="classsnuffbox_1_1_game.html#ae3d112ca6e0e55150d2fdbc704474530">snuffbox::Game::~Game</a></div><div class="ttdeci">~Game()</div><div class="ttdoc">Default destructor. </div><div class="ttdef"><b>Definition:</b> game.cc:35</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_a26bd9839136e8b541199bf94ef723070"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a26bd9839136e8b541199bf94ef723070">snuffbox::Game::ParseCommandLine</a></div><div class="ttdeci">void ParseCommandLine()</div><div class="ttdoc">Parses the command line. </div><div class="ttdef"><b>Definition:</b> game.cc:56</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_aef12e15d690ef593ff7c01cee5b6ae74"><div class="ttname"><a href="classsnuffbox_1_1_game.html#aef12e15d690ef593ff7c01cee5b6ae74">snuffbox::Game::GetCommand</a></div><div class="ttdeci">std::string GetCommand(const std::string &amp;cmdLine, const char *option)</div><div class="ttdoc">Finds a command. </div><div class="ttdef"><b>Definition:</b> game.cc:67</div></div>
 <div class="ttc" id="classsnuffbox_1_1_shared_ptr_html"><div class="ttname"><a href="classsnuffbox_1_1_shared_ptr.html">snuffbox::SharedPtr&lt; PlatformWindow &gt;</a></div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_a9d913921e1cbb2b2f5fe13e73208de6c"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a9d913921e1cbb2b2f5fe13e73208de6c">snuffbox::Game::CommandExists</a></div><div class="ttdeci">bool CommandExists(const std::string &amp;cmdLine, const char *option)</div><div class="ttdoc">Checks if a command exists. </div><div class="ttdef"><b>Definition:</b> game.cc:91</div></div>
+<div class="ttc" id="classsnuffbox_1_1_j_s_object_html"><div class="ttname"><a href="classsnuffbox_1_1_j_s_object.html">snuffbox::JSObject</a></div><div class="ttdoc">Every C++ object that will be extended to JS should extend from this. </div><div class="ttdef"><b>Definition:</b> js_state_wrapper.h:118</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_abfb0a8d3e56cf9450527fbd7990a22e8"><div class="ttname"><a href="classsnuffbox_1_1_game.html#abfb0a8d3e56cf9450527fbd7990a22e8">snuffbox::Game::RegisterJS</a></div><div class="ttdeci">static void RegisterJS(JS_TEMPLATE)</div><div class="ttdoc">Registers all JavaScript functions. </div><div class="ttdef"><b>Definition:</b> game.cc:117</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_a9d913921e1cbb2b2f5fe13e73208de6c"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a9d913921e1cbb2b2f5fe13e73208de6c">snuffbox::Game::CommandExists</a></div><div class="ttdeci">bool CommandExists(const std::string &amp;cmdLine, const char *option)</div><div class="ttdoc">Checks if a command exists. </div><div class="ttdef"><b>Definition:</b> game.cc:88</div></div>
 <div class="ttc" id="classsnuffbox_1_1_game_html_ac29903476c91c02c01035feddf9f44bf"><div class="ttname"><a href="classsnuffbox_1_1_game.html#ac29903476c91c02c01035feddf9f44bf">snuffbox::Game::Game</a></div><div class="ttdeci">Game()</div><div class="ttdoc">Default constructor. </div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_ae1ace018b9c60591d02d34b575e67f37"><div class="ttname"><a href="classsnuffbox_1_1_game.html#ae1ace018b9c60591d02d34b575e67f37">snuffbox::Game::started</a></div><div class="ttdeci">bool started()</div><div class="ttdoc">Returns if the game is started or not. </div><div class="ttdef"><b>Definition:</b> game.h:56</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_ae1ace018b9c60591d02d34b575e67f37"><div class="ttname"><a href="classsnuffbox_1_1_game.html#ae1ace018b9c60591d02d34b575e67f37">snuffbox::Game::started</a></div><div class="ttdeci">bool started()</div><div class="ttdoc">Returns if the game is started or not. </div><div class="ttdef"><b>Definition:</b> game.h:57</div></div>
 <div class="ttc" id="classsnuffbox_1_1_shared_ptr_html_a457ce05b753fe1df6adc5edb9b2f9a8a"><div class="ttname"><a href="classsnuffbox_1_1_shared_ptr.html#a457ce05b753fe1df6adc5edb9b2f9a8a">snuffbox::SharedPtr::get</a></div><div class="ttdeci">T * get()</div><div class="ttdoc">Returns the pointer of this shared pointer. </div><div class="ttdef"><b>Definition:</b> shared_ptr.h:267</div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_aff19ed260f04e70c8c2a61d271500154"><div class="ttname"><a href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">snuffbox::Game::window</a></div><div class="ttdeci">PlatformWindow * window()</div><div class="ttdoc">Returns the window the game is running in. </div><div class="ttdef"><b>Definition:</b> game.h:53</div></div>
-<div class="ttc" id="classsnuffbox_1_1_game_html_a1c5373c68261c54aff03e6abe40fee52"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a1c5373c68261c54aff03e6abe40fee52">snuffbox::Game::Update</a></div><div class="ttdeci">void Update()</div><div class="ttdoc">Updates the game. </div><div class="ttdef"><b>Definition:</b> game.cc:44</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_aff19ed260f04e70c8c2a61d271500154"><div class="ttname"><a href="classsnuffbox_1_1_game.html#aff19ed260f04e70c8c2a61d271500154">snuffbox::Game::window</a></div><div class="ttdeci">PlatformWindow * window()</div><div class="ttdoc">Returns the window the game is running in. </div><div class="ttdef"><b>Definition:</b> game.h:54</div></div>
+<div class="ttc" id="classsnuffbox_1_1_game_html_a1c5373c68261c54aff03e6abe40fee52"><div class="ttname"><a href="classsnuffbox_1_1_game.html#a1c5373c68261c54aff03e6abe40fee52">snuffbox::Game::Update</a></div><div class="ttdeci">void Update()</div><div class="ttdoc">Updates the game. </div><div class="ttdef"><b>Definition:</b> game.cc:41</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Apr 13 2014 04:52:50 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 15 2014 10:56:28 for Snuffbox by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

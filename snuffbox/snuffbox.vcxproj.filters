@@ -48,5 +48,8 @@
     <ClInclude Include="js\js_state_wrapper.h">
       <Filter>js</Filter>
     </ClInclude>
+    <ClInclude Include="js\js_object_register.h">
+      <Filter>js</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

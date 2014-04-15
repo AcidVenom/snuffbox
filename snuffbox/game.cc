@@ -1,6 +1,5 @@
 #include "../snuffbox/game.h"
 #include "../snuffbox/win32/win32_window.h"
-#include "../snuffbox/js/js_state_wrapper.h"
 #include "../snuffbox/environment.h"
 
 namespace snuffbox
@@ -109,6 +108,22 @@ void Game::NotifyEvent(GameEvents evt)
 	}
 }
 
+void Game::JSInit(JS_ARGS)
+{
+	SNUFF_LOG_ERROR("Testing JSInit");
+}
+
+//------------------------------------------------------------------------------------------------------
+void Game::RegisterJS(JS_TEMPLATE)
+{
+	JSFunctionRegister testFuncs[] =
+	{
+		JSFunctionRegister("init", JSInit)
+	};
+	
+	JS_REGISTER_OBJECT_FUNCTIONS(obj, testFuncs, true);
+}
+
 //------------------------------------------------------------------------------------------------------
 int SNUFF_MAIN
 {
@@ -120,6 +135,7 @@ int SNUFF_MAIN
 		);
 
   game->ParseCommandLine();
+
   js_state_wrapper.Initialise();
 
   game->InitialiseWindow();

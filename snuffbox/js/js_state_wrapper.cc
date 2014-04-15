@@ -1,4 +1,5 @@
 #include "../../snuffbox/js/js_state_wrapper.h"
+#include "../../snuffbox/js/js_object_register.h"
 #include "../../snuffbox/logging.h"
 #include <fstream>
 #include <algorithm>
@@ -15,13 +16,7 @@ for (int i = 0; i < args.Length(); i++) {                 \
   log(severity, *str);                                    \
 }                                                         \
 
-#define JS_REGISTER_OBJECT_FUNCTIONS(obj,func)                                                          \
-for (unsigned int i = 0; i < ARRAYSIZE(func); ++i)                                                      \
-{                                                                                                       \
-  obj->Set(String::NewFromUtf8(isolate_, func[i].name), FunctionTemplate::New(isolate_, func[i].cb));   \
-}                                                                                                       \
-
-#define JS_REGISTER_GLOBAL(name) Handle<ObjectTemplate> obj = ObjectTemplate::New(environment::js_state_wrapper().isolate()); environment::js_state_wrapper().global()->Set(String::NewFromUtf8(isolate_, name), obj);
+																																																																		\
 
 namespace snuffbox
 {
@@ -43,49 +38,59 @@ namespace snuffbox
   }
 
   //---------------------------------------------------------------------------
-  void JSStateWrapper::JSLogDebug(const v8::FunctionCallbackInfo<v8::Value>& args)
+	void JSStateWrapper::JSLogDebug(JS_ARGS)
   {
     JS_LOG(LogSeverity::kDebug);
   }
 
   //---------------------------------------------------------------------------
-  void JSStateWrapper::JSLogInfo(const v8::FunctionCallbackInfo<v8::Value>& args)
+	void JSStateWrapper::JSLogInfo(JS_ARGS)
   {
     JS_LOG(LogSeverity::kInfo);
   }
 
   //---------------------------------------------------------------------------
-  void JSStateWrapper::JSLogWarning(const v8::FunctionCallbackInfo<v8::Value>& args)
+	void JSStateWrapper::JSLogWarning(JS_ARGS)
   {
     JS_LOG(LogSeverity::kWarning);
   }
 
   //---------------------------------------------------------------------------
-  void JSStateWrapper::JSLogSuccess(const v8::FunctionCallbackInfo<v8::Value>& args)
+	void JSStateWrapper::JSLogSuccess(JS_ARGS)
   {
     JS_LOG(LogSeverity::kSuccess);
   }
 
   //---------------------------------------------------------------------------
-  void JSStateWrapper::JSLogError(const v8::FunctionCallbackInfo<v8::Value>& args)
+	void JSStateWrapper::JSLogError(JS_ARGS)
   {
     JS_LOG(LogSeverity::kError);
   }
 
   //---------------------------------------------------------------------------
-  void JSStateWrapper::JSLogFatal(const v8::FunctionCallbackInfo<v8::Value>& args)
+	void JSStateWrapper::JSLogFatal(JS_ARGS)
   {
     JS_LOG(LogSeverity::kFatal);
   }
+	
+	//---------------------------------------------------------------------------
+	void JSStateWrapper::JSRequire(JS_ARGS)
+	{                                      
+		HandleScope handle_scope(args.GetIsolate());                                                             
+		String::Utf8Value str(args[0]);                     
+		environment::js_state_wrapper().CompileAndRun(*str);
+	}
 
   //---------------------------------------------------------------------------
   Handle<Context> JSStateWrapper::CreateContext()
   {
     global_ = ObjectTemplate::New(isolate_);
 
+		RegisterJSObjects();
+
     JS_REGISTER_GLOBAL("Log");
 
-    JSFunctionRegister funcRegister[] =
+    JSFunctionRegister logFunctions[] =
     {
       JSFunctionRegister("debug", JSLogDebug),
       JSFunctionRegister("info", JSLogInfo),
@@ -95,7 +100,14 @@ namespace snuffbox
       JSFunctionRegister("fatal", JSLogFatal),
     };
     
-    JS_REGISTER_OBJECT_FUNCTIONS(obj, funcRegister);
+		JS_REGISTER_OBJECT_FUNCTIONS(obj, logFunctions, false);
+
+		JSFunctionRegister funcRegister[] =
+		{
+			JSFunctionRegister("require", JSRequire)
+		};
+
+		JS_REGISTER_FUNCTIONS(funcRegister);
 
     return Context::New(isolate_, NULL, global_);
   }
@@ -124,8 +136,7 @@ namespace snuffbox
       SNUFF_ASSERT("Source directory does not exist!");
     }
 
-    std::string main_js = path_ + "\\main.js";
-    CompileAndRun(main_js.c_str());
+		CompileAndRun("main");
 
     context->Exit();
   }
@@ -139,12 +150,12 @@ namespace snuffbox
   //---------------------------------------------------------------------------
   void JSStateWrapper::CompileAndRun(const char* path)
   {
-    std::string file_path(path);
+		std::string file_path = path_ + "/" + path + ".js";
     std::string error = "Couldn't find JavaScript file '" + file_path + "'";
     std::string src;
 
     char ch;
-    std::fstream fin(path);
+    std::fstream fin(file_path);
 
     if (fin)
     {
@@ -154,7 +165,7 @@ namespace snuffbox
       
       TryCatch try_catch;
       
-      Handle<Script> script = Script::Compile(String::NewFromUtf8(isolate_, src.c_str()), String::NewFromUtf8(isolate_, path));
+      Handle<Script> script = Script::Compile(String::NewFromUtf8(isolate_, src.c_str()), String::NewFromUtf8(isolate_, file_path.c_str()));
       Handle<Value> res = script->Run();
 
       if (res.IsEmpty())

@@ -5,6 +5,35 @@
 
 using namespace v8;
 
+#define JS_ARGS const v8::FunctionCallbackInfo<v8::Value>& args
+#define JS_TEMPLATE const Handle<FunctionTemplate>& obj
+
+#define JS_REGISTER_OBJECT_FUNCTIONS(obj,func,cons)																											\
+for (unsigned int i = 0; i < ARRAYSIZE(func); ++i)                                                      \
+{                                                                                                       \
+	if (cons)	\
+	{	\
+		obj->PrototypeTemplate()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb));   \
+	}	\
+		else \
+	{ \
+		obj->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb));   \
+	} \
+} \
+
+#define JS_CREATE_SCOPE HandleScope handle_scope(environment::js_state_wrapper().isolate());
+#define JS_REGISTER_GLOBAL(name) Handle<FunctionTemplate> obj = FunctionTemplate::New(environment::js_state_wrapper().isolate()); environment::js_state_wrapper().global()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), name), obj);
+
+#define JS_REGISTER_FUNCTIONS(func)																																																						\
+for (unsigned int i = 0; i < ARRAYSIZE(func); ++i)																																														\
+{																																																																							\
+	environment::js_state_wrapper().global()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb));		\
+}
+
+#define JS_NAME(className)																											\
+static const char* static_class_name() { return #className; }										\
+virtual const char* get_class_name() const { return static_class_name(); }			\
+
 namespace snuffbox
 {
   /**
@@ -60,21 +89,50 @@ namespace snuffbox
 
   private:
     /// JavaScript log debug
-    static void JSLogDebug(const v8::FunctionCallbackInfo<v8::Value>& args);
+		static void JSLogDebug(JS_ARGS);
 
     /// JavaScript log info
-    static void JSLogInfo(const v8::FunctionCallbackInfo<v8::Value>& args);
+		static void JSLogInfo(JS_ARGS);
 
     /// JavaScript log warning
-    static void JSLogWarning(const v8::FunctionCallbackInfo<v8::Value>& args);
+		static void JSLogWarning(JS_ARGS);
 
     /// JavaScript log error
-    static void JSLogError(const v8::FunctionCallbackInfo<v8::Value>& args);
+		static void JSLogError(JS_ARGS);
 
     /// JavaScript log fatal
-    static void JSLogFatal(const v8::FunctionCallbackInfo<v8::Value>& args);
+		static void JSLogFatal(JS_ARGS);
 
     /// JavaScript log success
-    static void JSLogSuccess(const v8::FunctionCallbackInfo<v8::Value>& args);
+		static void JSLogSuccess(JS_ARGS);
+
+		/// JavaScript require
+		static void JSRequire(JS_ARGS);
   };
+
+	/**
+	* @class snuffbox::JSObject
+	* @brief Every C++ object that will be extended to JS should extend from this
+	* @author Daniël Konings
+	*/
+	class JSObject
+	{
+	public: 
+		virtual ~JSObject(){}
+
+		JS_NAME(JSObject);
+		static void RegisterJS(JS_TEMPLATE);
+	};
+
+	template<typename T>
+	class JSRegister
+	{
+	public:
+		static void Register()
+		{
+			JS_CREATE_SCOPE;
+			JS_REGISTER_GLOBAL(T::static_class_name());
+			T::RegisterJS(obj);
+		}
+	};
 }

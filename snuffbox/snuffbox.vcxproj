@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="environment.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="js\js_object_register.h" />
     <ClInclude Include="js\js_state_wrapper.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="memory\allocated_memory.h" />
