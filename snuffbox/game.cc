@@ -2,6 +2,10 @@
 #include "../snuffbox/win32/win32_window.h"
 #include "../snuffbox/environment.h"
 
+#include <chrono>
+
+using namespace std::chrono;
+
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------------------------
@@ -38,12 +42,49 @@ Game::~Game()
 }
 
 //------------------------------------------------------------------------------------------------------
+void Game::Initialise()
+{
+	CreateCallbacks();
+	InitialiseWindow();
+
+	JS_CREATE_SCOPE;
+	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), initialise_);
+	Handle<Context> ctx = environment::js_state_wrapper().context();
+	Handle<Value> argv[1] = { };
+	ctx->Enter();
+	cb->Call(ctx->Global(), 0, argv);
+	ctx->Exit();
+}
+
+//------------------------------------------------------------------------------------------------------
 void Game::Update()
 {
+
+	high_resolution_clock::time_point startTime = high_resolution_clock::now();
+	high_resolution_clock::time_point lastTime = startTime;
+
 	JS_CREATE_SCOPE;
 	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), update_);
 	Handle<Context> ctx = environment::js_state_wrapper().context();
-	Handle<Value> argv[1] = { Number::New(environment::js_state_wrapper().isolate(), 16) };
+	Handle<Value> argv[1] = { Number::New(environment::js_state_wrapper().isolate(), deltaTime_) };
+	ctx->Enter();
+	cb->Call(ctx->Global(), 1, argv);
+	ctx->Exit();
+
+	high_resolution_clock::time_point now = high_resolution_clock::now();
+	duration<float, std::milli> dtDuration = duration_cast<duration<float, std::milli>>(now - lastTime);
+	deltaTime_ = dtDuration.count() * 1e-3f;
+
+	lastTime = now;
+}
+
+//------------------------------------------------------------------------------------------------------
+void Game::Draw()
+{
+	JS_CREATE_SCOPE;
+	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), draw_);
+	Handle<Context> ctx = environment::js_state_wrapper().context();
+	Handle<Value> argv[1] = { Number::New(environment::js_state_wrapper().isolate(), deltaTime_) };
 	ctx->Enter();
 	cb->Call(ctx->Global(), 1, argv);
 	ctx->Exit();
@@ -52,6 +93,14 @@ void Game::Update()
 //------------------------------------------------------------------------------------------------------
 void Game::Shutdown()
 {
+	JS_CREATE_SCOPE;
+	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), shutdown_);
+	Handle<Context> ctx = environment::js_state_wrapper().context();
+	Handle<Value> argv[1] = {};
+	ctx->Enter();
+	cb->Call(ctx->Global(), 0, argv);
+	ctx->Exit();
+
 	SNUFF_LOG_INFO("Snuffbox shutdown..");
 	started_ = false;
 	window_->Destroy();
@@ -129,14 +178,26 @@ void Game::CreateCallbacks()
 	Handle<Object> global = ctx->Global();
 	Handle<Value> game = global->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(),"Game"));
 
+	JS_SETUP_CALLBACKS;
+
 	SNUFF_XASSERT(game->IsFunction(), "Could not find 'Game' object!");
 	Handle<Object> obj = game->ToObject();
-	
-	Handle<Value> update = obj->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(), "Update"));
-	Handle<Function> cb = Handle<Function>::Cast(update);
-	update_.Reset(environment::js_state_wrapper().isolate(), cb);
 
+	JS_OBJECT_CALLBACK("Initialise", obj);
+	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Initialise()' function! Please add it to your main.js");
+	JS_CALLBACK_STORE(initialise_);
+	
+	JS_OBJECT_CALLBACK("Update", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Update(dt)' function! Please add it to your main.js");
+	JS_CALLBACK_STORE(update_);
+
+	JS_OBJECT_CALLBACK("Draw", obj);
+	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Draw(dt)' function! Please add it to your main.js");
+	JS_CALLBACK_STORE(draw_);
+
+	JS_OBJECT_CALLBACK("Shutdown", obj);
+	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Shutdown()' function! Please add it to your main.js");
+	JS_CALLBACK_STORE(shutdown_);
 
 	ctx->Exit();
 }
@@ -154,14 +215,14 @@ int SNUFF_MAIN
   game->ParseCommandLine();
 
   js_state_wrapper.Initialise();
-
-	game->CreateCallbacks();
-  game->InitialiseWindow();
+	
+	game->Initialise();
 
 	while (game->started())
 	{
   	game->window()->ProcessMessages();
 		game->Update();
+		game->Draw();
 	}
 	return EXIT_SUCCESS;
 }

@@ -44,8 +44,14 @@ namespace snuffbox
     /// Checks if a command exists
     bool CommandExists(const std::string& cmdLine, const char* option);
 
+		/// Initialises the game
+		void Initialise();
+
 		/// Updates the game
 		void Update();
+
+		/// Draws the game
+		void Draw();
 
 		/// Shuts the game down
 		void Shutdown();
@@ -68,7 +74,11 @@ namespace snuffbox
 	private:
 		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
 		bool started_;	///< Is the game started yet?
-		Persistent<Function, CopyablePersistentTraits<Function>> update_; /// The JavaScript update callback
+		Persistent<Function, CopyablePersistentTraits<Function>> initialise_; ///< The JavaScript update callback
+		Persistent<Function, CopyablePersistentTraits<Function>> update_; ///< The JavaScript update callback
+		Persistent<Function, CopyablePersistentTraits<Function>> draw_; ///< The JavaScript update callback
+		Persistent<Function, CopyablePersistentTraits<Function>> shutdown_; ///< The JavaScript update callback
+		double deltaTime_;	///< The current delta time
 
 	public:
 		JS_NAME(Game);
