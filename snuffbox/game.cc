@@ -40,7 +40,13 @@ Game::~Game()
 //------------------------------------------------------------------------------------------------------
 void Game::Update()
 {
-
+	JS_CREATE_SCOPE;
+	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), update_);
+	Handle<Context> ctx = environment::js_state_wrapper().context();
+	Handle<Value> argv[1] = { Number::New(environment::js_state_wrapper().isolate(), 16) };
+	ctx->Enter();
+	cb->Call(ctx->Global(), 1, argv);
+	ctx->Exit();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -108,20 +114,31 @@ void Game::NotifyEvent(GameEvents evt)
 	}
 }
 
-void Game::JSInit(JS_ARGS)
-{
-	SNUFF_LOG_ERROR("Testing JSInit");
-}
-
 //------------------------------------------------------------------------------------------------------
 void Game::RegisterJS(JS_TEMPLATE)
 {
-	JSFunctionRegister testFuncs[] =
-	{
-		JSFunctionRegister("init", JSInit)
-	};
 	
-	JS_REGISTER_OBJECT_FUNCTIONS(obj, testFuncs, true);
+}
+
+void Game::CreateCallbacks()
+{
+	JS_CREATE_SCOPE;
+
+	Handle<Context> ctx = environment::js_state_wrapper().context();
+	ctx->Enter();
+	Handle<Object> global = ctx->Global();
+	Handle<Value> game = global->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(),"Game"));
+
+	SNUFF_XASSERT(game->IsFunction(), "Could not find 'Game' object!");
+	Handle<Object> obj = game->ToObject();
+	
+	Handle<Value> update = obj->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(), "Update"));
+	Handle<Function> cb = Handle<Function>::Cast(update);
+	update_.Reset(environment::js_state_wrapper().isolate(), cb);
+
+	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Update(dt)' function! Please add it to your main.js");
+
+	ctx->Exit();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -138,11 +155,13 @@ int SNUFF_MAIN
 
   js_state_wrapper.Initialise();
 
+	game->CreateCallbacks();
   game->InitialiseWindow();
 
 	while (game->started())
 	{
   	game->window()->ProcessMessages();
+		game->Update();
 	}
 	return EXIT_SUCCESS;
 }

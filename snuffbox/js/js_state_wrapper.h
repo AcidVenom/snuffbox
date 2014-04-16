@@ -7,32 +7,11 @@ using namespace v8;
 
 #define JS_ARGS const v8::FunctionCallbackInfo<v8::Value>& args
 #define JS_TEMPLATE const Handle<FunctionTemplate>& obj
-
-#define JS_REGISTER_OBJECT_FUNCTIONS(obj,func,cons)																											\
-for (unsigned int i = 0; i < ARRAYSIZE(func); ++i)                                                      \
-{                                                                                                       \
-	if (cons)	\
-	{	\
-		obj->PrototypeTemplate()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb));   \
-	}	\
-		else \
-	{ \
-		obj->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb));   \
-	} \
-} \
-
+#define JS_REGISTER_OBJECT_FUNCTIONS(obj,func,cons) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){if (cons){ obj->PrototypeTemplate()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb)); }else{obj->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb)); }} 
 #define JS_CREATE_SCOPE HandleScope handle_scope(environment::js_state_wrapper().isolate());
 #define JS_REGISTER_GLOBAL(name) Handle<FunctionTemplate> obj = FunctionTemplate::New(environment::js_state_wrapper().isolate()); environment::js_state_wrapper().global()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), name), obj);
-
-#define JS_REGISTER_FUNCTIONS(func)																																																						\
-for (unsigned int i = 0; i < ARRAYSIZE(func); ++i)																																														\
-{																																																																							\
-	environment::js_state_wrapper().global()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb));		\
-}
-
-#define JS_NAME(className)																											\
-static const char* static_class_name() { return #className; }										\
-virtual const char* get_class_name() const { return static_class_name(); }			\
+#define JS_REGISTER_FUNCTIONS(func) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){environment::js_state_wrapper().global()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb));}
+#define JS_NAME(className)static const char* static_class_name() { return #className; } virtual const char* get_class_name() const { return static_class_name(); }
 
 namespace snuffbox
 {
@@ -77,15 +56,19 @@ namespace snuffbox
     void Initialise();
 
     /// Returns the global handle
-    Handle<ObjectTemplate> global(){ return global_; }
+    Local<ObjectTemplate> global(){ return Local<ObjectTemplate>::New(isolate_,global_); }
+
+		/// Returns the context
+		Local<Context> context(){ return Local<Context>::New(isolate_, context_); }
 
     /// Creates the JavaScript context
-    Handle<Context> CreateContext();
+		Handle<Context> CreateContext();
 
   private:
     Isolate* isolate_; ///< The JavaScript isolate created at startup
     std::string path_; ///< The source directory path
-    Handle<ObjectTemplate> global_; ///< The function registry
+		Persistent<ObjectTemplate, CopyablePersistentTraits<ObjectTemplate>> global_; ///< The function registry
+		Persistent<Context, CopyablePersistentTraits<Context>> context_;	/// The JavaScript context
 
   private:
     /// JavaScript log debug

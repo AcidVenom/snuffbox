@@ -62,9 +62,13 @@ namespace snuffbox
     /// Initialises, creates and shows the window
     void InitialiseWindow();
 
+		/// Creates the JavaScript callbacks
+		void CreateCallbacks();
+
 	private:
 		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
 		bool started_;	///< Is the game started yet?
+		Persistent<Function, CopyablePersistentTraits<Function>> update_; /// The JavaScript update callback
 
 	public:
 		JS_NAME(Game);

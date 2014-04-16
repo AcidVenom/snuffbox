@@ -16,8 +16,6 @@ for (int i = 0; i < args.Length(); i++) {                 \
   log(severity, *str);                                    \
 }                                                         \
 
-																																																																		\
-
 namespace snuffbox
 {
   //---------------------------------------------------------------------------
@@ -84,7 +82,8 @@ namespace snuffbox
   //---------------------------------------------------------------------------
   Handle<Context> JSStateWrapper::CreateContext()
   {
-    global_ = ObjectTemplate::New(isolate_);
+		Handle<ObjectTemplate> global = ObjectTemplate::New(isolate_);
+		global_.Reset(isolate_, global);
 
 		RegisterJSObjects();
 
@@ -109,7 +108,7 @@ namespace snuffbox
 
 		JS_REGISTER_FUNCTIONS(funcRegister);
 
-    return Context::New(isolate_, NULL, global_);
+    return Context::New(isolate_, NULL, global);
   }
 
   //---------------------------------------------------------------------------
@@ -124,12 +123,13 @@ namespace snuffbox
   void JSStateWrapper::Initialise()
   {
     HandleScope scope(isolate_);
-    Handle<Context> context = CreateContext();
+		Handle<Context> context = CreateContext();
+		context_.Reset(isolate_, context);
 
     SNUFF_XASSERT(!context.IsEmpty(), "Failed creating the JavaScript context!");
 
-    context->Enter();
-
+		context->Enter();
+		
     DWORD ftyp = GetFileAttributesA(path_.c_str());
     if (ftyp == INVALID_FILE_ATTRIBUTES)
     {
@@ -138,13 +138,14 @@ namespace snuffbox
 
 		CompileAndRun("main");
 
-    context->Exit();
+		context->Exit();
   }
 
   //---------------------------------------------------------------------------
   JSStateWrapper::~JSStateWrapper()
   {
-
+		global_.Reset();
+		context_.Reset();
   }
 
   //---------------------------------------------------------------------------

@@ -5,5 +5,5 @@ var searchData=
   ['get',['get',['../classsnuffbox_1_1_shared_ptr.html#a457ce05b753fe1df6adc5edb9b2f9a8a',1,'snuffbox::SharedPtr']]],
   ['getcommand',['GetCommand',['../classsnuffbox_1_1_game.html#aef12e15d690ef593ff7c01cee5b6ae74',1,'snuffbox::Game']]],
   ['getexception',['GetException',['../classsnuffbox_1_1_j_s_state_wrapper.html#a3f433f8e57f532d028defd7ef6a64380',1,'snuffbox::JSStateWrapper']]],
-  ['global',['global',['../classsnuffbox_1_1_j_s_state_wrapper.html#acd35c19aacac6831afb1f25eaa54a32d',1,'snuffbox::JSStateWrapper']]]
+  ['global',['global',['../classsnuffbox_1_1_j_s_state_wrapper.html#af6d44b474ebd5b429620310c788f5726',1,'snuffbox::JSStateWrapper']]]
 ];
