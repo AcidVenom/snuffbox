@@ -4,15 +4,15 @@
 #include <fstream>
 #include <algorithm>
 
-#define PRINT_RESULTS true
+#define PRINT_RESULTS false
 #define JS_LOG(severity)                                  \
 bool first = true;                                        \
 for (int i = 0; i < args.Length(); i++) {                 \
-  v8::HandleScope handle_scope(args.GetIsolate());        \
+  HandleScope handle_scope(args.GetIsolate());						\
   if (first) {                                            \
     first = false;                                        \
   }                                                       \
-  v8::String::Utf8Value str(args[i]);                     \
+	String::Utf8Value str(args[i]);													\
   log(severity, *str);                                    \
 }                                                         \
 

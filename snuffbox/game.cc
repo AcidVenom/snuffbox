@@ -45,15 +45,9 @@ Game::~Game()
 void Game::Initialise()
 {
 	CreateCallbacks();
-	InitialiseWindow();
+	//InitialiseWindow();
 
-	JS_CREATE_SCOPE;
-	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), initialise_);
-	Handle<Context> ctx = environment::js_state_wrapper().context();
-	Handle<Value> argv[1] = { };
-	ctx->Enter();
-	cb->Call(ctx->Global(), 0, argv);
-	ctx->Exit();
+	initialise_.Call(0);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -64,15 +58,13 @@ void Game::Update()
 	high_resolution_clock::time_point lastTime = startTime;
 
 	JS_CREATE_SCOPE;
-	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), update_);
-	Handle<Context> ctx = environment::js_state_wrapper().context();
-	Handle<Value> argv[1] = { Number::New(environment::js_state_wrapper().isolate(), deltaTime_) };
-	ctx->Enter();
-	cb->Call(ctx->Global(), 1, argv);
-	ctx->Exit();
+	Handle<Value> argv[1] = {
+		Number::New(JS_ISOLATE, deltaTime_)
+	};
+	update_.Call(1,argv);
 
 	high_resolution_clock::time_point now = high_resolution_clock::now();
-	duration<float, std::milli> dtDuration = duration_cast<duration<float, std::milli>>(now - lastTime);
+	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime);
 	deltaTime_ = dtDuration.count() * 1e-3f;
 
 	lastTime = now;
@@ -82,24 +74,16 @@ void Game::Update()
 void Game::Draw()
 {
 	JS_CREATE_SCOPE;
-	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), draw_);
-	Handle<Context> ctx = environment::js_state_wrapper().context();
-	Handle<Value> argv[1] = { Number::New(environment::js_state_wrapper().isolate(), deltaTime_) };
-	ctx->Enter();
-	cb->Call(ctx->Global(), 1, argv);
-	ctx->Exit();
+	Handle<Value> argv[1] = {
+		Number::New(JS_ISOLATE, deltaTime_)
+	};
+	draw_.Call(1,argv);
 }
 
 //------------------------------------------------------------------------------------------------------
 void Game::Shutdown()
 {
-	JS_CREATE_SCOPE;
-	Handle<Function> cb = Local<Function>::New(environment::js_state_wrapper().isolate(), shutdown_);
-	Handle<Context> ctx = environment::js_state_wrapper().context();
-	Handle<Value> argv[1] = {};
-	ctx->Enter();
-	cb->Call(ctx->Global(), 0, argv);
-	ctx->Exit();
+	shutdown_.Call(0);
 
 	SNUFF_LOG_INFO("Snuffbox shutdown..");
 	started_ = false;
@@ -173,10 +157,10 @@ void Game::CreateCallbacks()
 {
 	JS_CREATE_SCOPE;
 
-	Handle<Context> ctx = environment::js_state_wrapper().context();
+	Handle<Context> ctx = JS_CONTEXT;
 	ctx->Enter();
 	Handle<Object> global = ctx->Global();
-	Handle<Value> game = global->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(),"Game"));
+	Handle<Value> game = global->Get(String::NewFromUtf8(JS_ISOLATE,"Game"));
 
 	JS_SETUP_CALLBACKS;
 
@@ -185,19 +169,19 @@ void Game::CreateCallbacks()
 
 	JS_OBJECT_CALLBACK("Initialise", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Initialise()' function! Please add it to your main.js");
-	JS_CALLBACK_STORE(initialise_);
+	initialise_.SetFunction(cb);
 	
 	JS_OBJECT_CALLBACK("Update", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Update(dt)' function! Please add it to your main.js");
-	JS_CALLBACK_STORE(update_);
+	update_.SetFunction(cb);
 
 	JS_OBJECT_CALLBACK("Draw", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Draw(dt)' function! Please add it to your main.js");
-	JS_CALLBACK_STORE(draw_);
+	draw_.SetFunction(cb);
 
 	JS_OBJECT_CALLBACK("Shutdown", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Shutdown()' function! Please add it to your main.js");
-	JS_CALLBACK_STORE(shutdown_);
+	shutdown_.SetFunction(cb);
 
 	ctx->Exit();
 }

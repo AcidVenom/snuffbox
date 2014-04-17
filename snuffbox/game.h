@@ -4,6 +4,7 @@
 #include "../snuffbox/memory/shared_ptr.h"
 #include "../snuffbox/platform/definitions.h"
 #include "../snuffbox/js/js_state_wrapper.h"
+#include "../snuffbox/js/js_callback.h"
 
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 
@@ -74,10 +75,10 @@ namespace snuffbox
 	private:
 		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
 		bool started_;	///< Is the game started yet?
-		Persistent<Function, CopyablePersistentTraits<Function>> initialise_; ///< The JavaScript update callback
-		Persistent<Function, CopyablePersistentTraits<Function>> update_; ///< The JavaScript update callback
-		Persistent<Function, CopyablePersistentTraits<Function>> draw_; ///< The JavaScript update callback
-		Persistent<Function, CopyablePersistentTraits<Function>> shutdown_; ///< The JavaScript update callback
+		JSCallback initialise_; ///< The JavaScript update callback
+		JSCallback update_; ///< The JavaScript update callback
+		JSCallback draw_; ///< The JavaScript update callback
+		JSCallback shutdown_; ///< The JavaScript update callback
 		double deltaTime_;	///< The current delta time
 
 	public:

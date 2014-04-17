@@ -5,16 +5,19 @@
 
 using namespace v8;
 
+#define JS_ISOLATE environment::js_state_wrapper().isolate()
+#define JS_CONTEXT environment::js_state_wrapper().context()
+#define JS_GLOBAL environment::js_state_wrapper().global()
 #define JS_ARGS const v8::FunctionCallbackInfo<v8::Value>& args
 #define JS_TEMPLATE const Handle<FunctionTemplate>& obj
-#define JS_REGISTER_OBJECT_FUNCTIONS(obj,func,cons) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){if (cons){ obj->PrototypeTemplate()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb)); }else{obj->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb)); }} 
-#define JS_CREATE_SCOPE HandleScope handle_scope(environment::js_state_wrapper().isolate());
-#define JS_REGISTER_GLOBAL(name) Handle<FunctionTemplate> obj = FunctionTemplate::New(environment::js_state_wrapper().isolate()); environment::js_state_wrapper().global()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), name), obj);
-#define JS_REGISTER_FUNCTIONS(func) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){environment::js_state_wrapper().global()->Set(String::NewFromUtf8(environment::js_state_wrapper().isolate(), func[i].name), FunctionTemplate::New(environment::js_state_wrapper().isolate(), func[i].cb));}
+#define JS_REGISTER_OBJECT_FUNCTIONS(obj,func,cons) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){if (cons){ obj->PrototypeTemplate()->Set(String::NewFromUtf8(JS_ISOLATE, func[i].name), FunctionTemplate::New(JS_ISOLATE, func[i].cb)); }else{obj->Set(String::NewFromUtf8(JS_ISOLATE, func[i].name), FunctionTemplate::New(JS_ISOLATE, func[i].cb)); }} 
+#define JS_CREATE_SCOPE HandleScope handle_scope(JS_ISOLATE);
+#define JS_REGISTER_GLOBAL(name) Handle<FunctionTemplate> obj = FunctionTemplate::New(JS_ISOLATE); JS_GLOBAL->Set(String::NewFromUtf8(JS_ISOLATE, name), obj);
+#define JS_REGISTER_FUNCTIONS(func) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){JS_GLOBAL->Set(String::NewFromUtf8(JS_ISOLATE, func[i].name), FunctionTemplate::New(JS_ISOLATE, func[i].cb));}
 #define JS_NAME(className)static const char* static_class_name() { return #className; } virtual const char* get_class_name() const { return static_class_name(); }
 #define JS_SETUP_CALLBACKS Handle<Function> cb; Handle<Value> func;
-#define JS_OBJECT_CALLBACK(name,obj) func = obj->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(), name));cb = Handle<Function>::Cast(func);
-#define JS_CALLBACK_STORE(store) store.Reset(environment::js_state_wrapper().isolate(), cb);
+#define JS_OBJECT_CALLBACK(name,obj) func = obj->Get(String::NewFromUtf8(JS_ISOLATE, name));cb = Handle<Function>::Cast(func);
+
 namespace snuffbox
 {
   /**
