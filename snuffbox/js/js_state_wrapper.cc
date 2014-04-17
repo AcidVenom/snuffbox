@@ -74,10 +74,18 @@ namespace snuffbox
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSRequire(JS_ARGS)
 	{                                      
-		HandleScope handle_scope(args.GetIsolate());                                                             
+    JS_CREATE_ARGUMENT_SCOPE;
 		String::Utf8Value str(args[0]);                     
 		environment::js_state_wrapper().CompileAndRun(*str);
 	}
+
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::JSAssert(JS_ARGS)
+  {
+    JS_CREATE_ARGUMENT_SCOPE;
+    String::Utf8Value str(args[0]);
+    SNUFF_ASSERT(*str);
+  }
 
   //---------------------------------------------------------------------------
   Handle<Context> JSStateWrapper::CreateContext()
@@ -103,7 +111,8 @@ namespace snuffbox
 
 		JSFunctionRegister funcRegister[] =
 		{
-			JSFunctionRegister("require", JSRequire)
+			JSFunctionRegister("require", JSRequire),
+      JSFunctionRegister("assert", JSAssert)
 		};
 
 		JS_REGISTER_FUNCTIONS(funcRegister);
