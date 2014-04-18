@@ -43,6 +43,11 @@ ConsoleWidget::ConsoleWidget()
 	vLayout_->addWidget(label_);
 	lineEdit_->setAlignment(Qt::AlignBottom);
 
+  infoPath_ = QDir::currentPath() + "\\img\\info.png";
+  warningPath_ = QDir::currentPath() + "\\img\\warning.png";
+  successPath_ = QDir::currentPath() + "\\img\\success.png";
+  errorPath_ = QDir::currentPath() + "\\img\\error.png";
+
 	port_ = 1337; 
 	ip_ = "127.0.0.1";
 
@@ -119,8 +124,10 @@ void ConsoleWidget::AddLine(LogSeverity severity, const char* msg)
 	std::string timeStamp = hour + ":" + min + ":" + sec;
 	QString time = timeStamp.c_str();
 	QString line(msg);
-	QString result = time + " " + line;
-	SeverityColours colour = SeverityToColour(severity);
+  QString result;
+  
+  result = time + " " + line;
+  SeverityColours colour = SeverityToColour(severity);
 
 	QTextCursor cursor = textBox_->textCursor();
 	QTextBlockFormat format;
@@ -129,10 +136,32 @@ void ConsoleWidget::AddLine(LogSeverity severity, const char* msg)
 	QTextCharFormat textFormat;
 	textFormat.setForeground(colour.fg);
 
-	cursor.movePosition(QTextCursor::End);
-	cursor.insertBlock(format, textFormat);
-	cursor.insertText(result);
-	
+  cursor.movePosition(QTextCursor::End);
+  cursor.insertBlock(format, textFormat);
+  cursor.movePosition(QTextCursor::StartOfBlock);
+
+  
+
+  switch (severity)
+  {
+  case LogSeverity::kInfo:
+    cursor.insertHtml(QString("<img src=" + infoPath_ + "></img> [Info] "));
+    break;
+  case LogSeverity::kSuccess:
+    cursor.insertHtml("<img src=" + successPath_ + "></img> <span style='color: rgb(45, 225, 70);'> [Success] </span>");
+    break;
+  case LogSeverity::kWarning:
+    cursor.insertHtml("<img src=" + warningPath_ + "></img> <span style='color: rgb(190, 179, 87);'> [Warning] </span>");
+    break;
+  case LogSeverity::kError:
+    cursor.insertHtml("<img src=" + errorPath_ + "></img> <span style='color: red;'> [Error] </span>");
+    break;
+  case LogSeverity::kFatal:
+    cursor.insertHtml("<img src=" + errorPath_ + "></img> [Error] ");
+    break;
+  }
+  cursor.movePosition(QTextCursor::End);
+  cursor.insertText(result);
 }
 
 //------------------------------------------------------------

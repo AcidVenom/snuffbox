@@ -50,4 +50,8 @@ private:
 
 	unsigned int port_;
 	QString ip_;
+  QString infoPath_;
+  QString warningPath_;
+  QString successPath_;
+  QString errorPath_;
 };

@@ -1,4 +1,4 @@
-﻿Build started 4/17/2014 6:35:17 PM.
+﻿Build started 18/04/2014 14:10:37.
      1>Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" on node 2 (Rebuild target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\V8\include /Zi /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt game.cc js\js_state_wrapper.cc memory\allocated_memory.cc win32\win32_window.cc
@@ -12,9 +12,9 @@
          x64\Debug\js_state_wrapper.obj
          x64\Debug\allocated_memory.obj
          x64\Debug\win32_window.obj
-         snuffbox.vcxproj -> C:\Snuff\src\x64\Debug\snuffbox.exe
-     1>Done Building Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" (Rebuild target(s)).
+     1>LINK : fatal error LNK1104: cannot open file 'C:/V8/build/Debug/lib/v8_nosnapshot.x64.lib'
+     1>Done Building Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" (Rebuild target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:44.58
+Time Elapsed 00:00:02.48

@@ -1,4 +1,4 @@
-﻿Build started 4/18/2014 10:40:27 AM.
+﻿Build started 18/04/2014 14:18:51.
      1>Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /Zi /nologo /W1 /WX- /O2 /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc110.pdb" /Gd /TP /errorReport:prompt console_widget.cc
@@ -11,4 +11,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:03.70
+Time Elapsed 00:00:02.27
