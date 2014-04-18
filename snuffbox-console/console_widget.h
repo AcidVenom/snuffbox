@@ -47,4 +47,7 @@ private:
 	QLineEdit* lineEdit_;
 	QScrollBar* scrollBar_;
 	QLabel* label_;
+
+	unsigned int port_;
+	QString ip_;
 };

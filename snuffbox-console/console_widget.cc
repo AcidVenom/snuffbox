@@ -43,17 +43,13 @@ ConsoleWidget::ConsoleWidget()
 	vLayout_->addWidget(label_);
 	lineEdit_->setAlignment(Qt::AlignBottom);
 
-	for (unsigned int i = 0; i < 10; ++i)
-	{
-		AddLine(LogSeverity::kInfo, "Snuffbox version: 1.0.0");
-		AddLine(LogSeverity::kInfo, "Started snuffbox");
-		AddLine(LogSeverity::kDebug, "Some testing stuff");
-		AddLine(LogSeverity::kSuccess, "Connection succesful");
-		AddLine(LogSeverity::kDebug, "Some testing stuff");
-		AddLine(LogSeverity::kWarning, "WOTWOT..");
-		AddLine(LogSeverity::kError, "Shit's about to hit the fan..");
-		AddLine(LogSeverity::kFatal, "BROKE IT!");
-	}
+	port_ = 1337; 
+	ip_ = "127.0.0.1";
+
+	QString result = "Awaiting connection on IP: " + ip_ + ":" + std::to_string(port_).c_str() + "..";
+
+	AddLine(LogSeverity::kInfo, "Welcome!");
+	AddLine(LogSeverity::kInfo, result.toStdString().c_str());
 }
 
 //------------------------------------------------------------
