@@ -2,5 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cc" />
+    <ClCompile Include="console_widget.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="console_widget.h" />
   </ItemGroup>
 </Project>

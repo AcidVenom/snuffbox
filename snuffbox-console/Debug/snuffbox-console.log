@@ -1,11 +1,20 @@
-﻿Build started 17/04/2014 11:27:42.
-     1>Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" on node 3 (Build target(s)).
-     1>Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Snuff\src\Debug\snuffbox-console.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Snuff\src\Debug\snuffbox-console.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Snuff\src\Debug\snuffbox-console.lib" /MACHINE:X86 Debug\main.obj
-         LINK : C:\Snuff\src\Debug\snuffbox-console.exe not found or not built by the last incremental link; performing full link
-         snuffbox-console.vcxproj -> C:\Snuff\src\Debug\snuffbox-console.exe
-     1>Done Building Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" (Build target(s)).
+﻿Build started 4/17/2014 6:04:11 PM.
+     1>Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" on node 2 (Rebuild target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cc
+         main.cc
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Snuff\src\Debug\snuffbox-console.exe" /INCREMENTAL /NOLOGO C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgets.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Core.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Gui.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Network.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmain.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Snuff\src\Debug\snuffbox-console.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"main" /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Snuff\src\Debug\snuffbox-console.lib" /MACHINE:X86 Debug\main.obj
+     1>main.obj : error LNK2019: unresolved external symbol "__declspec(dllimport) public: __thiscall QString::~QString(void)" (__imp_??1QString@@QAE@XZ) referenced in function _main
+     1>main.obj : error LNK2019: unresolved external symbol "__declspec(dllimport) public: __thiscall QString::QString(char const *)" (__imp_??0QString@@QAE@PBD@Z) referenced in function _main
+     1>main.obj : error LNK2019: unresolved external symbol "__declspec(dllimport) public: static void __cdecl QCoreApplication::setOrganizationDomain(class QString const &)" (__imp_?setOrganizationDomain@QCoreApplication@@SAXABVQString@@@Z) referenced in function _main
+     1>main.obj : error LNK2019: unresolved external symbol "__declspec(dllimport) public: static void __cdecl QCoreApplication::setOrganizationName(class QString const &)" (__imp_?setOrganizationName@QCoreApplication@@SAXABVQString@@@Z) referenced in function _main
+     1>main.obj : error LNK2019: unresolved external symbol "__declspec(dllimport) public: static void __cdecl QCoreApplication::setApplicationName(class QString const &)" (__imp_?setApplicationName@QCoreApplication@@SAXABVQString@@@Z) referenced in function _main
+     1>main.obj : error LNK2019: unresolved external symbol "__declspec(dllimport) public: __thiscall QApplication::QApplication(int &,char * *,int)" (__imp_??0QApplication@@QAE@AAHPAPADH@Z) referenced in function _main
+     1>main.obj : error LNK2019: unresolved external symbol "__declspec(dllimport) public: virtual __thiscall QApplication::~QApplication(void)" (__imp_??1QApplication@@UAE@XZ) referenced in function _main
+     1>C:\Snuff\src\Debug\snuffbox-console.exe : fatal error LNK1120: 7 unresolved externals
+     1>Done Building Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" (Rebuild target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:01.37
+Time Elapsed 00:00:01.24

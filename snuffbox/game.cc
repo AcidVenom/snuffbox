@@ -105,9 +105,9 @@ void Game::ParseCommandLine()
 //------------------------------------------------------------------------------------------------------
 std::string Game::GetCommand(const std::string& cmdLine, const char* option)
 {
-  unsigned int pos = cmdLine.find(option) + strlen(option);
-  unsigned int len = strlen(cmdLine.c_str());
-  unsigned int start = len - pos;
+  size_t pos = cmdLine.find(option) + strlen(option);
+	size_t len = strlen(cmdLine.c_str());
+	size_t start = len - pos;
 
 
   std::string result = "";
