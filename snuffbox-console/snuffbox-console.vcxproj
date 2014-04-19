@@ -101,7 +101,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgets.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Core.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Gui.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Network.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmain.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgetsd.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Cored.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Guid.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmaind.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>
       </EntryPointSymbol>
@@ -109,14 +109,33 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>
+      </Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>
+      </Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>
+      </Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="console_widget.cc" />
     <ClCompile Include="main.cc" />
+    <ClCompile Include="networking\connection.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="console_widget.h" />
+    <ClInclude Include="networking\connection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

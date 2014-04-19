@@ -1,6 +1,7 @@
 #include "../snuffbox/game.h"
 #include "../snuffbox/win32/win32_window.h"
 #include "../snuffbox/environment.h"
+#include "../snuffbox/networking/connection.h"
 
 #include <chrono>
 
@@ -45,7 +46,10 @@ Game::~Game()
 void Game::Initialise()
 {
 	CreateCallbacks();
-	//InitialiseWindow();
+	Connection connection;
+	connection.Initialise();
+	connection.Listen();
+	InitialiseWindow();
 
 	initialise_.Call(0);
 }

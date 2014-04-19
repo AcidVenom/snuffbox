@@ -3,8 +3,19 @@
   <ItemGroup>
     <ClCompile Include="main.cc" />
     <ClCompile Include="console_widget.cc" />
+    <ClCompile Include="networking\connection.cc">
+      <Filter>networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="console_widget.h" />
+    <ClInclude Include="networking\connection.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="networking">
+      <UniqueIdentifier>{da374a46-7aef-46c8-8a59-c67115380ffd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

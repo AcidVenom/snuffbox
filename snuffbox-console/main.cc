@@ -1,11 +1,15 @@
+#define _WINSOCKAPI_
 #include <QApplication>
 #include <QtGui>
 
 #include "console_widget.h"
+#include "networking/connection.h"
 #include <qstylefactory.h>
 
 int main(int argc, char** argv)
 {
+	Connection connection;
+	
 	QApplication app(argc, argv);
 	app.setApplicationName("Snuffbox Console");
 	app.setOrganizationName("Daniël Konings");
@@ -19,9 +23,26 @@ int main(int argc, char** argv)
 	window.setWindowTitle(QApplication::translate("mainWindow","Snuffbox Console"));
 	window.setStyleSheet("background-color: rgb(76,88,68);");
 	
-	ConsoleWidget console;
+	ConsoleWidget console(app,connection);
 
 	window.setLayout(console.layout());
+	const char* result = connection.Initialise();
+
+	if (strcmp(result,"Success") != 0)
+		console.AddLine(LogSeverity::kFatal,result);
+	else
+	{
+		console.AddLine(LogSeverity::kSuccess, "Successfully opened socket");
+		console.WelcomeMessage();
+	}
+
+	result = connection.Connect(console,app);
+
+	if (strcmp(result, "Success") != 0)
+		console.AddLine(LogSeverity::kFatal, result);
+	else
+		console.AddLine(LogSeverity::kSuccess, "Connection established");
+
 	return app.exec();
 }
 

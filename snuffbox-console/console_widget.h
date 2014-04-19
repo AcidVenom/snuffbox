@@ -7,7 +7,7 @@
 #include <qscrollbar.h>
 #include <qlabel.h>
 #include <qmenubar.h>
-
+#include "networking/connection.h"
 enum LogSeverity
 {
 	kInfo,
@@ -25,30 +25,37 @@ struct SeverityColours
 	QColor bg;
 };
 
-class ConsoleWidget
+class ConsoleWidget : public QObject
 {
-
 public:
-	ConsoleWidget();
+	Q_OBJECT
+public:
+	ConsoleWidget(QApplication& parent, Connection& connection);
 	~ConsoleWidget();
 
 	QVBoxLayout* layout(){ return vLayout_; }
 
 	void AddLine(LogSeverity severity, const char* msg);
-	void paintEvent(QPaintEvent* );
+	void WelcomeMessage();
+
+	QLineEdit* line(){ return lineEdit_; }
 
 	SeverityColours SeverityToColour(LogSeverity severity);
 
+private slots:
+	void HandleEvent();
+
 private:
 	QVBoxLayout* vLayout_;
+	QApplication& parent_;
+	Connection& connection_;
 	
-	QMenuBar* menuBar_;
 	QTextBrowser* textBox_;
 	QLineEdit* lineEdit_;
 	QScrollBar* scrollBar_;
 	QLabel* label_;
 
-	unsigned int port_;
+	QString port_;
 	QString ip_;
   QString infoPath_;
   QString warningPath_;

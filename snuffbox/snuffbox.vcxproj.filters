@@ -13,6 +13,9 @@
     <Filter Include="js">
       <UniqueIdentifier>{ee2da02a-d3c7-4f41-b8d2-c580d0a32fc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="networking">
+      <UniqueIdentifier>{c88568b5-fea8-403b-8d02-b561f0578cc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -24,6 +27,9 @@
     </ClCompile>
     <ClCompile Include="js\js_state_wrapper.cc">
       <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="networking\connection.cc">
+      <Filter>networking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +59,12 @@
     </ClInclude>
     <ClInclude Include="js\js_callback.h">
       <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="networking\connection.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="networking\connection_info.h">
+      <Filter>networking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -157,6 +157,7 @@
     <ClCompile Include="game.cc" />
     <ClCompile Include="js\js_state_wrapper.cc" />
     <ClCompile Include="memory\allocated_memory.cc" />
+    <ClCompile Include="networking\connection.cc" />
     <ClCompile Include="win32\win32_window.cc" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +169,8 @@
     <ClInclude Include="logging.h" />
     <ClInclude Include="memory\allocated_memory.h" />
     <ClInclude Include="memory\shared_ptr.h" />
+    <ClInclude Include="networking\connection.h" />
+    <ClInclude Include="networking\connection_info.h" />
     <ClInclude Include="platform\definitions.h" />
     <ClInclude Include="platform\interfaces.h" />
     <ClInclude Include="win32\win32_window.h" />

@@ -1,29 +1,23 @@
+#define _WINSOCKAPI_
 #include "console_widget.h"
 #include <QStyleOption>
 #include <time.h>
 #include <string>
+#include "moc_console_widget.cpp"
+
+#include "networking/connection.h"
 
 //------------------------------------------------------------
-ConsoleWidget::ConsoleWidget()
+ConsoleWidget::ConsoleWidget(QApplication& parent, Connection& connection)
+: 
+parent_(parent),
+connection_(connection)
 {
 	vLayout_ = new QVBoxLayout();
 	lineEdit_ = new QLineEdit();
 	textBox_ = new QTextBrowser();
 	scrollBar_ = new QScrollBar();
-	menuBar_ = new QMenuBar();
-
 	vLayout_->setContentsMargins(2, 2, 2, 2);
-	
-	menuBar_->setMinimumWidth(360);
-	menuBar_->setStyleSheet("background-color: rgb(46,58,38); border-radius: 2px; border: 1px solid rgb(115,109,63); color: white;");
-	QAction* setPort = new QAction("Set port", menuBar_);
-	QAction* setIP = new QAction("Set IP", menuBar_);
-
-	QMenu* settingsMenu = menuBar_->addMenu("Settings");
-	settingsMenu->addAction(setPort);
-	settingsMenu->addSeparator();
-	settingsMenu->addAction(setIP);
-	settingsMenu->setStyleSheet("selection-color: rgb(190,179,87);");
 
 	label_ = new QLabel();
 	label_->setStyleSheet("color: rgb(170,170,170);");
@@ -37,7 +31,6 @@ ConsoleWidget::ConsoleWidget()
 	textBox_->setStyleSheet("background-color: rgb(46,58,38); font-size:8pt; font-weight:900;");
 
 	lineEdit_->setStyleSheet("background-color: rgb(46,58,38);");
-	vLayout_->addWidget(menuBar_);
 	vLayout_->addWidget(textBox_);
 	vLayout_->addWidget(lineEdit_);
 	vLayout_->addWidget(label_);
@@ -48,10 +41,45 @@ ConsoleWidget::ConsoleWidget()
   successPath_ = QDir::currentPath() + "\\img\\success.png";
   errorPath_ = QDir::currentPath() + "\\img\\error.png";
 
-	port_ = 1337; 
+	port_ = SNUFF_DEFAULT_PORT;
 	ip_ = "127.0.0.1";
 
-	QString result = "Awaiting connection on IP: " + ip_ + ":" + std::to_string(port_).c_str() + "..";
+	QObject::connect(lineEdit_, SIGNAL(returnPressed()), this, SLOT(HandleEvent()));
+}
+
+//------------------------------------------------------------
+void ConsoleWidget::HandleEvent()
+{
+	QString txt = lineEdit_->text();
+
+	if (strcmp(txt.toStdString().c_str(), "reconnect") == 0)
+	{
+		AddLine(LogSeverity::kInfo, "Attempting to reconnect..");
+		const char* result = connection_.Initialise();
+		if (strcmp(result, "Success") != 0)
+		{
+			AddLine(LogSeverity::kFatal, "Failed to re-initialise the connection socket!");
+		}
+		result = connection_.Connect(*this, parent_);
+
+		if (strcmp(result, "Success") != 0)
+			AddLine(LogSeverity::kFatal, result);
+		else
+			AddLine(LogSeverity::kSuccess, "Connection established");
+	}
+	else
+	{
+		QString result = "Unknown command: " + txt;
+		AddLine(LogSeverity::kError, result.toStdString().c_str());
+	}
+
+	lineEdit_->setText("");
+}
+
+//------------------------------------------------------------
+void ConsoleWidget::WelcomeMessage()
+{
+	QString result = "Awaiting connection on IP: " + ip_ + ":" + port_ + "..";
 
 	AddLine(LogSeverity::kInfo, "Welcome!");
 	AddLine(LogSeverity::kInfo, result.toStdString().c_str());
@@ -162,6 +190,9 @@ void ConsoleWidget::AddLine(LogSeverity severity, const char* msg)
   }
   cursor.movePosition(QTextCursor::End);
   cursor.insertText(result);
+
+	vLayout_->update();
+	textBox_->update();
 }
 
 //------------------------------------------------------------
