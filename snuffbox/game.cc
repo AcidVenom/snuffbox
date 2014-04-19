@@ -29,7 +29,7 @@ namespace snuffbox
 using namespace snuffbox;
 
 //------------------------------------------------------------------------------------------------------
-Game::Game(PlatformWindow* window) : started_(true)
+Game::Game(PlatformWindow* window) : started_(true), consoleEnabled_(false)
 {
 	window_ = window;
   environment::globalInstance = this;
@@ -46,11 +46,14 @@ Game::~Game()
 void Game::Initialise()
 {
 	CreateCallbacks();
-	Connection connection;
-	connection.Initialise();
-	connection.Listen();
 	InitialiseWindow();
-
+	if (consoleEnabled_)
+	{
+		Connection connection;
+		connection.Initialise();
+		connection.Listen();
+	}
+	window_->Show();
 	initialise_.Call(0);
 }
 
@@ -104,6 +107,11 @@ void Game::ParseCommandLine()
 
   std::string path = GetCommand(cmdLine, "-source-directory=");
   environment::js_state_wrapper().path() = path;
+
+	if (CommandExists(cmdLine, "-console"))
+	{
+		consoleEnabled_ = true;
+	}
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -118,10 +126,14 @@ std::string Game::GetCommand(const std::string& cmdLine, const char* option)
 
   for (auto it = cmdLine.c_str()+pos; *it; it++)
   {
-    if (strcmp(it, " ") != 0 || strcmp(it, "\0") == 0)
+		if (*it != *"\0" && *it != *" ")
     {
       result += it[0];
     }
+		else
+		{
+			break;
+		}
   }
 
   return result;
@@ -137,7 +149,6 @@ bool Game::CommandExists(const std::string& cmdLine, const char* option)
 void Game::InitialiseWindow()
 {
   window_->Create();
-  window_->Show();
 }
 
 //------------------------------------------------------------------------------------------------------

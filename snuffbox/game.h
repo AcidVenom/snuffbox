@@ -82,6 +82,7 @@ namespace snuffbox
 		JSCallback draw_; ///< The JavaScript update callback
 		JSCallback shutdown_; ///< The JavaScript update callback
 		double deltaTime_;	///< The current delta time
+		bool consoleEnabled_;
 
 	public:
 		JS_NAME(Game);

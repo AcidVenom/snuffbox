@@ -31,6 +31,9 @@ class ConsoleWidget;
 		/// Connects to the engine
 		const char* Connect(ConsoleWidget& console, QApplication& app);
 
+		/// Returns if there's a connection or not
+		bool connected(){ return connected_; }
+
 	private:
 		WSADATA data_; ///< Holds WinSock data
 		SOCKET socket_; ///< The socket the server is on

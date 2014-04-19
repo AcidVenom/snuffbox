@@ -54,6 +54,12 @@ void ConsoleWidget::HandleEvent()
 
 	if (strcmp(txt.toStdString().c_str(), "reconnect") == 0)
 	{
+		if (connection_.connected())
+		{
+			AddLine(LogSeverity::kError, "Already connected to the engine!");
+			lineEdit_->setText("");
+			return;
+		}
 		AddLine(LogSeverity::kInfo, "Attempting to reconnect..");
 		const char* result = connection_.Initialise();
 		if (strcmp(result, "Success") != 0)

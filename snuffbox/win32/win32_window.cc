@@ -44,13 +44,12 @@ namespace snuffbox
 	//---------------------------------------------------------------------------
 	void Win32Window::Create()
 	{
-		WNDCLASSEXA wndClass;
+		WNDCLASSA wndClass;
 
     instance_ = GetModuleHandle(0);
 
-		ZeroMemory(&wndClass, sizeof(WNDCLASSEX));
+		ZeroMemory(&wndClass, sizeof(WNDCLASS));
 
-		wndClass.cbSize = sizeof(WNDCLASSEX);
 		wndClass.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
 		wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = instance_;
@@ -58,8 +57,9 @@ namespace snuffbox
 		wndClass.hbrBackground = (HBRUSH)BLACK_BRUSH;
 		wndClass.lpszClassName = SNUFF_WINDOW_CLASS;
 		wndClass.cbWndExtra = sizeof(void*);
+		wndClass.cbClsExtra = sizeof(WNDCLASS);
 
-		if (!RegisterClassExA(&wndClass))
+		if (!RegisterClassA(&wndClass))
 		{
 			SNUFF_LOG_FATAL("Could not register window class!");
 			return;
@@ -70,7 +70,7 @@ namespace snuffbox
 		clientSize.right = params().w;
 		clientSize.bottom = params().h;
 
-    int style = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_MAXIMIZEBOX | WS_SIZEBOX;
+    int style = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_MINIMIZEBOX;
 
 		AdjustWindowRect(&clientSize, style, FALSE);
 		unsigned int actualWidth = clientSize.right - clientSize.left;
@@ -81,7 +81,7 @@ namespace snuffbox
 
 		auto name = params().name;
 
-		handle_ = CreateWindowExA(wndClass.style,wndClass.lpszClassName, params().name,
+		handle_ = CreateWindowA(wndClass.lpszClassName, params().name,
       style, params().x, params().y, params().w, params().h, GetDesktopWindow(), NULL,
 			wndClass.hInstance, this);
 		if (!handle_)
@@ -89,6 +89,8 @@ namespace snuffbox
 			SNUFF_LOG_FATAL("Unable to open window!");
 			return;
 		}
+
+		ShowWindow(handle_, SW_SHOWMINIMIZED);
 	}
 
 	//---------------------------------------------------------------------------
