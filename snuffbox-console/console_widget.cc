@@ -11,7 +11,8 @@
 ConsoleWidget::ConsoleWidget(QApplication& parent, Connection& connection)
 : 
 parent_(parent),
-connection_(connection)
+connection_(connection),
+connected_(false)
 {
 	vLayout_ = new QVBoxLayout();
 	lineEdit_ = new QLineEdit();
@@ -24,7 +25,7 @@ connection_(connection)
 
 	label_->setText("Snuffbox Console");
 
-	textBox_->resize(360, 480);
+	textBox_->resize(400, 480);
 	textBox_->addScrollBarWidget(scrollBar_, Qt::AlignRight);
 	textBox_->setContentsMargins(QMargins(0, 0, 0, 0));
 
@@ -54,7 +55,7 @@ void ConsoleWidget::HandleEvent()
 
 	if (strcmp(txt.toStdString().c_str(), "reconnect") == 0)
 	{
-		if (connection_.connected())
+		if (connected_)
 		{
 			AddLine(LogSeverity::kError, "Already connected to the engine!");
 			lineEdit_->setText("");
@@ -71,7 +72,11 @@ void ConsoleWidget::HandleEvent()
 		if (strcmp(result, "Success") != 0)
 			AddLine(LogSeverity::kFatal, result);
 		else
+		{
 			AddLine(LogSeverity::kSuccess, "Connection established");
+			socketThread_.join();
+			socketThread_ = std::thread(&Connection::Receive,connection_,this);
+		}
 	}
 	else
 	{

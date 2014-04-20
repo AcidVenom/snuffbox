@@ -5,6 +5,7 @@ namespace snuffbox
 	class Game;
   class JSStateWrapper;
 	struct AllocatedMemory;
+	class Connection;
 
 	namespace environment
 	{
@@ -17,6 +18,9 @@ namespace snuffbox
     /// Returns the JavaScript state
     JSStateWrapper& js_state_wrapper();
 
+		/// Returns the remote console
+		Connection& console();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -25,5 +29,8 @@ namespace snuffbox
 
     /// Returns if the environment owns a JavaScript state wrapper
     bool has_js_state_wrapper();
+
+		/// Returns if there's a connection with the console
+		bool has_console();
 	}
 }

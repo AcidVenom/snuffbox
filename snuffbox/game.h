@@ -3,10 +3,12 @@
 #define _WINSOCKAPI_
 #define NOMINMAX
 #include <Windows.h>
+#include <thread>
 #include "../snuffbox/memory/shared_ptr.h"
 #include "../snuffbox/platform/definitions.h"
 #include "../snuffbox/js/js_state_wrapper.h"
 #include "../snuffbox/js/js_callback.h"
+#include "../snuffbox/networking/connection.h"
 
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 
@@ -82,7 +84,9 @@ namespace snuffbox
 		JSCallback draw_; ///< The JavaScript update callback
 		JSCallback shutdown_; ///< The JavaScript update callback
 		double deltaTime_;	///< The current delta time
-		bool consoleEnabled_;
+		bool consoleEnabled_; ///< Is the console enabled?
+		Connection connection_; ///< The connection with the console
+		std::thread socket_thread; ///< Socket listening thread
 
 	public:
 		JS_NAME(Game);

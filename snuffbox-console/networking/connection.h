@@ -7,7 +7,8 @@
 #include <stdio.h>
 #include <qapplication.h>
 
-#define SNUFF_DEFAULT_PORT "50"
+#define SNUFF_DEFAULT_PORT "1337"
+#define SNUFF_DEFAULT_BUFFER 4096
 
 class ConsoleWidget;
 
@@ -31,12 +32,11 @@ class ConsoleWidget;
 		/// Connects to the engine
 		const char* Connect(ConsoleWidget& console, QApplication& app);
 
-		/// Returns if there's a connection or not
-		bool connected(){ return connected_; }
+		/// Receives messages
+		void Receive(ConsoleWidget* console);
 
 	private:
 		WSADATA data_; ///< Holds WinSock data
 		SOCKET socket_; ///< The socket the server is on
 		addrinfo* info_; ///< Holds address info
-		bool connected_; ///< Is there a connection with the server?
 	};

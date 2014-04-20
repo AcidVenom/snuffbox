@@ -8,6 +8,8 @@
 #include <qlabel.h>
 #include <qmenubar.h>
 #include "networking/connection.h"
+
+#include <thread>
 enum LogSeverity
 {
 	kInfo,
@@ -41,11 +43,16 @@ public:
 	QLineEdit* line(){ return lineEdit_; }
 
 	SeverityColours SeverityToColour(LogSeverity severity);
+	std::thread& thread(){ return socketThread_; }
+
+	void set_connected(bool connected){ connected_ = connected; }
+	bool connected(){ return connected_; }
 
 private slots:
 	void HandleEvent();
 
 private:
+	ConsoleWidget(const ConsoleWidget& other);
 	QVBoxLayout* vLayout_;
 	QApplication& parent_;
 	Connection& connection_;
@@ -61,4 +68,7 @@ private:
   QString warningPath_;
   QString successPath_;
   QString errorPath_;
+
+	std::thread socketThread_;
+	bool connected_;
 };

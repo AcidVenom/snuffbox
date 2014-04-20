@@ -63,8 +63,5 @@
     <ClInclude Include="networking\connection.h">
       <Filter>networking</Filter>
     </ClInclude>
-    <ClInclude Include="networking\connection_info.h">
-      <Filter>networking</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

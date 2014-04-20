@@ -1,7 +1,6 @@
 #include "../snuffbox/game.h"
 #include "../snuffbox/win32/win32_window.h"
 #include "../snuffbox/environment.h"
-#include "../snuffbox/networking/connection.h"
 
 #include <chrono>
 
@@ -49,9 +48,7 @@ void Game::Initialise()
 	InitialiseWindow();
 	if (consoleEnabled_)
 	{
-		Connection connection;
-		connection.Initialise();
-		connection.Listen();
+		connection_.Initialise();
 	}
 	window_->Show();
 	initialise_.Call(0);
@@ -95,6 +92,10 @@ void Game::Shutdown()
 	SNUFF_LOG_INFO("Snuffbox shutdown..");
 	started_ = false;
 	window_->Destroy();
+	if (consoleEnabled_)
+	{
+		connection_.Destroy();
+	}
 	SNUFF_LOG_INFO(".. Shutdown succesful");
 }
 

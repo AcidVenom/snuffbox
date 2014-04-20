@@ -1,5 +1,25 @@
 #include "../../snuffbox/networking/connection.h"
 #include "../../snuffbox/logging.h"
+#include "../../snuffbox/environment.h"
+#include "../../snuffbox/game.h"
+
+namespace snuffbox
+{
+	namespace environment {
+		namespace
+		{
+			Connection* globalInstance = nullptr;
+		}
+
+		bool has_console() { return globalInstance != nullptr; }
+
+		Connection& console()
+		{
+			SNUFF_ASSERT_NOTNULL(globalInstance);
+			return *globalInstance;
+		}
+	}
+}
 
 namespace snuffbox
 {
@@ -13,6 +33,15 @@ namespace snuffbox
 	Connection::~Connection()
 	{
 
+	}
+
+	//-----------------------------------------------------------------------------------
+	void Connection::Destroy()
+	{
+		closesocket(socket_);
+		WSACleanup();
+		if (thread_.joinable())
+			thread_.join();
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -48,14 +77,48 @@ namespace snuffbox
 		}
 
 		freeaddrinfo(info_);
+
+		thread_ = std::thread(&Connection::Listen,this);
 	}
 
+	//-----------------------------------------------------------------------------------
+	void Connection::Send(LogSeverity severity,const char* msg)
+	{
+		const char* sev = "";
+		switch (severity)
+		{
+		case LogSeverity::kInfo:
+			sev = "/i";
+			break;
+		case LogSeverity::kDebug:
+			sev = "/d";
+			break;
+		case LogSeverity::kWarning:
+			sev = "/w";
+			break;
+		case LogSeverity::kSuccess:
+			sev = "/s";
+			break;
+		case LogSeverity::kError:
+			sev = "/e";
+			break;
+		case LogSeverity::kFatal:
+			sev = "/f";
+			break;
+		}
+		std::string message(msg);
+		std::string result = sev + message;
+
+		send(client_, result.c_str(), SNUFF_DEFAULT_BUFFER, 0);
+	}
+
+	//-----------------------------------------------------------------------------------
 	void Connection::Listen()
 	{
 		int result = listen(socket_, 1);
 		SNUFF_XASSERT(result == 0, "Failed listening the socket!");
 
-		while (client_ == SOCKET_ERROR)
+		while (client_ == SOCKET_ERROR && environment::game().started())
 		{
 			SNUFF_LOG_INFO("Awaiting console connection..");
 			sockaddr incoming;
@@ -63,6 +126,12 @@ namespace snuffbox
 			client_ = accept(socket_, (sockaddr* )&incoming, &incomingSize);
 		}
 
-		SNUFF_LOG_SUCCESS("Successfully established a connection with the console");
+		if (client_ != SOCKET_ERROR)
+		{
+			environment::globalInstance = this;
+			SNUFF_LOG_INFO("Received welcome message from the server");
+		}
+
+
 	}
 }

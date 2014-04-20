@@ -170,7 +170,6 @@
     <ClInclude Include="memory\allocated_memory.h" />
     <ClInclude Include="memory\shared_ptr.h" />
     <ClInclude Include="networking\connection.h" />
-    <ClInclude Include="networking\connection_info.h" />
     <ClInclude Include="platform\definitions.h" />
     <ClInclude Include="platform\interfaces.h" />
     <ClInclude Include="win32\win32_window.h" />

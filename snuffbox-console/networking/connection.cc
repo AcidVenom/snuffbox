@@ -40,6 +40,59 @@
 		return "Success";
 	}
 
+	//-----------------------------------------------------------------------------------
+	void Connection::Receive(ConsoleWidget* console)
+	{
+		int recvbuflen = SNUFF_DEFAULT_BUFFER;
+
+		char *sendbuf = "Welcome message from console";
+		char recvbuf[SNUFF_DEFAULT_BUFFER];
+
+		int iResult;
+
+		do {
+			send(socket_, sendbuf, SNUFF_DEFAULT_BUFFER, 0);
+			iResult = recv(socket_, recvbuf, recvbuflen, 0);
+			if (iResult > 0)
+			{
+				std::string severity = "";
+				severity += recvbuf[0];
+				severity += recvbuf[1];
+
+				LogSeverity sev = LogSeverity::kInfo;
+
+				if (strcmp(severity.c_str(), "/d") == 0)
+				{
+					sev = LogSeverity::kDebug;
+				}
+				if (strcmp(severity.c_str(), "/w") == 0)
+				{
+					sev = LogSeverity::kWarning;
+				}
+				if (strcmp(severity.c_str(), "/s") == 0)
+				{
+					sev = LogSeverity::kSuccess;
+				}
+				if (strcmp(severity.c_str(), "/e") == 0)
+				{
+					sev = LogSeverity::kError;
+				}
+				if (strcmp(severity.c_str(), "/f") == 0)
+				{
+					sev = LogSeverity::kFatal;
+				}
+				console->AddLine(sev, &recvbuf[2]);
+			}
+			else
+			{
+				console->AddLine(LogSeverity::kWarning, "The connection with the server was closed");
+			}
+		} while (iResult > 0);
+
+		console->set_connected(false);
+	}
+
+	//-----------------------------------------------------------------------------------
 	const char* Connection::Connect(ConsoleWidget& console, QApplication& app)
 	{
 		app.processEvents();
@@ -60,6 +113,7 @@
 			}
 		}
 
-		connected_ = true;
+		console.set_connected(true);
+
 		return "Success";
 	}

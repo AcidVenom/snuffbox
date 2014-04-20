@@ -4,6 +4,8 @@
 #define NOMINMAX
 #include <Windows.h>
 #include <string>
+#include "../snuffbox/environment.h"
+#include "../snuffbox/networking/connection.h"
 
 namespace snuffbox
 {
@@ -45,6 +47,9 @@ namespace snuffbox
 		OutputDebugStringA("] ");
 		OutputDebugStringA(msg); 
 		OutputDebugStringA("\n");
+
+		if (environment::has_console())
+			environment::console().Send(severity, msg);
 	}
 }
 

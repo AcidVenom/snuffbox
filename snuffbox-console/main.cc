@@ -41,9 +41,19 @@ int main(int argc, char** argv)
 	if (strcmp(result, "Success") != 0)
 		console.AddLine(LogSeverity::kFatal, result);
 	else
+	{
 		console.AddLine(LogSeverity::kSuccess, "Connection established");
+		console.thread() = std::thread(&Connection::Receive, connection, &console);
+	}
 
-	return app.exec();
+	app.exec();
+
+	if (console.thread().joinable())
+	{
+		console.thread().join();
+	}
+
+	return 0;
 }
 
 
