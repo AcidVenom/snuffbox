@@ -106,6 +106,7 @@
       <EntryPointSymbol>
       </EntryPointSymbol>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE</AdditionalIncludeDirectories>
@@ -132,6 +133,7 @@
     <ClCompile Include="console_widget.cc" />
     <ClCompile Include="main.cc" />
     <ClCompile Include="networking\connection.cc" />
+    <ClCompile Include="terminal.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="console_widget.h" />

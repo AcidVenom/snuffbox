@@ -57,7 +57,6 @@ void Game::Initialise()
 //------------------------------------------------------------------------------------------------------
 void Game::Update()
 {
-
 	high_resolution_clock::time_point startTime = high_resolution_clock::now();
 	high_resolution_clock::time_point lastTime = startTime;
 
@@ -67,11 +66,12 @@ void Game::Update()
 	};
 	update_.Call(1,argv);
 
+	Sleep(16);
 	high_resolution_clock::time_point now = high_resolution_clock::now();
 	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime);
 	deltaTime_ = dtDuration.count() * 1e-3f;
-
 	lastTime = now;
+
 }
 
 //------------------------------------------------------------------------------------------------------

@@ -131,7 +131,5 @@ namespace snuffbox
 			environment::globalInstance = this;
 			SNUFF_LOG_INFO("Received welcome message from the server");
 		}
-
-
 	}
 }

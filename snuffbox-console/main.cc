@@ -8,52 +8,37 @@
 
 int main(int argc, char** argv)
 {
-	Connection connection;
-	
 	QApplication app(argc, argv);
 	app.setApplicationName("Snuffbox Console");
 	app.setOrganizationName("Daniël Konings");
 	app.setOrganizationDomain("http://www.danielkonings.com/");
-	app.setStyle(QStyleFactory::create("fusion"));
+	app.setStyle(QStyleFactory::create("Fusion"));
 
-	qApp->setStyleSheet("QScrollBar{color: white;} QTextBrowser, QLineEdit {border-radius: 2px; border: 1px solid rgb(115,109,63); color: white; selection-color: rgb(20,20,70); }");
+	QPalette steamPalette;
+	steamPalette.setColor(QPalette::Window, QColor(88, 106, 80));
+	steamPalette.setColor(QPalette::WindowText, Qt::white);
+	steamPalette.setColor(QPalette::Base, QColor(64, 70, 60));
+	steamPalette.setColor(QPalette::AlternateBase, QColor(88, 106, 80));
+	steamPalette.setColor(QPalette::ToolTipBase, Qt::white);
+	steamPalette.setColor(QPalette::ToolTipText, Qt::white);
+	steamPalette.setColor(QPalette::Text, Qt::white);
+	steamPalette.setColor(QPalette::Button, QColor(88, 106, 80));
+	steamPalette.setColor(QPalette::ButtonText, Qt::white);
+	steamPalette.setColor(QPalette::BrightText, Qt::red);
+	steamPalette.setColor(QPalette::Link, QColor(159, 164, 98));
+
+	steamPalette.setColor(QPalette::Highlight, QColor(159, 164, 98));
+	steamPalette.setColor(QPalette::HighlightedText, Qt::black);
+
+	app.setPalette(steamPalette);
+
 	QWidget window;
-	window.resize(360, 480);
+	ConsoleWidget* console = new ConsoleWidget();
+
+	window.setLayout(console->layout());
 	window.show();
-	window.setWindowTitle(QApplication::translate("mainWindow","Snuffbox Console"));
-	window.setStyleSheet("background-color: rgb(76,88,68);");
-	
-	ConsoleWidget console(app,connection);
 
-	window.setLayout(console.layout());
-	const char* result = connection.Initialise();
-
-	if (strcmp(result,"Success") != 0)
-		console.AddLine(LogSeverity::kFatal,result);
-	else
-	{
-		console.AddLine(LogSeverity::kSuccess, "Successfully opened socket");
-		console.WelcomeMessage();
-	}
-
-	result = connection.Connect(console,app);
-
-	if (strcmp(result, "Success") != 0)
-		console.AddLine(LogSeverity::kFatal, result);
-	else
-	{
-		console.AddLine(LogSeverity::kSuccess, "Connection established");
-		console.thread() = std::thread(&Connection::Receive, connection, &console);
-	}
-
-	app.exec();
-
-	if (console.thread().joinable())
-	{
-		console.thread().join();
-	}
-
-	return 0;
+	return app.exec();
 }
 
 

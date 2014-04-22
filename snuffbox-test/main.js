@@ -8,6 +8,7 @@ Game.Initialise = function()
 
 Game.Update = function(dt)
 {	
+
 	if (typeof(test) != "undefined")
 	{
 		if(test instanceof Test)
@@ -23,6 +24,8 @@ Game.Update = function(dt)
 			assert("type of 'test' is not of Test()");
 		}
 	}
+
+	Log.debug("Test");
 }
 
 Game.Draw = function(dt)

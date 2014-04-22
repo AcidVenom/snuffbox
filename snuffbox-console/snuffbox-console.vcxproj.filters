@@ -6,6 +6,7 @@
     <ClCompile Include="networking\connection.cc">
       <Filter>networking</Filter>
     </ClCompile>
+    <ClCompile Include="terminal.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="console_widget.h" />
