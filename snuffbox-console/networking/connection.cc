@@ -16,6 +16,8 @@ int(__stdcall *con)(SOCKET s, const sockaddr* name, int namelen) = &connect;
 	{
 		closesocket(socket_);
 		WSACleanup();
+    if (thread_.joinable())
+      thread_.join();
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -43,7 +45,7 @@ int(__stdcall *con)(SOCKET s, const sockaddr* name, int namelen) = &connect;
 			return;
 		}
 
-		parent_->AddLine(LogSeverity::kSuccess, "Succesfully setup connection");
+		parent_->AddLine(LogSeverity::kInfo, "Succesfully initialised connection");
 	}
 
 	//-----------------------------------------------------------------------------------
