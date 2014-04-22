@@ -25,7 +25,7 @@ Game.Update = function(dt)
 		}
 	}
 
-	Log.debug("Test");
+	Log.error("asdasdasdsad");
 }
 
 Game.Draw = function(dt)

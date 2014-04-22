@@ -35,13 +35,13 @@ parent_(parent)
 	QObject::connect(lineEdit_, SIGNAL(returnPressed()), this, SLOT(HandleEvent()));
 	WelcomeMessage();
 
-	ip_ = "127.0.0.1";
-	port_ = SNUFF_DEFAULT_PORT;
+	ip_ = new QString("127.0.0.1");
+  port_ = new QString(SNUFF_DEFAULT_PORT);
 
 	viewport()->setCursor(Qt::IBeamCursor);
 
-	connection_->Initialise();
-	connection_->Connect();
+  if (int result = connection_->Initialise(ip_->toStdString().c_str()) == 0)
+    connection_->Connect();
 }
 
 //----------------------------------------------------------------
@@ -159,10 +159,8 @@ void Terminal::AddLine(LogSeverity severity, const char* msg)
 //------------------------------------------------------------
 void Terminal::WelcomeMessage()
 {
-	QString result = "Awaiting connection on IP: " + ip_ + ":" + port_ + "..";
-
 	AddLine(LogSeverity::kInfo, "Welcome!");
-	AddLine(LogSeverity::kInfo, result.toStdString().c_str());
+	AddLine(LogSeverity::kInfo, "Please start the engine if you're experiencing problems!");
 }
 
 //------------------------------------------------------------
@@ -177,16 +175,40 @@ void Terminal::HandleEvent()
 		{
 			delete connection_;
 			connection_ = new Connection(this);
-			connection_->Initialise();
-			connection_->Connect();
+      if(int result = connection_->Initialise(ip_->toStdString().c_str()) == 0)
+			  connection_->Connect();
 		}
 		else
 		{
 			AddLine(LogSeverity::kError, "Already connected to the engine!");
 		}
 	}
+  else if (strcmp(txt.toStdString().c_str(), "ip") == 0)
+  {
+    QString result = "Current IP address: " + *ip_;
+    AddLine(LogSeverity::kInfo, result.toStdString().c_str());
+  }
 	else
 	{
+    if (strlen(txt.toStdString().c_str()) >= 6)
+    {
+      std::string str = txt.toStdString();
+      std::string result = "";
+      for (unsigned int i = 0; i < 6; ++i)
+      {
+        result += str.at(i);
+      }
+      if (strcmp(result.c_str(), "set ip") == 0)
+      {
+        ip_ = new QString(&str[6]);
+      }
+      
+      result = "Set new IP to: " + ip_->toStdString();
+      AddLine(LogSeverity::kInfo, result.c_str());
+      lineEdit_->setText("");
+      return;
+    }
+
 		QString result = "Unknown command: " + txt;
 		AddLine(LogSeverity::kError, result.toStdString().c_str());
 	}

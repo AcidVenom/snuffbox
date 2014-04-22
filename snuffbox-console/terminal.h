@@ -46,8 +46,8 @@ private slots:
 private:
 	QLineEdit* lineEdit_;
 	QTextBrowser* terminal_;
-	QString ip_;
-	QString port_;
+	QString* ip_;
+	QString* port_;
 	QObject* parent_;
 
 	QString* infoPath_;

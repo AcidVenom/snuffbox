@@ -21,7 +21,7 @@ int(__stdcall *con)(SOCKET s, const sockaddr* name, int namelen) = &connect;
 	}
 
 	//-----------------------------------------------------------------------------------
-	void Connection::Initialise()
+	int Connection::Initialise(const char* ip)
 	{
 		socket_ = INVALID_SOCKET;
 
@@ -29,7 +29,7 @@ int(__stdcall *con)(SOCKET s, const sockaddr* name, int namelen) = &connect;
 		if (result != 0)
 		{
 			parent_->AddLine(LogSeverity::kFatal,"Could not setup WinSock!");
-			return;
+      return -1;
 		}
 
 		addrinfo hints;
@@ -38,14 +38,15 @@ int(__stdcall *con)(SOCKET s, const sockaddr* name, int namelen) = &connect;
 		hints.ai_family = AF_INET;
 		hints.ai_socktype = SOCK_STREAM;
 
-		result = getaddrinfo("127.0.0.1", SNUFF_DEFAULT_PORT, &hints, &info_);
+		result = getaddrinfo(ip, SNUFF_DEFAULT_PORT, &hints, &info_);
 		if (result != 0)
 		{
 			parent_->AddLine(LogSeverity::kFatal, "Failed getting address info");
-			return;
+			return -1;
 		}
 
 		parent_->AddLine(LogSeverity::kInfo, "Succesfully initialised connection");
+    return 0;
 	}
 
 	//-----------------------------------------------------------------------------------

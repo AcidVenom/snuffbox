@@ -31,7 +31,7 @@ class SocketThread;
 		~Connection();
 
 		/// Initialises the connection for use
-		void Initialise();
+    int Initialise(const char* ip);
 
 		/// Connects to the engine
 		void Connect();
@@ -49,8 +49,6 @@ class SocketThread;
 		addrinfo* info_; ///< Holds address info
 		bool connected_; ///< Are we connected?
 		Terminal* parent_; ///< The terminal widget to stream to
-		int lastSeverity_;
-		QString lastMessage_;
 		std::thread thread_;
 
 	signals:
