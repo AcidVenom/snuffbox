@@ -28,7 +28,10 @@ namespace snuffbox
 using namespace snuffbox;
 
 //------------------------------------------------------------------------------------------------------
-Game::Game(PlatformWindow* window) : started_(true), consoleEnabled_(false)
+Game::Game(PlatformWindow* window) : 
+started_(true), 
+consoleEnabled_(false),
+mouse_(environment::memory().ConstructShared<Mouse>())
 {
 	window_ = window;
   environment::globalInstance = this;
@@ -65,6 +68,7 @@ void Game::Update()
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 	update_.Call(1,argv);
+	mouse_->Update();
   double sleep = 16 - deltaTime_*1000;
   if (sleep < 0)
     sleep = 0;

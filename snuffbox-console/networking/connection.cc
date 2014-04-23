@@ -14,7 +14,9 @@ int(__stdcall *con)(SOCKET s, const sockaddr* name, int namelen) = &connect;
 	//-----------------------------------------------------------------------------------
 	Connection::~Connection()
 	{
-		closesocket(socket_);
+		if (socket_ != INVALID_SOCKET)
+			closesocket(socket_);
+
 		WSACleanup();
     if (thread_.joinable())
       thread_.join();
@@ -46,6 +48,7 @@ int(__stdcall *con)(SOCKET s, const sockaddr* name, int namelen) = &connect;
 		}
 
 		parent_->AddLine(LogSeverity::kInfo, "Succesfully initialised connection");
+		qApp->processEvents();
     return 0;
 	}
 
@@ -99,24 +102,37 @@ int(__stdcall *con)(SOCKET s, const sockaddr* name, int namelen) = &connect;
 	//-----------------------------------------------------------------------------------
 	void Connection::Connect()
 	{
-		addrinfo* ip;
-		qApp->processEvents();
-		for (addrinfo* p = info_; p != NULL && socket_ == INVALID_SOCKET; p = p->ai_next)
+		int result;
+		int retries = 0;
+		parent_->AddLine(LogSeverity::kInfo, "Awaiting connection..");
+		do
 		{
-			ip = p;
-			socket_ = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-			if (socket_ == INVALID_SOCKET)
+			addrinfo* ip;
+			for (addrinfo* p = info_; p != NULL && socket_ == INVALID_SOCKET; p = p->ai_next)
 			{
-				parent_->AddLine(LogSeverity::kFatal, "Error creating socket!");
-				return;
+				qApp->processEvents();
+				ip = p;
+				socket_ = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+				if (socket_ == INVALID_SOCKET)
+				{
+					parent_->AddLine(LogSeverity::kFatal, "Error creating socket!");
+					return;
+				}
+				result = con(socket_, p->ai_addr, p->ai_addrlen);
 			}
-			else if (con(socket_, p->ai_addr, p->ai_addrlen) < 0)
-			{
-				closesocket(socket_);
-				parent_->AddLine(LogSeverity::kFatal,"Could not resolve connection with engine!");
-				return;
-			}
+			if (result != 0)
+				socket_ = INVALID_SOCKET;
+			if (++retries >= 10)
+				break;
+			parent_->AddLine(LogSeverity::kWarning, std::string("Retrying connection.." + std::to_string(retries)).c_str());
+		} while (result != 0);
+
+		if (socket_ == INVALID_SOCKET)
+		{
+			parent_->AddLine(LogSeverity::kError, "Could not resolve connection with the engine");
+			return;
 		}
+
 		parent_->AddLine(LogSeverity::kSuccess, "Successfully connected to the engine");
 		connected_ = true;
 		thread_ = std::thread(&Connection::Receive, this);

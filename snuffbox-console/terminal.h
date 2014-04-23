@@ -40,6 +40,7 @@ public:
 	Connection* connection(){ return connection_; }
 	QLineEdit* line(){ return lineEdit_; }
 	QTextBrowser* text(){ return terminal_; }
+	QString* ip(){ return ip_; }
 private slots:
 	void HandleEvent();
 	void ReceiveMsg(int sev, QString msg);
@@ -56,4 +57,5 @@ private:
 	QString* errorPath_;
 
 	Connection* connection_;
+	int maxLines_, lines_;
 };

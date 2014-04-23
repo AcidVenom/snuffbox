@@ -8,7 +8,9 @@ Terminal::Terminal(QObject* parent)
 terminal_(new QTextBrowser()),
 lineEdit_(new QLineEdit()),
 connection_(new Connection(this)),
-parent_(parent)
+parent_(parent),
+maxLines_(800),
+lines_(0)
 {
 	setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
 	setAttribute(Qt::WA_MacSmallSize);
@@ -39,9 +41,6 @@ parent_(parent)
   port_ = new QString(SNUFF_DEFAULT_PORT);
 
 	viewport()->setCursor(Qt::IBeamCursor);
-
-  if (int result = connection_->Initialise(ip_->toStdString().c_str()) == 0)
-    connection_->Connect();
 }
 
 //----------------------------------------------------------------
@@ -151,6 +150,12 @@ void Terminal::AddLine(LogSeverity severity, const char* msg)
 	}
 	cursor.movePosition(QTextCursor::End);
 	cursor.insertText(result);
+
+	if (++lines_ > maxLines_)
+	{
+		lines_ = 0;
+		terminal_->clear();
+	}
 
 	viewport()->update();
 	terminal_->verticalScrollBar()->setValue(terminal_->verticalScrollBar()->maximum());

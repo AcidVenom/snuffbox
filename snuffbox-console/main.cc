@@ -38,6 +38,9 @@ int main(int argc, char** argv)
 	window.setLayout(console->layout());
 	window.show();
 
+	if (int result = console->terminal()->connection()->Initialise(console->terminal()->ip()->toStdString().c_str()) == 0)
+		console->terminal()->connection()->Connect();
+
 	return app.exec();
 }
 

@@ -3,6 +3,7 @@
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
 #include "../../snuffbox/memory/allocated_memory.h"
+#include "../../snuffbox/input/mouse.h"
 #include <string>
 
 namespace snuffbox
@@ -110,6 +111,17 @@ namespace snuffbox
 		std::string result = "Destroyed the window with name: " + name;
 		SNUFF_LOG_INFO(result.c_str());
 	}
+	
+	//---------------------------------------------------------------------------
+	void Win32Window::OnMouseMove(LPARAM lParam, WPARAM wParam)
+	{
+		MouseData evt;
+		evt.x = LOWORD(lParam);
+		evt.y = HIWORD(lParam);
+		evt.type = MouseEvent::kMove;
+
+		environment::mouse().ReceiveEvent(evt);
+	}
 
 	//---------------------------------------------------------------------------
 	void Win32Window::OnSetFocus()
@@ -180,6 +192,9 @@ namespace snuffbox
 
 		case WM_CLOSE:
 			window->OnClose();
+			break;
+		case WM_MOUSEMOVE:
+			window->OnMouseMove(lParam,wParam);
 			break;
 		}
 		return DefWindowProcA(hWnd, message, wParam, lParam);

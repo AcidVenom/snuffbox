@@ -46,6 +46,8 @@ namespace snuffbox
 		void OnKillFocus();
 		/// When the window is closed
 		void OnClose();
+		/// When the mouse is moved
+		void OnMouseMove(LPARAM lParam, WPARAM wParam);
 		/// Processes all messages
 		void ProcessMessages();
 

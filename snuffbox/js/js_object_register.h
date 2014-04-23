@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../snuffbox/game.h"
+#include "../../snuffbox/input/mouse.h"
 #include "../../snuffbox/js/js_state_wrapper.h"
 
 namespace snuffbox
@@ -9,5 +10,6 @@ namespace snuffbox
 	static void RegisterJSObjects()
 	{
 		JSRegister<Game>::Register();
+		JSRegister<Mouse>::Register();
 	}
 }

@@ -6,6 +6,7 @@ namespace snuffbox
   class JSStateWrapper;
 	struct AllocatedMemory;
 	class Connection;
+	class Mouse;
 
 	namespace environment
 	{
@@ -21,6 +22,9 @@ namespace snuffbox
 		/// Returns the remote console
 		Connection& console();
 
+		/// Returns the mouse
+		Mouse& mouse();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -32,5 +36,8 @@ namespace snuffbox
 
 		/// Returns if there's a connection with the console
 		bool has_console();
+
+		/// Returns if there's a mouse or not
+		bool has_mouse();
 	}
 }
