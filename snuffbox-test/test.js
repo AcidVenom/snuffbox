@@ -6,6 +6,8 @@ var Test = function()
 	{
 		this.x = Mouse.position().x;
 		this.y = Mouse.position().y;
-		Log.debug("Delta time: " + dt);
+
+		if(Mouse.IsDown(0))
+			Log.debug("X,Y: " + this.x + " | " + this.y);
 	}
 }

@@ -10,6 +10,8 @@
 namespace snuffbox
 {
 
+	enum MouseButton;
+
 	/**
 	* @class snuffbox::Win32Window
 	* @brief A Windows window for use with the engine
@@ -48,6 +50,10 @@ namespace snuffbox
 		void OnClose();
 		/// When the mouse is moved
 		void OnMouseMove(LPARAM lParam, WPARAM wParam);
+		/// When the mouse is held down
+		void OnMouseDown(MouseButton button, LPARAM lParam, WPARAM wParam);
+		/// When the mouse is released
+		void OnMouseUp(MouseButton button);
 		/// Processes all messages
 		void ProcessMessages();
 

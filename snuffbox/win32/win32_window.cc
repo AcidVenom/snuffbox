@@ -124,6 +124,28 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------
+	void Win32Window::OnMouseDown(MouseButton button, LPARAM lParam, WPARAM wParam)
+	{
+		MouseData evt;
+		evt.x = LOWORD(lParam);
+		evt.y = HIWORD(lParam);
+		evt.button = button;
+		evt.type = MouseEvent::kDown;
+
+		environment::mouse().ReceiveEvent(evt);
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::OnMouseUp(MouseButton button)
+	{
+		MouseData evt;
+		evt.type = MouseEvent::kUp;
+		evt.button = button;
+
+		environment::mouse().ReceiveEvent(evt);
+	}
+
+	//---------------------------------------------------------------------------
 	void Win32Window::OnSetFocus()
 	{
 		SNUFF_LOG_INFO("[WIN32] The window received focus");
@@ -193,8 +215,21 @@ namespace snuffbox
 		case WM_CLOSE:
 			window->OnClose();
 			break;
+			
+		case WM_LBUTTONDBLCLK:
+			window->OnMouseDown(MouseButton::kLeft, lParam, wParam);
+			break;
+
+		case WM_LBUTTONDOWN:
+			window->OnMouseDown(MouseButton::kLeft, lParam, wParam);
+			break;
+
+		case WM_LBUTTONUP:
+			window->OnMouseUp(MouseButton::kLeft);
+			break;
+
 		case WM_MOUSEMOVE:
-			window->OnMouseMove(lParam,wParam);
+			window->OnMouseMove(lParam, wParam);
 			break;
 		}
 		return DefWindowProcA(hWnd, message, wParam, lParam);

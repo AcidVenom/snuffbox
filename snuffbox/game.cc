@@ -60,6 +60,7 @@ void Game::Initialise()
 //------------------------------------------------------------------------------------------------------
 void Game::Update()
 {
+	mouse_->Update();
 	high_resolution_clock::time_point startTime = high_resolution_clock::now();
 	high_resolution_clock::time_point lastTime = startTime;
 
@@ -68,7 +69,6 @@ void Game::Update()
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 	update_.Call(1,argv);
-	mouse_->Update();
   double sleep = 16 - deltaTime_*1000;
   if (sleep < 0)
     sleep = 0;
