@@ -84,5 +84,8 @@ namespace snuffbox
 	public:
 		JS_NAME(Keyboard);
 		static void RegisterJS(JS_TEMPLATE); ///< Register all JS functions
+		static void JSIsPressed(JS_ARGS); ///< Checks if a key is pressed
+		static void JSIsDown(JS_ARGS); ///< Checks if a key is down
+		static void JSIsReleased(JS_ARGS); ///< Checks if a key is released
 	};
 }

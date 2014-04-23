@@ -4,6 +4,7 @@
 #include "../../snuffbox/game.h"
 #include "../../snuffbox/memory/allocated_memory.h"
 #include "../../snuffbox/input/mouse.h"
+#include "../../snuffbox/input/keyboard.h"
 #include <string>
 
 #define WIN32_GET_MOUSE_POS POINT p;if (GetCursorPos(&p)){ScreenToClient(hWnd, &p);}
@@ -149,6 +150,7 @@ namespace snuffbox
 		environment::mouse().ReceiveEvent(evt);
 	}
 
+	//---------------------------------------------------------------------------
 	void Win32Window::OnMouseDbl(MouseEnums::MouseButton button, float x, float y)
 	{
 		MouseData evt;
@@ -156,6 +158,26 @@ namespace snuffbox
 		evt.button = button;
 
 		environment::mouse().ReceiveEvent(evt);
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::OnKeyDown(LPARAM lParam, WPARAM wParam)
+	{
+		KeyData evt;
+		evt.type = KeyboardEnums::KeyEvent::kPressed;
+		evt.key = static_cast<Key>(wParam);
+
+		environment::keyboard().ReceiveEvent(evt);
+	}
+
+	//---------------------------------------------------------------------------
+	void Win32Window::OnKeyUp(LPARAM lParam, WPARAM wParam)
+	{
+		KeyData evt;
+		evt.type = KeyboardEnums::KeyEvent::kReleased;
+		evt.key = static_cast<Key>(wParam);
+
+		environment::keyboard().ReceiveEvent(evt);
 	}
 
 	//---------------------------------------------------------------------------
@@ -269,6 +291,14 @@ namespace snuffbox
 
 		case WM_MOUSEMOVE:
       window->OnMouseMove(static_cast<float>(p.x), static_cast<float>(p.y));
+			break;
+
+		case WM_KEYDOWN:
+			window->OnKeyDown(lParam, wParam);
+			break;
+
+		case WM_KEYUP:
+			window->OnKeyUp(lParam, wParam);
 			break;
 		}
 		return DefWindowProcA(hWnd, message, wParam, lParam);

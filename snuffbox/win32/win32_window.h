@@ -55,6 +55,10 @@ namespace snuffbox
 		void OnMouseUp(MouseEnums::MouseButton button);
 		/// When the mouse is double clicked
 		void OnMouseDbl(MouseEnums::MouseButton button, float x, float y);
+		/// When the key is pressed
+		void OnKeyDown(LPARAM lParam, WPARAM wParam);
+		/// When the key is released
+		void OnKeyUp(LPARAM lParam, WPARAM wParam);
 		/// Processes all messages
 		void ProcessMessages();
 

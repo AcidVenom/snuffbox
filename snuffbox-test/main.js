@@ -7,7 +7,7 @@ Game.Initialise = function()
 
 Game.Update = function(dt)
 {	
-	test.update(dt);
+
 }
 
 Game.Draw = function(dt)

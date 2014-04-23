@@ -10,6 +10,7 @@
 #include "../snuffbox/js/js_callback.h"
 #include "../snuffbox/networking/connection.h"
 #include "../snuffbox/input/mouse.h"
+#include "../snuffbox/input/keyboard.h"
 
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 
@@ -80,6 +81,7 @@ namespace snuffbox
 	private:
 		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
 		SharedPtr<Mouse> mouse_; ///< The mouse object
+		SharedPtr<Keyboard> keyboard_; ///< The keyboard object
 		bool started_;	///< Is the game started yet?
 		JSCallback initialise_; ///< The JavaScript update callback
 		JSCallback update_; ///< The JavaScript update callback

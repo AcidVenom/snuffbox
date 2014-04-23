@@ -31,7 +31,8 @@ using namespace snuffbox;
 Game::Game(PlatformWindow* window) : 
 started_(true), 
 consoleEnabled_(false),
-mouse_(environment::memory().ConstructShared<Mouse>())
+mouse_(environment::memory().ConstructShared<Mouse>()),
+keyboard_(environment::memory().ConstructShared<Keyboard>())
 {
 	window_ = window;
   environment::globalInstance = this;
@@ -61,6 +62,7 @@ void Game::Initialise()
 void Game::Update()
 {
 	mouse_->Update();
+	keyboard_->Update();
 	high_resolution_clock::time_point startTime = high_resolution_clock::now();
 	high_resolution_clock::time_point lastTime = startTime;
 

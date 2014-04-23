@@ -32,6 +32,8 @@ namespace snuffbox
 			keyStates_[i].down = false;
 			keyStates_[i].released = false;
 		}
+
+		environment::globalInstance = this;
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -42,6 +44,24 @@ namespace snuffbox
 			keyStates_[i].pressed = false;
 			keyStates_[i].released = false;
 		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	bool Keyboard::IsPressed(Key key)
+	{
+		return keyStates_[key].pressed;
+	}
+
+	//--------------------------------------------------------------------------------------
+	bool Keyboard::IsDown(Key key)
+	{
+		return keyStates_[key].down;
+	}
+
+	//--------------------------------------------------------------------------------------
+	bool Keyboard::IsReleased(Key key)
+	{
+		return keyStates_[key].released;
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -57,17 +77,20 @@ namespace snuffbox
 
 		while (!queue_.empty())
 		{
-			KeyData& evt = queue_.front();
+			const KeyData& evt = queue_.front();
 
 			switch (evt.type)
 			{
 			case KeyboardEnums::KeyEvent::kPressed:
-				break;
-
-			case KeyboardEnums::KeyEvent::kDown:
+				if (!keyStates_[evt.key].down)
+					keyStates_[evt.key].pressed = true;
+				
+				keyStates_[evt.key].down = true;
 				break;
 
 			case KeyboardEnums::KeyEvent::kReleased:
+				keyStates_[evt.key].down = false;
+				keyStates_[evt.key].released = true;
 				break;
 			}
 
@@ -84,7 +107,52 @@ namespace snuffbox
 	//--------------------------------------------------------------------------------------
 	void Keyboard::RegisterJS(JS_TEMPLATE)
 	{
+		JS_CREATE_SCOPE;
 
+		JSFunctionRegister funcs[] =
+		{
+			JSFunctionRegister("IsPressed", JSIsPressed),
+			JSFunctionRegister("IsDown", JSIsDown),
+			JSFunctionRegister("IsReleased", JSIsReleased)
+		};
+
+		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Keyboard::JSIsPressed(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		String::Utf8Value str(args[0]);
+		const char* keyStr = *str;
+		Key key = StringToKey(keyStr);
+
+		bool check = environment::keyboard().IsPressed(key);
+		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Keyboard::JSIsDown(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		String::Utf8Value str(args[0]);
+		const char* keyStr = *str;
+		Key key = StringToKey(keyStr);
+
+		bool check = environment::keyboard().IsDown(key);
+		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Keyboard::JSIsReleased(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		String::Utf8Value str(args[0]);
+		const char* keyStr = *str;
+		Key key = StringToKey(keyStr);
+
+		bool check = environment::keyboard().IsReleased(key);
+		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
 	}
 
 	//--------------------------------------------------------------------------------------
