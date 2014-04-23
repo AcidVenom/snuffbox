@@ -7,13 +7,16 @@ var Test = function()
 		this.x = Mouse.position().x;
 		this.y = Mouse.position().y;
 
-		if(Mouse.IsPressed(0))
+		if(Mouse.IsPressed(1))
 			Log.error("Pressed");
 
-		if(Mouse.IsDown(0))
+		if(Mouse.IsDoubleClicked(1))
+			Log.warning("Double clicked");
+
+		if(Mouse.IsDown(1))
 			Log.debug("X,Y: " + this.x + " | " + this.y);
 
-		if(Mouse.IsReleased(0))
+		if(Mouse.IsReleased(1))
 			Log.success("Released");
 	}
 }

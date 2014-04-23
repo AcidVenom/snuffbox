@@ -149,6 +149,15 @@ namespace snuffbox
 		environment::mouse().ReceiveEvent(evt);
 	}
 
+	void Win32Window::OnMouseDbl(MouseButton button, float x, float y)
+	{
+		MouseData evt;
+		evt.type = MouseEvent::kDblClk;
+		evt.button = button;
+
+		environment::mouse().ReceiveEvent(evt);
+	}
+
 	//---------------------------------------------------------------------------
 	void Win32Window::OnSetFocus()
 	{
@@ -223,7 +232,7 @@ namespace snuffbox
 			break;
 			
 		case WM_LBUTTONDBLCLK:
-      window->OnMouseDown(MouseButton::kLeft, static_cast<float>(p.x), static_cast<float>(p.y));
+      window->OnMouseDbl(MouseButton::kLeft, static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 
 		case WM_LBUTTONDOWN:
@@ -232,6 +241,30 @@ namespace snuffbox
 
 		case WM_LBUTTONUP:
 			window->OnMouseUp(MouseButton::kLeft);
+			break;
+
+		case WM_RBUTTONDBLCLK:
+			window->OnMouseDbl(MouseButton::kRight, static_cast<float>(p.x), static_cast<float>(p.y));
+			break;
+
+		case WM_RBUTTONDOWN:
+			window->OnMouseDown(MouseButton::kRight, static_cast<float>(p.x), static_cast<float>(p.y));
+			break;
+
+		case WM_RBUTTONUP:
+			window->OnMouseUp(MouseButton::kRight);
+			break;
+
+		case WM_MBUTTONDBLCLK:
+			window->OnMouseDbl(MouseButton::kMiddle, static_cast<float>(p.x), static_cast<float>(p.y));
+			break;
+
+		case WM_MBUTTONDOWN:
+			window->OnMouseDown(MouseButton::kMiddle, static_cast<float>(p.x), static_cast<float>(p.y));
+			break;
+
+		case WM_MBUTTONUP:
+			window->OnMouseUp(MouseButton::kMiddle);
 			break;
 
 		case WM_MOUSEMOVE:

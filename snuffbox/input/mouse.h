@@ -13,7 +13,7 @@ namespace snuffbox
 	*/
 	struct MouseButtonState
 	{
-		bool down, pressed, released;
+		bool down, pressed, released, dblclk;
 	};
 
 	/**
@@ -26,7 +26,8 @@ namespace snuffbox
 		kPressed,
 		kDown,
 		kUp,
-		kMove
+		kMove,
+		kDblClk
 	};
 
 	/**
@@ -84,6 +85,9 @@ namespace snuffbox
 		/// Checks if a certain button is released
 		bool IsReleased(MouseButton button);
 
+		/// Checks if a certain button is double clicked
+		bool IsDoubleClicked(MouseButton button);
+
 
 		/// Returns the position of the mouse
 		std::tuple<double, double> position(){ return std::tuple<double, double>(x_,y_); }
@@ -102,5 +106,6 @@ namespace snuffbox
 		static void JSIsPressed(JS_ARGS);	///< Returns if a mouse button was pressed this frame
 		static void JSIsDown(JS_ARGS);	///< Returns if a mouse button is down this frame
 		static void JSIsReleased(JS_ARGS);	///< Returns if a mouse button is released this frame
+		static void JSIsDoubleClicked(JS_ARGS);	///< Returns if a mouse button is double clicked this frame
 	};
 }

@@ -54,6 +54,8 @@ namespace snuffbox
     void OnMouseDown(MouseButton button, float x, float y);
 		/// When the mouse is released
 		void OnMouseUp(MouseButton button);
+		/// When the mouse is double clicked
+		void OnMouseDbl(MouseButton button, float x, float y);
 		/// Processes all messages
 		void ProcessMessages();
 

@@ -55,6 +55,12 @@ namespace snuffbox
   }
 
 	//--------------------------------------------------------------------------------------
+	bool Mouse::IsDoubleClicked(MouseButton button)
+	{
+		return buttonStates_[button].dblclk;
+	}
+
+	//--------------------------------------------------------------------------------------
 	void Mouse::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -64,7 +70,8 @@ namespace snuffbox
 			JSFunctionRegister("position",JSGetPosition),
 			JSFunctionRegister("IsPressed",JSIsPressed),
 			JSFunctionRegister("IsDown",JSIsDown),
-			JSFunctionRegister("IsReleased", JSIsReleased)
+			JSFunctionRegister("IsReleased", JSIsReleased),
+			JSFunctionRegister("IsDoubleClicked", JSIsDoubleClicked)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
@@ -113,12 +120,23 @@ namespace snuffbox
 	}
 
 	//--------------------------------------------------------------------------------------
+	void Mouse::JSIsDoubleClicked(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		int button = args[0]->Int32Value();
+
+		bool check = environment::mouse().IsDoubleClicked(static_cast<MouseButton>(button));
+		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+	}
+
+	//--------------------------------------------------------------------------------------
 	void Mouse::ResetStates()
 	{
 		for (unsigned int i = 0; i < 3; ++i)
 		{
 			buttonStates_[i].pressed = false;
 			buttonStates_[i].released = false;
+			buttonStates_[i].dblclk = false;
 		}
 	}
 
@@ -138,6 +156,13 @@ namespace snuffbox
 			const MouseData& evt = queue_.front();
 			switch (evt.type)
 			{
+			case MouseEvent::kDblClk:
+				buttonStates_[evt.button].down = true;
+				buttonStates_[evt.button].dblclk = true;
+				x_ = evt.x;
+				y_ = evt.y;
+				break;
+
 			case MouseEvent::kMove:
 				x_ = evt.x;
 				y_ = evt.y;
