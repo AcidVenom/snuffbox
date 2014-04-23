@@ -4,13 +4,12 @@
 #define NOMINMAX
 #include <Windows.h>
 #include "../../snuffbox/platform/interfaces.h"
+#include "../../snuffbox/input/mouse.h"
 
 #define SNUFF_WINDOW_CLASS "Snuff Window Class"
 
 namespace snuffbox
 {
-
-	enum MouseButton;
 
 	/**
 	* @class snuffbox::Win32Window
@@ -51,11 +50,11 @@ namespace snuffbox
 		/// When the mouse is moved
     void OnMouseMove(float x, float y);
 		/// When the mouse is held down
-    void OnMouseDown(MouseButton button, float x, float y);
+		void OnMouseDown(MouseEnums::MouseButton button, float x, float y);
 		/// When the mouse is released
-		void OnMouseUp(MouseButton button);
+		void OnMouseUp(MouseEnums::MouseButton button);
 		/// When the mouse is double clicked
-		void OnMouseDbl(MouseButton button, float x, float y);
+		void OnMouseDbl(MouseEnums::MouseButton button, float x, float y);
 		/// Processes all messages
 		void ProcessMessages();
 

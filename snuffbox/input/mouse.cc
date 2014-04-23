@@ -37,25 +37,25 @@ namespace snuffbox
 	}
 
 	//--------------------------------------------------------------------------------------
-	bool Mouse::IsDown(MouseButton button)
+	bool Mouse::IsDown(MouseEnums::MouseButton button)
 	{
 		return buttonStates_[button].down;
 	}
 
 	//--------------------------------------------------------------------------------------
-	bool Mouse::IsPressed(MouseButton button)
+	bool Mouse::IsPressed(MouseEnums::MouseButton button)
 	{
 		return buttonStates_[button].pressed;
 	}
 
   //--------------------------------------------------------------------------------------
-  bool Mouse::IsReleased(MouseButton button)
+	bool Mouse::IsReleased(MouseEnums::MouseButton button)
   {
     return buttonStates_[button].released;
   }
 
 	//--------------------------------------------------------------------------------------
-	bool Mouse::IsDoubleClicked(MouseButton button)
+	bool Mouse::IsDoubleClicked(MouseEnums::MouseButton button)
 	{
 		return buttonStates_[button].dblclk;
 	}
@@ -95,7 +95,7 @@ namespace snuffbox
 		JS_CREATE_ARGUMENT_SCOPE;
 		int button = args[0]->Int32Value();
 
-		bool check = environment::mouse().IsPressed(static_cast<MouseButton>(button));
+		bool check = environment::mouse().IsPressed(static_cast<MouseEnums::MouseButton>(button));
 		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
 	}
 
@@ -105,7 +105,7 @@ namespace snuffbox
 		JS_CREATE_ARGUMENT_SCOPE;
 		int button = args[0]->Int32Value();
 
-		bool check = environment::mouse().IsDown(static_cast<MouseButton>(button));
+		bool check = environment::mouse().IsDown(static_cast<MouseEnums::MouseButton>(button));
 		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
 	}
 
@@ -115,7 +115,7 @@ namespace snuffbox
 		JS_CREATE_ARGUMENT_SCOPE;
     int button = args[0]->Int32Value();
 
-    bool check = environment::mouse().IsReleased(static_cast<MouseButton>(button));
+		bool check = environment::mouse().IsReleased(static_cast<MouseEnums::MouseButton>(button));
     args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
 	}
 
@@ -125,7 +125,7 @@ namespace snuffbox
 		JS_CREATE_ARGUMENT_SCOPE;
 		int button = args[0]->Int32Value();
 
-		bool check = environment::mouse().IsDoubleClicked(static_cast<MouseButton>(button));
+		bool check = environment::mouse().IsDoubleClicked(static_cast<MouseEnums::MouseButton>(button));
 		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
 	}
 
@@ -156,32 +156,32 @@ namespace snuffbox
 			const MouseData& evt = queue_.front();
 			switch (evt.type)
 			{
-			case MouseEvent::kDblClk:
+			case MouseEnums::MouseEvent::kDblClk:
 				buttonStates_[evt.button].down = true;
 				buttonStates_[evt.button].dblclk = true;
 				x_ = evt.x;
 				y_ = evt.y;
 				break;
 
-			case MouseEvent::kMove:
+			case MouseEnums::MouseEvent::kMove:
 				x_ = evt.x;
 				y_ = evt.y;
 				break;
 
-      case MouseEvent::kPressed:
+			case MouseEnums::MouseEvent::kPressed:
         buttonStates_[evt.button].down = true;
         buttonStates_[evt.button].pressed = true;
         x_ = evt.x;
         y_ = evt.y;
         break;
 
-			case MouseEvent::kDown:
+			case MouseEnums::MouseEvent::kDown:
 				buttonStates_[evt.button].down = true;
 				x_ = evt.x;
 				y_ = evt.y;
 				break;
 
-			case MouseEvent::kUp:
+			case MouseEnums::MouseEvent::kUp:
 				buttonStates_[evt.button].down = false;
 				buttonStates_[evt.button].released = true;
 				break;

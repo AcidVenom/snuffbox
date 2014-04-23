@@ -121,38 +121,38 @@ namespace snuffbox
 
     evt.x = x;
     evt.y = y;
-		evt.type = MouseEvent::kMove;
+		evt.type = MouseEnums::MouseEvent::kMove;
 
 		environment::mouse().ReceiveEvent(evt);
 	}
 
 	//---------------------------------------------------------------------------
-	void Win32Window::OnMouseDown(MouseButton button, float x, float y)
+	void Win32Window::OnMouseDown(MouseEnums::MouseButton button, float x, float y)
 	{
 		MouseData evt;
     
     evt.x = x;
     evt.y = y;
 		evt.button = button;
-		evt.type = MouseEvent::kPressed;
+		evt.type = MouseEnums::MouseEvent::kPressed;
 
 		environment::mouse().ReceiveEvent(evt);
 	}
 
 	//---------------------------------------------------------------------------
-	void Win32Window::OnMouseUp(MouseButton button)
+	void Win32Window::OnMouseUp(MouseEnums::MouseButton button)
 	{
 		MouseData evt;
-		evt.type = MouseEvent::kUp;
+		evt.type = MouseEnums::MouseEvent::kUp;
 		evt.button = button;
 
 		environment::mouse().ReceiveEvent(evt);
 	}
 
-	void Win32Window::OnMouseDbl(MouseButton button, float x, float y)
+	void Win32Window::OnMouseDbl(MouseEnums::MouseButton button, float x, float y)
 	{
 		MouseData evt;
-		evt.type = MouseEvent::kDblClk;
+		evt.type = MouseEnums::MouseEvent::kDblClk;
 		evt.button = button;
 
 		environment::mouse().ReceiveEvent(evt);
@@ -232,39 +232,39 @@ namespace snuffbox
 			break;
 			
 		case WM_LBUTTONDBLCLK:
-      window->OnMouseDbl(MouseButton::kLeft, static_cast<float>(p.x), static_cast<float>(p.y));
+			window->OnMouseDbl(MouseEnums::MouseButton::kLeft, static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 
 		case WM_LBUTTONDOWN:
-			window->OnMouseDown(MouseButton::kLeft, static_cast<float>(p.x),static_cast<float>(p.y));
+			window->OnMouseDown(MouseEnums::MouseButton::kLeft, static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 
 		case WM_LBUTTONUP:
-			window->OnMouseUp(MouseButton::kLeft);
+			window->OnMouseUp(MouseEnums::MouseButton::kLeft);
 			break;
 
 		case WM_RBUTTONDBLCLK:
-			window->OnMouseDbl(MouseButton::kRight, static_cast<float>(p.x), static_cast<float>(p.y));
+			window->OnMouseDbl(MouseEnums::MouseButton::kRight, static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 
 		case WM_RBUTTONDOWN:
-			window->OnMouseDown(MouseButton::kRight, static_cast<float>(p.x), static_cast<float>(p.y));
+			window->OnMouseDown(MouseEnums::MouseButton::kRight, static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 
 		case WM_RBUTTONUP:
-			window->OnMouseUp(MouseButton::kRight);
+			window->OnMouseUp(MouseEnums::MouseButton::kRight);
 			break;
 
 		case WM_MBUTTONDBLCLK:
-			window->OnMouseDbl(MouseButton::kMiddle, static_cast<float>(p.x), static_cast<float>(p.y));
+			window->OnMouseDbl(MouseEnums::MouseButton::kMiddle, static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 
 		case WM_MBUTTONDOWN:
-			window->OnMouseDown(MouseButton::kMiddle, static_cast<float>(p.x), static_cast<float>(p.y));
+			window->OnMouseDown(MouseEnums::MouseButton::kMiddle, static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 
 		case WM_MBUTTONUP:
-			window->OnMouseUp(MouseButton::kMiddle);
+			window->OnMouseUp(MouseEnums::MouseButton::kMiddle);
 			break;
 
 		case WM_MOUSEMOVE:

@@ -165,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="environment.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="input\key.h" />
     <ClInclude Include="input\keyboard.h" />
     <ClInclude Include="input\mouse.h" />
     <ClInclude Include="js\js_callback.h" />

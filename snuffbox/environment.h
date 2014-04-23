@@ -7,6 +7,7 @@ namespace snuffbox
 	struct AllocatedMemory;
 	class Connection;
 	class Mouse;
+	class Keyboard;
 
 	namespace environment
 	{
@@ -25,6 +26,9 @@ namespace snuffbox
 		/// Returns the mouse
 		Mouse& mouse();
 
+		/// Returns the keyboard
+		Keyboard& keyboard();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -39,5 +43,8 @@ namespace snuffbox
 
 		/// Returns if there's a mouse or not
 		bool has_mouse();
+
+		/// Returns if there's a keyboard or not
+		bool has_keyboard();
 	}
 }

@@ -6,6 +6,35 @@
 
 namespace snuffbox
 {
+	class MouseEnums
+	{
+	public:
+		/**
+		* @enum snuffbox::MouseButton
+		* @brief Contains all mouse buttons as an enumeration
+		* @author Daniël Konings
+		*/
+		enum MouseButton
+		{
+			kLeft,
+			kRight,
+			kMiddle
+		};
+
+		/**
+		* @enum snuffbox::MouseEvent
+		* @brief The different mouse event types
+		* @author Daniël Konings
+		*/
+		enum MouseEvent
+		{
+			kPressed,
+			kDown,
+			kUp,
+			kMove,
+			kDblClk
+		};
+	};
 	/**
 	* @struct snuffbox::MouseState
 	* @brief Structure to hold the state of a mouse button
@@ -17,40 +46,14 @@ namespace snuffbox
 	};
 
 	/**
-	* @enum snuffbox::MouseEvent
-	* @brief The different mouse event types
-	* @author Daniël Konings
-	*/
-	enum MouseEvent
-	{
-		kPressed,
-		kDown,
-		kUp,
-		kMove,
-		kDblClk
-	};
-
-	/**
-	* @enum snuffbox::MouseButton
-	* @brief Contains all mouse buttons as an enumeration
-	* @author Daniël Konings
-	*/
-	enum MouseButton
-	{
-		kLeft,
-		kRight,
-		kMiddle
-	};
-
-	/**
 	* @struct snuffbox::MouseData
 	* @brief Structure to hold the data of the mouse in the message loop
 	* @author Daniël Konings
 	*/
 	struct MouseData
 	{
-		MouseEvent type;
-		MouseButton button;
+		MouseEnums::MouseEvent type;
+		MouseEnums::MouseButton button;
 		float x, y;
 	};
 
@@ -62,6 +65,7 @@ namespace snuffbox
 	class Mouse : public JSObject
 	{
 	public:
+
 		/// Default constructor
 		Mouse();
 		/// Default destructor
@@ -77,16 +81,16 @@ namespace snuffbox
 		void Update();
 
 		/// Checks if a certain button is down
-		bool IsDown(MouseButton button);
+		bool IsDown(MouseEnums::MouseButton button);
 
 		/// Checks if a certain button is pressed
-		bool IsPressed(MouseButton button);
+		bool IsPressed(MouseEnums::MouseButton button);
 
 		/// Checks if a certain button is released
-		bool IsReleased(MouseButton button);
+		bool IsReleased(MouseEnums::MouseButton button);
 
 		/// Checks if a certain button is double clicked
-		bool IsDoubleClicked(MouseButton button);
+		bool IsDoubleClicked(MouseEnums::MouseButton button);
 
 
 		/// Returns the position of the mouse
