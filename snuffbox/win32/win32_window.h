@@ -49,9 +49,9 @@ namespace snuffbox
 		/// When the window is closed
 		void OnClose();
 		/// When the mouse is moved
-		void OnMouseMove(LPARAM lParam, WPARAM wParam);
+    void OnMouseMove(float x, float y);
 		/// When the mouse is held down
-		void OnMouseDown(MouseButton button, LPARAM lParam, WPARAM wParam);
+    void OnMouseDown(MouseButton button, float x, float y);
 		/// When the mouse is released
 		void OnMouseUp(MouseButton button);
 		/// Processes all messages

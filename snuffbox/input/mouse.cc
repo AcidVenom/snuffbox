@@ -48,6 +48,12 @@ namespace snuffbox
 		return buttonStates_[button].pressed;
 	}
 
+  //--------------------------------------------------------------------------------------
+  bool Mouse::IsReleased(MouseButton button)
+  {
+    return buttonStates_[button].released;
+  }
+
 	//--------------------------------------------------------------------------------------
 	void Mouse::RegisterJS(JS_TEMPLATE)
 	{
@@ -100,6 +106,10 @@ namespace snuffbox
 	void Mouse::JSIsReleased(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
+    int button = args[0]->Int32Value();
+
+    bool check = environment::mouse().IsReleased(static_cast<MouseButton>(button));
+    args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -107,7 +117,6 @@ namespace snuffbox
 	{
 		for (unsigned int i = 0; i < 3; ++i)
 		{
-			buttonStates_[i].down = false;
 			buttonStates_[i].pressed = false;
 			buttonStates_[i].released = false;
 		}
@@ -122,6 +131,8 @@ namespace snuffbox
 	//--------------------------------------------------------------------------------------
 	void Mouse::Update()
 	{
+    ResetStates();
+
 		while (!queue_.empty())
 		{
 			const MouseData& evt = queue_.front();
@@ -131,6 +142,13 @@ namespace snuffbox
 				x_ = evt.x;
 				y_ = evt.y;
 				break;
+
+      case MouseEvent::kPressed:
+        buttonStates_[evt.button].down = true;
+        buttonStates_[evt.button].pressed = true;
+        x_ = evt.x;
+        y_ = evt.y;
+        break;
 
 			case MouseEvent::kDown:
 				buttonStates_[evt.button].down = true;

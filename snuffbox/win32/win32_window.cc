@@ -6,6 +6,8 @@
 #include "../../snuffbox/input/mouse.h"
 #include <string>
 
+#define WIN32_GET_MOUSE_POS POINT p;if (GetCursorPos(&p)){ScreenToClient(hWnd, &p);}
+
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------
@@ -113,24 +115,26 @@ namespace snuffbox
 	}
 	
 	//---------------------------------------------------------------------------
-	void Win32Window::OnMouseMove(LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnMouseMove(float x, float y)
 	{
 		MouseData evt;
-		evt.x = LOWORD(lParam);
-		evt.y = HIWORD(lParam);
+
+    evt.x = x;
+    evt.y = y;
 		evt.type = MouseEvent::kMove;
 
 		environment::mouse().ReceiveEvent(evt);
 	}
 
 	//---------------------------------------------------------------------------
-	void Win32Window::OnMouseDown(MouseButton button, LPARAM lParam, WPARAM wParam)
+	void Win32Window::OnMouseDown(MouseButton button, float x, float y)
 	{
 		MouseData evt;
-		evt.x = LOWORD(lParam);
-		evt.y = HIWORD(lParam);
+    
+    evt.x = x;
+    evt.y = y;
 		evt.button = button;
-		evt.type = MouseEvent::kDown;
+		evt.type = MouseEvent::kPressed;
 
 		environment::mouse().ReceiveEvent(evt);
 	}
@@ -197,6 +201,8 @@ namespace snuffbox
 
 		Win32Window *window = reinterpret_cast<Win32Window*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
 
+    WIN32_GET_MOUSE_POS;
+
 		switch (message)
 		{
 		case WM_SYSCOMMAND:
@@ -217,11 +223,11 @@ namespace snuffbox
 			break;
 			
 		case WM_LBUTTONDBLCLK:
-			window->OnMouseDown(MouseButton::kLeft, lParam, wParam);
+      window->OnMouseDown(MouseButton::kLeft, static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 
 		case WM_LBUTTONDOWN:
-			window->OnMouseDown(MouseButton::kLeft, lParam, wParam);
+			window->OnMouseDown(MouseButton::kLeft, static_cast<float>(p.x),static_cast<float>(p.y));
 			break;
 
 		case WM_LBUTTONUP:
@@ -229,7 +235,7 @@ namespace snuffbox
 			break;
 
 		case WM_MOUSEMOVE:
-			window->OnMouseMove(lParam, wParam);
+      window->OnMouseMove(static_cast<float>(p.x), static_cast<float>(p.y));
 			break;
 		}
 		return DefWindowProcA(hWnd, message, wParam, lParam);

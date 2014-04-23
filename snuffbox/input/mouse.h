@@ -84,8 +84,6 @@ namespace snuffbox
 		/// Checks if a certain button is released
 		bool IsReleased(MouseButton button);
 
-		/// Checks if a mouse button was pressed the previous frame
-		bool WasPressed(MouseButton button);
 
 		/// Returns the position of the mouse
 		std::tuple<double, double> position(){ return std::tuple<double, double>(x_,y_); }
