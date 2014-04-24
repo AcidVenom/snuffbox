@@ -106,7 +106,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\V8\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V8\include;$(DXSDK_DIR)\Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -114,7 +114,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>Ws2_32.lib;WINMM.lib;C:/V8/build/Debug/lib/icui18n.lib;C:/V8/build/Debug/lib/icuuc.lib;C:/V8/build/Debug/lib/v8_snapshot.lib;C:/V8/build/Debug/lib/v8_nosnapshot.x64.lib;C:/V8/build/Debug/lib/v8_base.x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;WINMM.lib;C:/V8/build/Debug/lib/icui18n.lib;C:/V8/build/Debug/lib/icuuc.lib;C:/V8/build/Debug/lib/v8_snapshot.lib;C:/V8/build/Debug/lib/v8_nosnapshot.x64.lib;C:/V8/build/Debug/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="d3d11\d3d11_display_device.cc" />
     <ClCompile Include="game.cc" />
     <ClCompile Include="input\keyboard.cc" />
     <ClCompile Include="input\mouse.cc" />
@@ -163,6 +164,7 @@
     <ClCompile Include="win32\win32_window.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="d3d11\d3d11_display_device.h" />
     <ClInclude Include="environment.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="input\key.h" />
@@ -175,8 +177,6 @@
     <ClInclude Include="memory\allocated_memory.h" />
     <ClInclude Include="memory\shared_ptr.h" />
     <ClInclude Include="networking\connection.h" />
-    <ClInclude Include="platform\definitions.h" />
-    <ClInclude Include="platform\interfaces.h" />
     <ClInclude Include="win32\win32_window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

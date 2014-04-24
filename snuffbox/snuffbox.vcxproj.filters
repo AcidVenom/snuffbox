@@ -7,9 +7,6 @@
     <Filter Include="win32">
       <UniqueIdentifier>{f008c19b-1274-4cc2-8320-2d9bfad57c5a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="platform">
-      <UniqueIdentifier>{8ab6413b-ddf2-4859-bcce-bba1b41b42a8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="js">
       <UniqueIdentifier>{ee2da02a-d3c7-4f41-b8d2-c580d0a32fc4}</UniqueIdentifier>
     </Filter>
@@ -18,6 +15,9 @@
     </Filter>
     <Filter Include="input">
       <UniqueIdentifier>{0401b396-4bd5-414c-ba79-dd2a9394e46c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="d3d11">
+      <UniqueIdentifier>{9c9ba9f6-cc7b-499d-8c48-6c5804ab95a2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +40,9 @@
     <ClCompile Include="input\mouse.cc">
       <Filter>input</Filter>
     </ClCompile>
+    <ClCompile Include="d3d11\d3d11_display_device.cc">
+      <Filter>d3d11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -49,12 +52,6 @@
     </ClInclude>
     <ClInclude Include="win32\win32_window.h">
       <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="platform\definitions.h">
-      <Filter>platform</Filter>
-    </ClInclude>
-    <ClInclude Include="platform\interfaces.h">
-      <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="environment.h" />
     <ClInclude Include="memory\allocated_memory.h">
@@ -80,6 +77,9 @@
     </ClInclude>
     <ClInclude Include="input\key.h">
       <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\d3d11_display_device.h">
+      <Filter>d3d11</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

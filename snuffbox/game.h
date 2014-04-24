@@ -5,12 +5,13 @@
 #include <Windows.h>
 #include <thread>
 #include "../snuffbox/memory/shared_ptr.h"
-#include "../snuffbox/platform/definitions.h"
 #include "../snuffbox/js/js_state_wrapper.h"
 #include "../snuffbox/js/js_callback.h"
 #include "../snuffbox/networking/connection.h"
 #include "../snuffbox/input/mouse.h"
 #include "../snuffbox/input/keyboard.h"
+#include "../snuffbox/win32/win32_window.h"
+#include "../snuffbox/d3d11/d3d11_display_device.h"
 
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 
@@ -37,7 +38,7 @@ namespace snuffbox
 		Game();
 
 		/// Construct with a window
-		Game(PlatformWindow* window);
+		Game(Win32Window* window);
 
 		/// Default destructor
 		~Game();
@@ -64,7 +65,7 @@ namespace snuffbox
 		void Shutdown();
 
 		/// Returns the window the game is running in 
-		PlatformWindow* window(){ return window_.get(); }
+		Win32Window* window(){ return window_.get(); }
 
 		/// Returns if the game is started or not
 		bool started(){ return started_; }
@@ -79,9 +80,10 @@ namespace snuffbox
 		void CreateCallbacks();
 
 	private:
-		SharedPtr<PlatformWindow> window_; ///< The Win32 window hooked to the game
+		SharedPtr<Win32Window> window_; ///< The Win32 window hooked to the game
 		SharedPtr<Mouse> mouse_; ///< The mouse object
 		SharedPtr<Keyboard> keyboard_; ///< The keyboard object
+		SharedPtr<D3D11DisplayDevice> device_; ///< The D3D11 device
 		bool started_;	///< Is the game started yet?
 		JSCallback initialise_; ///< The JavaScript update callback
 		JSCallback update_; ///< The JavaScript update callback

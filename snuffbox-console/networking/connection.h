@@ -9,7 +9,7 @@
 #include <thread>
 
 #define SNUFF_DEFAULT_PORT "1337"
-#define SNUFF_DEFAULT_BUFFER 64
+#define SNUFF_DEFAULT_BUFFER 512
 
 class Terminal;
 class SocketThread;

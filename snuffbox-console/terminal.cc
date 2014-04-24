@@ -207,6 +207,13 @@ void Terminal::HandleEvent()
       {
         ip_ = new QString(&str[6]);
       }
+			else
+			{
+				QString result = "Unknown command: " + txt;
+				AddLine(LogSeverity::kError, result.toStdString().c_str());
+				lineEdit_->setText("");
+				return;
+			}
       
       result = "Set new IP to: " + ip_->toStdString();
       AddLine(LogSeverity::kInfo, result.c_str());

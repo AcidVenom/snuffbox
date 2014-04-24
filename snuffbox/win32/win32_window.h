@@ -3,20 +3,31 @@
 #define _WINSOCKAPI_
 #define NOMINMAX
 #include <Windows.h>
-#include "../../snuffbox/platform/interfaces.h"
 #include "../../snuffbox/input/mouse.h"
 
+#define SNUFF_WINDOW_CENTERED -1
 #define SNUFF_WINDOW_CLASS "Snuff Window Class"
 
 namespace snuffbox
 {
 
 	/**
+	* @struct snuffbox::WindowParameters
+	* @brief Contains information of the parameters a window was created with
+	* @author Daniël Konings
+	*/
+	struct WindowParameters
+	{
+		int x, y, w, h;
+		const char* name;
+	};
+
+	/**
 	* @class snuffbox::Win32Window
 	* @brief A Windows window for use with the engine
 	* @author Daniël Konings
 	*/
-	class Win32Window : public IPlatformWindow
+	class Win32Window
 	{
 	public:
 		/// Default constructor
@@ -61,11 +72,16 @@ namespace snuffbox
 		void OnKeyUp(LPARAM lParam, WPARAM wParam);
 		/// Processes all messages
 		void ProcessMessages();
+		/// Returns the parameters
+		WindowParameters& params(){ return params_; }
+		/// Returns the window handle
+		HWND& handle(){ return handle_; }
 
 	private:
 		HWND handle_; ///< The reference to the window handle used by this window
     HINSTANCE instance_; ///< The reference to the hInstance
 		bool focussed_; ///< Check to see if the window is focussed or not
+		WindowParameters params_; ///< The parameters of this window
 	};
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam); ///< The windows message loop

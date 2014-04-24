@@ -1,5 +1,4 @@
 #include "../snuffbox/game.h"
-#include "../snuffbox/win32/win32_window.h"
 #include "../snuffbox/environment.h"
 
 #include <chrono>
@@ -28,11 +27,12 @@ namespace snuffbox
 using namespace snuffbox;
 
 //------------------------------------------------------------------------------------------------------
-Game::Game(PlatformWindow* window) : 
+Game::Game(Win32Window* window) : 
 started_(true), 
 consoleEnabled_(false),
 mouse_(environment::memory().ConstructShared<Mouse>()),
-keyboard_(environment::memory().ConstructShared<Keyboard>())
+keyboard_(environment::memory().ConstructShared<Keyboard>()),
+device_(environment::memory().ConstructShared<D3D11DisplayDevice>())
 {
 	window_ = window;
   environment::globalInstance = this;
@@ -48,13 +48,14 @@ Game::~Game()
 //------------------------------------------------------------------------------------------------------
 void Game::Initialise()
 {
-	CreateCallbacks();
-	InitialiseWindow();
 	if (consoleEnabled_)
 	{
 		connection_.Initialise();
 	}
+	CreateCallbacks();
+	InitialiseWindow();
 	window_->Show();
+	device_->Initialise();
 	initialise_.Call(0);
 }
 
@@ -99,6 +100,7 @@ void Game::Shutdown()
 
 	SNUFF_LOG_INFO("Snuffbox shutdown..");
 	started_ = false;
+	device_->Destroy();
 	window_->Destroy();
 	if (consoleEnabled_)
 	{
@@ -217,7 +219,7 @@ int SNUFF_MAIN
   JSStateWrapper js_state_wrapper;
 
 	SharedPtr<Game> game = environment::memory().ConstructShared<Game>(
-		environment::memory().ConstructShared<PlatformWindow>("Snuffbox Alpha (D3D11)",1024,600)
+		environment::memory().ConstructShared<Win32Window>("Snuffbox Alpha (D3D11)",1024,600)
 		);
 
   game->ParseCommandLine();
