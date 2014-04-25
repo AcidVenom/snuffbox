@@ -1,8 +1,5 @@
 #pragma once
 
-#define _WINSOCKAPI_
-#define NOMINMAX
-#include <Windows.h>
 #include <string>
 #include "../snuffbox/environment.h"
 #include "../snuffbox/networking/connection.h"

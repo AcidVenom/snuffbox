@@ -2,6 +2,8 @@
 
 #include <v8.h>
 #include <string>
+#include <vector>
+#include "../../snuffbox/memory/shared_ptr.h"
 
 using namespace v8;
 
@@ -13,14 +15,64 @@ using namespace v8;
 #define JS_REGISTER_OBJECT_FUNCTIONS(obj,func,cons) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){if (cons){ obj->PrototypeTemplate()->Set(String::NewFromUtf8(JS_ISOLATE, func[i].name), FunctionTemplate::New(JS_ISOLATE, func[i].cb)); }else{obj->Set(String::NewFromUtf8(JS_ISOLATE, func[i].name), FunctionTemplate::New(JS_ISOLATE, func[i].cb)); }} 
 #define JS_CREATE_SCOPE HandleScope handle_scope(JS_ISOLATE);
 #define JS_CREATE_ARGUMENT_SCOPE HandleScope handle_scope(args.GetIsolate());
-#define JS_REGISTER_GLOBAL(name) Handle<FunctionTemplate> obj = FunctionTemplate::New(JS_ISOLATE); JS_GLOBAL->Set(String::NewFromUtf8(JS_ISOLATE, name), obj);
+#define JS_REGISTER_GLOBAL(name,type) Handle<FunctionTemplate> obj = FunctionTemplate::New(JS_ISOLATE); JS_GLOBAL->Set(String::NewFromUtf8(JS_ISOLATE, name), obj); obj->Set(String::NewFromUtf8(JS_ISOLATE,"new"), FunctionTemplate::New(JS_ISOLATE,JSStateWrapper::JSNew<##type>))
+#define JS_REGISTER_GLOBAL_TYPELESS(name) Handle<FunctionTemplate> obj = FunctionTemplate::New(JS_ISOLATE); JS_GLOBAL->Set(String::NewFromUtf8(JS_ISOLATE, name), obj)
 #define JS_REGISTER_FUNCTIONS(func) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){JS_GLOBAL->Set(String::NewFromUtf8(JS_ISOLATE, func[i].name), FunctionTemplate::New(JS_ISOLATE, func[i].cb));}
 #define JS_NAME(className)static const char* static_class_name() { return #className; } virtual const char* get_class_name() const { return static_class_name(); }
 #define JS_SETUP_CALLBACKS Handle<Function> cb; Handle<Value> func;
 #define JS_OBJECT_CALLBACK(name,obj) func = obj->Get(String::NewFromUtf8(JS_ISOLATE, name));cb = Handle<Function>::Cast(func);
+#define JS_SETUP(type) Handle<Object> obj = args.This();Handle<Value> ptr = obj->Get(String::NewFromUtf8(JS_ISOLATE, "__ptr"));Handle<External> external = ptr.As<External>();type* self = static_cast<type*>(external->Value())
 
 namespace snuffbox
 {
+	/**
+	* @class snuffbox::JSObject
+	* @brief Every C++ object that will be extended to JS should extend from this
+	* @author Daniël Konings
+	*/
+	class JSObject
+	{
+	public:
+		virtual ~JSObject(){}
+
+		JS_NAME(JSObject);
+		static void RegisterJS(JS_TEMPLATE);
+	};
+
+	template<typename T, bool cons>
+	class JSRegister
+	{
+
+	};
+
+	template<typename T>
+	class JSRegister<T, false>
+	{
+	public:
+		static void Register()
+		{
+			JS_CREATE_SCOPE;
+
+			JS_REGISTER_GLOBAL_TYPELESS(T::static_class_name());
+
+			T::RegisterJS(obj);
+		}
+	};
+
+	template<typename T>
+	class JSRegister<T, true>
+	{
+	public:
+		static void Register()
+		{
+			JS_CREATE_SCOPE;
+
+			JS_REGISTER_GLOBAL(T::static_class_name(), T);
+
+			T::RegisterJS(obj);
+		}
+	};
+
   /**
   * @struct snuffbox::JSFunctionRegister
   * @brief A structure to hold a name and a function associated with it, use as an array
@@ -70,11 +122,19 @@ namespace snuffbox
     /// Creates the JavaScript context
 		Handle<Context> CreateContext();
 
+		/// Returns the list of JavaScript references
+		std::vector<JSObject*>& jsReferences(){ return jsReferences_; }
+
+		/// Creates a new instance of a C++ object from JavaScript
+		template<typename T>
+		static void JSNew(JS_ARGS);
+
   private:
     Isolate* isolate_; ///< The JavaScript isolate created at startup
     std::string path_; ///< The source directory path
 		Persistent<ObjectTemplate, CopyablePersistentTraits<ObjectTemplate>> global_; ///< The function registry
 		Persistent<Context, CopyablePersistentTraits<Context>> context_;	/// The JavaScript context
+		std::vector<JSObject*> jsReferences_;	/// A list of all JavaScript constructed C++ objects
 
   private:
     /// JavaScript log debug
@@ -102,29 +162,4 @@ namespace snuffbox
     static void JSAssert(JS_ARGS);
   };
 
-	/**
-	* @class snuffbox::JSObject
-	* @brief Every C++ object that will be extended to JS should extend from this
-	* @author Daniël Konings
-	*/
-	class JSObject
-	{
-	public: 
-		virtual ~JSObject(){}
-
-		JS_NAME(JSObject);
-		static void RegisterJS(JS_TEMPLATE);
-	};
-
-	template<typename T>
-	class JSRegister
-	{
-	public:
-		static void Register()
-		{
-			JS_CREATE_SCOPE;
-			JS_REGISTER_GLOBAL(T::static_class_name());
-			T::RegisterJS(obj);
-		}
-	};
 }

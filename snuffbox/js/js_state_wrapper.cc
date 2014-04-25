@@ -95,7 +95,7 @@ namespace snuffbox
 
 		RegisterJSObjects();
 
-    JS_REGISTER_GLOBAL("Log");
+		JS_REGISTER_GLOBAL_TYPELESS("Log");
 
     JSFunctionRegister logFunctions[] =
     {
@@ -239,4 +239,23 @@ namespace snuffbox
       }
     }
   }
+
+	//---------------------------------------------------------------------------
+	template<typename T>
+	void JSStateWrapper::JSNew(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		SharedPtr<T> ptr = environment::memory().ConstructShared<T>(args);
+		environment::js_state_wrapper().jsReferences().push_back(ptr.get());
+		Handle<Context> ctx = JS_CONTEXT;
+		ctx->Enter();
+		Handle<Object> global = ctx->Global();
+		Handle<Value> templ = global->Get(String::NewFromUtf8(JS_ISOLATE, ptr->get_class_name()));
+		Handle<Function> objTemplate = Handle<Function>::Cast(templ);
+		ctx->Exit();
+		
+		Handle<Object> obj = objTemplate->NewInstance();
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "__ptr"), External::New(JS_ISOLATE, static_cast<void*>(ptr.get())));
+		args.GetReturnValue().Set(obj);
+	}
 }

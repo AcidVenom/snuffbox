@@ -52,6 +52,8 @@ void Game::Initialise()
 	{
 		connection_.Initialise();
 	}
+
+	Sleep(1000);
 	CreateCallbacks();
 	InitialiseWindow();
 	window_->Show();

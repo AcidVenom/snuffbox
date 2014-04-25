@@ -43,6 +43,7 @@
     <ClCompile Include="d3d11\d3d11_display_device.cc">
       <Filter>d3d11</Filter>
     </ClCompile>
+    <ClCompile Include="test.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -81,5 +82,6 @@
     <ClInclude Include="d3d11\d3d11_display_device.h">
       <Filter>d3d11</Filter>
     </ClInclude>
+    <ClInclude Include="test.h" />
   </ItemGroup>
 </Project>

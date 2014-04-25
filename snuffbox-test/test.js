@@ -5,14 +5,6 @@ var Test = function()
 
 	this.update = function()
 	{
-		if(Keyboard.IsDown("W"))
-		{
-			Log.debug("Key W held down");
-		}
 
-		if(Mouse.IsDown(0))
-		{
-			Log.debug("Left mouse button held down");
-		}
 	}
 }

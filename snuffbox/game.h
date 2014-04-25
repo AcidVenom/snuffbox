@@ -2,15 +2,14 @@
 
 #define _WINSOCKAPI_
 #define NOMINMAX
-#include <Windows.h>
 #include <thread>
+#include "../snuffbox/win32/win32_window.h"
 #include "../snuffbox/memory/shared_ptr.h"
 #include "../snuffbox/js/js_state_wrapper.h"
 #include "../snuffbox/js/js_callback.h"
 #include "../snuffbox/networking/connection.h"
 #include "../snuffbox/input/mouse.h"
 #include "../snuffbox/input/keyboard.h"
-#include "../snuffbox/win32/win32_window.h"
 #include "../snuffbox/d3d11/d3d11_display_device.h"
 
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
