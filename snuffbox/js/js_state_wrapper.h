@@ -37,6 +37,11 @@ namespace snuffbox
 
 		JS_NAME(JSObject);
 		static void RegisterJS(JS_TEMPLATE);
+
+		Persistent<Object>& persistent(){ return persistent_; }
+
+	private:
+		Persistent<Object> persistent_;
 	};
 
 	template<typename T, bool cons>
@@ -122,9 +127,6 @@ namespace snuffbox
     /// Creates the JavaScript context
 		Handle<Context> CreateContext();
 
-		/// Returns the list of JavaScript references
-		std::vector<JSObject*>& jsReferences(){ return jsReferences_; }
-
 		/// Creates a new instance of a C++ object from JavaScript
 		template<typename T>
 		static void JSNew(JS_ARGS);
@@ -134,7 +136,6 @@ namespace snuffbox
     std::string path_; ///< The source directory path
 		Persistent<ObjectTemplate, CopyablePersistentTraits<ObjectTemplate>> global_; ///< The function registry
 		Persistent<Context, CopyablePersistentTraits<Context>> context_;	/// The JavaScript context
-		std::vector<JSObject*> jsReferences_;	/// A list of all JavaScript constructed C++ objects
 
   private:
     /// JavaScript log debug
@@ -160,6 +161,9 @@ namespace snuffbox
 
     /// JavaScript assert
     static void JSAssert(JS_ARGS);
+
+		/// Destroys a JavaScript object
+		static void JSDestroy(const v8::WeakCallbackData<v8::Object, JSObject>& data);
   };
 
 }

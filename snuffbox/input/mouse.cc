@@ -71,7 +71,9 @@ namespace snuffbox
 			JSFunctionRegister("IsPressed",JSIsPressed),
 			JSFunctionRegister("IsDown",JSIsDown),
 			JSFunctionRegister("IsReleased", JSIsReleased),
-			JSFunctionRegister("IsDoubleClicked", JSIsDoubleClicked)
+			JSFunctionRegister("IsDoubleClicked", JSIsDoubleClicked),
+			JSFunctionRegister("WheelUp", JSWheelUp),
+			JSFunctionRegister("WheelDown", JSWheelDown)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
@@ -87,6 +89,24 @@ namespace snuffbox
 		retVal->Set(String::NewFromUtf8(JS_ISOLATE, "y"), Number::New(JS_ISOLATE, std::get<1>(pos)));
 
 		args.GetReturnValue().Set(retVal);
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Mouse::JSWheelUp(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+
+		bool check = environment::mouse().IsPressed(MouseEnums::MouseButton::kWheelUp);
+		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Mouse::JSWheelDown(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+
+		bool check = environment::mouse().IsPressed(MouseEnums::MouseButton::kWheelDown);
+		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -132,7 +152,7 @@ namespace snuffbox
 	//--------------------------------------------------------------------------------------
 	void Mouse::ResetStates()
 	{
-		for (unsigned int i = 0; i < 3; ++i)
+		for (unsigned int i = 0; i < 5; ++i)
 		{
 			buttonStates_[i].pressed = false;
 			buttonStates_[i].released = false;
@@ -156,6 +176,10 @@ namespace snuffbox
 			const MouseData& evt = queue_.front();
 			switch (evt.type)
 			{
+			case MouseEnums::MouseEvent::kWheel:
+				buttonStates_[evt.button].pressed = true;
+				break;
+
 			case MouseEnums::MouseEvent::kDblClk:
 				buttonStates_[evt.button].down = true;
 				buttonStates_[evt.button].dblclk = true;

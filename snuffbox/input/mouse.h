@@ -18,7 +18,9 @@ namespace snuffbox
 		{
 			kLeft,
 			kRight,
-			kMiddle
+			kMiddle,
+			kWheelDown,
+			kWheelUp
 		};
 
 		/**
@@ -32,7 +34,8 @@ namespace snuffbox
 			kDown,
 			kUp,
 			kMove,
-			kDblClk
+			kDblClk,
+			kWheel
 		};
 	};
 	/**
@@ -97,7 +100,7 @@ namespace snuffbox
 		std::tuple<double, double> position(){ return std::tuple<double, double>(x_,y_); }
 
 	private:
-		MouseButtonState buttonStates_[3]; ///< The button states of every button
+		MouseButtonState buttonStates_[5]; ///< The button states of every button
 		float x_, y_;											 ///< X and Y position of the mouse
 		std::queue<MouseData> queue_;			 ///< The queue to handle messages from
 
@@ -111,5 +114,7 @@ namespace snuffbox
 		static void JSIsDown(JS_ARGS);	///< Returns if a mouse button is down this frame
 		static void JSIsReleased(JS_ARGS);	///< Returns if a mouse button is released this frame
 		static void JSIsDoubleClicked(JS_ARGS);	///< Returns if a mouse button is double clicked this frame
+		static void JSWheelUp(JS_ARGS);	///< Returns if the mouse was scrolled up this frame
+		static void JSWheelDown(JS_ARGS); ///< Retrusn if the mouse was scrolled down this frame
 	};
 }

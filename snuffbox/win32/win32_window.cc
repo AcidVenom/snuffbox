@@ -181,6 +181,16 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------
+	void Win32Window::OnWheel(LPARAM lParam, WPARAM wParam)
+	{
+		MouseData evt;
+		evt.button = GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? MouseEnums::MouseButton::kWheelUp : MouseEnums::MouseButton::kWheelDown;
+		evt.type = MouseEnums::MouseEvent::kWheel;
+
+		environment::mouse().ReceiveEvent(evt);
+	}
+
+	//---------------------------------------------------------------------------
 	void Win32Window::OnSetFocus()
 	{
 		SNUFF_LOG_INFO("[WIN32] The window received focus");
@@ -299,6 +309,10 @@ namespace snuffbox
 
 		case WM_KEYUP:
 			window->OnKeyUp(lParam, wParam);
+			break;
+
+		case WM_MOUSEWHEEL:
+			window->OnWheel(lParam, wParam);
 			break;
 		}
 		return DefWindowProcA(hWnd, message, wParam, lParam);

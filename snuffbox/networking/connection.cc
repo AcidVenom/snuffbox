@@ -32,7 +32,7 @@ namespace snuffbox
 	//-----------------------------------------------------------------------------------
 	Connection::~Connection()
 	{
-
+		Destroy();
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -40,6 +40,7 @@ namespace snuffbox
 	{
 		closesocket(socket_);
 		WSACleanup();
+
 		if (thread_.joinable())
 			thread_.join();
 	}
@@ -118,7 +119,7 @@ namespace snuffbox
 		int result = listen(socket_, 1);
 		SNUFF_XASSERT(result == 0, "Failed listening the socket!");
 
-		while (client_ == SOCKET_ERROR && environment::game().started())
+		while (client_ == SOCKET_ERROR && environment::has_game())
 		{
 			SNUFF_LOG_INFO("Awaiting console connection..");
 			sockaddr incoming;
@@ -129,6 +130,7 @@ namespace snuffbox
 		if (client_ != SOCKET_ERROR)
 		{
 			environment::globalInstance = this;
+			connected_ = true;
 			SNUFF_LOG_INFO("Received welcome message from the server");
 		}
 	}

@@ -78,6 +78,9 @@ namespace snuffbox
 		/// Creates the JavaScript callbacks
 		void CreateCallbacks();
 
+		/// Checks if the console is enabled
+		bool consoleEnabled(){ return consoleEnabled_; }
+
 	private:
 		SharedPtr<Win32Window> window_; ///< The Win32 window hooked to the game
 		SharedPtr<Mouse> mouse_; ///< The mouse object
@@ -90,8 +93,6 @@ namespace snuffbox
 		JSCallback shutdown_; ///< The JavaScript update callback
 		double deltaTime_;	///< The current delta time
 		bool consoleEnabled_; ///< Is the console enabled?
-		Connection connection_; ///< The connection with the console
-		std::thread socket_thread; ///< Socket listening thread
 
 	public:
 		JS_NAME(Game);

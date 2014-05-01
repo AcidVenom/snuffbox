@@ -70,6 +70,8 @@ namespace snuffbox
 		void OnKeyDown(LPARAM lParam, WPARAM wParam);
 		/// When the key is released
 		void OnKeyUp(LPARAM lParam, WPARAM wParam);
+		/// When the mouse wheel is scrolled
+		void OnWheel(LPARAM lParam, WPARAM wParam);
 		/// Processes all messages
 		void ProcessMessages();
 		/// Returns the parameters

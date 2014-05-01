@@ -37,6 +37,12 @@ namespace snuffbox
 		/// Sends a message to the remote console
 		void Send(LogSeverity severity, const char* msg);
 
+		/// Returns if the console is connected
+		bool connected(){ return connected_; }
+
+		/// Disconnects
+		void disconnect(){ connected_ = false; }
+
 	private:
 		WSADATA data_; ///< Holds WinSock data
 		addrinfo* info_; ///< Holds WinSock address info

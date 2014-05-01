@@ -48,12 +48,6 @@ Game::~Game()
 //------------------------------------------------------------------------------------------------------
 void Game::Initialise()
 {
-	if (consoleEnabled_)
-	{
-		connection_.Initialise();
-	}
-
-	Sleep(1000);
 	CreateCallbacks();
 	InitialiseWindow();
 	window_->Show();
@@ -64,6 +58,10 @@ void Game::Initialise()
 //------------------------------------------------------------------------------------------------------
 void Game::Update()
 {
+
+	if (!started_)
+		return;
+
 	mouse_->Update();
 	keyboard_->Update();
 	high_resolution_clock::time_point startTime = high_resolution_clock::now();
@@ -82,7 +80,6 @@ void Game::Update()
 	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime);
 	deltaTime_ = dtDuration.count() * 1e-3f;
 	lastTime = now;
-
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -100,15 +97,29 @@ void Game::Shutdown()
 {
 	shutdown_.Call(0);
 
+	JS_CREATE_SCOPE;
+	Handle<Context> ctx = JS_CONTEXT;
+	ctx->Enter();
+	Handle<Object> global = ctx->Global();
+	Handle<Array> arr = global->GetPropertyNames();
+		
+	for (unsigned int i = 0; i < arr->Length(); ++i)
+	{
+		String::Utf8Value str(arr->Get(i));
+		std::string varName = *str;
+		std::string result = varName + " = null;";
+		Handle<Script> script = Script::Compile(String::NewFromUtf8(JS_ISOLATE, result.c_str()));
+		script->Run();
+	}
+	ctx->Exit();
+	
 	SNUFF_LOG_INFO("Snuffbox shutdown..");
 	started_ = false;
 	device_->Destroy();
 	window_->Destroy();
-	if (consoleEnabled_)
-	{
-		connection_.Destroy();
-	}
 	SNUFF_LOG_INFO(".. Shutdown succesful");
+
+	environment::globalInstance = nullptr;
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -192,7 +203,7 @@ void Game::CreateCallbacks()
 
 	JS_SETUP_CALLBACKS;
 
-	SNUFF_XASSERT(game->IsFunction(), "Could not find 'Game' object!");
+	SNUFF_XASSERT(game->IsObject(), "Could not find 'Game' object!");
 	Handle<Object> obj = game->ToObject();
 
 	JS_OBJECT_CALLBACK("Initialise", obj);
@@ -217,6 +228,7 @@ void Game::CreateCallbacks()
 //------------------------------------------------------------------------------------------------------
 int SNUFF_MAIN
 {
+	Connection connection;
 	AllocatedMemory memory;
   JSStateWrapper js_state_wrapper;
 
@@ -225,7 +237,11 @@ int SNUFF_MAIN
 		);
 
   game->ParseCommandLine();
-
+	if (game->consoleEnabled())
+	{
+		connection.Initialise();
+		Sleep(1000);
+	}
   js_state_wrapper.Initialise();
 	
 	game->Initialise();

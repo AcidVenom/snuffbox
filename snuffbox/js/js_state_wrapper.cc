@@ -155,6 +155,10 @@ namespace snuffbox
   {
 		global_.Reset();
 		context_.Reset();
+
+		while (!V8::IdleNotification()){} //Garbage collection
+
+		V8::Dispose();
   }
 
   //---------------------------------------------------------------------------
@@ -235,27 +239,41 @@ namespace snuffbox
 
       if (stack_trace.length() > 0) {
         SNUFF_LOG_FATAL(error.c_str());
-        SNUFF_ASSERT("Failed compiling a JavaScript file! See above for errors.");
+        SNUFF_ASSERT("Failed running a JavaScript file! See above for errors.");
       }
     }
   }
+
+	//---------------------------------------------------------------------------
+	void JSStateWrapper::JSDestroy(const v8::WeakCallbackData<v8::Object, JSObject>& data)
+	{
+		int64_t size = -static_cast<int64_t>(sizeof(data.GetParameter()));
+		data.GetParameter()->persistent().Reset();
+		environment::memory().Destruct<JSObject>(data.GetParameter());
+		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size);
+		data.GetValue().Clear();
+	}
 
 	//---------------------------------------------------------------------------
 	template<typename T>
 	void JSStateWrapper::JSNew(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		SharedPtr<T> ptr = environment::memory().ConstructShared<T>(args);
-		environment::js_state_wrapper().jsReferences().push_back(ptr.get());
+		T* ptr = environment::memory().ConstructShared<T>(args);
 		Handle<Context> ctx = JS_CONTEXT;
 		ctx->Enter();
 		Handle<Object> global = ctx->Global();
 		Handle<Value> templ = global->Get(String::NewFromUtf8(JS_ISOLATE, ptr->get_class_name()));
 		Handle<Function> objTemplate = Handle<Function>::Cast(templ);
-		ctx->Exit();
-		
+
 		Handle<Object> obj = objTemplate->NewInstance();
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "__ptr"), External::New(JS_ISOLATE, static_cast<void*>(ptr.get())));
+		ptr->persistent().Reset(JS_ISOLATE, obj);
+		ptr->persistent().SetWeak(static_cast<JSObject*>(ptr), JSDestroy);
+		ptr->persistent().MarkIndependent();
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "__ptr"), External::New(JS_ISOLATE, static_cast<void*>(ptr)));
+		int64_t allocated = JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(sizeof(ptr));
+		ctx->Exit();
+
 		args.GetReturnValue().Set(obj);
 	}
 }
