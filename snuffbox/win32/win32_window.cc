@@ -58,7 +58,7 @@ namespace snuffbox
 		wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = instance_;
 		wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wndClass.hbrBackground = (HBRUSH)BLACK_BRUSH;
+		wndClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
 		wndClass.lpszClassName = SNUFF_WINDOW_CLASS;
 		wndClass.cbWndExtra = sizeof(void*);
 		wndClass.cbClsExtra = sizeof(WNDCLASS);

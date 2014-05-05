@@ -5,6 +5,7 @@
 #include <d3d11.h>
 #include <d3dcommon.h>
 #include <D3DX10.h>
+#include <D3DX11.h>
 
 #include <vector>
 
@@ -16,9 +17,22 @@ typedef												ID3D11DeviceContext							D3DContext;
 typedef												IDXGIAdapter										DisplayAdapter;
 typedef												ID3D11Texture2D									D3DTexture2D;
 typedef												ID3D11RenderTargetView					D3DRenderTargetView;
+typedef												ID3D11VertexShader							VertexShader;
+typedef												ID3D11PixelShader								PixelShader;
 
 namespace snuffbox
 {
+	/**
+	* @struct snuffbox::Vertex
+	* @brief A vertex structure for use with vertex buffers
+	* @author Daniël Konings
+	*/
+	struct Vertex
+	{
+		float x, y, z;
+		D3DXCOLOR colour;
+	};
+
 	/**
 	* @class snuffbox::D3D11DisplayDevice
 	* @brief The actual display device for Direct3D 11, used for rendering on-screen
@@ -44,6 +58,21 @@ namespace snuffbox
 
 		/// Creates the backbuffer of this device
 		void CreateBackBuffer();
+		
+		/// Creates a vertex buffer for use with this device
+		void CreateVertexBuffer();
+
+		/// Creates the shaders for use with this device
+		void CreateShaders();
+
+		/// Creates the viewport
+		void CreateViewport();
+
+		/// Starts the draw
+		void StartDraw();
+
+		/// Ends the draw
+		void EndDraw();
 
 		/// Destroys the device
 		void Destroy();
@@ -60,5 +89,11 @@ namespace snuffbox
 		DisplayAdapter*								primaryAdapter_;		///< The primary display adapter
 		D3DTexture2D*									backBuffer_;				///< The backbuffer of this device
 		D3DRenderTargetView*					renderTargetView_;	///< The render target view of this device
+		ID3D11Buffer*									vertexBuffer_;			///< The vertex buffer
+		ID3D11InputLayout*						inputLayout_;				///< The vertex input layout
+		ID3D10Blob*										vsBuffer_;					///< Vertex shader buffer
+		ID3D10Blob*										psBuffer_;					///< Pixel shader buffer
+		VertexShader*									vs_;								///< The vertex shader
+		PixelShader*									ps_;								///< The pixel shader
 	};
 }

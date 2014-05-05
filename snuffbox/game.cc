@@ -85,11 +85,17 @@ void Game::Update()
 //------------------------------------------------------------------------------------------------------
 void Game::Draw()
 {
+	if (!started_)
+		return;
+
 	JS_CREATE_SCOPE;
 	Handle<Value> argv[1] = {
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
+
+	environment::render_device().StartDraw();
 	draw_.Call(1,argv);
+	environment::render_device().EndDraw();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -233,7 +239,7 @@ int SNUFF_MAIN
   JSStateWrapper js_state_wrapper;
 
 	SharedPtr<Game> game = environment::memory().ConstructShared<Game>(
-		environment::memory().ConstructShared<Win32Window>("Snuffbox Alpha (D3D11)",1024,600)
+		environment::memory().ConstructShared<Win32Window>("Snuffbox Alpha (D3D11)",1280,720)
 		);
 
   game->ParseCommandLine();

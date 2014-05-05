@@ -5,6 +5,24 @@
 
 namespace snuffbox
 {
+	namespace environment
+	{
+		namespace
+		{
+			D3D11DisplayDevice* globalInstance = nullptr;
+		}
+
+		bool has_render_device(){ return globalInstance != nullptr; }
+
+		D3D11DisplayDevice& render_device()
+		{
+			return *globalInstance;
+		}
+	}
+}
+
+namespace snuffbox
+{
 	//---------------------------------------------------------------------------------
 	std::basic_string<TCHAR> D3D11DisplayDevice::HRToString(HRESULT hr)
 	{
@@ -19,6 +37,10 @@ namespace snuffbox
 		CreateDevice();
 		GetAdapters();
 		CreateBackBuffer();
+		CreateViewport();
+		CreateShaders();
+		CreateVertexBuffer();
+		environment::globalInstance = this;
 	}
 
 	//---------------------------------------------------------------------------------
@@ -38,6 +60,7 @@ namespace snuffbox
 		swapDesc_.SampleDesc.Count = 1;
 		swapDesc_.SampleDesc.Quality = 0;
 		swapDesc_.Windowed = TRUE;
+		swapDesc_.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 		HRESULT result = S_OK;
 
@@ -65,7 +88,6 @@ namespace snuffbox
 			&context_
 			)))
 		{
-			auto i = featureLevelsSupported;
 			SNUFF_ASSERT(HRToString(result));
 		}
 
@@ -140,12 +162,106 @@ namespace snuffbox
 		result = device_->CreateRenderTargetView(backBuffer_, NULL,
 			&renderTargetView_);
 
+		SNUFF_XASSERT(result == S_OK, HRToString(result))
+
 		context_->OMSetRenderTargets(1, &renderTargetView_, NULL);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateVertexBuffer()
+	{
+		HRESULT result = S_OK;
+
+		Vertex vertices[] =
+		{
+			{ 0.0f, 0.5f, 0.0f, D3DXCOLOR(0.0f,0.0f,1.0f,1.0f) },
+			{ 0.45f, -0.5f, 0.0f, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) },
+			{ -0.45f, -0.5f, 0.0f, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f) }
+		};
+
+		D3D11_BUFFER_DESC bufferDesc;
+
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		bufferDesc.ByteWidth = sizeof(Vertex) * 3;
+		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.MiscFlags = 0;
+
+		D3D11_INPUT_ELEMENT_DESC layout[] = 
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		};
+
+		D3D11_SUBRESOURCE_DATA inputData;
+		inputData.pSysMem = vertices;
+
+		result = device_->CreateBuffer(&bufferDesc, &inputData, &vertexBuffer_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		context_->IASetVertexBuffers(0, 1, &vertexBuffer_, &stride, &offset);
+
+		result = device_->CreateInputLayout(layout, 2, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		context_->IASetInputLayout(inputLayout_);
+		context_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateShaders()
+	{
+		HRESULT result = S_OK;
+		std::string path = environment::js_state_wrapper().path() + "/shaders/test.fx";
+
+		result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "VS", "vs_5_0", 0, 0, 0, &vsBuffer_, 0, 0);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+		result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "PS", "ps_5_0", 0, 0, 0, &psBuffer_, 0, 0);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		result = device_->CreateVertexShader(vsBuffer_->GetBufferPointer(), vsBuffer_->GetBufferSize(), NULL, &vs_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+		result = device_->CreatePixelShader(psBuffer_->GetBufferPointer(), psBuffer_->GetBufferSize(), NULL, &ps_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		context_->VSSetShader(vs_, 0, 0);
+		context_->PSSetShader(ps_, 0, 0);
+	}
+
+	void D3D11DisplayDevice::CreateViewport()
+	{
+		D3D11_VIEWPORT viewport;
+
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		viewport.Width = static_cast<float>(environment::game().window()->params().w);
+		viewport.Height = static_cast<float>(environment::game().window()->params().h);
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		context_->RSSetViewports(1, &viewport);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::StartDraw()
+	{
+		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+		context_->Draw(3, 0);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::EndDraw()
+	{
+		swapChain_->Present(0, 0);
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Destroy()
 	{
+		swapChain_->SetFullscreenState(FALSE, NULL);
+
 		SNUFF_ASSERT_NOTNULL(device_);
 		device_->Release();
 		device_ = NULL;
@@ -172,6 +288,30 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(backBuffer_);
 		backBuffer_->Release();
 		backBuffer_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(vertexBuffer_);
+		vertexBuffer_->Release();
+		vertexBuffer_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(inputLayout_);
+		inputLayout_->Release();
+		inputLayout_ = NULL;
+		
+		SNUFF_ASSERT_NOTNULL(vsBuffer_);
+		vsBuffer_->Release();
+		vsBuffer_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(psBuffer_);
+		psBuffer_->Release();
+		psBuffer_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(vs_);
+		vs_->Release();
+		vs_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(ps_);
+		ps_->Release();
+		ps_ = NULL;
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");
 	}

@@ -8,6 +8,7 @@ namespace snuffbox
 	class Connection;
 	class Mouse;
 	class Keyboard;
+	class D3D11DisplayDevice;
 
 	namespace environment
 	{
@@ -29,6 +30,9 @@ namespace snuffbox
 		/// Returns the keyboard
 		Keyboard& keyboard();
 
+		/// Returns the render device
+		D3D11DisplayDevice& render_device();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -46,5 +50,8 @@ namespace snuffbox
 
 		/// Returns if there's a keyboard or not
 		bool has_keyboard();
+
+		/// Returns if there's a render device or not
+		bool has_render_device();
 	}
 }
