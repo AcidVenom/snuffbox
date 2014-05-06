@@ -27,7 +27,7 @@ namespace snuffbox
 	std::basic_string<TCHAR> D3D11DisplayDevice::HRToString(HRESULT hr)
 	{
 		_com_error error(hr);
-		std::basic_string<TCHAR> str = error.ErrorMessage();
+		std::basic_string<TCHAR> str = std::string("[D3D11] ") + error.ErrorMessage();
 		return str;
 	}
 
@@ -172,17 +172,17 @@ namespace snuffbox
 	{
 		HRESULT result = S_OK;
 
-		Vertex vertices[] =
+		std::vector<Vertex> vertices;
+
+		for (unsigned int i = 0; i < 1000; ++i)
 		{
-			{ 0.0f, 0.5f, 0.0f, D3DXCOLOR(0.0f,0.0f,1.0f,1.0f) },
-			{ 0.45f, -0.5f, 0.0f, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) },
-			{ -0.45f, -0.5f, 0.0f, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f) }
-		};
+			vertices.push_back({ -1.0f+i*0.002f, 0.4f+i%2*0.2f, 0.0f, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f) });
+		}
 
 		D3D11_BUFFER_DESC bufferDesc;
 
 		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.ByteWidth = sizeof(Vertex) * 3;
+		bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices.size());
 		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bufferDesc.CPUAccessFlags = 0;
 		bufferDesc.MiscFlags = 0;
@@ -194,7 +194,7 @@ namespace snuffbox
 		};
 
 		D3D11_SUBRESOURCE_DATA inputData;
-		inputData.pSysMem = vertices;
+		inputData.pSysMem = &vertices[0];
 
 		result = device_->CreateBuffer(&bufferDesc, &inputData, &vertexBuffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
@@ -207,7 +207,7 @@ namespace snuffbox
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		context_->IASetInputLayout(inputLayout_);
-		context_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -226,8 +226,31 @@ namespace snuffbox
 		result = device_->CreatePixelShader(psBuffer_->GetBufferPointer(), psBuffer_->GetBufferSize(), NULL, &ps_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
+
+		VS_CONSTANT_BUFFER vsConstantBuffer;
+		vsConstantBuffer.Time = time_;
+
+		D3D11_BUFFER_DESC constantBufferDesc;
+		constantBufferDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER) * 4;
+		constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		constantBufferDesc.CPUAccessFlags = 0;
+		constantBufferDesc.MiscFlags = 0;
+		constantBufferDesc.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA initData;
+		initData.pSysMem = &vsConstantBuffer;
+		initData.SysMemPitch = 0;
+		initData.SysMemSlicePitch = 0;
+
+		result = device_->CreateBuffer(&constantBufferDesc, &initData, &vsConstantBuffer_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
 		context_->VSSetShader(vs_, 0, 0);
 		context_->PSSetShader(ps_, 0, 0);
+
+		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 	}
 
 	void D3D11DisplayDevice::CreateViewport()
@@ -247,14 +270,21 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
+		HRESULT result = S_OK;
+		VS_CONSTANT_BUFFER vsConstantBuffer;
+		vsConstantBuffer.Time = time_;
+
+		context_->UpdateSubresource(vsConstantBuffer_, 0, NULL, &vsConstantBuffer, 0, 0);
+		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-		context_->Draw(3, 0);
+		context_->Draw(1000, 0);
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::EndDraw()
 	{
-		swapChain_->Present(0, 0);
+		swapChain_->Present(1, 0);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -304,6 +334,10 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(psBuffer_);
 		psBuffer_->Release();
 		psBuffer_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(vsConstantBuffer_);
+		vsConstantBuffer_->Release();
+		vsConstantBuffer_ = NULL;
 
 		SNUFF_ASSERT_NOTNULL(vs_);
 		vs_->Release();

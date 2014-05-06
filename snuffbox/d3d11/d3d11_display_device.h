@@ -33,6 +33,11 @@ namespace snuffbox
 		D3DXCOLOR colour;
 	};
 
+	struct VS_CONSTANT_BUFFER
+	{
+		float Time;
+	};
+
 	/**
 	* @class snuffbox::D3D11DisplayDevice
 	* @brief The actual display device for Direct3D 11, used for rendering on-screen
@@ -42,7 +47,7 @@ namespace snuffbox
 	{
 	public:
 		/// Default constructor
-		D3D11DisplayDevice(){};
+		D3D11DisplayDevice() : time_(0.0f){};
 
 		/// Default destructor
 		~D3D11DisplayDevice(){};
@@ -74,6 +79,9 @@ namespace snuffbox
 		/// Ends the draw
 		void EndDraw();
 
+		/// Increases the elapsed time
+		void IncrementTime(){ ++time_; }
+
 		/// Destroys the device
 		void Destroy();
 
@@ -90,10 +98,12 @@ namespace snuffbox
 		D3DTexture2D*									backBuffer_;				///< The backbuffer of this device
 		D3DRenderTargetView*					renderTargetView_;	///< The render target view of this device
 		ID3D11Buffer*									vertexBuffer_;			///< The vertex buffer
+		ID3D11Buffer*									vsConstantBuffer_;	///< The vertex buffer
 		ID3D11InputLayout*						inputLayout_;				///< The vertex input layout
 		ID3D10Blob*										vsBuffer_;					///< Vertex shader buffer
 		ID3D10Blob*										psBuffer_;					///< Pixel shader buffer
 		VertexShader*									vs_;								///< The vertex shader
 		PixelShader*									ps_;								///< The pixel shader
+		float													time_;							///< The game time
 	};
 }

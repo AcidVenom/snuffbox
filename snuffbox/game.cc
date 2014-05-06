@@ -80,6 +80,8 @@ void Game::Update()
 	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime);
 	deltaTime_ = dtDuration.count() * 1e-3f;
 	lastTime = now;
+
+	environment::render_device().IncrementTime();
 }
 
 //------------------------------------------------------------------------------------------------------
