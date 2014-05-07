@@ -1,6 +1,7 @@
 cbuffer VS_CONSTANT_BUFFER : register(b0)
 {
 	float Time;
+	float4x4 WorldViewProjection;
 }
 
 struct VOut
@@ -13,7 +14,7 @@ VOut VS(float4 position : POSITION, float4 color : COLOR)
 {
     VOut output;
 
-    output.position = float4(position.x,position.y+sin((position.x*position.x*10)+Time/20)*0.4,position.z,1);
+    output.position = mul(float4(position.x,position.y+sin(position.x*position.x*10+Time/10)/2,position.z,position.w), WorldViewProjection);
     output.color = color;
 
     return output;

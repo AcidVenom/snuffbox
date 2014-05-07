@@ -154,17 +154,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="d3d11\d3d11_camera.cc" />
     <ClCompile Include="d3d11\d3d11_display_device.cc" />
     <ClCompile Include="game.cc" />
     <ClCompile Include="input\keyboard.cc" />
     <ClCompile Include="input\mouse.cc" />
     <ClCompile Include="js\js_state_wrapper.cc" />
+    <ClCompile Include="js\js_wrapper.cc" />
     <ClCompile Include="memory\allocated_memory.cc" />
     <ClCompile Include="networking\connection.cc" />
     <ClCompile Include="test.cc" />
     <ClCompile Include="win32\win32_window.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="d3d11\d3d11_camera.h" />
     <ClInclude Include="d3d11\d3d11_display_device.h" />
     <ClInclude Include="environment.h" />
     <ClInclude Include="game.h" />
@@ -174,6 +177,7 @@
     <ClInclude Include="js\js_callback.h" />
     <ClInclude Include="js\js_object_register.h" />
     <ClInclude Include="js\js_state_wrapper.h" />
+    <ClInclude Include="js\js_wrapper.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="memory\allocated_memory.h" />
     <ClInclude Include="memory\shared_ptr.h" />

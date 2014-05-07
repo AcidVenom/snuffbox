@@ -3,6 +3,7 @@
 #include "../../snuffbox/game.h"
 #include "../../snuffbox/input/mouse.h"
 #include "../../snuffbox/input/keyboard.h"
+#include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/js/js_state_wrapper.h"
 #include "../../snuffbox/test.h"
 
@@ -15,5 +16,6 @@ namespace snuffbox
 		JSRegister<Mouse,false>::Register();
 		JSRegister<Keyboard,false>::Register();
 		JSRegister<TestObject,true>::Register();
+		JSRegister<Camera, true>::Register();
 	}
 }

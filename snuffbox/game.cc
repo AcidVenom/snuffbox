@@ -95,8 +95,8 @@ void Game::Draw()
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 
+	draw_.Call(1, argv);
 	environment::render_device().StartDraw();
-	draw_.Call(1,argv);
 	environment::render_device().EndDraw();
 }
 
@@ -195,9 +195,25 @@ void Game::NotifyEvent(GameEvents evt)
 }
 
 //------------------------------------------------------------------------------------------------------
+void Game::JSRender(JS_ARGS)
+{
+	JSWrapper wrapper(args);
+
+	Camera* camera = wrapper.GetPointer<Camera>(0);
+
+	environment::render_device().UpdateConstantBuffers(camera);
+}
+
+//------------------------------------------------------------------------------------------------------
 void Game::RegisterJS(JS_TEMPLATE)
 {
-	
+	JS_CREATE_SCOPE;
+
+	JSFunctionRegister funcs[] = {
+		JSFunctionRegister("render", JSRender)
+	};
+
+	JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
 }
 
 void Game::CreateCallbacks()

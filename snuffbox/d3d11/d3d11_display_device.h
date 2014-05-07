@@ -6,6 +6,7 @@
 #include <d3dcommon.h>
 #include <D3DX10.h>
 #include <D3DX11.h>
+#include <xnamath.h>
 
 #include <vector>
 
@@ -22,6 +23,9 @@ typedef												ID3D11PixelShader								PixelShader;
 
 namespace snuffbox
 {
+
+	class Camera;
+
 	/**
 	* @struct snuffbox::Vertex
 	* @brief A vertex structure for use with vertex buffers
@@ -36,6 +40,7 @@ namespace snuffbox
 	struct VS_CONSTANT_BUFFER
 	{
 		float Time;
+		XMMATRIX WorldViewProjection;
 	};
 
 	/**
@@ -76,6 +81,9 @@ namespace snuffbox
 		/// Starts the draw
 		void StartDraw();
 
+		/// Updates the constant buffer
+		void UpdateConstantBuffers(Camera* camera);
+
 		/// Ends the draw
 		void EndDraw();
 
@@ -105,5 +113,8 @@ namespace snuffbox
 		VertexShader*									vs_;								///< The vertex shader
 		PixelShader*									ps_;								///< The pixel shader
 		float													time_;							///< The game time
+		XMMATRIX											worldMatrix_;				///< The world matrix
+		XMMATRIX											viewMatrix_;				///< The view matrix
+		XMMATRIX											projectionMatrix_;	///< The projection matrix
 	};
 }

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <v8.h>
 #include <string>
 #include <vector>
 #include "../../snuffbox/memory/shared_ptr.h"
+#include "../../snuffbox/js/js_wrapper.h"
 
 using namespace v8;
 
@@ -21,7 +21,7 @@ using namespace v8;
 #define JS_NAME(className)static const char* static_class_name() { return #className; } virtual const char* get_class_name() const { return static_class_name(); }
 #define JS_SETUP_CALLBACKS Handle<Function> cb; Handle<Value> func;
 #define JS_OBJECT_CALLBACK(name,obj) func = obj->Get(String::NewFromUtf8(JS_ISOLATE, name));cb = Handle<Function>::Cast(func);
-#define JS_SETUP(type) Handle<Object> obj = args.This();Handle<Value> ptr = obj->Get(String::NewFromUtf8(JS_ISOLATE, "__ptr"));Handle<External> external = ptr.As<External>();type* self = static_cast<type*>(external->Value())
+#define JS_SETUP(type) Handle<Object> obj = args.This();Handle<Value> ptr = obj->Get(String::NewFromUtf8(JS_ISOLATE, "__ptr"));Handle<External> external = ptr.As<External>();type* self = static_cast<type*>(external->Value()); JSWrapper wrapper(args);
 
 namespace snuffbox
 {
@@ -126,6 +126,8 @@ namespace snuffbox
 
     /// Creates the JavaScript context
 		Handle<Context> CreateContext();
+
+		void RegisterApplicationFunctions();
 
 		/// Creates a new instance of a C++ object from JavaScript
 		template<typename T>

@@ -11,6 +11,7 @@
 #include "../snuffbox/input/mouse.h"
 #include "../snuffbox/input/keyboard.h"
 #include "../snuffbox/d3d11/d3d11_display_device.h"
+#include "../snuffbox/d3d11/d3d11_camera.h"
 
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 
@@ -97,5 +98,6 @@ namespace snuffbox
 	public:
 		JS_NAME(Game);
 		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions
+		static void JSRender(JS_ARGS); ///< Renders the scene
 	};
 }

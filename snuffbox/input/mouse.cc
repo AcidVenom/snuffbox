@@ -68,12 +68,12 @@ namespace snuffbox
 		JSFunctionRegister funcs[] = 
 		{
 			JSFunctionRegister("position",JSGetPosition),
-			JSFunctionRegister("IsPressed",JSIsPressed),
-			JSFunctionRegister("IsDown",JSIsDown),
-			JSFunctionRegister("IsReleased", JSIsReleased),
-			JSFunctionRegister("IsDoubleClicked", JSIsDoubleClicked),
-			JSFunctionRegister("WheelUp", JSWheelUp),
-			JSFunctionRegister("WheelDown", JSWheelDown)
+			JSFunctionRegister("isPressed",JSIsPressed),
+			JSFunctionRegister("isDown",JSIsDown),
+			JSFunctionRegister("isReleased", JSIsReleased),
+			JSFunctionRegister("isDoubleClicked", JSIsDoubleClicked),
+			JSFunctionRegister("wheelUp", JSWheelUp),
+			JSFunctionRegister("wheelDown", JSWheelDown)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);

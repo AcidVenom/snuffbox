@@ -1,4 +1,5 @@
 #include "../../snuffbox/d3d11/d3d11_display_device.h"
+#include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
 #include <comdef.h>
@@ -229,6 +230,7 @@ namespace snuffbox
 
 		VS_CONSTANT_BUFFER vsConstantBuffer;
 		vsConstantBuffer.Time = time_;
+		vsConstantBuffer.WorldViewProjection = worldMatrix_ * projectionMatrix_ * viewMatrix_;
 
 		D3D11_BUFFER_DESC constantBufferDesc;
 		constantBufferDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER) * 4;
@@ -270,15 +272,27 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
-		HRESULT result = S_OK;
+		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+		context_->Draw(1000, 0);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::UpdateConstantBuffers(Camera* camera)
+	{
+		SwapChainDescription swapDesc;
+		swapChain_->GetDesc(&swapDesc);
+
+		worldMatrix_ = XMMatrixIdentity();
+		projectionMatrix_ = XMMatrixPerspectiveFovLH(80, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 0.0f, 1000.0f);
+		viewMatrix_ = XMMatrixLookAtLH(camera->translation(), camera->orientation(), camera->up());
+		
 		VS_CONSTANT_BUFFER vsConstantBuffer;
 		vsConstantBuffer.Time = time_;
+		vsConstantBuffer.WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
 
 		context_->UpdateSubresource(vsConstantBuffer_, 0, NULL, &vsConstantBuffer, 0, 0);
 		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-		context_->Draw(1000, 0);
 	}
 
 	//---------------------------------------------------------------------------------

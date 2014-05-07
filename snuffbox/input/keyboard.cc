@@ -111,9 +111,9 @@ namespace snuffbox
 
 		JSFunctionRegister funcs[] =
 		{
-			JSFunctionRegister("IsPressed", JSIsPressed),
-			JSFunctionRegister("IsDown", JSIsDown),
-			JSFunctionRegister("IsReleased", JSIsReleased)
+			JSFunctionRegister("isPressed", JSIsPressed),
+			JSFunctionRegister("isDown", JSIsDown),
+			JSFunctionRegister("isReleased", JSIsReleased)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);

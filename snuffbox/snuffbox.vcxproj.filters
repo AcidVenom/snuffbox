@@ -44,6 +44,12 @@
       <Filter>d3d11</Filter>
     </ClCompile>
     <ClCompile Include="test.cc" />
+    <ClCompile Include="d3d11\d3d11_camera.cc">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="js\js_wrapper.cc">
+      <Filter>js</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -83,5 +89,11 @@
       <Filter>d3d11</Filter>
     </ClInclude>
     <ClInclude Include="test.h" />
+    <ClInclude Include="d3d11\d3d11_camera.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="js\js_wrapper.h">
+      <Filter>js</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
