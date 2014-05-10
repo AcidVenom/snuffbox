@@ -12,15 +12,24 @@ Game.Update = function(dt)
 {	
 	var mx = 0,
 		mz = 0,
-		speed = 0.1;
+		rx = 0,
+		rz = 0,
+		speed = 2;
 
 	if(Keyboard.isDown("W")) mz = 1;
 	if(Keyboard.isDown("S")) mz = -1;
 	if(Keyboard.isDown("A")) mx = -1;
 	if(Keyboard.isDown("D")) mx = 1;
 
+	if (Mouse.isDown(0))
+	{
+		rx = Mouse.movement().x;
+		rz = Mouse.movement().y;
+	}
+
 	timer++;
-	camera.translateBy(mx*speed,mz*speed,0);
+	camera.translateBy(mx*speed,0,mz*speed);
+	camera.rotateBy(rx/300,rz/300,0);
 }
 
 Game.Draw = function(dt)

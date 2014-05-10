@@ -90,6 +90,8 @@ namespace snuffbox
 		/// Increases the elapsed time
 		void IncrementTime(){ ++time_; }
 
+		void UpdateScene();
+
 		/// Destroys the device
 		void Destroy();
 
@@ -106,6 +108,7 @@ namespace snuffbox
 		D3DTexture2D*									backBuffer_;				///< The backbuffer of this device
 		D3DRenderTargetView*					renderTargetView_;	///< The render target view of this device
 		ID3D11Buffer*									vertexBuffer_;			///< The vertex buffer
+		ID3D11Buffer*									indexBuffer_;				///< A buffer holding indices
 		ID3D11Buffer*									vsConstantBuffer_;	///< The vertex buffer
 		ID3D11InputLayout*						inputLayout_;				///< The vertex input layout
 		ID3D10Blob*										vsBuffer_;					///< Vertex shader buffer
@@ -116,5 +119,13 @@ namespace snuffbox
 		XMMATRIX											worldMatrix_;				///< The world matrix
 		XMMATRIX											viewMatrix_;				///< The view matrix
 		XMMATRIX											projectionMatrix_;	///< The projection matrix
+		XMMATRIX											triangle_;
+		XMMATRIX											scale_;
+		XMMATRIX											translation_;
+		XMMATRIX											rotation_;
+		float													rot_;
+		std::vector<Vertex>						vertices_;
+		std::vector<unsigned int>			indices_;
+		ID3D11RasterizerState*				rasterizerState_;	
 	};
 }

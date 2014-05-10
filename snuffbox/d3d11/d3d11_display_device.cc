@@ -171,19 +171,64 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::CreateVertexBuffer()
 	{
+		unsigned int width = 200;
+		unsigned int height = width;
+
+		const double yScale = std::sqrt(0.75f);
+
+		vertices_.resize(width*height);
+
 		HRESULT result = S_OK;
-
-		std::vector<Vertex> vertices;
-
-		for (unsigned int i = 0; i < 1000; ++i)
+		for (unsigned int y = 0; y < height; y++)
 		{
-			vertices.push_back({ -1.0f+i*0.002f, 0.4f+i%2*0.2f, 0.0f, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f) });
+			for (unsigned int x = 0; x < width; x++)
+			{
+				unsigned int i = y * width + x;
+				Vertex vertex;
+
+				if (y % 2 == 0)
+				{
+					vertex.x = static_cast<float>(x);
+				}
+				else
+				{
+					vertex.x = static_cast<float>(x + 0.5f);
+				}
+
+				vertex.y = 0.0f;
+				vertex.z = static_cast<float>(y*yScale);
+				vertex.colour = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+				vertices_[i] = vertex;
+			}
+		}
+		for (unsigned int y = 0; y < height - 1; ++y)
+		{
+			for (unsigned int x = 0; x < width; ++x)
+			{
+				if ((y % 2) == 0)
+				{
+					indices_.push_back(y*width + x);
+					indices_.push_back((y + 1)*width + x);
+				}
+				else
+				{
+					indices_.push_back((y + 1)*width + x);
+					indices_.push_back(y*width + x);
+				}
+			}
+
+			if (y < height - 2)
+			{
+				indices_.push_back(indices_.back());
+				indices_.push_back(indices_.back() + 1);
+			}
 		}
 
 		D3D11_BUFFER_DESC bufferDesc;
 
 		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices.size());
+		bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices_.size());
 		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bufferDesc.CPUAccessFlags = 0;
 		bufferDesc.MiscFlags = 0;
@@ -195,20 +240,45 @@ namespace snuffbox
 		};
 
 		D3D11_SUBRESOURCE_DATA inputData;
-		inputData.pSysMem = &vertices[0];
+		inputData.pSysMem = &vertices_[0];
 
 		result = device_->CreateBuffer(&bufferDesc, &inputData, &vertexBuffer_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		D3D11_BUFFER_DESC ibufferDesc;
+
+		ibufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		ibufferDesc.ByteWidth = static_cast<UINT>(sizeof(unsigned int)* indices_.size());
+		ibufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		ibufferDesc.CPUAccessFlags = 0;
+		ibufferDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA indexData;
+		indexData.pSysMem = &indices_[0];
+
+		result = device_->CreateBuffer(&ibufferDesc, &indexData, &indexBuffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 		context_->IASetVertexBuffers(0, 1, &vertexBuffer_, &stride, &offset);
+		context_->IASetIndexBuffer(indexBuffer_, DXGI_FORMAT_R32_UINT, 0);
 
 		result = device_->CreateInputLayout(layout, 2, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		context_->IASetInputLayout(inputLayout_);
 		context_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		
+
+		D3D11_RASTERIZER_DESC rasterizer;
+		ZeroMemory(&rasterizer, sizeof(D3D11_RASTERIZER_DESC));
+		rasterizer.CullMode = D3D11_CULL_NONE;
+		rasterizer.FillMode = D3D11_FILL_SOLID;
+
+		result = device_->CreateRasterizerState(&rasterizer, &rasterizerState_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 	}
 
 	//---------------------------------------------------------------------------------
@@ -230,7 +300,7 @@ namespace snuffbox
 
 		VS_CONSTANT_BUFFER vsConstantBuffer;
 		vsConstantBuffer.Time = time_;
-		vsConstantBuffer.WorldViewProjection = worldMatrix_ * projectionMatrix_ * viewMatrix_;
+		vsConstantBuffer.WorldViewProjection = XMMatrixTranspose(worldMatrix_ * projectionMatrix_ * viewMatrix_);
 
 		D3D11_BUFFER_DESC constantBufferDesc;
 		constantBufferDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER) * 4;
@@ -252,7 +322,6 @@ namespace snuffbox
 		context_->PSSetShader(ps_, 0, 0);
 
 		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 	}
 
 	void D3D11DisplayDevice::CreateViewport()
@@ -269,30 +338,38 @@ namespace snuffbox
 		context_->RSSetViewports(1, &viewport);
 	}
 
+	void D3D11DisplayDevice::UpdateScene()
+	{
+		triangle_ = XMMatrixIdentity();
+		triangle_ = XMMatrixTranslation(0.0f, -10.0f, 30.0f);
+	}
+
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
 		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-		context_->Draw(1000, 0);
+		context_->DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::UpdateConstantBuffers(Camera* camera)
 	{
+		context_->RSSetState(rasterizerState_);
 		SwapChainDescription swapDesc;
 		swapChain_->GetDesc(&swapDesc);
 
-		worldMatrix_ = XMMatrixIdentity();
-		projectionMatrix_ = XMMatrixPerspectiveFovLH(80, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 0.0f, 1000.0f);
-		viewMatrix_ = XMMatrixLookAtLH(camera->translation(), camera->orientation(), camera->up());
-		
+		UpdateScene();
+
+		worldMatrix_ = triangle_;
+		projectionMatrix_ = XMMatrixPerspectiveFovLH(120.0f*3.14f/180.0f/2.0f, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
+		viewMatrix_ = camera->view();
+
 		VS_CONSTANT_BUFFER vsConstantBuffer;
 		vsConstantBuffer.Time = time_;
-		vsConstantBuffer.WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+		vsConstantBuffer.WorldViewProjection = XMMatrixTranspose(worldMatrix_ * viewMatrix_ * projectionMatrix_);
 
 		context_->UpdateSubresource(vsConstantBuffer_, 0, NULL, &vsConstantBuffer, 0, 0);
 		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -336,6 +413,10 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(vertexBuffer_);
 		vertexBuffer_->Release();
 		vertexBuffer_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(indexBuffer_);
+		indexBuffer_->Release();
+		indexBuffer_ = NULL;
 
 		SNUFF_ASSERT_NOTNULL(inputLayout_);
 		inputLayout_->Release();

@@ -68,6 +68,7 @@ namespace snuffbox
 		JSFunctionRegister funcs[] = 
 		{
 			JSFunctionRegister("position",JSGetPosition),
+			JSFunctionRegister("movement", JSGetMovement),
 			JSFunctionRegister("isPressed",JSIsPressed),
 			JSFunctionRegister("isDown",JSIsDown),
 			JSFunctionRegister("isReleased", JSIsReleased),
@@ -83,12 +84,18 @@ namespace snuffbox
 	void Mouse::JSGetPosition(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
+		JSWrapper wrapper(args);
 		std::tuple<double, double> pos = environment::mouse().position();
-		Local<Object> retVal = Object::New(JS_ISOLATE);
-		retVal->Set(String::NewFromUtf8(JS_ISOLATE,"x"), Number::New(JS_ISOLATE, std::get<0>(pos)));
-		retVal->Set(String::NewFromUtf8(JS_ISOLATE, "y"), Number::New(JS_ISOLATE, std::get<1>(pos)));
+		wrapper.ReturnTuple<double>(std::get<0>(pos), std::get<1>(pos));
+	}
 
-		args.GetReturnValue().Set(retVal);
+	//--------------------------------------------------------------------------------------
+	void Mouse::JSGetMovement(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		JSWrapper wrapper(args);
+		std::tuple<double, double> movement = environment::mouse().movement();
+		wrapper.ReturnTuple<double>(std::get<0>(movement), std::get<1>(movement));
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -171,6 +178,9 @@ namespace snuffbox
 	{
     ResetStates();
 
+		dx_ = 0.0f;
+		dy_ = 0.0f;
+
 		while (!queue_.empty())
 		{
 			const MouseData& evt = queue_.front();
@@ -212,5 +222,11 @@ namespace snuffbox
 			}
 			queue_.pop();
 		}
+
+		dx_ = x_ - prevX_;
+		dy_ = y_ - prevY_;
+
+		prevX_ = x_;
+		prevY_ = y_;
 	}
 }
