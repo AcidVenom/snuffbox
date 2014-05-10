@@ -35,12 +35,14 @@ namespace snuffbox
 	{
 		float x, y, z;
 		D3DXCOLOR colour;
+		XMFLOAT3 normal;
 	};
 
 	struct VS_CONSTANT_BUFFER
 	{
 		float Time;
 		XMMATRIX WorldViewProjection;
+		XMMATRIX World;
 	};
 
 	/**

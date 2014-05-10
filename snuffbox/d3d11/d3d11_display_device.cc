@@ -198,6 +198,7 @@ namespace snuffbox
 				vertex.y = 0.0f;
 				vertex.z = static_cast<float>(y*yScale);
 				vertex.colour = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 
 				vertices_[i] = vertex;
 			}
@@ -236,7 +237,8 @@ namespace snuffbox
 		D3D11_INPUT_ELEMENT_DESC layout[] = 
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
 		D3D11_SUBRESOURCE_DATA inputData;
@@ -264,7 +266,7 @@ namespace snuffbox
 		context_->IASetVertexBuffers(0, 1, &vertexBuffer_, &stride, &offset);
 		context_->IASetIndexBuffer(indexBuffer_, DXGI_FORMAT_R32_UINT, 0);
 
-		result = device_->CreateInputLayout(layout, 2, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
+		result = device_->CreateInputLayout(layout, 3, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		context_->IASetInputLayout(inputLayout_);
@@ -341,7 +343,6 @@ namespace snuffbox
 	void D3D11DisplayDevice::UpdateScene()
 	{
 		triangle_ = XMMatrixIdentity();
-		triangle_ = XMMatrixTranslation(0.0f, -10.0f, 30.0f);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -367,6 +368,7 @@ namespace snuffbox
 		VS_CONSTANT_BUFFER vsConstantBuffer;
 		vsConstantBuffer.Time = time_;
 		vsConstantBuffer.WorldViewProjection = XMMatrixTranspose(worldMatrix_ * viewMatrix_ * projectionMatrix_);
+		vsConstantBuffer.World = XMMatrixTranspose(worldMatrix_);
 
 		context_->UpdateSubresource(vsConstantBuffer_, 0, NULL, &vsConstantBuffer, 0, 0);
 		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
@@ -441,6 +443,10 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(ps_);
 		ps_->Release();
 		ps_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(rasterizerState_);
+		rasterizerState_->Release();
+		rasterizerState_ = NULL;
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");
 	}
