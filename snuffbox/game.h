@@ -82,6 +82,9 @@ namespace snuffbox
 		/// Checks if the console is enabled
 		bool consoleEnabled(){ return consoleEnabled_; }
 
+		/// Returns the path the game is running in
+		std::string path(){ return path_; }
+
 	private:
 		SharedPtr<Win32Window> window_; ///< The Win32 window hooked to the game
 		SharedPtr<Mouse> mouse_; ///< The mouse object
@@ -94,7 +97,7 @@ namespace snuffbox
 		JSCallback shutdown_; ///< The JavaScript update callback
 		double deltaTime_;	///< The current delta time
 		bool consoleEnabled_; ///< Is the console enabled?
-
+		std::string path_; ///< The path the game is running in
 	public:
 		JS_NAME(Game);
 		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions

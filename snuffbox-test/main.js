@@ -1,6 +1,7 @@
 require("test")
 
 camera = Camera.new();
+terrain = Terrain.new(128,128);
 timer = 0;
 
 Game.Initialise = function()
@@ -27,7 +28,7 @@ Game.Update = function(dt)
 		rz = Mouse.movement().y;
 	}
 
-	timer++;
+	timer+=1*dt;
 	camera.translateBy(mx*speed,0,mz*speed);
 	camera.rotateBy(rx/300,rz/300,0);
 }

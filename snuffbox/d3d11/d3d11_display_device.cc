@@ -1,4 +1,5 @@
 #include "../../snuffbox/d3d11/d3d11_display_device.h"
+#include "../../snuffbox/d3d11/elements/render_element.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
@@ -40,7 +41,7 @@ namespace snuffbox
 		CreateBackBuffer();
 		CreateViewport();
 		CreateShaders();
-		CreateVertexBuffer();
+		CreateLayout();
 		environment::globalInstance = this;
 	}
 
@@ -169,70 +170,9 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::CreateVertexBuffer()
+	void D3D11DisplayDevice::CreateLayout()
 	{
-		unsigned int width = 200;
-		unsigned int height = width;
-
-		const double yScale = std::sqrt(0.75f);
-
-		vertices_.resize(width*height);
-
 		HRESULT result = S_OK;
-		for (unsigned int y = 0; y < height; y++)
-		{
-			for (unsigned int x = 0; x < width; x++)
-			{
-				unsigned int i = y * width + x;
-				Vertex vertex;
-
-				if (y % 2 == 0)
-				{
-					vertex.x = static_cast<float>(x);
-				}
-				else
-				{
-					vertex.x = static_cast<float>(x + 0.5f);
-				}
-
-				vertex.y = 0.0f;
-				vertex.z = static_cast<float>(y*yScale);
-				vertex.colour = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-
-				vertices_[i] = vertex;
-			}
-		}
-		for (unsigned int y = 0; y < height - 1; ++y)
-		{
-			for (unsigned int x = 0; x < width; ++x)
-			{
-				if ((y % 2) == 0)
-				{
-					indices_.push_back(y*width + x);
-					indices_.push_back((y + 1)*width + x);
-				}
-				else
-				{
-					indices_.push_back((y + 1)*width + x);
-					indices_.push_back(y*width + x);
-				}
-			}
-
-			if (y < height - 2)
-			{
-				indices_.push_back(indices_.back());
-				indices_.push_back(indices_.back() + 1);
-			}
-		}
-
-		D3D11_BUFFER_DESC bufferDesc;
-
-		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices_.size());
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bufferDesc.CPUAccessFlags = 0;
-		bufferDesc.MiscFlags = 0;
 
 		D3D11_INPUT_ELEMENT_DESC layout[] = 
 		{
@@ -241,38 +181,11 @@ namespace snuffbox
 			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		D3D11_SUBRESOURCE_DATA inputData;
-		inputData.pSysMem = &vertices_[0];
-
-		result = device_->CreateBuffer(&bufferDesc, &inputData, &vertexBuffer_);
-		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-
-		D3D11_BUFFER_DESC ibufferDesc;
-
-		ibufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		ibufferDesc.ByteWidth = static_cast<UINT>(sizeof(unsigned int)* indices_.size());
-		ibufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		ibufferDesc.CPUAccessFlags = 0;
-		ibufferDesc.MiscFlags = 0;
-
-		D3D11_SUBRESOURCE_DATA indexData;
-		indexData.pSysMem = &indices_[0];
-
-		result = device_->CreateBuffer(&ibufferDesc, &indexData, &indexBuffer_);
-		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		context_->IASetVertexBuffers(0, 1, &vertexBuffer_, &stride, &offset);
-		context_->IASetIndexBuffer(indexBuffer_, DXGI_FORMAT_R32_UINT, 0);
-
 		result = device_->CreateInputLayout(layout, 3, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		context_->IASetInputLayout(inputLayout_);
 		context_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-		
 
 		D3D11_RASTERIZER_DESC rasterizer;
 		ZeroMemory(&rasterizer, sizeof(D3D11_RASTERIZER_DESC));
@@ -287,7 +200,7 @@ namespace snuffbox
 	void D3D11DisplayDevice::CreateShaders()
 	{
 		HRESULT result = S_OK;
-		std::string path = environment::js_state_wrapper().path() + "/shaders/test.fx";
+		std::string path = environment::game().path() + "/shaders/test.fx";
 
 		result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "VS", "vs_5_0", 0, 0, 0, &vsBuffer_, 0, 0);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
@@ -340,16 +253,76 @@ namespace snuffbox
 		context_->RSSetViewports(1, &viewport);
 	}
 
-	void D3D11DisplayDevice::UpdateScene()
+	//---------------------------------------------------------------------------------
+	ID3D11Buffer* D3D11DisplayDevice::CreateVertexBuffer(const std::vector<Vertex>& vertices)
 	{
-		triangle_ = XMMatrixIdentity();
+		HRESULT result = S_OK;
+		ID3D11Buffer* vertexBuffer;
+		D3D11_BUFFER_DESC vbDesc;
+
+		vbDesc.Usage = D3D11_USAGE_DEFAULT;
+		vbDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex)* vertices.size());
+		vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vbDesc.CPUAccessFlags = 0;
+		vbDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA inputData;
+		inputData.pSysMem = &vertices[0];
+
+		device_->CreateBuffer(&vbDesc, &inputData, &vertexBuffer);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		return vertexBuffer;
+	}
+
+	//---------------------------------------------------------------------------------
+	ID3D11Buffer* D3D11DisplayDevice::CreateIndexBuffer(const std::vector<unsigned int>& indices)
+	{
+		HRESULT result = S_OK;
+		ID3D11Buffer* indexBuffer;
+		D3D11_BUFFER_DESC ibDesc;
+
+		ibDesc.Usage = D3D11_USAGE_DEFAULT;
+		ibDesc.ByteWidth = static_cast<UINT>(sizeof(unsigned int)* indices.size());
+		ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		ibDesc.CPUAccessFlags = 0;
+		ibDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA inputData;
+		inputData.pSysMem = &indices[0];
+
+		device_->CreateBuffer(&ibDesc, &inputData, &indexBuffer);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		return indexBuffer;
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
 		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-		context_->DrawIndexed(static_cast<UINT>(indices_.size()), 0, 0);
+		Draw();
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::Draw()
+	{
+		for (auto it : renderElements_)
+		{
+			it->Draw();
+			worldMatrix_ = it->World();
+
+			VS_CONSTANT_BUFFER vsConstantBuffer;
+			vsConstantBuffer.Time = time_;
+			vsConstantBuffer.WorldViewProjection = XMMatrixTranspose(worldMatrix_ * viewMatrix_ * projectionMatrix_);
+			vsConstantBuffer.WorldView = XMMatrixTranspose(worldMatrix_ * viewMatrix_);
+			vsConstantBuffer.World = XMMatrixTranspose(worldMatrix_);
+
+			context_->UpdateSubresource(vsConstantBuffer_, 0, NULL, &vsConstantBuffer, 0, 0);
+			context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+
+			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+		}
 	}
 
 	//---------------------------------------------------------------------------------
@@ -359,19 +332,9 @@ namespace snuffbox
 		SwapChainDescription swapDesc;
 		swapChain_->GetDesc(&swapDesc);
 
-		UpdateScene();
-
-		worldMatrix_ = triangle_;
-		projectionMatrix_ = XMMatrixPerspectiveFovLH(120.0f*3.14f/180.0f/2.0f, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
+		worldMatrix_ = XMMatrixIdentity();
+		projectionMatrix_ = XMMatrixPerspectiveFovLH(80.0f*3.14f/180.0f, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
 		viewMatrix_ = camera->view();
-
-		VS_CONSTANT_BUFFER vsConstantBuffer;
-		vsConstantBuffer.Time = time_;
-		vsConstantBuffer.WorldViewProjection = XMMatrixTranspose(worldMatrix_ * viewMatrix_ * projectionMatrix_);
-		vsConstantBuffer.World = XMMatrixTranspose(worldMatrix_);
-
-		context_->UpdateSubresource(vsConstantBuffer_, 0, NULL, &vsConstantBuffer, 0, 0);
-		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -411,14 +374,6 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(backBuffer_);
 		backBuffer_->Release();
 		backBuffer_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(vertexBuffer_);
-		vertexBuffer_->Release();
-		vertexBuffer_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(indexBuffer_);
-		indexBuffer_->Release();
-		indexBuffer_ = NULL;
 
 		SNUFF_ASSERT_NOTNULL(inputLayout_);
 		inputLayout_->Release();

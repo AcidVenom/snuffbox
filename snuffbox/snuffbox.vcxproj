@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="d3d11\d3d11_camera.cc" />
     <ClCompile Include="d3d11\d3d11_display_device.cc" />
+    <ClCompile Include="d3d11\elements\terrain_element.cc" />
     <ClCompile Include="game.cc" />
     <ClCompile Include="input\keyboard.cc" />
     <ClCompile Include="input\mouse.cc" />
@@ -163,12 +164,13 @@
     <ClCompile Include="js\js_wrapper.cc" />
     <ClCompile Include="memory\allocated_memory.cc" />
     <ClCompile Include="networking\connection.cc" />
-    <ClCompile Include="test.cc" />
     <ClCompile Include="win32\win32_window.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d11\d3d11_camera.h" />
     <ClInclude Include="d3d11\d3d11_display_device.h" />
+    <ClInclude Include="d3d11\elements\render_element.h" />
+    <ClInclude Include="d3d11\elements\terrain_element.h" />
     <ClInclude Include="environment.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="input\key.h" />
@@ -182,7 +184,6 @@
     <ClInclude Include="memory\allocated_memory.h" />
     <ClInclude Include="memory\shared_ptr.h" />
     <ClInclude Include="networking\connection.h" />
-    <ClInclude Include="test.h" />
     <ClInclude Include="win32\win32_window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

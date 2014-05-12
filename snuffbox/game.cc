@@ -32,10 +32,14 @@ started_(true),
 consoleEnabled_(false),
 mouse_(environment::memory().ConstructShared<Mouse>()),
 keyboard_(environment::memory().ConstructShared<Keyboard>()),
-device_(environment::memory().ConstructShared<D3D11DisplayDevice>())
+device_(environment::memory().ConstructShared<D3D11DisplayDevice>()),
+path_("")
 {
+	environment::globalInstance = this;
+	ParseCommandLine();
 	window_ = window;
-  environment::globalInstance = this;
+	InitialiseWindow();
+	device_->Initialise();
   CoInitialize(0);
 }
 
@@ -49,9 +53,7 @@ Game::~Game()
 void Game::Initialise()
 {
 	CreateCallbacks();
-	InitialiseWindow();
 	window_->Show();
-	device_->Initialise();
 	initialise_.Call(0);
 }
 
@@ -139,6 +141,7 @@ void Game::ParseCommandLine()
 
   std::string path = GetCommand(cmdLine, "-source-directory=");
   environment::js_state_wrapper().path() = path;
+	path_ = path;
 
 	if (CommandExists(cmdLine, "-console"))
 	{
@@ -260,7 +263,6 @@ int SNUFF_MAIN
 		environment::memory().ConstructShared<Win32Window>("Snuffbox Alpha (D3D11)",1280,720)
 		);
 
-  game->ParseCommandLine();
 	if (game->consoleEnabled())
 	{
 		connection.Initialise();

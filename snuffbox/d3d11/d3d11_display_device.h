@@ -25,6 +25,7 @@ namespace snuffbox
 {
 
 	class Camera;
+	class RenderElement;
 
 	/**
 	* @struct snuffbox::Vertex
@@ -36,12 +37,14 @@ namespace snuffbox
 		float x, y, z;
 		D3DXCOLOR colour;
 		XMFLOAT3 normal;
+		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 3 + sizeof(D3DXCOLOR)+sizeof(XMFLOAT3));
 	};
 
 	struct VS_CONSTANT_BUFFER
 	{
 		float Time;
 		XMMATRIX WorldViewProjection;
+		XMMATRIX WorldView;
 		XMMATRIX World;
 	};
 
@@ -72,7 +75,7 @@ namespace snuffbox
 		void CreateBackBuffer();
 		
 		/// Creates a vertex buffer for use with this device
-		void CreateVertexBuffer();
+		void CreateLayout();
 
 		/// Creates the shaders for use with this device
 		void CreateShaders();
@@ -83,6 +86,9 @@ namespace snuffbox
 		/// Starts the draw
 		void StartDraw();
 
+		/// Draws every render element
+		void Draw();
+
 		/// Updates the constant buffer
 		void UpdateConstantBuffers(Camera* camera);
 
@@ -92,13 +98,38 @@ namespace snuffbox
 		/// Increases the elapsed time
 		void IncrementTime(){ ++time_; }
 
-		void UpdateScene();
-
 		/// Destroys the device
 		void Destroy();
 
+		/// Creates a vertex buffer and returns it
+		ID3D11Buffer* CreateVertexBuffer(const std::vector<Vertex>& vertices);
+
+		/// Creates an index buffer and returns it
+		ID3D11Buffer* CreateIndexBuffer(const std::vector<unsigned int>& indices);
+
 		/// Converts a HRESULT to a C string
 		std::basic_string<TCHAR> HRToString(HRESULT hr);
+
+		/// Returns the default vertex shader
+		VertexShader* vs(){ return vs_; }
+
+		/// Returns the default pixel shader
+		PixelShader* ps(){ return ps_; }
+
+		/// Returns the input layout
+		ID3D11InputLayout* layout(){ return inputLayout_; }
+
+		/// Sets the vertex buffer
+		void SetVertexBuffer(ID3D11Buffer* vertexBuffer){ UINT offset = 0; context_->IASetVertexBuffers(0, 1, &vertexBuffer, &Vertex::stride_size, &offset); }
+
+		/// Sets the index buffer
+		void SetIndexBuffer(ID3D11Buffer* indexBuffer){ context_->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0); }
+
+		/// Returns the list of render elements
+		std::vector<RenderElement*>& renderElements(){ return renderElements_; }
+
+		/// Sets the world matrix
+		void SetWorldMatrix(XMMATRIX& worldMatrix){ worldMatrix_ = worldMatrix; }
 
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
@@ -109,8 +140,6 @@ namespace snuffbox
 		DisplayAdapter*								primaryAdapter_;		///< The primary display adapter
 		D3DTexture2D*									backBuffer_;				///< The backbuffer of this device
 		D3DRenderTargetView*					renderTargetView_;	///< The render target view of this device
-		ID3D11Buffer*									vertexBuffer_;			///< The vertex buffer
-		ID3D11Buffer*									indexBuffer_;				///< A buffer holding indices
 		ID3D11Buffer*									vsConstantBuffer_;	///< The vertex buffer
 		ID3D11InputLayout*						inputLayout_;				///< The vertex input layout
 		ID3D10Blob*										vsBuffer_;					///< Vertex shader buffer
@@ -121,13 +150,7 @@ namespace snuffbox
 		XMMATRIX											worldMatrix_;				///< The world matrix
 		XMMATRIX											viewMatrix_;				///< The view matrix
 		XMMATRIX											projectionMatrix_;	///< The projection matrix
-		XMMATRIX											triangle_;
-		XMMATRIX											scale_;
-		XMMATRIX											translation_;
-		XMMATRIX											rotation_;
-		float													rot_;
-		std::vector<Vertex>						vertices_;
-		std::vector<unsigned int>			indices_;
-		ID3D11RasterizerState*				rasterizerState_;	
+		ID3D11RasterizerState*				rasterizerState_;	  ///< The rasterizer state
+		std::vector<RenderElement*>		renderElements_;		///< The list of render elements
 	};
 }

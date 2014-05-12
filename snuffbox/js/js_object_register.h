@@ -5,7 +5,7 @@
 #include "../../snuffbox/input/keyboard.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/js/js_state_wrapper.h"
-#include "../../snuffbox/test.h"
+#include "../../snuffbox/d3d11/elements/terrain_element.h"
 
 namespace snuffbox
 {
@@ -15,7 +15,7 @@ namespace snuffbox
 		JSRegister<Game,false>::Register();
 		JSRegister<Mouse,false>::Register();
 		JSRegister<Keyboard,false>::Register();
-		JSRegister<TestObject,true>::Register();
 		JSRegister<Camera, true>::Register();
+		JSRegister<Terrain, true>::Register();
 	}
 }
