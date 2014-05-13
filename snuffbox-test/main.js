@@ -52,7 +52,7 @@ Game.Update = function(dt)
 			quads[i].setTranslation(0+i*3,-Math.sin(timer)*3,0);
 		}
 
-		quads[i].setScale(Math.abs(Math.sin(timer)),Math.abs(Math.sin(timer)),Math.abs(Math.sin(timer)));
+		quads[i].setScale(0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)));
 
 	}
 }

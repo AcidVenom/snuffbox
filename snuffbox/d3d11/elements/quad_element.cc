@@ -25,13 +25,10 @@ namespace snuffbox
 		vertices().push_back({ 0.0f, 0.0f, 1.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
 		vertices().push_back({ 1.0f, 0.0f, 0.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
 
-		indices().push_back(0);
-		indices().push_back(1);
 		indices().push_back(2);
-
 		indices().push_back(0);
-		indices().push_back(3);
 		indices().push_back(1);
+    indices().push_back(3);
 
 		vertexBuffer_ = environment::render_device().CreateVertexBuffer(vertices());
 		indexBuffer_ = environment::render_device().CreateIndexBuffer(indices());

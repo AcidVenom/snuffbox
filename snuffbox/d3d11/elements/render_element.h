@@ -20,7 +20,7 @@ namespace snuffbox
 			worldMatrix_(XMMatrixIdentity()),
       x_(0.0f), y_(0.0f), z_(0.0f),
       ox_(0.0f), oy_(0.0f), oz_(0.0f),
-      sx_(0.0f), sy_(0.0f), sz_(0.0f),
+      sx_(1.0f), sy_(1.0f), sz_(1.0f),
 			yaw_(0.0f), pitch_(0.0f), roll_(0.0f)
 		{}
 

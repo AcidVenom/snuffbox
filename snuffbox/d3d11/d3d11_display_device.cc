@@ -229,9 +229,9 @@ namespace snuffbox
 
 		D3D11_BUFFER_DESC constantBufferDesc;
 		constantBufferDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER) * 4;
-		constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		constantBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		constantBufferDesc.CPUAccessFlags = 0;
+		constantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		constantBufferDesc.MiscFlags = 0;
 		constantBufferDesc.StructureByteStride = 0;
 
@@ -331,13 +331,18 @@ namespace snuffbox
       }
 			worldMatrix_ = it->World();
 
-			VS_CONSTANT_BUFFER vsConstantBuffer;
-			vsConstantBuffer.Time = time_;
-			vsConstantBuffer.WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
-			vsConstantBuffer.WorldView = worldMatrix_ * viewMatrix_;
-			vsConstantBuffer.World = worldMatrix_;
+      D3D11_MAPPED_SUBRESOURCE cbData;
+      VS_CONSTANT_BUFFER* mappedData;
 
-			context_->UpdateSubresource(vsConstantBuffer_, 0, NULL, &vsConstantBuffer, 0, 0);
+      context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+
+      mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
+      mappedData->Time = time_;
+      mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+      mappedData->WorldView = worldMatrix_ * viewMatrix_;
+      mappedData->World = worldMatrix_;
+
+      context_->Unmap(vsConstantBuffer_, 0);
 
 			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 		}
@@ -357,7 +362,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::EndDraw()
 	{
-		swapChain_->Present(1, 0);
+		swapChain_->Present(0, 0);
 	}
 
 	//---------------------------------------------------------------------------------

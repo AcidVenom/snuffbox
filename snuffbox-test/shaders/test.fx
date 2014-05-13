@@ -8,8 +8,8 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 
 struct VOut
 {
-    float4 position : SV_POSITION;
-    float4 color : COLOR;
+  float4 position : SV_POSITION;
+  float4 color : COLOR;
 	float3 normal : NORMAL;
 };
 
