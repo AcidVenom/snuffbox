@@ -116,6 +116,10 @@
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>Ws2_32.lib;WINMM.lib;C:/V8/build/Debug/lib/icui18n.lib;C:/V8/build/Debug/lib/icuuc.lib;C:/V8/build/Debug/lib/v8_snapshot.lib;C:/V8/build/Debug/lib/v8_nosnapshot.x64.lib;C:/V8/build/Debug/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -156,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="d3d11\d3d11_camera.cc" />
     <ClCompile Include="d3d11\d3d11_display_device.cc" />
+    <ClCompile Include="d3d11\elements\quad_element.cc" />
     <ClCompile Include="d3d11\elements\terrain_element.cc" />
     <ClCompile Include="game.cc" />
     <ClCompile Include="input\keyboard.cc" />
@@ -169,6 +174,7 @@
   <ItemGroup>
     <ClInclude Include="d3d11\d3d11_camera.h" />
     <ClInclude Include="d3d11\d3d11_display_device.h" />
+    <ClInclude Include="d3d11\elements\quad_element.h" />
     <ClInclude Include="d3d11\elements\render_element.h" />
     <ClInclude Include="d3d11\elements\terrain_element.h" />
     <ClInclude Include="environment.h" />

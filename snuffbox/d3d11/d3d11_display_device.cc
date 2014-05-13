@@ -26,10 +26,16 @@ namespace snuffbox
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------
-	std::basic_string<TCHAR> D3D11DisplayDevice::HRToString(HRESULT hr)
+	D3D11DisplayDevice::D3D11DisplayDevice() : time_(0.0f)
+	{
+		environment::globalInstance = this;
+	}
+
+	//---------------------------------------------------------------------------------
+	std::basic_string<TCHAR> D3D11DisplayDevice::HRToString(HRESULT hr, const char* subGroup = "")
 	{
 		_com_error error(hr);
-		std::basic_string<TCHAR> str = std::string("[D3D11] ") + error.ErrorMessage();
+		std::basic_string<TCHAR> str = std::string("[D3D11] ") + subGroup + ": " + error.ErrorMessage();
 		return str;
 	}
 
@@ -42,7 +48,6 @@ namespace snuffbox
 		CreateViewport();
 		CreateShaders();
 		CreateLayout();
-		environment::globalInstance = this;
 	}
 
 	//---------------------------------------------------------------------------------
@@ -199,13 +204,16 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::CreateShaders()
 	{
+		ID3D10Blob* errors = nullptr;
 		HRESULT result = S_OK;
 		std::string path = environment::game().path() + "/shaders/test.fx";
-
-		result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "VS", "vs_5_0", 0, 0, 0, &vsBuffer_, 0, 0);
-		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-		result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "PS", "ps_5_0", 0, 0, 0, &psBuffer_, 0, 0);
-		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+		
+		result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "VS", "vs_5_0", 0, 0, 0, &vsBuffer_, &errors, 0);
+		SNUFF_XASSERT(errors == nullptr, static_cast<const char*>(errors->GetBufferPointer()));
+		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + path).c_str()).c_str());
+		result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "PS", "ps_5_0", 0, 0, 0, &psBuffer_, &errors, 0);
+		SNUFF_XASSERT(errors == nullptr, static_cast<const char*>(errors->GetBufferPointer()));
+		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + path).c_str()).c_str());
 
 		result = device_->CreateVertexShader(vsBuffer_->GetBufferPointer(), vsBuffer_->GetBufferSize(), NULL, &vs_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
@@ -237,6 +245,10 @@ namespace snuffbox
 		context_->PSSetShader(ps_, 0, 0);
 
 		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+		if (errors != nullptr)
+		{
+			errors->Release();
+		}
 	}
 
 	void D3D11DisplayDevice::CreateViewport()

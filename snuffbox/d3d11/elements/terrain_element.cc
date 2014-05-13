@@ -93,20 +93,4 @@ namespace snuffbox
 		vertexBuffer_->Release();
 		indexBuffer_->Release();
 	}
-
-	//---------------------------------------------------------------------------------
-	void Terrain::RegisterJS(JS_TEMPLATE)
-	{
-		JS_CREATE_SCOPE;
-
-		JSFunctionRegister funcs[] = {
-			JSFunctionRegister("setTranslation", JSSetTranslation),
-			JSFunctionRegister("translateBy", JSTranslateBy),
-			JSFunctionRegister("rotateBy", JSRotateBy),
-			JSFunctionRegister("setRotation", JSSetRotation),
-			JSFunctionRegister("setScale", JSSetScale)
-		};
-
-		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);
-	}
 }

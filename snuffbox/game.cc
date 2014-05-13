@@ -39,7 +39,6 @@ path_("")
 	ParseCommandLine();
 	window_ = window;
 	InitialiseWindow();
-	device_->Initialise();
   CoInitialize(0);
 }
 
@@ -268,6 +267,7 @@ int SNUFF_MAIN
 		connection.Initialise();
 		Sleep(1000);
 	}
+	environment::render_device().Initialise();
   js_state_wrapper.Initialise();
 	
 	game->Initialise();

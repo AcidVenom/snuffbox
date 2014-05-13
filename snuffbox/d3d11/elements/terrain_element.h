@@ -11,7 +11,7 @@ namespace snuffbox
 	* @brief Creates a terrain of triangles to work with
 	* @author Daniël Konings
 	*/
-	class Terrain : public RenderElement, public JSObject
+	class Terrain : public RenderElement
 	{
 	public:
 		/// Default constructor
@@ -34,6 +34,5 @@ namespace snuffbox
 
 	public:
 		JS_NAME(Terrain);
-		static void RegisterJS(JS_TEMPLATE);
 	};
 }

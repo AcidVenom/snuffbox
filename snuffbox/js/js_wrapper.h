@@ -29,9 +29,13 @@ namespace snuffbox
 		template<typename T>
 		T* GetPointer(int arg);
 
-		/// Sets a tuple as the return value of the arguments in .x and .y
+		/// Sets a tuple as the return value of the arguments in .x and .y (defaults)
 		template<typename T>
-		void ReturnTuple(T x, T y);
+		void ReturnTuple(T x, T y, const char* n1 = "x", const char* n2 = "y");
+
+		/// Sets a tuple as the return value of the arguments in .x, .y and .z (defaults)
+		template<typename T>
+		void ReturnTriple(T x, T y, T z, const char* n1 = "x", const char* n2 = "y", const char* n3 = "z");
 
 	private:
 		const FunctionCallbackInfo<Value>& args_; ///< The JavaScript arguments passed by a function
@@ -57,12 +61,25 @@ namespace snuffbox
 
 	//------------------------------------------------------------------------------
 	template<typename T>
-	inline void JSWrapper::ReturnTuple(T x, T y)
+	inline void JSWrapper::ReturnTuple(T x, T y, const char* n1, const char* n2)
 	{
 		auto isolate = environment::js_state_wrapper().isolate();
 		Local<Object> retVal = Object::New(isolate);
-		retVal->Set(String::NewFromUtf8(isolate, "x"), Number::New(isolate, static_cast<T>(x)));
-		retVal->Set(String::NewFromUtf8(isolate, "y"), Number::New(isolate, static_cast<T>(y)));
+		retVal->Set(String::NewFromUtf8(isolate, n1), Number::New(isolate, static_cast<T>(x)));
+		retVal->Set(String::NewFromUtf8(isolate, n2), Number::New(isolate, static_cast<T>(y)));
+
+		args_.GetReturnValue().Set(retVal);
+	}
+
+	//------------------------------------------------------------------------------
+	template<typename T>
+	inline void JSWrapper::ReturnTriple(T x, T y, T z, const char* n1, const char* n2, const char* n3)
+	{
+		auto isolate = environment::js_state_wrapper().isolate();
+		Local<Object> retVal = Object::New(isolate);
+		retVal->Set(String::NewFromUtf8(isolate, n1), Number::New(isolate, static_cast<T>(x)));
+		retVal->Set(String::NewFromUtf8(isolate, n2), Number::New(isolate, static_cast<T>(y)));
+		retVal->Set(String::NewFromUtf8(isolate, n2), Number::New(isolate, static_cast<T>(z)));
 
 		args_.GetReturnValue().Set(retVal);
 	}

@@ -57,7 +57,7 @@ namespace snuffbox
 	{
 	public:
 		/// Default constructor
-		D3D11DisplayDevice() : time_(0.0f){};
+		D3D11DisplayDevice();
 
 		/// Default destructor
 		~D3D11DisplayDevice(){};
@@ -108,7 +108,7 @@ namespace snuffbox
 		ID3D11Buffer* CreateIndexBuffer(const std::vector<unsigned int>& indices);
 
 		/// Converts a HRESULT to a C string
-		std::basic_string<TCHAR> HRToString(HRESULT hr);
+		std::basic_string<TCHAR> HRToString(HRESULT hr, const char* subGroup);
 
 		/// Returns the default vertex shader
 		VertexShader* vs(){ return vs_; }

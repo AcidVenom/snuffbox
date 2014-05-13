@@ -1,12 +1,19 @@
 require("test")
 
 camera = Camera.new();
-terrain = Terrain.new(128,128);
+quads = new Array();
 timer = 0;
 
 Game.Initialise = function()
 {
-
+	for(var i = 0; i < 20; ++i)
+	{
+		var quad = Quad.new();
+		quad.setTranslation(0+i*3,0,0);
+		quad.setRotation(90*Math.PI/180,0,0);
+		quad.setOffset(0.5,0,0.5);
+		quads.push(quad);
+	}
 }
 
 Game.Update = function(dt)
@@ -31,6 +38,23 @@ Game.Update = function(dt)
 	timer+=1*dt;
 	camera.translateBy(mx*speed,0,mz*speed);
 	camera.rotateBy(rx/300,rz/300,0);
+
+	for(var i = 0; i < quads.length; ++i)
+	{
+		if(i % 2 == 0)
+		{
+			quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
+			quads[i].setTranslation(0+i*3,Math.sin(timer)*3,0);
+		}
+		else 
+		{
+			quads[i].rotateBy(0,0,-Math.sin(timer)*0.5);
+			quads[i].setTranslation(0+i*3,-Math.sin(timer)*3,0);
+		}
+
+		quads[i].setScale(Math.abs(Math.sin(timer)),Math.abs(Math.sin(timer)),Math.abs(Math.sin(timer)));
+
+	}
 }
 
 Game.Draw = function(dt)
