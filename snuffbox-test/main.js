@@ -6,11 +6,11 @@ timer = 0;
 
 Game.Initialise = function()
 {
-	for(var i = 0; i < 20; ++i)
+	for(var i = 0; i < 1000; ++i)
 	{
 		var quad = Quad.new();
 		quad.setTranslation(0+i*3,0,0);
-		quad.setRotation(90*Math.PI/180,0,0);
+		quad.setRotation(90*Math.PI/180,90*Math.PI/180,0);
 		quad.setOffset(0.5,0,0.5);
 		quads.push(quad);
 	}

@@ -25,6 +25,9 @@ namespace snuffbox
 		/// Draws the quad
 		void Draw();
 
+    /// Returns the vertex buffer type
+    VertexBufferType type(){ return VertexBufferType::kQuad; }
+
 	private:
 		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer
 		ID3D11Buffer* indexBuffer_; ///< The index buffer

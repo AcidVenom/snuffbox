@@ -18,10 +18,9 @@ namespace snuffbox
 		/// Default constructor
 		RenderElement() : 
 			worldMatrix_(XMMatrixIdentity()),
-			translation_(XMMatrixIdentity()),
-			rotation_(XMMatrixIdentity()),
-			scaling_(XMMatrixIdentity()),
-			offset_(XMMatrixIdentity()),
+      x_(0.0f), y_(0.0f), z_(0.0f),
+      ox_(0.0f), oy_(0.0f), oz_(0.0f),
+      sx_(0.0f), sy_(0.0f), sz_(0.0f),
 			yaw_(0.0f), pitch_(0.0f), roll_(0.0f)
 		{}
 
@@ -34,7 +33,13 @@ namespace snuffbox
 		std::vector<unsigned int>& indices(){ return indices_; };
 
 		/// Returns the world matrix
-		XMMATRIX& World(){ worldMatrix_ = offset_ * rotation_ * scaling_ * translation_; return worldMatrix_; }
+    XMMATRIX& World(){ 
+      worldMatrix_ = XMMatrixTranslation(ox_, oy_, oz_) *  
+      XMMatrixRotationRollPitchYaw(roll_, pitch_, yaw_) *
+      XMMatrixScaling(sx_, sy_, sz_) *
+      XMMatrixTranslation(x_, y_, z_);
+      return worldMatrix_; 
+    }
 
 		/// Sets the translation on the X, Y, Z plane
 		void SetTranslation(float x, float y, float z);
@@ -49,16 +54,17 @@ namespace snuffbox
 		/// Sets the X, Y and Z offset
 		void SetOffset(float x, float y, float z);
 
+    /// Returns the vertex buffer type
+    virtual VertexBufferType type() = 0;
+
 	private:
 		std::vector<Vertex>						vertices_; ///< The vertices
 		std::vector<unsigned int>			indices_; ///< The indices
 		XMMATRIX											worldMatrix_; ///< The world matrix
-		XMMATRIX											translation_;	///< The translation matrix
-		XMMATRIX											rotation_; ///< The rotation matrix
-		XMMATRIX											scaling_; ///< The scaling matrix
-		XMMATRIX											offset_;	///< The offset matrix
 		float													yaw_, pitch_, roll_; ///< Rotation floats
-
+    float                         x_, y_, z_; ///< Translation floats
+    float                         ox_, oy_, oz_; ///< Offset floats
+    float                         sx_, sy_, sz_; ///< Scaling floats
 	public:
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);
@@ -76,37 +82,49 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::SetOffset(float x, float y, float z)
 	{
-		offset_ = XMMatrixTranslation(x, y, z);
+    ox_ = x;
+    oy_ = y;
+    oz_ = z;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::TranslateBy(float x, float y, float z)
 	{
-		translation_ *= XMMatrixTranslation(x, y, z);
+    x_ += x;
+    y_ += y;
+    z_ += z;
 	}
 	
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::SetTranslation(float x, float y, float z)
 	{
-		translation_ = XMMatrixTranslation(x, y, z);
+    x_ = x;
+    y_ = y;
+    z_ = z;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RotateBy(float x, float y, float z)
 	{
-		rotation_ *= XMMatrixRotationRollPitchYaw(x, y, z);
+    yaw_ += x;
+    pitch_ += y;
+    roll_ += z;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::SetRotation(float x, float y, float z)
 	{
-		rotation_ = XMMatrixRotationRollPitchYaw(x, y, z);
+    yaw_ = x;
+    pitch_ = y;
+    roll_ = z;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::SetScale(float x, float y, float z)
 	{
-		scaling_ = XMMatrixScaling(x, y, z);
+    sx_ = x;
+    sy_ = y;
+    sz_ = z;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -142,10 +160,6 @@ namespace snuffbox
 		float y = wrapper.GetNumber<float>(1);
 		float z = wrapper.GetNumber<float>(2);
 
-		self->yaw_ = x;
-		self->pitch_ = y;
-		self->roll_ = z;
-
 		self->SetRotation(x, y, z);
 	}
 
@@ -157,10 +171,6 @@ namespace snuffbox
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
 		float z = wrapper.GetNumber<float>(2);
-
-		self->yaw_ += x;
-		self->pitch_ += y;
-		self->roll_ += z;
 
 		self->RotateBy(x, y, z);
 	}
@@ -194,7 +204,7 @@ namespace snuffbox
 	{
 		JS_SETUP(RenderElement);
 
-		wrapper.ReturnTriple<float>(-self->offset_._41, -self->offset_._42, -self->offset_._43);
+    wrapper.ReturnTriple<float>(-self->ox_, -self->oy_, -self->oz_);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -202,7 +212,7 @@ namespace snuffbox
 	{
 		JS_SETUP(RenderElement);
 
-		wrapper.ReturnTriple<float>(self->scaling_._41, self->scaling_._42, self->scaling_._43);
+    wrapper.ReturnTriple<float>(self->sx_, self->sy_, self->sz_);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -210,7 +220,7 @@ namespace snuffbox
 	{
 		JS_SETUP(RenderElement);
 
-		wrapper.ReturnTriple<float>(self->translation_._41, self->translation_._42, self->translation_._43);
+    wrapper.ReturnTriple<float>(self->x_, self->y_, self->z_);
 	}
 
 	//-------------------------------------------------------------------------------------------

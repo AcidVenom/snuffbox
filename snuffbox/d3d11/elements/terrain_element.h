@@ -27,6 +27,9 @@ namespace snuffbox
 		/// Draws the terrain
 		void Draw();
 
+    /// Returns the vertex buffer type
+    VertexBufferType type(){ return VertexBufferType::kTerrain; }
+
 	private:
 		unsigned int w_, h_; ///< The width and the height of the terrain
 		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer

@@ -27,6 +27,18 @@ namespace snuffbox
 	class Camera;
 	class RenderElement;
 
+  /**
+  * @enum snuffbox::VertexBufferType
+  * @brief The vertex buffer types for checking if a vertex buffer should be swapped
+  * @author Daniël Konings
+  */
+  enum VertexBufferType
+  {
+    kNone,
+    kQuad,
+    kTerrain
+  };
+
 	/**
 	* @struct snuffbox::Vertex
 	* @brief A vertex structure for use with vertex buffers
@@ -131,6 +143,9 @@ namespace snuffbox
 		/// Sets the world matrix
 		void SetWorldMatrix(XMMATRIX& worldMatrix){ worldMatrix_ = worldMatrix; }
 
+    /// Returns the current vertex buffer type
+    VertexBufferType& vbType(){ return vbType_; }
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device
@@ -152,5 +167,6 @@ namespace snuffbox
 		XMMATRIX											projectionMatrix_;	///< The projection matrix
 		ID3D11RasterizerState*				rasterizerState_;	  ///< The rasterizer state
 		std::vector<RenderElement*>		renderElements_;		///< The list of render elements
+    VertexBufferType              vbType_;            ///< The vertex buffer type
 	};
 }
