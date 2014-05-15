@@ -22,8 +22,8 @@ namespace snuffbox
 		/// Creates the quad vertices
 		void Create();
 
-		/// Draws the quad
-		void Draw();
+		/// Sets the buffers of the quad
+		void SetBuffers();
 
     /// Returns the vertex buffer type
     VertexBufferType type(){ return VertexBufferType::kQuad; }

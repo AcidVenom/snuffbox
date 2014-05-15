@@ -37,15 +37,23 @@ namespace snuffbox
 			TryCatch try_catch;
 
 			ctx->Enter();
+			bool failed = false;
+			std::string exception;
+
 			if (argc == 0)
 			{
 				func->Call(ctx->Global(), argc, 0);
-				environment::js_state_wrapper().GetException(&try_catch);
+				exception = environment::js_state_wrapper().GetException(&try_catch,&failed);
 			}
 			else if (argc > 0)
 			{
 				func->Call(ctx->Global(), argc, argv);
-				environment::js_state_wrapper().GetException(&try_catch);
+				exception = environment::js_state_wrapper().GetException(&try_catch, &failed);
+			}
+
+			if (failed)
+			{
+				SNUFF_LOG_ERROR(exception.c_str());
 			}
 			ctx->Exit();
 		}

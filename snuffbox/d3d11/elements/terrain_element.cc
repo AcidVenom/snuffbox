@@ -81,7 +81,7 @@ namespace snuffbox
 	}
 
 	//------------------------------------------------------------------------------
-	void Terrain::Draw()
+	void Terrain::SetBuffers()
 	{
 		environment::render_device().SetVertexBuffer(vertexBuffer_);
 		environment::render_device().SetIndexBuffer(indexBuffer_);

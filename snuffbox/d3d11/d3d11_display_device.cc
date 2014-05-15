@@ -1,5 +1,6 @@
 #include "../../snuffbox/d3d11/d3d11_display_device.h"
 #include "../../snuffbox/d3d11/elements/render_element.h"
+#include "../../snuffbox/d3d11/elements/quad_element.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
@@ -326,7 +327,7 @@ namespace snuffbox
       VertexBufferType type = it->type();
       if (type != vbType_)
       {
-        it->Draw();
+        it->SetBuffers();
         vbType_ = type;
       }
 			worldMatrix_ = it->World();

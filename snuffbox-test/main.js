@@ -1,8 +1,8 @@
 require("test")
 
-camera = Camera.new();
-quads = new Array();
-timer = 0;
+var camera = camera || Camera.new();
+var quads = quads || new Array();
+var timer = timer || 0;
 
 Game.Initialise = function()
 {

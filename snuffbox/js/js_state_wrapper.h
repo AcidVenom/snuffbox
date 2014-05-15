@@ -26,6 +26,17 @@ using namespace v8;
 namespace snuffbox
 {
 	/**
+	* @struct snuffbox::FileWatch
+	* @brief A structure to hold filewatch data
+	* @author Daniël Konings
+	*/
+	struct FileWatch
+	{
+		std::string path;
+		SYSTEMTIME lastTime;
+	};
+
+	/**
 	* @class snuffbox::JSObject
 	* @brief Every C++ object that will be extended to JS should extend from this
 	* @author Daniël Konings
@@ -113,7 +124,7 @@ namespace snuffbox
     void CompileAndRun(const char* path);
 
     /// Returns an error of a TryCatch object
-    void GetException(TryCatch* try_catch);
+		std::string GetException(TryCatch* try_catch, bool* failed);
 
     /// Initialises the JavaScript state
     void Initialise();
@@ -127,7 +138,11 @@ namespace snuffbox
     /// Creates the JavaScript context
 		Handle<Context> CreateContext();
 
-		void RegisterApplicationFunctions();
+		/// Watches files for chances
+		void WatchFiles();
+
+		/// Get file time
+		SYSTEMTIME GetTimeForFile(std::string path);
 
 		/// Creates a new instance of a C++ object from JavaScript
 		template<typename T>
@@ -137,7 +152,8 @@ namespace snuffbox
     Isolate* isolate_; ///< The JavaScript isolate created at startup
     std::string path_; ///< The source directory path
 		Persistent<ObjectTemplate, CopyablePersistentTraits<ObjectTemplate>> global_; ///< The function registry
-		Persistent<Context, CopyablePersistentTraits<Context>> context_;	/// The JavaScript context
+		Persistent<Context, CopyablePersistentTraits<Context>> context_;	///< The JavaScript context
+		std::vector<FileWatch> filesToWatch_;	///< The files to watch for hot reloading
 
   private:
     /// JavaScript log debug

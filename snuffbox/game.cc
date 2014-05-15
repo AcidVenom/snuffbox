@@ -277,6 +277,7 @@ int SNUFF_MAIN
   	game->window()->ProcessMessages();
 		game->Update();
 		game->Draw();
+		environment::js_state_wrapper().WatchFiles();
 	}
 	return EXIT_SUCCESS;
 }

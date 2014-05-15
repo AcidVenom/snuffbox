@@ -6,6 +6,7 @@
 
 namespace snuffbox
 {
+
 	class D3D11DisplayDevice;
 	/**
 	* @class snuffbox::RenderElement
@@ -24,8 +25,8 @@ namespace snuffbox
 			yaw_(0.0f), pitch_(0.0f), roll_(0.0f)
 		{}
 
-		/// Draws the render element
-		virtual void Draw() = 0;
+		/// Sets the buffers of the render element
+		virtual void SetBuffers() = 0;
 		
 		/// Returns the vertices of the render element
 		std::vector<Vertex>& vertices(){ return vertices_; };

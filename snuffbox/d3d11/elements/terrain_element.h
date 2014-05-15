@@ -24,8 +24,8 @@ namespace snuffbox
 		/// Creates the terrain
 		void Create();
 
-		/// Draws the terrain
-		void Draw();
+		/// Sets the buffers of the terrain
+		void SetBuffers();
 
     /// Returns the vertex buffer type
     VertexBufferType type(){ return VertexBufferType::kTerrain; }
