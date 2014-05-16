@@ -138,7 +138,7 @@ namespace snuffbox
 		Local<Context> context(){ return Local<Context>::New(isolate_, context_); }
 
     /// Creates the JavaScript context
-		Handle<Context> CreateContext();
+		Local<Context> CreateContext();
 
 		/// Watches files for chances
 		void WatchFiles();
@@ -149,6 +149,9 @@ namespace snuffbox
 		/// Creates a new instance of a C++ object from JavaScript
 		template<typename T>
 		static void JSNew(JS_ARGS);
+
+    /// Destroys the state wrapper
+    void Destroy();
 
   private:
     Isolate* isolate_; ///< The JavaScript isolate created at startup

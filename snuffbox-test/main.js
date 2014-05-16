@@ -55,6 +55,7 @@ Game.Update = function(dt)
 		quads[i].setScale(0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)));
 
 	}
+
 }
 
 Game.Draw = function(dt)

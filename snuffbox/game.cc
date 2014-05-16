@@ -113,8 +113,7 @@ void Game::Shutdown()
 	shutdown_.Call(0);
 
 	JS_CREATE_SCOPE;
-	Handle<Context> ctx = JS_CONTEXT;
-	ctx->Enter();
+  Local<Context> ctx = JS_CONTEXT;
 	Handle<Object> global = ctx->Global();
 	Handle<Array> arr = global->GetPropertyNames();
 		
@@ -126,7 +125,6 @@ void Game::Shutdown()
 		Handle<Script> script = Script::Compile(String::NewFromUtf8(JS_ISOLATE, result.c_str()));
 		script->Run();
 	}
-	ctx->Exit();
 	
 	SNUFF_LOG_INFO("Snuffbox shutdown..");
 	started_ = false;
@@ -228,8 +226,8 @@ void Game::CreateCallbacks()
 {
 	JS_CREATE_SCOPE;
 
-	Handle<Context> ctx = JS_CONTEXT;
-	ctx->Enter();
+  Local<Context> ctx = JS_CONTEXT;
+
 	Handle<Object> global = ctx->Global();
 	Handle<Value> game = global->Get(String::NewFromUtf8(JS_ISOLATE,"Game"));
 
@@ -253,8 +251,6 @@ void Game::CreateCallbacks()
 	JS_OBJECT_CALLBACK("Shutdown", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Shutdown()' function! Please add it to your main.js");
 	shutdown_.SetFunction(cb);
-
-	ctx->Exit();
 }
 
 //------------------------------------------------------------------------------------------------------

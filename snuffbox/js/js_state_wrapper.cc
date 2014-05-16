@@ -89,7 +89,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------
-	Handle<Context> JSStateWrapper::CreateContext()
+	Local<Context> JSStateWrapper::CreateContext()
 	{
 		Handle<ObjectTemplate> global = ObjectTemplate::New(isolate_);
 		global_.Reset(isolate_, global);
@@ -133,8 +133,9 @@ namespace snuffbox
 	void JSStateWrapper::Initialise()
 	{
 		HandleScope scope(isolate_);
-		Handle<Context> context = CreateContext();
+		Local<Context> context = CreateContext();
 		context_.Reset(isolate_, context);
+    context->Enter();
 
 		SNUFF_XASSERT(!context.IsEmpty(), "Failed creating the JavaScript context!");
 
@@ -150,20 +151,24 @@ namespace snuffbox
 	//---------------------------------------------------------------------------
 	JSStateWrapper::~JSStateWrapper()
 	{
-		global_.Reset();
-		context_.Reset();
-
-		while (!V8::IdleNotification()){} //Garbage collection
-
-		V8::Dispose();
+    Destroy();
 	}
+
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::Destroy()
+  {
+    global_.Reset();
+    context_.Reset();
+
+    while (!V8::IdleNotification()){} //Garbage collection
+
+    V8::Dispose();
+  }
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::CompileAndRun(const char* path, bool reloading)
 	{
 		JS_CREATE_SCOPE;
-		Handle<Context> ctx = JS_CONTEXT;
-		ctx->Enter();
 		std::string file_path = path_ + "/" + path + ".js";
 		std::string error = "Couldn't find JavaScript file '" + file_path + "'";
 		std::string src;
@@ -210,7 +215,6 @@ namespace snuffbox
 		{
 			SNUFF_ASSERT(error.c_str());
 		}
-		ctx->Exit();
 
 		fin.close();
 
@@ -277,6 +281,7 @@ namespace snuffbox
 					it.lastTime = lastTime;
 					CompileAndRun(it.relativePath.c_str(), true);
 					environment::game().CreateCallbacks();
+          while (!V8::IdleNotification()){}
 				}
 			}
 		}
@@ -342,8 +347,7 @@ namespace snuffbox
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
 		T* ptr = environment::memory().ConstructShared<T>(args);
-		Handle<Context> ctx = JS_CONTEXT;
-		ctx->Enter();
+    Local<Context> ctx = JS_CONTEXT;
 		Handle<Object> global = ctx->Global();
 		Handle<Value> templ = global->Get(String::NewFromUtf8(JS_ISOLATE, ptr->get_class_name()));
 		Handle<Function> objTemplate = Handle<Function>::Cast(templ);
@@ -354,7 +358,6 @@ namespace snuffbox
 		ptr->persistent().MarkIndependent();
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "__ptr"), External::New(JS_ISOLATE, static_cast<void*>(ptr)));
 		int64_t allocated = JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(sizeof(ptr));
-		ctx->Exit();
 
 		args.GetReturnValue().Set(obj);
 	}

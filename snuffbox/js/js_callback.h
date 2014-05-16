@@ -33,10 +33,9 @@ namespace snuffbox
 			JS_CREATE_SCOPE;
 
 			Handle<Function> func = Local<Function>::New(JS_ISOLATE, func_);
-			Handle<Context> ctx = JS_CONTEXT;
+			Local<Context> ctx = JS_CONTEXT;
 			TryCatch try_catch;
 
-			ctx->Enter();
 			bool failed = false;
 			std::string exception;
 
@@ -55,7 +54,6 @@ namespace snuffbox
 			{
 				SNUFF_LOG_ERROR(exception.c_str());
 			}
-			ctx->Exit();
 		}
 	private:
 		Persistent<Function> func_; ///< The actual function of this callback
