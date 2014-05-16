@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include "../../snuffbox/memory/shared_ptr.h"
 #include "../../snuffbox/js/js_wrapper.h"
 
@@ -33,7 +34,8 @@ namespace snuffbox
 	struct FileWatch
 	{
 		std::string path;
-		SYSTEMTIME lastTime;
+		std::string relativePath;
+		FILETIME lastTime;
 	};
 
 	/**
@@ -121,7 +123,7 @@ namespace snuffbox
     std::string& path(){ return path_; }
 
     /// Compiles and runs a JavaScript file
-    void CompileAndRun(const char* path);
+    void CompileAndRun(const char* path, bool reloading = false);
 
     /// Returns an error of a TryCatch object
 		std::string GetException(TryCatch* try_catch, bool* failed);
@@ -142,7 +144,7 @@ namespace snuffbox
 		void WatchFiles();
 
 		/// Get file time
-		SYSTEMTIME GetTimeForFile(std::string path);
+		FILETIME GetTimeForFile(std::string path,bool* failed);
 
 		/// Creates a new instance of a C++ object from JavaScript
 		template<typename T>
@@ -154,6 +156,7 @@ namespace snuffbox
 		Persistent<ObjectTemplate, CopyablePersistentTraits<ObjectTemplate>> global_; ///< The function registry
 		Persistent<Context, CopyablePersistentTraits<Context>> context_;	///< The JavaScript context
 		std::vector<FileWatch> filesToWatch_;	///< The files to watch for hot reloading
+		std::map<std::string, bool> loadedFiles_; ///< Check to see if a file is already loaded
 
   private:
     /// JavaScript log debug

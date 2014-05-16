@@ -98,6 +98,7 @@ namespace snuffbox
 		double deltaTime_;	///< The current delta time
 		bool consoleEnabled_; ///< Is the console enabled?
 		std::string path_; ///< The path the game is running in
+		int gameTime_; ///< The game time
 	public:
 		JS_NAME(Game);
 		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions

@@ -1,0 +1,19 @@
+﻿Build started 5/16/2014 10:24:56 AM.
+     1>Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" on node 2 (Rebuild target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt console_widget.cc main.cc networking\connection.cc terminal.cc
+         console_widget.cc
+         main.cc
+         connection.cc
+         terminal.cc
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Snuff\src\Release\snuffbox-console.exe" /INCREMENTAL:NO /NOLOGO C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgets.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Core.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Gui.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Network.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmain.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Snuff\src\Release\snuffbox-console.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /ENTRY:"main" /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Snuff\src\Release\snuffbox-console.lib" /MACHINE:X86 /SAFESEH Release\console_widget.obj
+         Release\main.obj
+         Release\connection.obj
+         Release\terminal.obj
+     1>Qt5Widgets.lib(Qt5Widgets.dll) : fatal error LNK1112: module machine type 'x64' conflicts with target machine type 'X86'
+     1>Done Building Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" (Rebuild target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:09.05

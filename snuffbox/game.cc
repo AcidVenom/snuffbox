@@ -27,13 +27,14 @@ namespace snuffbox
 using namespace snuffbox;
 
 //------------------------------------------------------------------------------------------------------
-Game::Game(Win32Window* window) : 
-started_(true), 
+Game::Game(Win32Window* window) :
+started_(true),
 consoleEnabled_(false),
 mouse_(environment::memory().ConstructShared<Mouse>()),
 keyboard_(environment::memory().ConstructShared<Keyboard>()),
 device_(environment::memory().ConstructShared<D3D11DisplayDevice>()),
-path_("")
+path_(""),
+gameTime_(0)
 {
 	environment::globalInstance = this;
 	ParseCommandLine();
@@ -59,7 +60,7 @@ void Game::Initialise()
 //------------------------------------------------------------------------------------------------------
 void Game::Update()
 {
-
+	++gameTime_;
 	if (!started_)
 		return;
 
@@ -83,6 +84,11 @@ void Game::Update()
 	lastTime = now;
 
 	environment::render_device().IncrementTime();
+
+	if (gameTime_ % 10 == 0)
+	{
+		environment::js_state_wrapper().WatchFiles();
+	}
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -277,7 +283,6 @@ int SNUFF_MAIN
   	game->window()->ProcessMessages();
 		game->Update();
 		game->Draw();
-		environment::js_state_wrapper().WatchFiles();
 	}
 	return EXIT_SUCCESS;
 }

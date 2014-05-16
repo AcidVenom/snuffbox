@@ -95,7 +95,8 @@ SeverityColours Terminal::SeverityToColour(LogSeverity severity)
 void Terminal::AddLine(LogSeverity severity, const char* msg)
 {
 	time_t t = time(0);
-	struct tm now = *localtime(&t);
+	struct tm now;
+	localtime_s(&now,&t);
 	std::string hour = std::to_string(now.tm_hour);
 	if (strlen(hour.c_str()) < 2)
 	{

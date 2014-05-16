@@ -3,6 +3,7 @@
 #include "../../snuffbox/logging.h"
 #include <fstream>
 #include <algorithm>
+#include <comdef.h>
 
 #define PRINT_RESULTS false
 #define JS_LOG(severity)                                  \
@@ -137,8 +138,6 @@ namespace snuffbox
 
 		SNUFF_XASSERT(!context.IsEmpty(), "Failed creating the JavaScript context!");
 
-		context->Enter();
-
 		DWORD ftyp = GetFileAttributesA(path_.c_str());
 		if (ftyp == INVALID_FILE_ATTRIBUTES)
 		{
@@ -146,8 +145,6 @@ namespace snuffbox
 		}
 
 		CompileAndRun("main");
-
-		context->Exit();
 	}
 
 	//---------------------------------------------------------------------------
@@ -162,8 +159,11 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------
-	void JSStateWrapper::CompileAndRun(const char* path)
+	void JSStateWrapper::CompileAndRun(const char* path, bool reloading)
 	{
+		JS_CREATE_SCOPE;
+		Handle<Context> ctx = JS_CONTEXT;
+		ctx->Enter();
 		std::string file_path = path_ + "/" + path + ".js";
 		std::string error = "Couldn't find JavaScript file '" + file_path + "'";
 		std::string src;
@@ -179,14 +179,22 @@ namespace snuffbox
 
 			TryCatch try_catch;
 
-			Handle<Script> script = Script::Compile(String::NewFromUtf8(isolate_, src.c_str()), String::NewFromUtf8(isolate_, file_path.c_str()));
-			Handle<Value> res = script->Run();
+			Local<Script> script = Script::Compile(String::NewFromUtf8(isolate_, src.c_str()), String::NewFromUtf8(isolate_, file_path.c_str()));
+			Local<Value> res = script->Run();
 
 			if (res.IsEmpty())
 			{
 				bool failed = false;
 				std::string exception(GetException(&try_catch, &failed));
-				SNUFF_XASSERT(failed == false, std::string("Failed compiling a JavaScript file! " + exception).c_str());
+				if (!reloading)
+				{
+					SNUFF_XASSERT(failed == false, std::string("Failed compiling a JavaScript file! " + exception).c_str());
+				}
+				else
+				{
+					SNUFF_LOG_ERROR(exception.c_str());
+					return;
+				}
 			}
 			else
 			{
@@ -202,42 +210,74 @@ namespace snuffbox
 		{
 			SNUFF_ASSERT(error.c_str());
 		}
+		ctx->Exit();
 
-		FileWatch fileWatch;
-		fileWatch.path = file_path;
-		fileWatch.lastTime = GetTimeForFile(file_path);
+		fin.close();
 
-		filesToWatch_.push_back(fileWatch);
+		if (!reloading)
+		{
+			if (loadedFiles_.find(file_path) == loadedFiles_.end())
+			{
+				bool failed = false;
+				FileWatch fileWatch;
+				fileWatch.path = file_path;
+				fileWatch.lastTime = GetTimeForFile(file_path, &failed);
+				fileWatch.relativePath = path;
+
+				if (!failed)
+				{
+					filesToWatch_.push_back(fileWatch);
+				}
+				else
+				{
+					SNUFF_LOG_ERROR(std::string("Could not add file: " + file_path + " to the file watch!\nThe file will not be hot-reloaded").c_str());
+				}
+
+				loadedFiles_.emplace(file_path, true);
+			}
+		}
 	}
 
 	//---------------------------------------------------------------------------
-	SYSTEMTIME JSStateWrapper::GetTimeForFile(std::string path)
+	FILETIME JSStateWrapper::GetTimeForFile(std::string path, bool* failed)
 	{
 		FILETIME creationTime;
 		FILETIME lastAccessTime;
 		FILETIME lastWriteTime;
+		
+		HANDLE file = CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 
-		std::ifstream file;
+		if (file == INVALID_HANDLE_VALUE)
+		{
+			FILETIME error = {};
+			return error;
+		}
 
-		BOOL result = GetFileTime(&file, &creationTime, &lastAccessTime, &lastWriteTime);
+		BOOL result = GetFileTime(file, &creationTime, &lastAccessTime, &lastWriteTime);
 		SNUFF_XASSERT(result == TRUE, std::string("Could not get time for file: " + path).c_str());
 
-		SYSTEMTIME sysTime;
-		FileTimeToSystemTime(&lastWriteTime, &sysTime);
-
-		return sysTime;
+		CloseHandle(file);
+		return lastWriteTime;
 	}
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::WatchFiles()
 	{
-		for (auto it : filesToWatch_)
+		if (!environment::has_game())
+			return;
+		for (auto &it : filesToWatch_)
 		{
-			SYSTEMTIME lastTime = GetTimeForFile(it.path);
-			if (it.lastTime.wMilliseconds != lastTime.wMilliseconds)
+			bool failed = false;
+			FILETIME lastTime = GetTimeForFile(it.path,&failed);
+			if (!failed)
 			{
-				SNUFF_LOG_INFO(std::string("Hot reloaded JavaScript file: " + it.path).c_str());
-				it.lastTime = lastTime;
+				if (CompareFileTime(&it.lastTime, &lastTime) != 0)
+				{
+					SNUFF_LOG_INFO(std::string("Hot reloaded JavaScript file: " + it.path).c_str());
+					it.lastTime = lastTime;
+					CompileAndRun(it.relativePath.c_str(), true);
+					environment::game().CreateCallbacks();
+				}
 			}
 		}
 	}
