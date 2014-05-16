@@ -4,8 +4,9 @@ var camera = camera || Camera.new();
 var quads = quads || new Array();
 var timer = timer || 0;
 
-Game.Initialise = function()
+function CreateQuads()
 {
+	quads = new Array();
 	for(var i = 0; i < 1000; ++i)
 	{
 		var quad = Quad.new();
@@ -14,6 +15,11 @@ Game.Initialise = function()
 		quad.setOffset(0.5,0,0.5);
 		quads.push(quad);
 	}
+}
+
+Game.Initialise = function()
+{
+	CreateQuads();
 }
 
 Game.Update = function(dt)
@@ -39,23 +45,25 @@ Game.Update = function(dt)
 	camera.translateBy(mx*speed,0,mz*speed);
 	camera.rotateBy(rx/300,rz/300,0);
 
+	Log.success(test);
+	var multiplier = 1;
 	for(var i = 0; i < quads.length; ++i)
 	{
 		if(i % 2 == 0)
 		{
 			quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
-			quads[i].setTranslation(0+i*3,Math.sin(timer)*3,0);
+			quads[i].setTranslation(0+i*3,Math.sin(timer)*3*multiplier,0);
 		}
 		else 
 		{
 			quads[i].rotateBy(0,0,-Math.sin(timer)*0.5);
-			quads[i].setTranslation(0+i*3,-Math.sin(timer)*3,0);
+			quads[i].setTranslation(0+i*3,-Math.sin(timer)*3*multiplier,0);
 		}
 
 		quads[i].setScale(0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)));
 
 	}
-
+	
 }
 
 Game.Draw = function(dt)

@@ -3,6 +3,7 @@
 #include "../../../snuffbox/d3d11/d3d11_display_device.h"
 #include "../../../snuffbox/logging.h"
 #include "../../../snuffbox/js/js_state_wrapper.h"
+#include "../../../snuffbox/game.h"
 
 namespace snuffbox
 {
@@ -24,6 +25,24 @@ namespace snuffbox
       sx_(1.0f), sy_(1.0f), sz_(1.0f),
 			yaw_(0.0f), pitch_(0.0f), roll_(0.0f)
 		{}
+
+    /// Default destructor
+    ~RenderElement()
+    {
+      unsigned int index = 0;
+      if (environment::has_game())
+      {
+        for (auto& it : environment::render_device().renderElements())
+        {
+          if (it == this)
+          {
+            environment::render_device().renderElements().erase(environment::render_device().renderElements().begin() + index);
+            break;
+          }
+          ++index;
+        }
+      }
+    }
 
 		/// Sets the buffers of the render element
 		virtual void SetBuffers() = 0;

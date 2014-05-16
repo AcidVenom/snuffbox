@@ -1,4 +1,4 @@
-﻿Build started 5/16/2014 8:43:16 AM.
+﻿Build started 16/05/2014 11:49:54 AM.
      1>Project "C:\Snuff\src\snuffbox-console\snuffbox-console.vcxproj" on node 3 (Build target(s)).
      1>Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Snuff\src\x64\Debug\snuffbox-console.exe" /NOLOGO C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgetsd.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Cored.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Guid.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmaind.lib Ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Snuff\src\x64\Debug\snuffbox-console.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Snuff\src\x64\Debug\snuffbox-console.lib" /MACHINE:X64 x64\Debug\console_widget.obj
@@ -10,4 +10,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.68
+Time Elapsed 00:00:02.11

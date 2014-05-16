@@ -322,7 +322,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Draw()
 	{
-		for (auto it : renderElements_)
+		for (auto& it : renderElements_)
 		{
       VertexBufferType type = it->type();
       if (type != vbType_)
