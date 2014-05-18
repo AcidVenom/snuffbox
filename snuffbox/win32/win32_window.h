@@ -19,7 +19,7 @@ namespace snuffbox
 	struct WindowParameters
 	{
 		int x, y, w, h;
-		const char* name;
+		std::string name;
 	};
 
 	/**
@@ -41,7 +41,7 @@ namespace snuffbox
 		* @param[in] x (int) The x position of the window (optional, will center if left out)
 		* @param[in] y (int) The y position of the window (optional, will center if left out)
 		*/
-		Win32Window(const char* name, int w, int h, int x = SNUFF_WINDOW_CENTERED, int y = SNUFF_WINDOW_CENTERED);
+		Win32Window(std::string name, int w, int h, int x = SNUFF_WINDOW_CENTERED, int y = SNUFF_WINDOW_CENTERED);
 
 		/// Default destructor
 		~Win32Window();

@@ -1,13 +1,13 @@
 require("test")
 
 var camera = camera || Camera.new();
-var quads = quads || new Array();
+var quads = new Array();
 var timer = timer || 0;
+var terrain = terrain || Terrain.new(256,256);
 
 function CreateQuads()
 {
-	quads = new Array();
-	for(var i = 0; i < 1000; ++i)
+	for(var i = 0; i < 100; ++i)
 	{
 		var quad = Quad.new();
 		quad.setTranslation(0+i*3,0,0);
@@ -19,7 +19,7 @@ function CreateQuads()
 
 Game.Initialise = function()
 {
-	CreateQuads();
+	
 }
 
 Game.Update = function(dt)
@@ -45,7 +45,6 @@ Game.Update = function(dt)
 	camera.translateBy(mx*speed,0,mz*speed);
 	camera.rotateBy(rx/300,rz/300,0);
 
-	Log.success(test);
 	var multiplier = 1;
 	for(var i = 0; i < quads.length; ++i)
 	{
@@ -74,4 +73,9 @@ Game.Draw = function(dt)
 Game.Shutdown = function()
 {
 		
+}
+
+Game.OnReload = function()
+{
+
 }

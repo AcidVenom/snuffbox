@@ -28,6 +28,8 @@ namespace snuffbox
 		/// Rotates the camera by given values
 		void RotateBy(float x, float y, float z);
 
+		XMVECTOR translation(){ return translation_; }
+
 		XMMATRIX& view();
 
 	private:

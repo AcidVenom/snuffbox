@@ -3,6 +3,15 @@
 
 #include <chrono>
 
+#define SNUFF_VERSION_MAJOR 0
+#define SNUFF_VERSION_MINOR 1
+
+#ifdef _DEBUG
+#define SNUFF_DEBUG_MODE "Debug"
+#else
+#define SNUFF_DEBUG_MODE "Release"
+#endif
+
 using namespace std::chrono;
 
 namespace snuffbox
@@ -85,9 +94,9 @@ void Game::Update()
 
 	environment::render_device().IncrementTime();
 
-	if (gameTime_ % 10 == 0)
+	if (gameTime_ % 20 == 0)
 	{
-		environment::js_state_wrapper().WatchFiles();
+		environment::file_watcher().WatchFiles();
 	}
 }
 
@@ -207,7 +216,7 @@ void Game::JSRender(JS_ARGS)
 
 	Camera* camera = wrapper.GetPointer<Camera>(0);
 
-	environment::render_device().UpdateConstantBuffers(camera);
+	environment::render_device().UpdateCamera(camera);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -251,6 +260,16 @@ void Game::CreateCallbacks()
 	JS_OBJECT_CALLBACK("Shutdown", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Shutdown()' function! Please add it to your main.js");
 	shutdown_.SetFunction(cb);
+
+	JS_OBJECT_CALLBACK("OnReload", obj);
+	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.OnReload()' function! Please add it to your main.js");
+	onReload_.SetFunction(cb);
+}
+
+//------------------------------------------------------------------------------------------------------
+void Game::Reload()
+{
+	onReload_.Call(0);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -259,10 +278,15 @@ int SNUFF_MAIN
 	Connection connection;
 	AllocatedMemory memory;
   JSStateWrapper js_state_wrapper;
+	FileWatcher file_watcher;
 
-	SharedPtr<Game> game = environment::memory().ConstructShared<Game>(
-		environment::memory().ConstructShared<Win32Window>("Snuffbox Alpha (D3D11)",1280,720)
+	std::string windowName(
+		"Snuffbox_" + std::string(SNUFF_DEBUG_MODE) + "_V_" +
+		std::to_string(SNUFF_VERSION_MAJOR) + "." +
+		std::to_string(SNUFF_VERSION_MINOR)
 		);
+	SharedPtr<Game> game = environment::memory().ConstructShared<Game>(
+		environment::memory().ConstructShared<Win32Window>(windowName.c_str(), 1280, 720));
 
 	if (game->consoleEnabled())
 	{

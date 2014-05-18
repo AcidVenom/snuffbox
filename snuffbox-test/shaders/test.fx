@@ -1,31 +1,58 @@
 cbuffer VS_CONSTANT_BUFFER : register(b0)
 {
 	float Time;
-	float4x4 WorldViewProjection;
-	float4x4 WorldView;
 	float4x4 World;
+	float4x4 View;
+	float4x4 Projection;
+	float4x4 WorldViewProjection;
+	float4 CamPos;
 }
 
 struct VOut
 {
   float4 position : SV_POSITION;
+  float4 unmodified : POSITION;
   float4 color : COLOR;
 	float3 normal : NORMAL;
 };
 
+float4 GetVertexPos(float4 position)
+{
+	float4 wave = float4(position.x,position.y+sin(position.x/10+Time/50)*5+cos(position.z/10)*5+sin(Time/50)*3,position.z,position.w);
+
+	return float4(wave.x,wave.y*(sin(wave.x*3.14/180)*wave.z/100),wave.z,wave.w);
+}
+
 VOut VS(float4 position : POSITION, float4 color : COLOR, float3 normal : NORMAL)
 {
     VOut output;
-    //output.position = mul(float4(position.x,position.y+sin(position.x/2+Time/10)*1,position.z,position.w),WorldViewProjection);
-    output.position = mul(position,WorldViewProjection);
+    output.position = mul(GetVertexPos(position), WorldViewProjection);
     output.color = color;
 	output.normal = normal;
+	output.unmodified = position;
 	
     return output;
 }
 
-
 float4 PS(VOut input) : SV_TARGET
-{
-	return input.color;
+{	
+	float4 position = input.unmodified;
+	float4 A = GetVertexPos(position);
+    float4 C = GetVertexPos(float4(position.x+0.5,position.y,position.z+sqrt(0.75),position.w));
+    float4 B = GetVertexPos(float4(position.x+1,position.y,position.z,position.w));
+
+    float diffuseIntensity = 0.8;
+    float3 diffuseColor = float3(0.9,0.2,2.0);
+
+    float3 diffuse = diffuseIntensity * diffuseColor;
+    float3 light = normalize(float3(1.0,1.0,0.2));
+    float specIntens = 10;
+    float3 normal = cross(C.xyz - A.xyz, B.xyz - A.xyz);
+    normalize(normal);
+    float4 camView = CamPos - mul(position,World);
+    float3 half = normalize(normalize(light*-1) + camView.xyz); 
+	float specular = pow(saturate(dot(normal,half)),specIntens);
+	float4 specColor = float4(1.0,0.2,0.8,1);
+
+	return input.color * float4(diffuse,1) * saturate(dot(light,normal)) + specular * specColor;
 }

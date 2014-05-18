@@ -27,7 +27,10 @@ namespace snuffbox
 namespace snuffbox
 {
 	//---------------------------------------------------------------------------------
-  D3D11DisplayDevice::D3D11DisplayDevice() : time_(0.0f), vbType_(VertexBufferType::kNone)
+	D3D11DisplayDevice::D3D11DisplayDevice() : 
+		time_(0.0f), 
+		vbType_(VertexBufferType::kNone), 
+		camPos_(XMVectorSet(0.0f,0.0f,0.0f,0.0f))
 	{
 		environment::globalInstance = this;
 	}
@@ -43,11 +46,14 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Initialise()
 	{
+		vs_ = nullptr;
+		ps_ = nullptr;
 		CreateDevice();
 		GetAdapters();
 		CreateBackBuffer();
 		CreateViewport();
-		CreateShaders();
+		LoadShader("shaders/test");
+		CreateConstantBuffer();
 		CreateLayout();
 	}
 
@@ -205,31 +211,64 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::CreateShaders()
+	void D3D11DisplayDevice::LoadShader(const char* path, bool reloading)
 	{
+		if (vs_)
+		{
+			vs_->Release();
+			vs_ = nullptr;
+		}
+		if (ps_)
+		{
+			ps_->Release();
+			ps_ = nullptr;
+		}
+
 		ID3D10Blob* errors = nullptr;
 		HRESULT result = S_OK;
-		std::string path = environment::game().path() + "/shaders/test.fx";
+		std::string file_path = environment::game().path() + "/" + path + ".fx";
 		
-		result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "VS", "vs_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &vsBuffer_, &errors, 0);
-		SNUFF_XASSERT(errors == nullptr, static_cast<const char*>(errors->GetBufferPointer()));
-		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + path).c_str()).c_str());
-    result = D3DX11CompileFromFileA(path.c_str(), 0, 0, "PS", "ps_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &psBuffer_, &errors, 0);
-		SNUFF_XASSERT(errors == nullptr, static_cast<const char*>(errors->GetBufferPointer()));
-		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + path).c_str()).c_str());
+		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "VS", "vs_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &vsBuffer_, &errors, 0);
+		if (errors != nullptr)
+		{
+			SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
+			return;
+		}
+		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + file_path).c_str()).c_str());
+		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "PS", "ps_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &psBuffer_, &errors, 0);
+		if (errors != nullptr)
+		{
+			SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
+			return;
+		}
+		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + file_path).c_str()).c_str());
 
 		result = device_->CreateVertexShader(vsBuffer_->GetBufferPointer(), vsBuffer_->GetBufferSize(), NULL, &vs_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 		result = device_->CreatePixelShader(psBuffer_->GetBufferPointer(), psBuffer_->GetBufferSize(), NULL, &ps_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
+		context_->VSSetShader(vs_, 0, 0);
+		context_->PSSetShader(ps_, 0, 0);
 
+		if (!reloading)
+		{
+			environment::file_watcher().AddFile(file_path, std::string(path), FileType::kShader);
+		}
+
+		if (errors != nullptr)
+		{
+			errors->Release();
+		}
+	}
+
+	void D3D11DisplayDevice::CreateConstantBuffer()
+	{
+		HRESULT result = S_OK;
 		VS_CONSTANT_BUFFER vsConstantBuffer;
-		vsConstantBuffer.Time = time_;
-		vsConstantBuffer.WorldViewProjection = worldMatrix_ * projectionMatrix_ * viewMatrix_;
 
 		D3D11_BUFFER_DESC constantBufferDesc;
-		constantBufferDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER) * 4;
+		constantBufferDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER)* 4;
 		constantBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		constantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -244,14 +283,8 @@ namespace snuffbox
 		result = device_->CreateBuffer(&constantBufferDesc, &initData, &vsConstantBuffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
-		context_->VSSetShader(vs_, 0, 0);
-		context_->PSSetShader(ps_, 0, 0);
-
 		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-		if (errors != nullptr)
-		{
-			errors->Release();
-		}
+		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 	}
 
 	void D3D11DisplayDevice::CreateViewport()
@@ -339,9 +372,11 @@ namespace snuffbox
 
       mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
       mappedData->Time = time_;
-      mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
-      mappedData->WorldView = worldMatrix_ * viewMatrix_;
       mappedData->World = worldMatrix_;
+      mappedData->View = viewMatrix_;
+      mappedData->Projection = projectionMatrix_;
+			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+			mappedData->CamPos = camPos_;
 
       context_->Unmap(vsConstantBuffer_, 0);
 
@@ -350,7 +385,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::UpdateConstantBuffers(Camera* camera)
+	void D3D11DisplayDevice::UpdateCamera(Camera* camera)
 	{
 		SwapChainDescription swapDesc;
 		swapChain_->GetDesc(&swapDesc);
@@ -358,6 +393,8 @@ namespace snuffbox
 		worldMatrix_ = XMMatrixIdentity();
 		projectionMatrix_ = XMMatrixPerspectiveFovLH(80.0f*3.14f/180.0f, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 10.0f);
 		viewMatrix_ = camera->view();
+
+		camPos_ = camera->translation();
 	}
 
 	//---------------------------------------------------------------------------------

@@ -55,9 +55,11 @@ namespace snuffbox
 	struct VS_CONSTANT_BUFFER
 	{
 		float Time;
-		XMMATRIX WorldViewProjection;
-		XMMATRIX WorldView;
+		XMMATRIX Projection;
+		XMMATRIX View;
 		XMMATRIX World;
+		XMMATRIX WorldViewProjection;
+		XMVECTOR CamPos;
 	};
 
 	/**
@@ -89,8 +91,11 @@ namespace snuffbox
 		/// Creates a vertex buffer for use with this device
 		void CreateLayout();
 
-		/// Creates the shaders for use with this device
-		void CreateShaders();
+		/// Loads a specific shader
+		void LoadShader(const char* path, bool reloading = false);
+
+		/// Creates the constant buffer
+		void CreateConstantBuffer();
 
 		/// Creates the viewport
 		void CreateViewport();
@@ -102,7 +107,7 @@ namespace snuffbox
 		void Draw();
 
 		/// Updates the constant buffer
-		void UpdateConstantBuffers(Camera* camera);
+		void UpdateCamera(Camera* camera);
 
 		/// Ends the draw
 		void EndDraw();
@@ -168,5 +173,6 @@ namespace snuffbox
 		ID3D11RasterizerState*				rasterizerState_;	  ///< The rasterizer state
 		std::vector<RenderElement*>		renderElements_;		///< The list of render elements
     VertexBufferType              vbType_;            ///< The vertex buffer type
+		XMVECTOR											camPos_;						///< The current camera position
 	};
 }

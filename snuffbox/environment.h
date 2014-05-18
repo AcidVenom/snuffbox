@@ -9,6 +9,7 @@ namespace snuffbox
 	class Mouse;
 	class Keyboard;
 	class D3D11DisplayDevice;
+	class FileWatcher;
 
 	namespace environment
 	{
@@ -33,6 +34,9 @@ namespace snuffbox
 		/// Returns the render device
 		D3D11DisplayDevice& render_device();
 
+		/// Returns the file watcher
+		FileWatcher& file_watcher();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -53,5 +57,8 @@ namespace snuffbox
 
 		/// Returns if there's a render device or not
 		bool has_render_device();
+
+		/// Returns if there's a file watcher or not
+		bool has_file_watcher();
 	}
 }

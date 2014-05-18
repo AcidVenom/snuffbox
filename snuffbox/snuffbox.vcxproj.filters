@@ -58,6 +58,9 @@
     <ClCompile Include="d3d11\elements\quad_element.cc">
       <Filter>d3d11\elements</Filter>
     </ClCompile>
+    <ClCompile Include="win32\win32_file_watch.cc">
+      <Filter>win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -110,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="d3d11\elements\quad_element.h">
       <Filter>d3d11\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\win32_file_watch.h">
+      <Filter>win32</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

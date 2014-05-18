@@ -1,6 +1,7 @@
 #include "../../snuffbox/js/js_state_wrapper.h"
 #include "../../snuffbox/js/js_object_register.h"
 #include "../../snuffbox/logging.h"
+#include "../../snuffbox/win32/win32_file_watch.h"
 #include <fstream>
 #include <algorithm>
 #include <comdef.h>
@@ -158,9 +159,8 @@ namespace snuffbox
   void JSStateWrapper::Destroy()
   {
     global_.Reset();
+		while (!V8::IdleNotification()){}
     context_.Reset();
-
-    while (!V8::IdleNotification()){} //Garbage collection
 
     V8::Dispose();
   }
@@ -222,67 +222,8 @@ namespace snuffbox
 		{
 			if (loadedFiles_.find(file_path) == loadedFiles_.end())
 			{
-				bool failed = false;
-				FileWatch fileWatch;
-				fileWatch.path = file_path;
-				fileWatch.lastTime = GetTimeForFile(file_path, &failed);
-				fileWatch.relativePath = path;
-
-				if (!failed)
-				{
-					filesToWatch_.push_back(fileWatch);
-				}
-				else
-				{
-					SNUFF_LOG_ERROR(std::string("Could not add file: " + file_path + " to the file watch!\nThe file will not be hot-reloaded").c_str());
-				}
-
+				environment::file_watcher().AddFile(file_path, std::string(path), FileType::kScript);
 				loadedFiles_.emplace(file_path, true);
-			}
-		}
-	}
-
-	//---------------------------------------------------------------------------
-	FILETIME JSStateWrapper::GetTimeForFile(std::string path, bool* failed)
-	{
-		FILETIME creationTime;
-		FILETIME lastAccessTime;
-		FILETIME lastWriteTime;
-		
-		HANDLE file = CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-
-		if (file == INVALID_HANDLE_VALUE)
-		{
-			FILETIME error = {};
-			return error;
-		}
-
-		BOOL result = GetFileTime(file, &creationTime, &lastAccessTime, &lastWriteTime);
-		SNUFF_XASSERT(result == TRUE, std::string("Could not get time for file: " + path).c_str());
-
-		CloseHandle(file);
-		return lastWriteTime;
-	}
-
-	//---------------------------------------------------------------------------
-	void JSStateWrapper::WatchFiles()
-	{
-		if (!environment::has_game())
-			return;
-		for (auto &it : filesToWatch_)
-		{
-			bool failed = false;
-			FILETIME lastTime = GetTimeForFile(it.path,&failed);
-			if (!failed)
-			{
-				if (CompareFileTime(&it.lastTime, &lastTime) != 0)
-				{
-					SNUFF_LOG_INFO(std::string("Hot reloaded JavaScript file: " + it.path).c_str());
-					it.lastTime = lastTime;
-					CompileAndRun(it.relativePath.c_str(), true);
-					environment::game().CreateCallbacks();
-          while (!V8::IdleNotification()){}
-				}
 			}
 		}
 	}

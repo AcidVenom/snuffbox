@@ -26,17 +26,6 @@ using namespace v8;
 
 namespace snuffbox
 {
-	/**
-	* @struct snuffbox::FileWatch
-	* @brief A structure to hold filewatch data
-	* @author Daniël Konings
-	*/
-	struct FileWatch
-	{
-		std::string path;
-		std::string relativePath;
-		FILETIME lastTime;
-	};
 
 	/**
 	* @class snuffbox::JSObject
@@ -140,12 +129,6 @@ namespace snuffbox
     /// Creates the JavaScript context
 		Local<Context> CreateContext();
 
-		/// Watches files for chances
-		void WatchFiles();
-
-		/// Get file time
-		FILETIME GetTimeForFile(std::string path,bool* failed);
-
 		/// Creates a new instance of a C++ object from JavaScript
 		template<typename T>
 		static void JSNew(JS_ARGS);
@@ -158,7 +141,6 @@ namespace snuffbox
     std::string path_; ///< The source directory path
 		Persistent<ObjectTemplate, CopyablePersistentTraits<ObjectTemplate>> global_; ///< The function registry
 		Persistent<Context, CopyablePersistentTraits<Context>> context_;	///< The JavaScript context
-		std::vector<FileWatch> filesToWatch_;	///< The files to watch for hot reloading
 		std::map<std::string, bool> loadedFiles_; ///< Check to see if a file is already loaded
 
   private:

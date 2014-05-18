@@ -18,7 +18,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------
-	Win32Window::Win32Window(const char* name, int w, int h, int x, int y) : focussed_(false)
+	Win32Window::Win32Window(std::string name, int w, int h, int x, int y) : focussed_(false)
 	{
 		params().x = x;
 		params().y = y;
@@ -85,7 +85,7 @@ namespace snuffbox
 
 		auto name = params().name;
 
-		handle_ = CreateWindowA(wndClass.lpszClassName, params().name,
+		handle_ = CreateWindowA(wndClass.lpszClassName, params().name.c_str(),
       style, params().x, params().y, params().w, params().h, GetDesktopWindow(), NULL,
 			wndClass.hInstance, this);
 		if (!handle_)
@@ -110,8 +110,7 @@ namespace snuffbox
 		DestroyWindow(handle_);
     UnregisterClassA(SNUFF_WINDOW_CLASS, instance_);
 
-		std::string name = params().name;
-		std::string result = "Destroyed the window with name: " + name;
+		std::string result = "Destroyed the window with name: " + params().name;
 		SNUFF_LOG_INFO(result.c_str());
 	}
 	
