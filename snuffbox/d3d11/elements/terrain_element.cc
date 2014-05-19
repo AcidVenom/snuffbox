@@ -24,8 +24,6 @@ namespace snuffbox
 	{
 		const double yScale = std::sqrt(0.75f);
 
-		vertices().resize(w_*h_);
-
 		HRESULT result = S_OK;
 		for (unsigned int y = 0; y < h_; y++)
 		{
@@ -34,44 +32,45 @@ namespace snuffbox
 				unsigned int i = y * w_ + x;
 				Vertex vertex;
 
-				if (y % 2 == 0)
-				{
-					vertex.x = static_cast<float>(x);
-				}
-				else
-				{
-					vertex.x = static_cast<float>(x + 0.5f);
-				}
-
+				vertex.x = static_cast<float>(x);
 				vertex.y = 0.0f;
 				vertex.z = static_cast<float>(y*yScale);
 				vertex.colour = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 
-				vertices()[i] = vertex;
+				vertices().push_back(vertex);
 			}
 		}
-		for (unsigned int y = 0; y < h_ - 1; ++y)
+		for (unsigned int y = 0; y < h_-1; ++y)
 		{
-			for (unsigned int x = 0; x < w_; ++x)
+			if (y % 2 == 0)
 			{
-				if ((y % 2) == 0)
+				for (unsigned int x = 0; x < w_; ++x)
 				{
-					indices().push_back(y*w_ + x);
-					indices().push_back((y + 1)*w_ + x);
-				}
-				else
-				{
-					indices().push_back((y + 1)*w_ + x);
-					indices().push_back(y*w_ + x);
-				}
-			}
 
-			if (y < h_ - 2)
-			{
-				indices().push_back(indices().back());
-				indices().push_back(indices().back() + 1);
+					indices().push_back(y*w_ + x);
+					indices().push_back((y + 1)* w_ + x);
+
+					if (x == w_ - 1)
+					{
+						indices().push_back((y+1)*w_ + x);
+					}
+				}
 			}
+			else
+			{
+				for (int x = w_ - 1; x >= 0; --x)
+				{
+					indices().push_back((y + 1)* w_ + x);
+					indices().push_back(y*w_ + x);
+
+					if (x == 0)
+					{
+						indices().push_back((y + 1)*w_ + x);
+					}
+				}
+			}
+			
 		}
 
 		vertexBuffer_ = environment::render_device().CreateVertexBuffer(vertices());

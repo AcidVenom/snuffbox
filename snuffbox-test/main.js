@@ -77,5 +77,5 @@ Game.Shutdown = function()
 
 Game.OnReload = function()
 {
-
+	CreateQuads();
 }

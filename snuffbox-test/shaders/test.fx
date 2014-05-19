@@ -18,7 +18,7 @@ struct VOut
 
 float4 GetVertexPos(float4 position)
 {
-	float4 wave = float4(position.x,position.y+sin(position.x/10+Time/50)*5+cos(position.z/10)*5+sin(Time/50)*3,position.z,position.w);
+	float4 wave = float4(position.x,position.y+sin(position.x/10+Time/50)*4+cos(position.z/10)*5+sin(Time/50)*10,position.z,position.w);
 
 	return float4(wave.x,wave.y*(sin(wave.x*3.14/180)*wave.z/100),wave.z,wave.w);
 }
@@ -42,17 +42,17 @@ float4 PS(VOut input) : SV_TARGET
     float4 B = GetVertexPos(float4(position.x+1,position.y,position.z,position.w));
 
     float diffuseIntensity = 0.8;
-    float3 diffuseColor = float3(0.9,0.2,2.0);
+    float3 diffuseColor = float3(1.0,1.0,1.0);
 
     float3 diffuse = diffuseIntensity * diffuseColor;
     float3 light = normalize(float3(1.0,1.0,0.2));
-    float specIntens = 10;
+    float specIntens = 4;
     float3 normal = cross(C.xyz - A.xyz, B.xyz - A.xyz);
     normalize(normal);
     float4 camView = CamPos - mul(position,World);
     float3 half = normalize(normalize(light*-1) + camView.xyz); 
-	float specular = pow(saturate(dot(normal,half)),specIntens);
-	float4 specColor = float4(1.0,0.2,0.8,1);
+	float specular = pow(saturate(dot(normal,half)),specIntens)*1.5;
+	float4 specColor = float4(0.8,0.7,0.6,1);
 
 	return input.color * float4(diffuse,1) * saturate(dot(light,normal)) + specular * specColor;
 }
