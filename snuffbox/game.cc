@@ -111,8 +111,9 @@ void Game::Draw()
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 
-	draw_.Call(1, argv);
 	environment::render_device().StartDraw();
+	draw_.Call(1, argv);
+	environment::render_device().Draw();
 	environment::render_device().EndDraw();
 }
 
@@ -277,8 +278,8 @@ int SNUFF_MAIN
 {
 	Connection connection;
 	AllocatedMemory memory;
-  JSStateWrapper js_state_wrapper;
-	FileWatcher file_watcher;
+  SharedPtr<JSStateWrapper> js_state_wrapper = environment::memory().ConstructShared<JSStateWrapper>();
+	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
 
 	std::string windowName(
 		"Snuffbox_" + std::string(SNUFF_DEBUG_MODE) + "_V_" +
@@ -294,7 +295,7 @@ int SNUFF_MAIN
 		Sleep(1000);
 	}
 	environment::render_device().Initialise();
-  js_state_wrapper.Initialise();
+  js_state_wrapper->Initialise();
 	
 	game->Initialise();
 

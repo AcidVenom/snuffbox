@@ -115,6 +115,9 @@ namespace snuffbox
 		/// Increases the elapsed time
 		void IncrementTime(){ ++time_; }
 
+		/// Creates the depth stencil view/buffer
+		void CreateDepthStencil();
+
 		/// Destroys the device
 		void Destroy();
 
@@ -174,5 +177,7 @@ namespace snuffbox
 		std::vector<RenderElement*>		renderElements_;		///< The list of render elements
     VertexBufferType              vbType_;            ///< The vertex buffer type
 		XMVECTOR											camPos_;						///< The current camera position
+		ID3D11DepthStencilView*				depthStencilView_;	///< The depth stencil view
+		ID3D11Texture2D*							depthStencilBuffer_;///< The buffer of the depth stencil
 	};
 }

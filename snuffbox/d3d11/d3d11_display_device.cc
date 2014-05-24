@@ -55,6 +55,8 @@ namespace snuffbox
 		LoadShader("shaders/test");
 		CreateConstantBuffer();
 		CreateLayout();
+		CreateDepthStencil();
+		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -177,8 +179,6 @@ namespace snuffbox
 			&renderTargetView_);
 
 		SNUFF_XASSERT(result == S_OK, HRToString(result))
-
-		context_->OMSetRenderTargets(1, &renderTargetView_, NULL);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -290,15 +290,22 @@ namespace snuffbox
 	void D3D11DisplayDevice::CreateViewport()
 	{
 		D3D11_VIEWPORT viewport;
+		DXGI_SWAP_CHAIN_DESC scDesc;
+
+		swapChain_->GetDesc(&scDesc);
 
 		viewport.TopLeftX = 0.0f;
 		viewport.TopLeftY = 0.0f;
-		viewport.Width = static_cast<float>(environment::game().window()->params().w);
-		viewport.Height = static_cast<float>(environment::game().window()->params().h);
+		viewport.Width = static_cast<float>(scDesc.BufferDesc.Width);
+		viewport.Height = static_cast<float>(scDesc.BufferDesc.Height);
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 
 		context_->RSSetViewports(1, &viewport);
+
+		SwapChainDescription swapDesc;
+		swapChain_->GetDesc(&swapDesc);
+		projectionMatrix_ = XMMatrixPerspectiveFovLH(80.0f*3.14f / 180.0f, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -346,10 +353,37 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateDepthStencil()
+	{
+		HRESULT result = S_OK;
+
+		D3D11_TEXTURE2D_DESC dsDesc;
+		DXGI_SWAP_CHAIN_DESC scDesc;
+		swapChain_->GetDesc(&scDesc);
+
+		dsDesc.Width = scDesc.BufferDesc.Width;
+		dsDesc.Height = scDesc.BufferDesc.Height;
+		dsDesc.MipLevels = 1;
+		dsDesc.ArraySize = 1;
+		dsDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		dsDesc.SampleDesc.Count = 1;
+		dsDesc.SampleDesc.Quality = 0;
+		dsDesc.Usage = D3D11_USAGE_DEFAULT;
+		dsDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		dsDesc.CPUAccessFlags = 0;
+		dsDesc.MiscFlags = 0;
+
+		result = device_->CreateTexture2D(&dsDesc, NULL, &depthStencilBuffer_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+		result = device_->CreateDepthStencilView(depthStencilBuffer_, NULL, &depthStencilView_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+	}
+
+	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
 		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-		Draw();
+		context_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -387,13 +421,8 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::UpdateCamera(Camera* camera)
 	{
-		SwapChainDescription swapDesc;
-		swapChain_->GetDesc(&swapDesc);
-
 		worldMatrix_ = XMMatrixIdentity();
-		projectionMatrix_ = XMMatrixPerspectiveFovLH(80.0f*3.14f/180.0f, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 10.0f);
 		viewMatrix_ = camera->view();
-
 		camPos_ = camera->translation();
 	}
 
@@ -462,6 +491,14 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(rasterizerState_);
 		rasterizerState_->Release();
 		rasterizerState_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(depthStencilBuffer_);
+		depthStencilBuffer_->Release();
+		depthStencilBuffer_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(depthStencilView_);
+		depthStencilView_->Release();
+		depthStencilView_ = NULL;
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");
 	}
