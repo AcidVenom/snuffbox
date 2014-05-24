@@ -37,6 +37,7 @@ namespace snuffbox
 				vertex.z = static_cast<float>(y*yScale);
 				vertex.colour = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+				vertex.texCoord = XMFLOAT2(static_cast<float>(x) / w_, 1.0f-(static_cast<float>(y) / h_));
 
 				vertices().push_back(vertex);
 			}

@@ -4,22 +4,24 @@ var camera = camera || Camera.new();
 var quads = new Array();
 var timer = timer || 0;
 var terrain = terrain || Terrain.new(256,256);
+var testTexture = Texture.new("textures/test.png");
 
 function CreateQuads()
 {
-	for(var i = 0; i < 100; ++i)
+	for(var i = 0; i < 10; ++i)
 	{
 		var quad = Quad.new();
 		quad.setTranslation(0+i*3,0,0);
 		quad.setRotation(90*Math.PI/180,90*Math.PI/180,0);
 		quad.setOffset(0.5,0,0.5);
+		quad.setTexture(testTexture);
 		quads.push(quad);
 	}
 }
 
 Game.Initialise = function()
 {
-	
+	CreateQuads();
 }
 
 Game.Update = function(dt)

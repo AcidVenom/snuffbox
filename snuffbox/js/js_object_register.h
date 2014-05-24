@@ -7,6 +7,7 @@
 #include "../../snuffbox/js/js_state_wrapper.h"
 #include "../../snuffbox/d3d11/elements/terrain_element.h"
 #include "../../snuffbox/d3d11/elements/quad_element.h"
+#include "../../snuffbox/d3d11/d3d11_texture.h"
 
 namespace snuffbox
 {
@@ -19,5 +20,6 @@ namespace snuffbox
 		JSRegister<Camera, true>::Register();
 		JSRegister<Terrain, true>::Register();
 		JSRegister<Quad, true>::Register();
+		JSRegister<Texture, true>::Register();
 	}
 }

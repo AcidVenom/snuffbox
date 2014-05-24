@@ -4,10 +4,10 @@
 #include "../../../snuffbox/logging.h"
 #include "../../../snuffbox/js/js_state_wrapper.h"
 #include "../../../snuffbox/game.h"
+#include "../../../snuffbox/d3d11/d3d11_texture.h"
 
 namespace snuffbox
 {
-
 	class D3D11DisplayDevice;
 	/**
 	* @class snuffbox::RenderElement
@@ -18,12 +18,13 @@ namespace snuffbox
 	{
 	public:
 		/// Default constructor
-		RenderElement() : 
+		RenderElement() :
 			worldMatrix_(XMMatrixIdentity()),
-      x_(0.0f), y_(0.0f), z_(0.0f),
-      ox_(0.0f), oy_(0.0f), oz_(0.0f),
-      sx_(1.0f), sy_(1.0f), sz_(1.0f),
-			yaw_(0.0f), pitch_(0.0f), roll_(0.0f)
+			x_(0.0f), y_(0.0f), z_(0.0f),
+			ox_(0.0f), oy_(0.0f), oz_(0.0f),
+			sx_(1.0f), sy_(1.0f), sz_(1.0f),
+			yaw_(0.0f), pitch_(0.0f), roll_(0.0f),
+			texture_(nullptr)
 		{}
 
     /// Default destructor
@@ -74,6 +75,9 @@ namespace snuffbox
 		/// Sets the X, Y and Z offset
 		void SetOffset(float x, float y, float z);
 
+		/// Returns the texture
+		Texture* texture(){ return texture_; }
+
     /// Returns the vertex buffer type
     virtual VertexBufferType type() = 0;
 
@@ -85,6 +89,7 @@ namespace snuffbox
     float                         x_, y_, z_; ///< Translation floats
     float                         ox_, oy_, oz_; ///< Offset floats
     float                         sx_, sy_, sz_; ///< Scaling floats
+		Texture*											texture_;	///< The texture of this render element
 	public:
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);
@@ -97,6 +102,7 @@ namespace snuffbox
 		static void JSScale(JS_ARGS);
 		static void JSRotation(JS_ARGS);
 		static void JSTranslation(JS_ARGS);
+		static void JSSetTexture(JS_ARGS);
 	};
 
 	//-------------------------------------------------------------------------------------------
@@ -252,6 +258,14 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSSetTexture(JS_ARGS)
+	{
+		JS_SETUP(RenderElement);
+
+		self->texture_ = wrapper.GetPointer<Texture>(0);
+	}
+
+	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -266,7 +280,8 @@ namespace snuffbox
 			JSFunctionRegister("rotateBy", JSRotateBy),
 			JSFunctionRegister("setRotation", JSSetRotation),
 			JSFunctionRegister("setScale", JSSetScale),
-			JSFunctionRegister("setOffset", JSSetOffset)
+			JSFunctionRegister("setOffset", JSSetOffset),
+			JSFunctionRegister("setTexture", JSSetTexture)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);

@@ -163,6 +163,7 @@
   <ItemGroup>
     <ClCompile Include="d3d11\d3d11_camera.cc" />
     <ClCompile Include="d3d11\d3d11_display_device.cc" />
+    <ClCompile Include="d3d11\d3d11_texture.cc" />
     <ClCompile Include="d3d11\elements\quad_element.cc" />
     <ClCompile Include="d3d11\elements\terrain_element.cc" />
     <ClCompile Include="game.cc" />
@@ -178,6 +179,7 @@
   <ItemGroup>
     <ClInclude Include="d3d11\d3d11_camera.h" />
     <ClInclude Include="d3d11\d3d11_display_device.h" />
+    <ClInclude Include="d3d11\d3d11_texture.h" />
     <ClInclude Include="d3d11\elements\quad_element.h" />
     <ClInclude Include="d3d11\elements\render_element.h" />
     <ClInclude Include="d3d11\elements\terrain_element.h" />

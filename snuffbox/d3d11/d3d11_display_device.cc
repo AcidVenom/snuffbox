@@ -52,10 +52,12 @@ namespace snuffbox
 		GetAdapters();
 		CreateBackBuffer();
 		CreateViewport();
-		LoadShader("shaders/test");
+		LoadShader("shaders/base");
 		CreateConstantBuffer();
 		CreateLayout();
 		CreateDepthStencil();
+		CreateSamplerState();
+		CreateDefaultTexture();
 		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
 	}
 
@@ -190,10 +192,11 @@ namespace snuffbox
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		result = device_->CreateInputLayout(layout, 3, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
+		result = device_->CreateInputLayout(layout, 4, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		context_->IASetInputLayout(inputLayout_);
@@ -380,6 +383,59 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateSamplerState()
+	{
+		HRESULT result = S_OK;
+		D3D11_SAMPLER_DESC sDesc;
+
+		ZeroMemory(&sDesc, sizeof(D3D11_SAMPLER_DESC));
+		sDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		sDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		sDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		sDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		sDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		sDesc.MinLOD = 0;
+		sDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+		result = device_->CreateSamplerState(&sDesc, &samplerState_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		context_->PSSetSamplers(0, 1, &samplerState_);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateDefaultTexture()
+	{
+		HRESULT result = S_OK;
+		uint32_t color = 0xffffffff;
+
+		D3D11_TEXTURE2D_DESC whiteTexture;
+		ZeroMemory(&whiteTexture, sizeof(D3D11_TEXTURE2D_DESC));
+		whiteTexture.ArraySize = 1;
+		whiteTexture.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		whiteTexture.CPUAccessFlags = 0;
+		whiteTexture.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		whiteTexture.Height = 1;
+		whiteTexture.MipLevels = 1;
+		whiteTexture.MiscFlags = 0;
+		whiteTexture.SampleDesc.Count = 1;
+		whiteTexture.SampleDesc.Quality = 0;
+		whiteTexture.Usage = D3D11_USAGE_DEFAULT;
+		whiteTexture.Width = 1;
+
+		D3D11_SUBRESOURCE_DATA initData;
+		ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+		initData.pSysMem = &color;
+		initData.SysMemPitch = sizeof(color);
+		initData.SysMemSlicePitch = sizeof(color);
+
+		result = device_->CreateTexture2D(&whiteTexture, &initData, &noTexture_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+		result = device_->CreateShaderResourceView(noTexture_, NULL, &defaultResource_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+	}
+
+	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
 		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
@@ -413,6 +469,22 @@ namespace snuffbox
 			mappedData->CamPos = camPos_;
 
       context_->Unmap(vsConstantBuffer_, 0);
+
+			if (it->texture())
+			{
+				if (currentTexture_ != it->texture())
+				{
+					auto tex = it->texture()->resource();
+					context_->PSSetShaderResources(0, 1, &tex);
+					currentTexture_ = it->texture();
+				}
+			}
+			else
+			{
+				context_->PSSetShaderResources(0, 1, &defaultResource_);
+				currentTexture_ = nullptr;
+			}
+			
 
 			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 		}
@@ -499,6 +571,18 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(depthStencilView_);
 		depthStencilView_->Release();
 		depthStencilView_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(samplerState_);
+		samplerState_->Release();
+		samplerState_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(noTexture_);
+		noTexture_->Release();
+		noTexture_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(defaultResource_);
+		defaultResource_->Release();
+		defaultResource_ = NULL;
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");
 	}

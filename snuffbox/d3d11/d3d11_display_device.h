@@ -26,6 +26,7 @@ namespace snuffbox
 
 	class Camera;
 	class RenderElement;
+	class Texture;
 
   /**
   * @enum snuffbox::VertexBufferType
@@ -49,7 +50,8 @@ namespace snuffbox
 		float x, y, z;
 		D3DXCOLOR colour;
 		XMFLOAT3 normal;
-		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 3 + sizeof(D3DXCOLOR)+sizeof(XMFLOAT3));
+		XMFLOAT2 texCoord;
+		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 3 + sizeof(D3DXCOLOR)+sizeof(XMFLOAT3)+sizeof(XMFLOAT2));
 	};
 
 	struct VS_CONSTANT_BUFFER
@@ -118,6 +120,9 @@ namespace snuffbox
 		/// Creates the depth stencil view/buffer
 		void CreateDepthStencil();
 
+		/// Creates the sampler state
+		void CreateSamplerState();
+
 		/// Destroys the device
 		void Destroy();
 
@@ -154,6 +159,12 @@ namespace snuffbox
     /// Returns the current vertex buffer type
     VertexBufferType& vbType(){ return vbType_; }
 
+		/// Returns the device
+		ID3D11Device* device(){ return device_; }
+
+		/// Creates the default texture to use in shaders
+		void CreateDefaultTexture();
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device
@@ -179,5 +190,9 @@ namespace snuffbox
 		XMVECTOR											camPos_;						///< The current camera position
 		ID3D11DepthStencilView*				depthStencilView_;	///< The depth stencil view
 		ID3D11Texture2D*							depthStencilBuffer_;///< The buffer of the depth stencil
+		ID3D11Texture2D*							noTexture_;					///< A white rectangular texture as default
+		ID3D11ShaderResourceView*			defaultResource_;		///< The default shader resource
+		ID3D11SamplerState*						samplerState_;			///< The texture sampler state
+		Texture*											currentTexture_;		///< The current texture being used
 	};
 }

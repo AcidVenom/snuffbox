@@ -61,6 +61,9 @@
     <ClCompile Include="win32\win32_file_watch.cc">
       <Filter>win32</Filter>
     </ClCompile>
+    <ClCompile Include="d3d11\d3d11_texture.cc">
+      <Filter>d3d11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -116,6 +119,9 @@
     </ClInclude>
     <ClInclude Include="win32\win32_file_watch.h">
       <Filter>win32</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\d3d11_texture.h">
+      <Filter>d3d11</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -29,6 +29,9 @@ namespace snuffbox
 		template<typename T>
 		T* GetPointer(int arg);
 
+		/// Gets a string for the arguments
+		std::string GetString(int arg);
+
 		/// Sets a tuple as the return value of the arguments in .x and .y (defaults)
 		template<typename T>
 		void ReturnTuple(T x, T y, const char* n1 = "x", const char* n2 = "y");
@@ -52,9 +55,9 @@ namespace snuffbox
 	template<typename T>
 	inline T* JSWrapper::GetPointer(int arg)
 	{
-		Handle<Object> obj = args_[arg]->ToObject();
-		Handle<Value> val = obj->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(), "__ptr"));
-		Handle<External> ptr = val.As<External>();
+		Local<Object> obj = args_[arg]->ToObject();
+		Local<Value> val = obj->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(), "__ptr"));
+		Local<External> ptr = val.As<External>();
 
 		return static_cast<T*>(ptr->Value());
 	}
@@ -82,5 +85,11 @@ namespace snuffbox
 		retVal->Set(String::NewFromUtf8(isolate, n2), Number::New(isolate, static_cast<T>(z)));
 
 		args_.GetReturnValue().Set(retVal);
+	}
+
+	//------------------------------------------------------------------------------
+	inline std::string JSWrapper::GetString(int arg)
+	{
+		return std::string(*String::Utf8Value(args_[arg]->ToString()));
 	}
 }
