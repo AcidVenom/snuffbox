@@ -4,7 +4,7 @@ var camera = camera || Camera.new();
 var quads = [];
 var timer = timer || 0;
 var terrain = terrain || Terrain.new(256,256);
-var testTexture = testTexture || Texture.new("textures/test.png");
+var testTexture = Texture.new("textures/test.png");
 
 
 function CreateQuads()
@@ -54,12 +54,12 @@ Game.Update = function(dt)
 	{
 		if(i % 2 == 0)
 		{
-			quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
+			//quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
 			quads[i].setTranslation(0+i*3,Math.sin(timer)*3*multiplier,0);
 		}
 		else 
 		{
-			quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
+			//quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
 			quads[i].setTranslation(0+i*3,-Math.sin(timer)*3*multiplier,0);
 		}
 
@@ -81,4 +81,5 @@ Game.Shutdown = function()
 Game.OnReload = function()
 {
 	CreateQuads();
+	terrain.setTexture(testTexture);
 }
