@@ -124,17 +124,21 @@ void Game::Shutdown()
 
 	JS_CREATE_SCOPE;
   Local<Context> ctx = JS_CONTEXT;
-	Handle<Object> global = ctx->Global();
-	Handle<Array> arr = global->GetPropertyNames();
-		
-	for (unsigned int i = 0; i < arr->Length(); ++i)
+	Local<Object> global = ctx->Global();
+	Local<Array> names = global->GetPropertyNames();
+	Local<String> src;
+	std::string c_src = "";
+
+	for (unsigned int i = 0; i < names->Length(); ++i)
 	{
-		String::Utf8Value str(arr->Get(i));
-		std::string varName = *str;
-		std::string result = varName + " = null;";
-		Handle<Script> script = Script::Compile(String::NewFromUtf8(JS_ISOLATE, result.c_str()));
-		script->Run();
+		Local<Value> str = names->Get(i);
+		c_src += *String::Utf8Value(str.As<String>());
+		c_src += "=null;";
 	}
+
+	src = String::NewFromUtf8(JS_ISOLATE,c_src.c_str());
+	Local<Script> script = Script::Compile(src, String::NewFromUtf8(JS_ISOLATE,"shutdown"));
+	script->Run();
 	
 	SNUFF_LOG_INFO("Snuffbox shutdown..");
 	started_ = false;
@@ -278,7 +282,7 @@ int SNUFF_MAIN
 {
 	Connection connection;
 	AllocatedMemory memory;
-  SharedPtr<JSStateWrapper> js_state_wrapper = environment::memory().ConstructShared<JSStateWrapper>();
+	JSStateWrapper js_state_wrapper;
 	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
 
 	std::string windowName(
@@ -295,15 +299,16 @@ int SNUFF_MAIN
 		Sleep(1000);
 	}
 	environment::render_device().Initialise();
-  js_state_wrapper->Initialise();
+  js_state_wrapper.Initialise();
 	
 	game->Initialise();
 
 	while (game->started())
 	{
-  	game->window()->ProcessMessages();
+		game->window()->ProcessMessages();
 		game->Update();
 		game->Draw();
+		while (!V8::IdleNotification()){}
 	}
 	return EXIT_SUCCESS;
 }

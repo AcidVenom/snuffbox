@@ -158,8 +158,10 @@ namespace snuffbox
   //---------------------------------------------------------------------------
   void JSStateWrapper::Destroy()
   {
+		SNUFF_LOG_DEBUG("Collecting all garbage..");
+		V8::LowMemoryNotification();
+		SNUFF_LOG_DEBUG(".. Collected garbage");
     global_.Reset();
-		while (!V8::IdleNotification()){}
     context_.Reset();
 
     V8::Dispose();
@@ -278,8 +280,8 @@ namespace snuffbox
 		int64_t size = -static_cast<int64_t>(sizeof(data.GetParameter()));
 		data.GetParameter()->persistent().Reset();
 		environment::memory().Destruct<JSObject>(data.GetParameter());
-		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size);
 		data.GetValue().Clear();
+		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size);
 	}
 
 	//---------------------------------------------------------------------------
@@ -298,8 +300,9 @@ namespace snuffbox
 		ptr->persistent().SetWeak(static_cast<JSObject*>(ptr), JSDestroy);
 		ptr->persistent().MarkIndependent();
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "__ptr"), External::New(JS_ISOLATE, static_cast<void*>(ptr)));
-		int64_t allocated = JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(sizeof(ptr));
+		int64_t size = static_cast<int64_t>(sizeof(ptr));
 
+		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size);
 		args.GetReturnValue().Set(obj);
 	}
 }

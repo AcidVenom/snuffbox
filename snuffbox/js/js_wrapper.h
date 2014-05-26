@@ -82,7 +82,7 @@ namespace snuffbox
 		Local<Object> retVal = Object::New(isolate);
 		retVal->Set(String::NewFromUtf8(isolate, n1), Number::New(isolate, static_cast<T>(x)));
 		retVal->Set(String::NewFromUtf8(isolate, n2), Number::New(isolate, static_cast<T>(y)));
-		retVal->Set(String::NewFromUtf8(isolate, n2), Number::New(isolate, static_cast<T>(z)));
+		retVal->Set(String::NewFromUtf8(isolate, n3), Number::New(isolate, static_cast<T>(z)));
 
 		args_.GetReturnValue().Set(retVal);
 	}

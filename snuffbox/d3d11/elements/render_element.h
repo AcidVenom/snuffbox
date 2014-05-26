@@ -23,7 +23,7 @@ namespace snuffbox
 			x_(0.0f), y_(0.0f), z_(0.0f),
 			ox_(0.0f), oy_(0.0f), oz_(0.0f),
 			sx_(1.0f), sy_(1.0f), sz_(1.0f),
-			yaw_(0.0f), pitch_(0.0f), roll_(0.0f),
+			rotation_(XMMatrixIdentity()),
 			texture_(nullptr)
 		{}
 
@@ -56,7 +56,7 @@ namespace snuffbox
 		/// Returns the world matrix
     XMMATRIX& World(){ 
       worldMatrix_ = XMMatrixTranslation(ox_, oy_, oz_) *  
-      XMMatrixRotationRollPitchYaw(roll_, pitch_, yaw_) *
+      rotation_ *
       XMMatrixScaling(sx_, sy_, sz_) *
       XMMatrixTranslation(x_, y_, z_);
       return worldMatrix_; 
@@ -85,7 +85,7 @@ namespace snuffbox
 		std::vector<Vertex>						vertices_; ///< The vertices
 		std::vector<unsigned int>			indices_; ///< The indices
 		XMMATRIX											worldMatrix_; ///< The world matrix
-		float													yaw_, pitch_, roll_; ///< Rotation floats
+		XMMATRIX											rotation_;	///< Rotation
     float                         x_, y_, z_; ///< Translation floats
     float                         ox_, oy_, oz_; ///< Offset floats
     float                         sx_, sy_, sz_; ///< Scaling floats
@@ -132,17 +132,13 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RotateBy(float x, float y, float z)
 	{
-    yaw_ += x;
-    pitch_ += y;
-    roll_ += z;
+		rotation_ *= XMMatrixRotationRollPitchYaw(x, y, z);
 	}
 
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::SetRotation(float x, float y, float z)
 	{
-    yaw_ = x;
-    pitch_ = y;
-    roll_ = z;
+		rotation_ = XMMatrixRotationRollPitchYaw(x,y,z);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -253,8 +249,10 @@ namespace snuffbox
 	inline void RenderElement::JSRotation(JS_ARGS)
 	{
 		JS_SETUP(RenderElement);
-
-		wrapper.ReturnTriple<float>(self->yaw_, self->pitch_, self->roll_);
+		float roll = atan2(self->rotation_._31, self->rotation_._32);
+		float pitch = acos(self->rotation_._33);
+		float yaw = -atan2(self->rotation_._13, self->rotation_._23);
+		wrapper.ReturnTriple<float>(yaw, pitch, roll);
 	}
 
 	//-------------------------------------------------------------------------------------------

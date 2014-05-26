@@ -1,18 +1,20 @@
 require("test")
 
 var camera = camera || Camera.new();
-var quads = new Array();
+var quads = [];
 var timer = timer || 0;
 var terrain = terrain || Terrain.new(256,256);
-var testTexture = Texture.new("textures/test.png");
+var testTexture = testTexture || Texture.new("textures/test.png");
+
 
 function CreateQuads()
 {
+	quads = [];
 	for(var i = 0; i < 10; ++i)
 	{
 		var quad = Quad.new();
 		quad.setTranslation(0+i*3,0,0);
-		quad.setRotation(90*Math.PI/180,90*Math.PI/180,0);
+		quad.setRotation(-90*Math.PI/180,0,0);
 		quad.setOffset(0.5,0,0.5);
 		quad.setTexture(testTexture);
 		quads.push(quad);
@@ -43,7 +45,7 @@ Game.Update = function(dt)
 		rz = Mouse.movement().y;
 	}
 
-	timer+=1*dt;
+	timer+=dt;
 	camera.translateBy(mx*speed,0,mz*speed);
 	camera.rotateBy(rx/300,rz/300,0);
 
@@ -57,12 +59,11 @@ Game.Update = function(dt)
 		}
 		else 
 		{
-			quads[i].rotateBy(0,0,-Math.sin(timer)*0.5);
+			quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
 			quads[i].setTranslation(0+i*3,-Math.sin(timer)*3*multiplier,0);
 		}
 
 		quads[i].setScale(0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)));
-
 	}
 	
 }
