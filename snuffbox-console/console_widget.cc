@@ -9,9 +9,6 @@
 //------------------------------------------------------------
 ConsoleWidget::ConsoleWidget() : terminal_(new Terminal(this)), layout_(new QVBoxLayout())
 {
-	terminal_->text()->setMinimumSize(QSize(300,380));
-	terminal_->resize(QSize(300,380));
-
 	layout_->setContentsMargins(2, 2, 2, 2);
 
 	label_ = new QLabel();

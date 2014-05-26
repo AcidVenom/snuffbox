@@ -33,6 +33,7 @@ lines_(0)
 	setFont(f);
 
 	terminal_->setFont(font());
+	terminal_->setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
 
 	QObject::connect(lineEdit_, SIGNAL(returnPressed()), this, SLOT(HandleEvent()));
 	WelcomeMessage();
