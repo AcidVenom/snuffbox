@@ -162,6 +162,9 @@ namespace snuffbox
 		/// Creates the default texture to use in shaders
 		void CreateDefaultTexture();
 
+		/// Resets the current texture for reloading
+		void ResetCurrentTexture(){ currentTexture_ = nullptr; }
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device

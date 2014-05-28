@@ -21,6 +21,9 @@ namespace snuffbox
 		/// Destroy the texture object
 		void Destroy();
 
+		/// Reloads the texture
+		void Reload(std::string path);
+
 		/// Returns the shader resource
 		ID3D11ShaderResourceView* resource(){ return texture_; }
 

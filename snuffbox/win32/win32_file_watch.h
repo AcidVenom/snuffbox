@@ -15,7 +15,8 @@ namespace snuffbox
 	enum FileType
 	{
 		kScript,
-		kShader
+		kShader,
+		kTexture
 	};
 
 	/**
@@ -52,6 +53,9 @@ namespace snuffbox
 
 		/// Reloads a watched shader when it has been changed
 		void ReloadShaderFile(WatchedFile& file);
+
+		/// Reloads a watched texture when it has been changed
+		void ReloadTextureFile(WatchedFile& file);
 
 		/// Adds a file to the watched files list
 		void AddFile(std::string& path, std::string& relativePath, FileType type);

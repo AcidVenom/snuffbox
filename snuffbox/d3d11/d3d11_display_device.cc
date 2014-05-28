@@ -20,6 +20,7 @@ namespace snuffbox
 
 		D3D11DisplayDevice& render_device()
 		{
+			SNUFF_ASSERT_NOTNULL(globalInstance);
 			return *globalInstance;
 		}
 	}
