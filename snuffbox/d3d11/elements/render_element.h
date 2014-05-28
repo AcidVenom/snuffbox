@@ -8,6 +8,7 @@
 
 namespace snuffbox
 {
+
 	class D3D11DisplayDevice;
 	/**
 	* @class snuffbox::RenderElement
@@ -17,14 +18,28 @@ namespace snuffbox
 	class RenderElement : public JSObject
 	{
 	public:
+
+		/**
+		* @enum snuffbox::ElementTypes
+		* @brief An enumerator to hold typing information on render elements
+		* @author Daniël Konings
+		*/
+		enum ElementTypes
+		{
+			kQuad,
+			kBillboard,
+			kTerrain
+		};
+
 		/// Default constructor
-		RenderElement() :
+		RenderElement(ElementTypes type) :
 			worldMatrix_(XMMatrixIdentity()),
 			x_(0.0f), y_(0.0f), z_(0.0f),
 			ox_(0.0f), oy_(0.0f), oz_(0.0f),
 			sx_(1.0f), sy_(1.0f), sz_(1.0f),
 			rotation_(XMMatrixIdentity()),
-			texture_(nullptr)
+			texture_(nullptr),
+			elementType_(type)
 		{}
 
     /// Default destructor
@@ -62,6 +77,10 @@ namespace snuffbox
       return worldMatrix_; 
     }
 
+		XMMATRIX scaling(){ return XMMatrixScaling(sx_, sy_, sz_); }
+		XMMATRIX offset(){ return XMMatrixTranslation(ox_, oy_, oz_); }
+		XMMATRIX rotation(){ return rotation_; }
+
 		/// Sets the translation on the X, Y, Z plane
 		void SetTranslation(float x, float y, float z);
 		/// Translates on the X, Y, Z plane
@@ -75,11 +94,17 @@ namespace snuffbox
 		/// Sets the X, Y and Z offset
 		void SetOffset(float x, float y, float z);
 
+		/// Returns the translation as a vector
+		XMVECTOR translation(){ return XMVectorSet(x_, y_, z_, 0.0); }
+
 		/// Returns the texture
 		Texture* texture(){ return texture_; }
 
     /// Returns the vertex buffer type
     virtual VertexBufferType type() = 0;
+		
+		/// Returns the element type
+		ElementTypes& element_type(){ return elementType_; }
 
 	private:
 		std::vector<Vertex>						vertices_; ///< The vertices
@@ -90,6 +115,7 @@ namespace snuffbox
     float                         ox_, oy_, oz_; ///< Offset floats
     float                         sx_, sy_, sz_; ///< Scaling floats
 		Texture*											texture_;	///< The texture of this render element
+		ElementTypes									elementType_;	///< The type of this render element
 	public:
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);

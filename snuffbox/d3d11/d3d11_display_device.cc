@@ -1,6 +1,7 @@
 #include "../../snuffbox/d3d11/d3d11_display_device.h"
 #include "../../snuffbox/d3d11/elements/render_element.h"
 #include "../../snuffbox/d3d11/elements/quad_element.h"
+#include "../../snuffbox/d3d11/elements/billboard_element.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
@@ -30,7 +31,8 @@ namespace snuffbox
 	D3D11DisplayDevice::D3D11DisplayDevice() : 
 		time_(0.0f), 
 		vbType_(VertexBufferType::kNone), 
-		camPos_(XMVectorSet(0.0f,0.0f,0.0f,0.0f))
+		camPos_(XMVectorSet(0.0f,0.0f,0.0f,0.0f)),
+		camera_(nullptr)
 	{
 		environment::globalInstance = this;
 	}
@@ -453,8 +455,22 @@ namespace snuffbox
         it->SetBuffers();
         vbType_ = type;
       }
-			worldMatrix_ = it->World();
 
+			RenderElement::ElementTypes elementType = it->element_type();
+
+			if (elementType == RenderElement::ElementTypes::kBillboard)
+			{
+				Billboard* ptr = static_cast<Billboard*>(it);
+				if (camera_)
+				{
+					worldMatrix_ = ptr->WorldFromCamera(camera_);
+				}	
+			}
+			else
+			{
+				worldMatrix_ = it->World();
+			}
+				
       D3D11_MAPPED_SUBRESOURCE cbData;
       VS_CONSTANT_BUFFER* mappedData;
 
@@ -496,6 +512,7 @@ namespace snuffbox
 		worldMatrix_ = XMMatrixIdentity();
 		viewMatrix_ = camera->view();
 		camPos_ = camera->translation();
+		camera_ = camera;
 	}
 
 	//---------------------------------------------------------------------------------

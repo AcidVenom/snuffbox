@@ -29,6 +29,7 @@ namespace snuffbox
 		void RotateBy(float x, float y, float z);
 
 		XMVECTOR translation(){ return translation_; }
+		std::vector<float> rotation();
 
 		XMMATRIX& view();
 

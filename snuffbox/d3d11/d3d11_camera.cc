@@ -52,6 +52,16 @@ namespace snuffbox
 			pitch_ = XM_PI*2.0f;
 	}
 
+	std::vector<float> Camera::rotation()
+	{
+		std::vector<float> temp;
+
+		temp.push_back(pitch_);
+		temp.push_back(yaw_);
+		
+		return temp;
+	}
+
 	XMMATRIX& Camera::view()
 	{
 		rotation_ = XMMatrixRotationRollPitchYaw(pitch_, yaw_, 0);

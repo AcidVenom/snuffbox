@@ -46,7 +46,7 @@ float4 PS(VOut input) : SV_TARGET
   float4 C = GetVertexPos(float4(position.x+0.5,position.y,position.z+sqrt(0.75),position.w));
   float4 B = GetVertexPos(float4(position.x+1,position.y,position.z,position.w));
 
-  float diffuseIntensity = 0.8;
+  float diffuseIntensity = 1.0;
   float3 diffuseColor = float3(1.0,1.0,1.0);
 
   float3 diffuse = diffuseIntensity * diffuseColor;
@@ -58,7 +58,7 @@ float4 PS(VOut input) : SV_TARGET
   float3 half = normalize(normalize(light*-1) + camView.xyz); 
 	float specular = pow(saturate(dot(normal,half)),specIntens)*1.5;
 	float4 specColor = float4(0.8,0.7,0.6,1);
-  float4 textureColor = Texture.Sample(SampleType, input.texcoord);
+  float4 textureColor = Texture.Sample(SampleType, input.texcoord*4);
 
 	return (textureColor * input.color) * float4(diffuse,1) * saturate(dot(light,normal)) + specular * specColor;
 }

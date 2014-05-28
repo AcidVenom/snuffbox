@@ -3,13 +3,13 @@
 namespace snuffbox
 {
 	//------------------------------------------------------------------------------
-	Terrain::Terrain()
+	Terrain::Terrain() : RenderElement(RenderElement::ElementTypes::kTerrain)
 	{
 
 	}
 
 	//------------------------------------------------------------------------------
-	Terrain::Terrain(JS_ARGS)
+	Terrain::Terrain(JS_ARGS) : RenderElement(RenderElement::ElementTypes::kTerrain)
 	{
 		JSWrapper wrapper(args);
 

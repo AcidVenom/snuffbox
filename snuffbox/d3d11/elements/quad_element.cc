@@ -3,13 +3,13 @@
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
-	Quad::Quad()
+	Quad::Quad() : RenderElement(RenderElement::ElementTypes::kQuad)
 	{
 
 	}
 
 	//-------------------------------------------------------------------------------------------
-	Quad::Quad(JS_ARGS)
+	Quad::Quad(JS_ARGS) : RenderElement(RenderElement::ElementTypes::kQuad)
 	{
 		Create();
 	}

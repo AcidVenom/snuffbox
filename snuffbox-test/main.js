@@ -12,7 +12,7 @@ function CreateQuads()
 	quads = [];
 	for(var i = 0; i < 10; ++i)
 	{
-		var quad = Quad.new();
+		var quad = Billboard.new();
 		quad.setTranslation(0+i*3,0,0);
 		quad.setRotation(-90*Math.PI/180,0,0);
 		quad.setOffset(0.5,0,0.5);
@@ -32,7 +32,7 @@ Game.Update = function(dt)
 		mz = 0,
 		rx = 0,
 		rz = 0,
-		speed = 2;
+		speed = 0.05;
 
 	if(Keyboard.isDown("W")) mz = 1;
 	if(Keyboard.isDown("S")) mz = -1;

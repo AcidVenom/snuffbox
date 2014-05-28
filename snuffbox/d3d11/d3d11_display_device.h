@@ -153,9 +153,6 @@ namespace snuffbox
 		/// Returns the list of render elements
 		std::vector<RenderElement*>& renderElements(){ return renderElements_; }
 
-		/// Sets the world matrix
-		void SetWorldMatrix(XMMATRIX& worldMatrix){ worldMatrix_ = worldMatrix; }
-
     /// Returns the current vertex buffer type
     VertexBufferType& vbType(){ return vbType_; }
 
@@ -194,5 +191,6 @@ namespace snuffbox
 		ID3D11ShaderResourceView*			defaultResource_;		///< The default shader resource
 		ID3D11SamplerState*						samplerState_;			///< The texture sampler state
 		Texture*											currentTexture_;		///< The current texture being used
+		Camera*												camera_;						///< The current camera being used
 	};
 }

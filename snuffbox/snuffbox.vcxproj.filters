@@ -64,6 +64,9 @@
     <ClCompile Include="d3d11\d3d11_texture.cc">
       <Filter>d3d11</Filter>
     </ClCompile>
+    <ClCompile Include="d3d11\elements\billboard_element.cc">
+      <Filter>d3d11\elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -122,6 +125,9 @@
     </ClInclude>
     <ClInclude Include="d3d11\d3d11_texture.h">
       <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\elements\billboard_element.h">
+      <Filter>d3d11\elements</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
