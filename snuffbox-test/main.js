@@ -4,9 +4,9 @@ var camera = camera || Camera.new();
 var quads = [];
 var timer = timer || 0;
 var terrain = terrain || Terrain.new(256,256);
-var testTexture = Texture.new("textures/test.png");
+ContentManager.load("texture","textures/test.png");
 
-
+terrain.setTexture("textures/test.png");
 function CreateQuads()
 {
 	quads = [];
@@ -16,7 +16,7 @@ function CreateQuads()
 		quad.setTranslation(0+i*3,0,0);
 		quad.setRotation(-90*Math.PI/180,0,0);
 		quad.setOffset(0.5,0,0.5);
-		quad.setTexture(testTexture);
+		quad.setTexture("textures/test.png");
 		quads.push(quad);
 	}
 }
@@ -81,5 +81,4 @@ Game.Shutdown = function()
 Game.OnReload = function()
 {
 	CreateQuads();
-	terrain.setTexture(testTexture);
 }

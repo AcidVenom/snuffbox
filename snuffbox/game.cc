@@ -284,6 +284,7 @@ int SNUFF_MAIN
 	AllocatedMemory memory;
 	JSStateWrapper js_state_wrapper;
 	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
+	SharedPtr<ContentManager> content_manager = environment::memory().ConstructShared<ContentManager>();
 
 	std::string windowName(
 		"Snuffbox_" + std::string(SNUFF_DEBUG_MODE) + "_V_" +

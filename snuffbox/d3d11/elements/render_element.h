@@ -286,7 +286,7 @@ namespace snuffbox
 	{
 		JS_SETUP(RenderElement);
 
-		self->texture_ = wrapper.GetPointer<Texture>(0);
+		self->texture_ = environment::content_manager().Get<Texture>(wrapper.GetString(0)).get();
 	}
 
 	//-------------------------------------------------------------------------------------------

@@ -10,6 +10,7 @@ namespace snuffbox
 	class Keyboard;
 	class D3D11DisplayDevice;
 	class FileWatcher;
+	class ContentManager;
 
 	namespace environment
 	{
@@ -37,6 +38,9 @@ namespace snuffbox
 		/// Returns the file watcher
 		FileWatcher& file_watcher();
 
+		/// Returns the content manager
+		ContentManager& content_manager();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -60,5 +64,8 @@ namespace snuffbox
 
 		/// Returns if there's a file watcher or not
 		bool has_file_watcher();
+
+		/// Returns if there's a content manager or not
+		bool has_content_manager();
 	}
 }

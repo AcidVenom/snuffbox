@@ -22,6 +22,9 @@
     <Filter Include="d3d11\elements">
       <UniqueIdentifier>{5e58fa82-ee22-4e67-b7e0-00c4e92f211f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="content">
+      <UniqueIdentifier>{63f74a0c-47f6-49dd-bcea-c9e9fd110c33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -66,6 +69,12 @@
     </ClCompile>
     <ClCompile Include="d3d11\elements\billboard_element.cc">
       <Filter>d3d11\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="content\content_manager.cc">
+      <Filter>content</Filter>
+    </ClCompile>
+    <ClCompile Include="content\content.cc">
+      <Filter>content</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +137,12 @@
     </ClInclude>
     <ClInclude Include="d3d11\elements\billboard_element.h">
       <Filter>d3d11\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="content\content_manager.h">
+      <Filter>content</Filter>
+    </ClInclude>
+    <ClInclude Include="content\content.h">
+      <Filter>content</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -10,13 +10,11 @@ namespace snuffbox
 	*	@brief Texture class used to wrap D3D11 textures
 	* @author Daniël Konings
 	*/
-	class Texture : public JSObject
+	class Texture
 	{
 	public:
 		/// Default constructor
-		Texture();
-		/// JavaScript constructor
-		Texture(JS_ARGS);
+		Texture(std::string path);
 		/// Default destructor
 		~Texture();
 
@@ -28,9 +26,5 @@ namespace snuffbox
 
 	private:
 		ID3D11ShaderResourceView* texture_; ///< The actual texture
-
-	public:
-		JS_NAME(Texture);
-		static void RegisterJS(JS_TEMPLATE);
 	};
 }

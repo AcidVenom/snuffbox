@@ -5,15 +5,8 @@
 namespace snuffbox
 {
 	//------------------------------------------------------------------------------------------
-	Texture::Texture() : texture_(nullptr)
+	Texture::Texture(std::string path) : texture_(nullptr)
 	{
-
-	}
-
-	Texture::Texture(JS_ARGS)
-	{
-		JSWrapper wrapper(args);
-		std::string path = wrapper.GetString(0);
 		std::string file_path = std::string(environment::game().path() + "/" + path).c_str();
 
 		HRESULT result = S_OK;
@@ -41,11 +34,5 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(texture_);
 		texture_->Release();
 		texture_ = NULL;
-	}
-
-	//------------------------------------------------------------------------------------------
-	void Texture::RegisterJS(JS_TEMPLATE)
-	{
-
 	}
 }

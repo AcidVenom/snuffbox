@@ -20,6 +20,8 @@
 #include "../snuffbox/d3d11/d3d11_display_device.h"
 #include "../snuffbox/d3d11/d3d11_camera.h"
 
+#include "../snuffbox/content/content_manager.h"
+
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 
 namespace snuffbox

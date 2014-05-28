@@ -9,6 +9,7 @@
 #include "../../snuffbox/d3d11/elements/quad_element.h"
 #include "../../snuffbox/d3d11/elements/billboard_element.h"
 #include "../../snuffbox/d3d11/d3d11_texture.h"
+#include "../../snuffbox/content/content_manager.h"
 
 namespace snuffbox
 {
@@ -22,6 +23,6 @@ namespace snuffbox
 		JSRegister<Terrain, true>::Register();
 		JSRegister<Quad, true>::Register();
 		JSRegister<Billboard, true>::Register();
-		JSRegister<Texture, true>::Register();
+		JSRegister<ContentManager, false>::Register();
 	}
 }
