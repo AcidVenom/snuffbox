@@ -27,6 +27,8 @@ namespace snuffbox
 	class Camera;
 	class RenderElement;
 	class Texture;
+	class Shader;
+	struct Shaders;
 
   /**
   * @enum snuffbox::VertexBufferType
@@ -94,7 +96,7 @@ namespace snuffbox
 		void CreateLayout();
 
 		/// Loads a specific shader
-		void LoadShader(const char* path, bool reloading = false);
+		Shaders LoadShader(const char* path);
 
 		/// Creates the constant buffer
 		void CreateConstantBuffer();
@@ -135,12 +137,6 @@ namespace snuffbox
 		/// Converts a HRESULT to a C string
 		std::basic_string<TCHAR> HRToString(HRESULT hr, const char* subGroup);
 
-		/// Returns the default vertex shader
-		VertexShader* vs(){ return vs_; }
-
-		/// Returns the default pixel shader
-		PixelShader* ps(){ return ps_; }
-
 		/// Returns the input layout
 		ID3D11InputLayout* layout(){ return inputLayout_; }
 
@@ -165,6 +161,9 @@ namespace snuffbox
 		/// Resets the current texture for reloading
 		void ResetCurrentTexture(){ currentTexture_ = nullptr; }
 
+		/// Resets the current shader for reloading
+		void ResetCurrentShader(){ currentShader_ = nullptr; }
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device
@@ -178,8 +177,6 @@ namespace snuffbox
 		ID3D11InputLayout*						inputLayout_;				///< The vertex input layout
 		ID3D10Blob*										vsBuffer_;					///< Vertex shader buffer
 		ID3D10Blob*										psBuffer_;					///< Pixel shader buffer
-		VertexShader*									vs_;								///< The vertex shader
-		PixelShader*									ps_;								///< The pixel shader
 		float													time_;							///< The game time
 		XMMATRIX											worldMatrix_;				///< The world matrix
 		XMMATRIX											viewMatrix_;				///< The view matrix
@@ -194,6 +191,7 @@ namespace snuffbox
 		ID3D11ShaderResourceView*			defaultResource_;		///< The default shader resource
 		ID3D11SamplerState*						samplerState_;			///< The texture sampler state
 		Texture*											currentTexture_;		///< The current texture being used
+		Shader*												currentShader_;			///< The current shader being used
 		Camera*												camera_;						///< The current camera being used
 	};
 }

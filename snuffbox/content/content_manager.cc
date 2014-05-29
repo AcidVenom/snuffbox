@@ -2,7 +2,6 @@
 #include "../../snuffbox/content/content.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/memory/allocated_memory.h"
-#include "../../snuffbox/d3d11/d3d11_texture.h"
 
 namespace snuffbox
 {
@@ -50,6 +49,18 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	template<>
+	void ContentManager::Load<Shader>(std::string path)
+	{
+		if (loadedShaders_.find(path) != loadedShaders_.end())
+			return;
+		SharedPtr<Shader> texture = environment::memory().ConstructShared<Shader>(std::string(path));
+		SharedPtr<Content<Shader>> content = environment::memory().ConstructShared<Content<Shader>>(ContentTypes::kShader, texture);
+
+		loadedShaders_.emplace(path, content);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
 	void ContentManager::Unload<Texture>(std::string path)
 	{
 		SNUFF_XASSERT(loadedTextures_.find(path) != loadedTextures_.end(), "The texture '" + path + "' was never loaded!");
@@ -67,6 +78,19 @@ namespace snuffbox
 
 		contentPtr = loadedTextures_.find(path)->second.get();
 		
+		return contentPtr->Get();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	SharedPtr<Shader>& ContentManager::Get<Shader>(std::string path)
+	{
+		Content<Shader>* contentPtr = nullptr;
+
+		SNUFF_XASSERT(loadedShaders_.find(path) != loadedShaders_.end(), std::string("Shader not loaded '" + path + "'!"));
+
+		contentPtr = loadedShaders_.find(path)->second.get();
+
 		return contentPtr->Get();
 	}
 
@@ -101,6 +125,7 @@ namespace snuffbox
 		if (strcmp(contentType.c_str(), "shader") == 0)
 		{
 			isContent = true;
+			environment::content_manager().Load<Shader>(contentPath);
 		}
 
 		SNUFF_XASSERT(isContent == true, std::string("Content type '" + contentType + "' does not exist!").c_str());

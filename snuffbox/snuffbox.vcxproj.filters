@@ -76,6 +76,9 @@
     <ClCompile Include="content\content.cc">
       <Filter>content</Filter>
     </ClCompile>
+    <ClCompile Include="d3d11\d3d11_shader.cc">
+      <Filter>d3d11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -143,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="content\content.h">
       <Filter>content</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\d3d11_shader.h">
+      <Filter>d3d11</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

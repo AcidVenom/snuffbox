@@ -3,6 +3,7 @@
 #include <map>
 #include "../../snuffbox/js/js_state_wrapper.h"
 #include "../../snuffbox/d3d11/d3d11_texture.h"
+#include "../../snuffbox/d3d11/d3d11_shader.h"
 
 namespace snuffbox
 {
@@ -48,7 +49,7 @@ namespace snuffbox
 
 	private:
 		std::map<std::string, SharedPtr<Content<Texture>>> loadedTextures_; ///< A map by path of all loaded textures
-
+		std::map<std::string, SharedPtr<Content<Shader>>> loadedShaders_; ///< A map by path of all loaded shaders
 	public:
 		JS_NAME(ContentManager);
 		static void RegisterJS(JS_TEMPLATE);

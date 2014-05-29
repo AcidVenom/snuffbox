@@ -101,7 +101,9 @@ namespace snuffbox
 	//-------------------------------------------------------------------
 	void FileWatcher::ReloadShaderFile(WatchedFile& file)
 	{
-		environment::render_device().LoadShader(file.relativePath.c_str(),true);
+		Shader* shader = environment::content_manager().Get<Shader>(file.relativePath).get();
+		shader->Reload(file.relativePath);
+		environment::render_device().ResetCurrentShader();
 		SNUFF_LOG_INFO(std::string("Hot reloaded Shader file: " + file.path).c_str());
 	}
 
@@ -111,6 +113,7 @@ namespace snuffbox
 		Texture* texture = environment::content_manager().Get<Texture>(file.relativePath).get();
 		texture->Reload(file.relativePath);
 		environment::render_device().ResetCurrentTexture();
+		SNUFF_LOG_INFO(std::string("Hot reloaded Texture file: " + file.path).c_str());
 	}
 
 	//-------------------------------------------------------------------

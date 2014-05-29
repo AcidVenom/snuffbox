@@ -5,6 +5,9 @@
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
+#include "../../snuffbox/d3d11/d3d11_shader.h"
+#include "../../snuffbox/memory/allocated_memory.h"
+#include "../../snuffbox/content/content_manager.h"
 #include <comdef.h>
 
 namespace snuffbox
@@ -49,13 +52,11 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Initialise()
 	{
-		vs_ = nullptr;
-		ps_ = nullptr;
 		CreateDevice();
 		GetAdapters();
 		CreateBackBuffer();
 		CreateViewport();
-		LoadShader("shaders/base");
+		environment::content_manager().Load<Shader>("shaders/base.fx");
 		CreateConstantBuffer();
 		CreateLayout();
 		CreateDepthStencil();
@@ -217,55 +218,53 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::LoadShader(const char* path, bool reloading)
+	Shaders D3D11DisplayDevice::LoadShader(const char* path)
 	{
-		if (vs_)
+		VertexShader* vs;
+		PixelShader* ps;
+
+		if (vsBuffer_ != NULL)
 		{
-			vs_->Release();
-			vs_ = nullptr;
+			vsBuffer_->Release();
+			vsBuffer_ = NULL;
 		}
-		if (ps_)
+
+		if (psBuffer_ != NULL)
 		{
-			ps_->Release();
-			ps_ = nullptr;
+			psBuffer_->Release();
+			psBuffer_ = NULL;
 		}
 
 		ID3D10Blob* errors = nullptr;
 		HRESULT result = S_OK;
-		std::string file_path = environment::game().path() + "/" + path + ".fx";
+		std::string file_path = environment::game().path() + "/" + path;
 		
 		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "VS", "vs_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &vsBuffer_, &errors, 0);
 		if (errors != nullptr)
 		{
 			SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
-			return;
+			return Shaders{ nullptr, nullptr };
 		}
 		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + file_path).c_str()).c_str());
 		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "PS", "ps_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &psBuffer_, &errors, 0);
 		if (errors != nullptr)
 		{
 			SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
-			return;
+			return Shaders{ nullptr, nullptr };
 		}
 		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + file_path).c_str()).c_str());
 
-		result = device_->CreateVertexShader(vsBuffer_->GetBufferPointer(), vsBuffer_->GetBufferSize(), NULL, &vs_);
+		result = device_->CreateVertexShader(vsBuffer_->GetBufferPointer(), vsBuffer_->GetBufferSize(), NULL, &vs);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-		result = device_->CreatePixelShader(psBuffer_->GetBufferPointer(), psBuffer_->GetBufferSize(), NULL, &ps_);
+		result = device_->CreatePixelShader(psBuffer_->GetBufferPointer(), psBuffer_->GetBufferSize(), NULL, &ps);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-
-		context_->VSSetShader(vs_, 0, 0);
-		context_->PSSetShader(ps_, 0, 0);
-
-		if (!reloading)
-		{
-			environment::file_watcher().AddFile(file_path, std::string(path), FileType::kShader);
-		}
 
 		if (errors != nullptr)
 		{
 			errors->Release();
 		}
+
+		return Shaders{ vs, ps };
 	}
 
 	void D3D11DisplayDevice::CreateConstantBuffer()
@@ -501,6 +500,17 @@ namespace snuffbox
 				context_->PSSetShaderResources(0, 1, &defaultResource_);
 				currentTexture_ = nullptr;
 			}
+
+			if (it->shader())
+			{
+				if (currentShader_ != it->shader())
+				{
+					auto shaders = it->shader()->shaders();
+					context_->PSSetShader(shaders.ps, 0, 0);
+					context_->VSSetShader(shaders.vs, 0, 0);
+					currentShader_ = it->shader();
+				}
+			}
 			
 
 			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
@@ -569,14 +579,6 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(vsConstantBuffer_);
 		vsConstantBuffer_->Release();
 		vsConstantBuffer_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(vs_);
-		vs_->Release();
-		vs_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(ps_);
-		ps_->Release();
-		ps_ = NULL;
 
 		SNUFF_ASSERT_NOTNULL(rasterizerState_);
 		rasterizerState_->Release();

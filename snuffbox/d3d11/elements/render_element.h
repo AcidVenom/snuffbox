@@ -39,7 +39,8 @@ namespace snuffbox
 			sx_(1.0f), sy_(1.0f), sz_(1.0f),
 			rotation_(XMMatrixIdentity()),
 			texture_(nullptr),
-			elementType_(type)
+			elementType_(type),
+			shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get())
 		{}
 
     /// Default destructor
@@ -100,6 +101,9 @@ namespace snuffbox
 		/// Returns the texture
 		Texture* texture(){ return texture_; }
 
+		/// Returns the shader
+		Shader* shader(){ return shader_; }
+
     /// Returns the vertex buffer type
     virtual VertexBufferType type() = 0;
 		
@@ -115,6 +119,7 @@ namespace snuffbox
     float                         ox_, oy_, oz_; ///< Offset floats
     float                         sx_, sy_, sz_; ///< Scaling floats
 		Texture*											texture_;	///< The texture of this render element
+		Shader*												shader_; ///< The current shader used by this element
 		ElementTypes									elementType_;	///< The type of this render element
 	public:
 		static void RegisterJS(JS_TEMPLATE);
@@ -129,6 +134,7 @@ namespace snuffbox
 		static void JSRotation(JS_ARGS);
 		static void JSTranslation(JS_ARGS);
 		static void JSSetTexture(JS_ARGS);
+		static void JSSetShader(JS_ARGS);
 	};
 
 	//-------------------------------------------------------------------------------------------
@@ -290,6 +296,14 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSSetShader(JS_ARGS)
+	{
+		JS_SETUP(RenderElement);
+
+		self->shader_ = environment::content_manager().Get<Shader>(wrapper.GetString(0)).get();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -305,7 +319,8 @@ namespace snuffbox
 			JSFunctionRegister("setRotation", JSSetRotation),
 			JSFunctionRegister("setScale", JSSetScale),
 			JSFunctionRegister("setOffset", JSSetOffset),
-			JSFunctionRegister("setTexture", JSSetTexture)
+			JSFunctionRegister("setTexture", JSSetTexture),
+			JSFunctionRegister("setShader", JSSetShader)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);
