@@ -7,7 +7,6 @@ var terrain = terrain || Terrain.new(256,256);
 ContentManager.load("texture","textures/test.png");
 ContentManager.load("shader","shaders/custom.fx");
 
-terrain.setTexture("textures/test.png");
 function CreateQuads()
 {
 	quads = [];

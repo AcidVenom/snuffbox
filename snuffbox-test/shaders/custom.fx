@@ -58,6 +58,6 @@ float4 PS(VOut input) : SV_TARGET
 	float specular = pow(saturate(dot(normal,half)),specIntens)*1.5;
 	float4 specColor = float4(0.8,0.7,0.6,1);
   float4 textureColor = Texture.Sample(SampleType, input.texcoord);
-
-	return (textureColor * input.color) * float4(diffuse,1) * saturate(dot(light,normal)) + specular * specColor;
+  float4 color = (textureColor * input.color) * float4(diffuse,1) * saturate(dot(light,normal)) + specular * specColor;
+	return color;
 }

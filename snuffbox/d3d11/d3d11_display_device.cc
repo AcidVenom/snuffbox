@@ -497,10 +497,19 @@ namespace snuffbox
 
 		for (auto& it : renderElements_)
 		{
+      RenderElement::ElementTypes elementType = it->element_type();
 			translation = it->translation();
 			XMVECTOR delta = camTranslation - translation;
 			distance = abs(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
-			it->setDistanceToCamera(distance);
+
+      if (elementType != RenderElement::ElementTypes::kTerrain)
+      {
+        it->setDistanceToCamera(distance);
+      }
+      else
+      {
+        it->setDistanceToCamera(1000000000);
+      }
 
       VertexBufferType type = it->type();
       if (type != vbType_)
@@ -509,7 +518,7 @@ namespace snuffbox
         vbType_ = type;
       }
 
-			RenderElement::ElementTypes elementType = it->element_type();
+			
 
 			if (elementType == RenderElement::ElementTypes::kBillboard)
 			{
