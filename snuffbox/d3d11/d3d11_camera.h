@@ -13,6 +13,11 @@ namespace snuffbox
 	class Camera : public JSObject
 	{
 	public:
+		enum CameraType
+		{
+			kOrthographic,
+			kPerspective
+		};
 		/// Default constructor
 		Camera();
 
@@ -24,14 +29,22 @@ namespace snuffbox
 
 		/// Translates the camera by given values
 		void TranslateBy(float x, float y, float z);
+
+		/// Sets the translation of the camera
+		void SetTranslation(float x, float y, float z);
 		
 		/// Rotates the camera by given values
 		void RotateBy(float x, float y, float z);
 
+		/// Sets the rotation of the camera
+		void SetRotation(float x, float y, float z);
+
 		XMVECTOR translation(){ return translation_; }
-		std::vector<float> rotation();
+		std::vector<float> rotation(){ std::vector<float> temp; temp.push_back(yaw_); temp.push_back(pitch_); temp.push_back(roll_); return temp; }
 
 		XMMATRIX& view();
+		float fov(){ return fov_; }
+		CameraType type(){ return type_; }
 
 	private:
 		XMVECTOR up_; ///< Up vector
@@ -45,12 +58,20 @@ namespace snuffbox
 		XMVECTOR camForward_;
 		XMVECTOR camRight_;
 
-		float yaw_, pitch_;
-		float moveLeftRight_, moveBackForward_;
+		float yaw_, pitch_, roll_;
+		float moveLeftRight_, moveBackForward_, moveUpDown_;
+		float fov_;
+		CameraType type_;
 	public:
 		JS_NAME(Camera);
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);
 		static void JSRotateBy(JS_ARGS);
+		static void JSSetTranslation(JS_ARGS);
+		static void JSSetRotation(JS_ARGS);
+		static void JSTranslation(JS_ARGS);
+		static void JSRotation(JS_ARGS);
+		static void JSSetFov(JS_ARGS);
+		static void JSSetType(JS_ARGS);
 	};
 }

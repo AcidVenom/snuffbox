@@ -307,10 +307,6 @@ namespace snuffbox
 		viewport.MaxDepth = 1.0f;
 
 		context_->RSSetViewports(1, &viewport);
-
-		SwapChainDescription swapDesc;
-		swapChain_->GetDesc(&swapDesc);
-		projectionMatrix_ = XMMatrixPerspectiveFovLH(80.0f*3.14f / 180.0f, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -584,6 +580,17 @@ namespace snuffbox
 		worldMatrix_ = XMMatrixIdentity();
 		viewMatrix_ = camera->view();
 		camera_ = camera;
+
+		SwapChainDescription swapDesc;
+		swapChain_->GetDesc(&swapDesc);
+		if (camera->type() == Camera::CameraType::kOrthographic)
+		{
+			projectionMatrix_ = XMMatrixOrthographicRH(camera->fov(), static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
+		}
+		else
+		{
+			projectionMatrix_ = XMMatrixPerspectiveFovRH(camera->fov(), static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
+		}
 	}
 
 	//---------------------------------------------------------------------------------

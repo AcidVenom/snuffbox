@@ -22,7 +22,6 @@ VOut VS(float4 position : POSITION, float4 color : COLOR, float3 normal : NORMAL
   output.color = color;
 	output.normal = normal;
 	output.texcoord = texcoord;
-
   return output;
 }
 

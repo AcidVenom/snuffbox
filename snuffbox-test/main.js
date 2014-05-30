@@ -1,71 +1,31 @@
-require("test")
+require("loading")
 
-var camera = camera || Camera.new();
-var quads = [];
-var timer = timer || 0;
-var terrain = terrain || Terrain.new(256,256);
-ContentManager.load("texture","textures/test.png");
-ContentManager.load("shader","shaders/custom.fx");
-
-function CreateQuads()
+var camera = camera || Camera.new("orthographic");
+var blocks = [];
+for(var i = 0; i < 20; ++i)
 {
-	quads = [];
-	for(var i = 0; i < 10; ++i)
-	{
-		var quad = Billboard.new();
-		quad.setTranslation(0+i*3,0,0);
-		quad.setRotation(-90*Math.PI/180,0,0);
-		quad.setOffset(0.5,0,0.5);
-		quad.setTexture("textures/test.png");
-		quads.push(quad);
-	}
+	blocks.push(Quad.new());
+	blocks[i].setTranslation(i*0.05,0,0);
+	blocks[i].setScale(0.05,0.05,0.05);
+	blocks[i].setTexture("textures/sprBlock.png");
+	blocks[i].setRotation(-Math.PI/2,0,0);
 }
-
 Game.Initialise = function()
 {
-	CreateQuads();
+
 }
 
 Game.Update = function(dt)
 {	
-	var mx = 0,
-		mz = 0,
-		rx = 0,
-		rz = 0,
-		speed = 2;
-
-	if(Keyboard.isDown("W")) mz = 1;
-	if(Keyboard.isDown("S")) mz = -1;
-	if(Keyboard.isDown("A")) mx = -1;
-	if(Keyboard.isDown("D")) mx = 1;
-
-	if (Mouse.isDown(0))
+	if(Keyboard.isDown("A"))
 	{
-		rx = Mouse.movement().x;
-		rz = Mouse.movement().y;
+		camera.translateBy(-2*dt,0,0);
 	}
 
-	timer+=dt;
-	camera.translateBy(mx*speed*dt,0,mz*speed*dt);
-	camera.rotateBy(rx/300,rz/300,0);
-
-	var multiplier = 1;
-	for(var i = 0; i < quads.length; ++i)
+	if(Keyboard.isDown("D"))
 	{
-		if(i % 2 == 0)
-		{
-			//quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
-			quads[i].setTranslation(0+i*3,1,0);
-		}
-		else 
-		{
-			//quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
-			quads[i].setTranslation(0+i*3,1,0);
-		}
-
-		//quads[i].setScale(0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)));
+		camera.translateBy(2*dt,0,0);
 	}
-	
 }
 
 Game.Draw = function(dt)
@@ -80,5 +40,5 @@ Game.Shutdown = function()
 
 Game.OnReload = function()
 {
-	CreateQuads();
+
 }
