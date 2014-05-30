@@ -33,7 +33,7 @@ Game.Update = function(dt)
 		mz = 0,
 		rx = 0,
 		rz = 0,
-		speed = 0.05;
+		speed = 2;
 
 	if(Keyboard.isDown("W")) mz = 1;
 	if(Keyboard.isDown("S")) mz = -1;
@@ -47,7 +47,7 @@ Game.Update = function(dt)
 	}
 
 	timer+=dt;
-	camera.translateBy(mx*speed,0,mz*speed);
+	camera.translateBy(mx*speed*dt,0,mz*speed*dt);
 	camera.rotateBy(rx/300,rz/300,0);
 
 	var multiplier = 1;
@@ -56,15 +56,15 @@ Game.Update = function(dt)
 		if(i % 2 == 0)
 		{
 			//quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
-			quads[i].setTranslation(0+i*3,Math.sin(timer)*3*multiplier,0);
+			quads[i].setTranslation(0+i*3,1,0);
 		}
 		else 
 		{
 			//quads[i].rotateBy(0,0,Math.sin(timer)*0.5);
-			quads[i].setTranslation(0+i*3,-Math.sin(timer)*3*multiplier,0);
+			quads[i].setTranslation(0+i*3,1,0);
 		}
 
-		quads[i].setScale(0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)));
+		//quads[i].setScale(0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)),0.5+Math.abs(Math.sin(timer)));
 	}
 	
 }
@@ -81,6 +81,5 @@ Game.Shutdown = function()
 
 Game.OnReload = function()
 {
-	terrain.setShader("shaders/custom.fx");
 	CreateQuads();
 }

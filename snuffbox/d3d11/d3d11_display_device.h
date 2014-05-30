@@ -63,7 +63,6 @@ namespace snuffbox
 		XMMATRIX View;
 		XMMATRIX World;
 		XMMATRIX WorldViewProjection;
-		XMVECTOR CamPos;
 	};
 
 	/**
@@ -163,6 +162,9 @@ namespace snuffbox
 
 		/// Resets the current shader for reloading
 		void ResetCurrentShader(){ currentShader_ = nullptr; }
+		
+		/// Creates the context blend state
+		void CreateBlendState();
 
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
@@ -184,7 +186,6 @@ namespace snuffbox
 		ID3D11RasterizerState*				rasterizerState_;	  ///< The rasterizer state
 		std::vector<RenderElement*>		renderElements_;		///< The list of render elements
     VertexBufferType              vbType_;            ///< The vertex buffer type
-		XMVECTOR											camPos_;						///< The current camera position
 		ID3D11DepthStencilView*				depthStencilView_;	///< The depth stencil view
 		ID3D11Texture2D*							depthStencilBuffer_;///< The buffer of the depth stencil
 		ID3D11Texture2D*							noTexture_;					///< A white rectangular texture as default
@@ -193,5 +194,6 @@ namespace snuffbox
 		Texture*											currentTexture_;		///< The current texture being used
 		Shader*												currentShader_;			///< The current shader being used
 		Camera*												camera_;						///< The current camera being used
+		ID3D11BlendState*							blendState_;				///< The blend state of the context
 	};
 }

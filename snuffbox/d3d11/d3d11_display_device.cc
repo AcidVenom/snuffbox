@@ -35,7 +35,6 @@ namespace snuffbox
 	D3D11DisplayDevice::D3D11DisplayDevice() : 
 		time_(0.0f), 
 		vbType_(VertexBufferType::kNone), 
-		camPos_(XMVectorSet(0.0f,0.0f,0.0f,0.0f)),
 		camera_(nullptr)
 	{
 		environment::globalInstance = this;
@@ -62,6 +61,7 @@ namespace snuffbox
 		CreateDepthStencil();
 		CreateSamplerState();
 		CreateDefaultTexture();
+		CreateBlendState();
 		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
 	}
 
@@ -391,11 +391,17 @@ namespace snuffbox
 		D3D11_SAMPLER_DESC sDesc;
 
 		ZeroMemory(&sDesc, sizeof(D3D11_SAMPLER_DESC));
-		sDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		sDesc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
 		sDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-		sDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		sDesc.MipLODBias = 0.0f;
+		sDesc.MaxAnisotropy = 1;
+		sDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		sDesc.BorderColor[0] = 0;
+		sDesc.BorderColor[1] = 0;
+		sDesc.BorderColor[2] = 0;
+		sDesc.BorderColor[3] = 0;
 		sDesc.MinLOD = 0;
 		sDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
@@ -438,17 +444,64 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateBlendState()
+	{
+		HRESULT result = S_OK;
+
+		D3D11_BLEND_DESC bDesc;
+
+		ZeroMemory(&bDesc, sizeof(D3D11_BLEND_DESC));
+		bDesc.AlphaToCoverageEnable = false;
+		bDesc.IndependentBlendEnable = false;
+		bDesc.RenderTarget[0].BlendEnable = true;
+		bDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		bDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		bDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		bDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
+		bDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		bDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		bDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		result = device_->CreateBlendState(&bDesc, &blendState_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+	}
+	
+	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
 		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 		context_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		context_->OMSetBlendState(NULL, 0, 0xffffffff);
+
+		struct RenderElementSorter
+		{
+			inline bool operator() (RenderElement* a, RenderElement* b)
+			{
+				return (a->distanceToCamera() > b->distanceToCamera());
+			}
+		};
+
+		std::sort(renderElements_.begin(), renderElements_.end(), RenderElementSorter());
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Draw()
 	{
+		float blendFactor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		context_->OMSetBlendState(blendState_, blendFactor, 0xffffffff);
+
+		XMVECTOR camTranslation = camera_->translation();
+		XMVECTOR translation;
+
+		float distance = 0;
+
 		for (auto& it : renderElements_)
 		{
+			translation = it->translation();
+			XMVECTOR delta = camTranslation - translation;
+			distance = abs(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
+			it->setDistanceToCamera(distance);
+
       VertexBufferType type = it->type();
       if (type != vbType_)
       {
@@ -482,7 +535,6 @@ namespace snuffbox
       mappedData->View = viewMatrix_;
       mappedData->Projection = projectionMatrix_;
 			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
-			mappedData->CamPos = camPos_;
 
       context_->Unmap(vsConstantBuffer_, 0);
 
@@ -522,7 +574,6 @@ namespace snuffbox
 	{
 		worldMatrix_ = XMMatrixIdentity();
 		viewMatrix_ = camera->view();
-		camPos_ = camera->translation();
 		camera_ = camera;
 	}
 
@@ -603,6 +654,10 @@ namespace snuffbox
 		SNUFF_ASSERT_NOTNULL(defaultResource_);
 		defaultResource_->Release();
 		defaultResource_ = NULL;
+
+		SNUFF_ASSERT_NOTNULL(blendState_);
+		blendState_->Release();
+		blendState_ = NULL;
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");
 	}

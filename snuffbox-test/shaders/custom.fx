@@ -5,7 +5,6 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 	float4x4 View;
 	float4x4 Projection;
 	float4x4 WorldViewProjection;
-	float4 CamPos;
 }
 
 struct VOut
@@ -54,7 +53,7 @@ float4 PS(VOut input) : SV_TARGET
   float specIntens = 4;
   float3 normal = cross(C.xyz - A.xyz, B.xyz - A.xyz);
   normalize(normal);
-  float4 camView = CamPos - mul(position,World);
+  float4 camView = float4(View._41,View._42,View._43, View._44) - mul(position,World);
   float3 half = normalize(normalize(light*-1) + camView.xyz); 
 	float specular = pow(saturate(dot(normal,half)),specIntens)*1.5;
 	float4 specColor = float4(0.8,0.7,0.6,1);

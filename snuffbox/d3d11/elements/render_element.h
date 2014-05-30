@@ -40,7 +40,8 @@ namespace snuffbox
 			rotation_(XMMatrixIdentity()),
 			texture_(nullptr),
 			elementType_(type),
-			shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get())
+			shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get()),
+			distanceToCamera_(0.0f)
 		{}
 
     /// Default destructor
@@ -110,6 +111,12 @@ namespace snuffbox
 		/// Returns the element type
 		ElementTypes& element_type(){ return elementType_; }
 
+		/// Sets the distance to the camera
+		void setDistanceToCamera(float distance){ distanceToCamera_ = distance; }
+
+		/// Returns the distance to the camera
+		float distanceToCamera(){ return distanceToCamera_; }
+
 	private:
 		std::vector<Vertex>						vertices_; ///< The vertices
 		std::vector<unsigned int>			indices_; ///< The indices
@@ -118,6 +125,7 @@ namespace snuffbox
     float                         x_, y_, z_; ///< Translation floats
     float                         ox_, oy_, oz_; ///< Offset floats
     float                         sx_, sy_, sz_; ///< Scaling floats
+		float													distanceToCamera_; ///< Distance to camera
 		Texture*											texture_;	///< The texture of this render element
 		Shader*												shader_; ///< The current shader used by this element
 		ElementTypes									elementType_;	///< The type of this render element
