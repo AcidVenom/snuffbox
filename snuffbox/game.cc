@@ -228,12 +228,19 @@ void Game::JSRender(JS_ARGS)
 }
 
 //------------------------------------------------------------------------------------------------------
+void Game::JSCleanUp(JS_ARGS)
+{
+  V8::LowMemoryNotification();
+}
+
+//------------------------------------------------------------------------------------------------------
 void Game::RegisterJS(JS_TEMPLATE)
 {
 	JS_CREATE_SCOPE;
 
 	JSFunctionRegister funcs[] = {
-		JSFunctionRegister("render", JSRender)
+    JSFunctionRegister("render", JSRender),
+    JSFunctionRegister("cleanUp", JSCleanUp)
 	};
 
 	JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);

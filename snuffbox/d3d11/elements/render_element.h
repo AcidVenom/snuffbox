@@ -41,25 +41,14 @@ namespace snuffbox
 			texture_(nullptr),
 			elementType_(type),
 			shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get()),
-			distanceToCamera_(0.0f)
+			distanceToCamera_(0.0f),
+      destroyed_(true)
 		{}
 
     /// Default destructor
     ~RenderElement()
     {
-      unsigned int index = 0;
-      if (environment::has_game())
-      {
-        for (auto& it : environment::render_device().renderElements())
-        {
-          if (it == this)
-          {
-            environment::render_device().renderElements().erase(environment::render_device().renderElements().begin() + index);
-            break;
-          }
-          ++index;
-        }
-      }
+      Destroy();
     }
 
 		/// Sets the buffers of the render element
@@ -96,6 +85,12 @@ namespace snuffbox
 		/// Sets the X, Y and Z offset
 		void SetOffset(float x, float y, float z);
 
+    /// Destroys the render element
+    void Destroy();
+
+    /// Spawns the render element
+    void Spawn();
+
 		/// Returns the translation as a vector
 		XMVECTOR translation(){ return XMVectorSet(x_, y_, z_, 0.0); }
 
@@ -129,6 +124,7 @@ namespace snuffbox
 		Texture*											texture_;	///< The texture of this render element
 		Shader*												shader_; ///< The current shader used by this element
 		ElementTypes									elementType_;	///< The type of this render element
+    bool                          destroyed_; ///< Is this element destroyed?
 	public:
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);
@@ -143,7 +139,42 @@ namespace snuffbox
 		static void JSTranslation(JS_ARGS);
 		static void JSSetTexture(JS_ARGS);
 		static void JSSetShader(JS_ARGS);
+    static void JSDestroy(JS_ARGS);
+    static void JSSpawn(JS_ARGS);
 	};
+
+  //-------------------------------------------------------------------------------------------
+  inline void RenderElement::Spawn()
+  {
+    if (destroyed_)
+    {
+      destroyed_ = false;
+      environment::render_device().renderElements().push_back(this);
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  inline void RenderElement::Destroy()
+  {
+    if (!destroyed_)
+    {
+      unsigned int index = 0;
+      if (environment::has_game())
+      {
+        for (auto& it : environment::render_device().renderElements())
+        {
+          if (it == this)
+          {
+            environment::render_device().renderElements().erase(environment::render_device().renderElements().begin() + index);
+            break;
+          }
+          ++index;
+        }
+      }
+    }
+
+    destroyed_ = true;
+  }
 
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::SetOffset(float x, float y, float z)
@@ -188,6 +219,14 @@ namespace snuffbox
     sy_ = y;
     sz_ = z;
 	}
+
+  //-------------------------------------------------------------------------------------------
+  inline void RenderElement::JSSpawn(JS_ARGS)
+  {
+    JS_SETUP(RenderElement);
+
+    self->Spawn();
+  }
 
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetTranslation(JS_ARGS)
@@ -311,6 +350,14 @@ namespace snuffbox
 		self->shader_ = environment::content_manager().Get<Shader>(wrapper.GetString(0)).get();
 	}
 
+  //-------------------------------------------------------------------------------------------
+  inline void RenderElement::JSDestroy(JS_ARGS)
+  {
+    JS_SETUP(RenderElement);
+
+    self->Destroy();
+  }
+
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
@@ -328,7 +375,9 @@ namespace snuffbox
 			JSFunctionRegister("setScale", JSSetScale),
 			JSFunctionRegister("setOffset", JSSetOffset),
 			JSFunctionRegister("setTexture", JSSetTexture),
-			JSFunctionRegister("setShader", JSSetShader)
+			JSFunctionRegister("setShader", JSSetShader),
+      JSFunctionRegister("destroy", JSDestroy),
+      JSFunctionRegister("spawn", JSSpawn)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);

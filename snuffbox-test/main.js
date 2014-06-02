@@ -10,6 +10,17 @@ Game.Initialise = function()
 	
 }
 
+for(var i = 0; i < 10; ++i)
+{
+	blocks.push(Quad.new());
+	blocks[i].setTranslation(i*0.05,0,0);
+	blocks[i].setOffset(0.5,0.5,0.5);
+	blocks[i].setScale(0.05,0.05,0.05);
+	blocks[i].setTexture("textures/sprBlock.png");
+	blocks[i].setRotation(-Math.PI/2,0,0);
+	blocks[i].spawn();
+}
+
 Game.Update = function(dt)
 {	
 	if(Keyboard.isDown("A"))
@@ -21,19 +32,7 @@ Game.Update = function(dt)
 	{
 		camera.translateBy(2*dt,0,0);
 	}
-
-	var i = Math.floor(Math.random()*blocks.length);
-	blocks.splice(i,1);
-
-	for(var i = 0; i < 2; ++i)
-	{
-		blocks.push(Quad.new());
-		blocks[i].setTranslation(i*0.05,0,0);
-		blocks[i].setOffset(0.5,0.5,0.5);
-		blocks[i].setScale(0.05,0.05,0.05);
-		blocks[i].setTexture("textures/sprBlock.png");
-		blocks[i].setRotation(-Math.PI/2,0,0);
-	}
+	
 }
 
 Game.Draw = function(dt)

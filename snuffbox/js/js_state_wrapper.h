@@ -35,7 +35,7 @@ namespace snuffbox
 	class JSObject
 	{
 	public:
-		virtual ~JSObject(){ SNUFF_LOG_INFO("DESTROYED"); }
+		virtual ~JSObject(){}
 
 		JS_NAME(JSObject);
 		static void RegisterJS(JS_TEMPLATE);

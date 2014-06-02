@@ -117,5 +117,6 @@ namespace snuffbox
 		JS_NAME(Game);
 		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions
 		static void JSRender(JS_ARGS); ///< Renders the scene
+    static void JSCleanUp(JS_ARGS); ///< Forces a garabage collection
 	};
 }

@@ -36,8 +36,6 @@ namespace snuffbox
 
 		vertexBuffer_ = environment::render_device().CreateVertexBuffer(vertices());
 		indexBuffer_ = environment::render_device().CreateIndexBuffer(indices());
-
-		environment::render_device().renderElements().insert(environment::render_device().renderElements().begin(),this);
 	}
 
 	//-------------------------------------------------------------------------------------------
