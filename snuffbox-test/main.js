@@ -1,12 +1,14 @@
 require("loading")
+require("npc")
 
 var camera = camera || Camera.new("orthographic");
 var blocks = blocks || [];
 var timer = 0;
+var npc = new NPC(0,0);
+camera.setFov(90*Math.PI/180);
 
 Game.Initialise = function()
 {
-	camera.setFov(120*Math.PI/180);
 	
 }
 
@@ -23,16 +25,13 @@ for(var i = 0; i < 10; ++i)
 
 Game.Update = function(dt)
 {	
-	if(Keyboard.isDown("A"))
-	{
-		camera.translateBy(-2*dt,0,0);
-	}
 
-	if(Keyboard.isDown("D"))
-	{
-		camera.translateBy(2*dt,0,0);
-	}
+	var movement = Mouse.movement();
 	
+	if(Mouse.isDown(0))
+	{
+		camera.translateBy(-movement.x/500,0,0);
+	}
 }
 
 Game.Draw = function(dt)
