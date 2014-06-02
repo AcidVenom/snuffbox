@@ -93,7 +93,7 @@ namespace snuffbox
 	{
 		environment::js_state_wrapper().CompileAndRun(file.relativePath.c_str(), true);
 		environment::game().CreateCallbacks();
-		environment::game().Reload();
+		environment::game().NotifyEvent(GameEvents::kReload);
 		V8::LowMemoryNotification();
 		SNUFF_LOG_INFO(std::string("Hot reloaded JavaScript file: " + file.path).c_str());
 	}

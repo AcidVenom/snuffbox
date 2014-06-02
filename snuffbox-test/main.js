@@ -1,18 +1,13 @@
 require("loading")
 
 var camera = camera || Camera.new("orthographic");
-var blocks = [];
-for(var i = 0; i < 20; ++i)
-{
-	blocks.push(Quad.new());
-	blocks[i].setTranslation(i*0.05,0,0);
-	blocks[i].setScale(0.05,0.05,0.05);
-	blocks[i].setTexture("textures/sprBlock.png");
-	blocks[i].setRotation(-Math.PI/2,0,0);
-}
+var blocks = blocks || [];
+var timer = 0;
+
 Game.Initialise = function()
 {
-
+	camera.setFov(120*Math.PI/180);
+	
 }
 
 Game.Update = function(dt)
@@ -25,6 +20,19 @@ Game.Update = function(dt)
 	if(Keyboard.isDown("D"))
 	{
 		camera.translateBy(2*dt,0,0);
+	}
+
+	var i = Math.floor(Math.random()*blocks.length);
+	blocks.splice(i,1);
+
+	for(var i = 0; i < 2; ++i)
+	{
+		blocks.push(Quad.new());
+		blocks[i].setTranslation(i*0.05,0,0);
+		blocks[i].setOffset(0.5,0.5,0.5);
+		blocks[i].setScale(0.05,0.05,0.05);
+		blocks[i].setTexture("textures/sprBlock.png");
+		blocks[i].setRotation(-Math.PI/2,0,0);
 	}
 }
 

@@ -22,7 +22,7 @@ using namespace v8;
 #define JS_NAME(className)static const char* static_class_name() { return #className; } virtual const char* get_class_name() const { return static_class_name(); }
 #define JS_SETUP_CALLBACKS Handle<Function> cb; Handle<Value> func;
 #define JS_OBJECT_CALLBACK(name,obj) func = obj->Get(String::NewFromUtf8(JS_ISOLATE, name));cb = Handle<Function>::Cast(func);
-#define JS_SETUP(type) Handle<Object> obj = args.This();Local<Value> ptr = obj->Get(String::NewFromUtf8(JS_ISOLATE, "__ptr"));Local<External> external = ptr.As<External>();type* self = static_cast<type*>(external->Value()); JSWrapper wrapper(args);
+#define JS_SETUP(type) Local<Object> obj = args.This();Local<Value> ptr = obj->Get(String::NewFromUtf8(JS_ISOLATE, "__ptr"));Local<External> external = ptr.As<External>();type* self = static_cast<type*>(external->Value()); JSWrapper wrapper(args);
 
 namespace snuffbox
 {
@@ -35,7 +35,7 @@ namespace snuffbox
 	class JSObject
 	{
 	public:
-		virtual ~JSObject(){}
+		virtual ~JSObject(){ SNUFF_LOG_INFO("DESTROYED"); }
 
 		JS_NAME(JSObject);
 		static void RegisterJS(JS_TEMPLATE);

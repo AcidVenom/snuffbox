@@ -33,7 +33,8 @@ namespace snuffbox
 	*/
 	enum GameEvents
 	{
-		kQuit ///< Quit event
+		kQuit,
+		kReload
 	};
 	/**
 	* @class snuffbox::Game

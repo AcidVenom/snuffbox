@@ -281,7 +281,7 @@ namespace snuffbox
 		data.GetParameter()->persistent().Reset();
 		environment::memory().Destruct<JSObject>(data.GetParameter());
 		data.GetValue().Clear();
-		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size);
+		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size*100);
 	}
 
 	//---------------------------------------------------------------------------
@@ -291,9 +291,9 @@ namespace snuffbox
 		JS_CREATE_ARGUMENT_SCOPE;
 		T* ptr = environment::memory().ConstructShared<T>(args);
     Local<Context> ctx = JS_CONTEXT;
-		Handle<Object> global = ctx->Global();
-		Handle<Value> templ = global->Get(String::NewFromUtf8(JS_ISOLATE, ptr->get_class_name()));
-		Handle<Function> objTemplate = Handle<Function>::Cast(templ);
+		Local<Object> global = ctx->Global();
+		Local<Value> templ = global->Get(String::NewFromUtf8(JS_ISOLATE, ptr->get_class_name()));
+		Local<Function> objTemplate = Local<Function>::Cast(templ);
 
 		Handle<Object> obj = objTemplate->NewInstance();
 		ptr->persistent().Reset(JS_ISOLATE, obj);
@@ -302,7 +302,7 @@ namespace snuffbox
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "__ptr"), External::New(JS_ISOLATE, static_cast<void*>(ptr)));
 		int64_t size = static_cast<int64_t>(sizeof(ptr));
 
-		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size);
+		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size*100);
 		args.GetReturnValue().Set(obj);
 	}
 }

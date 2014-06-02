@@ -211,6 +211,9 @@ void Game::NotifyEvent(GameEvents evt)
 	case GameEvents::kQuit:
 		Shutdown();
 		break;
+	case GameEvents::kReload:
+		Reload();
+		break;
 	}
 }
 
@@ -242,13 +245,13 @@ void Game::CreateCallbacks()
 
   Local<Context> ctx = JS_CONTEXT;
 
-	Handle<Object> global = ctx->Global();
-	Handle<Value> game = global->Get(String::NewFromUtf8(JS_ISOLATE,"Game"));
+	Local<Object> global = ctx->Global();
+	Local<Value> game = global->Get(String::NewFromUtf8(JS_ISOLATE,"Game"));
 
 	JS_SETUP_CALLBACKS;
 
 	SNUFF_XASSERT(game->IsObject(), "Could not find 'Game' object!");
-	Handle<Object> obj = game->ToObject();
+	Local<Object> obj = game->ToObject();
 
 	JS_OBJECT_CALLBACK("Initialise", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Initialise()' function! Please add it to your main.js");
@@ -309,7 +312,6 @@ int SNUFF_MAIN
 		game->window()->ProcessMessages();
 		game->Update();
 		game->Draw();
-		while (!V8::IdleNotification()){}
 	}
 	return EXIT_SUCCESS;
 }
