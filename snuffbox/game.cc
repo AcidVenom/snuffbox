@@ -37,7 +37,7 @@ using namespace snuffbox;
 
 //------------------------------------------------------------------------------------------------------
 Game::Game(Win32Window* window) :
-started_(true),
+started_(false),
 consoleEnabled_(false),
 mouse_(environment::memory().ConstructShared<Mouse>()),
 keyboard_(environment::memory().ConstructShared<Keyboard>()),
@@ -64,11 +64,13 @@ void Game::Initialise()
 	CreateCallbacks();
 	window_->Show();
 	initialise_.Call(0);
+	started_ = true;
 }
 
 //------------------------------------------------------------------------------------------------------
 void Game::Update()
 {
+	environment::content_manager().LoadPendingContent();
 	++gameTime_;
 	if (!started_)
 		return;

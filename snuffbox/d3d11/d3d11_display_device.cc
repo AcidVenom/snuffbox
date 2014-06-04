@@ -574,7 +574,7 @@ namespace snuffbox
 
 		for (auto& it : renderElements_)
 		{
-			translation = it->translation;
+			translation = it->translation();
 			delta = translation - camTranslation;
 			distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
 

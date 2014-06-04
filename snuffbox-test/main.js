@@ -8,7 +8,7 @@ var terrain = Terrain.new(256,256);
 terrain.setShader("shaders/custom.fx");
 terrain.setTexture("textures/sprBlock.png");
 camera.setFov(120*Math.PI/180);
-terrain.spawn();
+
 Game.Initialise = function()
 {
 	
@@ -25,12 +25,14 @@ for(var i = 0; i < 100; ++i)
 	blocks[i].spawn();
 }
 
+terrain.spawn();
+
 Game.Update = function(dt)
 {	
 	var mx = 0,
 		mz = 0;
 
-	var speed = 0.1;
+	var speed = 2;
 
 	if(Keyboard.isDown("W")) mz = -speed;
 	if(Keyboard.isDown("S")) mz = speed;

@@ -2,6 +2,7 @@
 #include "../../snuffbox/content/content.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/memory/allocated_memory.h"
+#include "../../snuffbox/game.h"
 
 namespace snuffbox
 {
@@ -108,6 +109,27 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void ContentManager::LoadPendingContent()
+	{
+		while (!pendingContent_.empty())
+		{
+			auto& it = pendingContent_.front();
+
+			switch (it.type)
+			{
+			case ContentTypes::kTexture:
+				Load<Texture>(it.path);
+				break;
+			case ContentTypes::kShader:
+				Load<Shader>(it.path);
+				break;
+			}
+
+			pendingContent_.pop();
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void ContentManager::JSLoad(JS_ARGS)
 	{
 		JSWrapper wrapper(args);
@@ -115,17 +137,26 @@ namespace snuffbox
 		bool isContent = false;
 		std::string contentType = wrapper.GetString(0).c_str();
 		std::string contentPath = wrapper.GetString(1).c_str();
+		PendingContent content;
+		content.path = contentPath;
 
 		if (strcmp(contentType.c_str(), "texture") == 0)
 		{
 			isContent = true;
-			environment::content_manager().Load<Texture>(contentPath);
+			content.type = ContentManager::ContentTypes::kTexture;
+			environment::content_manager().AddPendingContent(content);
 		}
 
 		if (strcmp(contentType.c_str(), "shader") == 0)
 		{
 			isContent = true;
-			environment::content_manager().Load<Shader>(contentPath);
+			content.type = ContentManager::ContentTypes::kShader;
+			environment::content_manager().AddPendingContent(content);
+		}
+
+		if (!environment::game().started())
+		{
+			environment::content_manager().LoadPendingContent();
 		}
 
 		SNUFF_XASSERT(isContent == true, std::string("Content type '" + contentType + "' does not exist!").c_str());

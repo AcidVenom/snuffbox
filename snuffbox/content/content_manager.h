@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <queue>
 #include "../../snuffbox/js/js_state_wrapper.h"
 #include "../../snuffbox/d3d11/d3d11_texture.h"
 #include "../../snuffbox/d3d11/d3d11_shader.h"
@@ -28,6 +29,17 @@ namespace snuffbox
 			kTexture,
 			kShader
 		};
+
+		/**
+		* @struct snuffbox::ContentManager::PendingContent
+		* @brief A pending content structure so the content manager doesn't interfere with the file watcher
+		* @author Daniël Konings
+		*/ 
+		struct PendingContent
+		{
+			std::string path;
+			ContentTypes type;
+		};
 	public:
 		/// Default constructor
 		ContentManager();
@@ -47,9 +59,16 @@ namespace snuffbox
 		template<typename T>
 		SharedPtr<T>& Get(std::string path);
 
+		/// Loads all pending content
+		void LoadPendingContent();
+		
+		/// Adds pending content to the content manager
+		void AddPendingContent(PendingContent content){ pendingContent_.emplace(content); }
+
 	private:
 		std::map<std::string, SharedPtr<Content<Texture>>> loadedTextures_; ///< A map by path of all loaded textures
 		std::map<std::string, SharedPtr<Content<Shader>>> loadedShaders_; ///< A map by path of all loaded shaders
+		std::queue<PendingContent>												pendingContent_; ///< A queue for pending content
 	public:
 		JS_NAME(ContentManager);
 		static void RegisterJS(JS_TEMPLATE);

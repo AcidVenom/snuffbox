@@ -148,7 +148,7 @@ namespace snuffbox
     if (destroyed_)
     {
       destroyed_ = false;
-			if (type() != ElementTypes::kTerrain)
+			if (element_type() != ElementTypes::kTerrain)
 			{
 				environment::render_device().renderElements().push_back(this);
 			}
@@ -167,7 +167,7 @@ namespace snuffbox
       unsigned int index = 0;
       if (environment::has_game())
       {
-				if (type() != ElementTypes::kTerrain)
+				if (element_type() != ElementTypes::kTerrain)
 				{
 					for (auto& it : environment::render_device().renderElements())
 					{
