@@ -109,7 +109,7 @@ void Game::Draw()
 		return;
 
 	JS_CREATE_SCOPE;
-	Handle<Value> argv[1] = {
+	Local<Value> argv[1] = {
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 

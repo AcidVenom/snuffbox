@@ -32,6 +32,9 @@ namespace snuffbox
 		/// Gets a string for the arguments
 		std::string GetString(int arg);
 
+		template<typename T>
+		void ReturnValue(T value);
+
 		/// Sets a tuple as the return value of the arguments in .x and .y (defaults)
 		template<typename T>
 		void ReturnTuple(T x, T y, const char* n1 = "x", const char* n2 = "y");
@@ -55,11 +58,26 @@ namespace snuffbox
 	template<typename T>
 	inline T* JSWrapper::GetPointer(int arg)
 	{
-		Local<Object> obj = args_[arg]->ToObject();
-		Local<Value> val = obj->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(), "__ptr"));
+		Local<Value> obj = args_[arg];
+		if (obj->IsUndefined())
+		{
+			Local<Value> funcName = args_.Callee();
+			Local<String> functionName = funcName->ToString();
+			SNUFF_ASSERT(std::string("Tried to get the pointer of an undefined object in: " + std::string(*String::Utf8Value(functionName))).c_str());
+		}
+		Local<Object> object = obj->ToObject();
+		Local<Value> val = object->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(), "__ptr"));
 		Local<External> ptr = val.As<External>();
 
 		return static_cast<T*>(ptr->Value());
+	}
+
+	//------------------------------------------------------------------------------
+	template<typename T>
+	inline void JSWrapper::ReturnValue(T value)
+	{
+		auto isolate = environment::js_state_wrapper().isolate();
+		args_.GetReturnValue().Set(Number::New(isolate, static_cast<T>(value)));
 	}
 
 	//------------------------------------------------------------------------------

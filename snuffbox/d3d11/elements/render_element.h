@@ -42,7 +42,8 @@ namespace snuffbox
 			elementType_(type),
 			shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get()),
 			destroyed_(true),
-			distanceFromCamera_(0.0f)
+			distanceFromCamera_(0.0f),
+			alpha_(1.0f)
 		{}
 
     /// Default destructor
@@ -112,6 +113,12 @@ namespace snuffbox
 		/// Returns the element type
 		ElementTypes& element_type(){ return elementType_; }
 
+		/// Sets the alpha of this element
+		void SetAlpha(float alpha){ alpha_ = alpha; }
+
+		/// Returns the alpha of this element
+		float alpha(){ return alpha_; }
+
 	private:
 		std::vector<Vertex>						vertices_; ///< The vertices
 		std::vector<unsigned int>			indices_; ///< The indices
@@ -125,6 +132,7 @@ namespace snuffbox
 		ElementTypes									elementType_;	///< The type of this render element
     bool                          destroyed_; ///< Is this element destroyed?
 		float													distanceFromCamera_; ///< The distance from the camera
+		float													alpha_;	///< The alpha value of this whole element
 	public:
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);
@@ -141,6 +149,8 @@ namespace snuffbox
 		static void JSSetShader(JS_ARGS);
     static void JSDestroy(JS_ARGS);
     static void JSSpawn(JS_ARGS);
+		static void JSSetAlpha(JS_ARGS);
+		static void JSAlpha(JS_ARGS);
 	};
 
   //-------------------------------------------------------------------------------------------
@@ -231,7 +241,9 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::SetRotation(float x, float y, float z)
 	{
-		rotation_ = XMMatrixRotationRollPitchYaw(x,y,z);
+		rotation_ = XMMatrixRotationRollPitchYaw(x, 0, 0);
+		rotation_ *= XMMatrixRotationRollPitchYaw(0, y, 0);
+		rotation_ *= XMMatrixRotationRollPitchYaw(0, 0, z);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -381,6 +393,22 @@ namespace snuffbox
   }
 
 	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSSetAlpha(JS_ARGS)
+	{
+		JS_SETUP(RenderElement);
+		
+		self->SetAlpha(wrapper.GetNumber<float>(0));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSAlpha(JS_ARGS)
+	{
+		JS_SETUP(RenderElement);
+
+		wrapper.ReturnValue<float>(self->alpha());
+	}
+
+	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -399,7 +427,9 @@ namespace snuffbox
 			JSFunctionRegister("setTexture", JSSetTexture),
 			JSFunctionRegister("setShader", JSSetShader),
       JSFunctionRegister("destroy", JSDestroy),
-      JSFunctionRegister("spawn", JSSpawn)
+      JSFunctionRegister("spawn", JSSpawn),
+			JSFunctionRegister("alpha", JSAlpha),
+			JSFunctionRegister("setAlpha", JSSetAlpha)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);

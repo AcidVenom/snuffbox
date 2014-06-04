@@ -544,6 +544,7 @@ namespace snuffbox
 		mappedData->View = viewMatrix_;
 		mappedData->Projection = projectionMatrix_;
 		mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+		mappedData->Alpha = it->alpha();
 
 		context_->Unmap(vsConstantBuffer_, 0);
 
@@ -580,6 +581,8 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Draw()
 	{
+		if (!camera_) return;
+
 		for (auto& it : opaqueElements_)
 		{
 			DrawRenderElement(it);

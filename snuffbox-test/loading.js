@@ -1,3 +1,2 @@
-ContentManager.load("texture","textures/sprBlock.png");
-ContentManager.load("texture","textures/sprAlphaTest.png");
-ContentManager.load("shader","shaders/custom.fx");
+ContentManager.load("texture","textures/background.png");
+ContentManager.load("texture","textures/menu/logo.png");

@@ -65,6 +65,7 @@ namespace snuffbox
 		XMMATRIX View;
 		XMMATRIX World;
 		XMMATRIX WorldViewProjection;
+		float Alpha;
 	};
 
 	/**

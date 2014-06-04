@@ -1,64 +1,74 @@
-require("loading")
-require("npc")
+require("loading");
+require("statemanager");
 
-var camera = camera || Camera.new("perspective");
-var blocks = [];
-var timer = 0;
-var terrain = Terrain.new(256,256);
-terrain.setShader("shaders/custom.fx");
-terrain.setTexture("textures/sprBlock.png");
-camera.setFov(120*Math.PI/180);
+Game.timer = 0;
 
 Game.Initialise = function()
 {
-	
+	StateManager.addState({
+		_camera: Camera.new("orthographic"),
+		_background: Quad.new(),
+		_logo: Quad.new(),
+
+		name: "menu",
+		initialise: function()
+		{
+			this._camera.setTranslation(0,0,0);
+			this._camera.setFov(Math.PI);
+
+			this._background.setTranslation(0,0,-10);
+			this._background.setOffset(0.5,0.5,0.5);
+			this._background.setScale(4,1.6,1.6);
+			this._background.setRotation(-Math.PI/2,0,0);
+			this._background.setTexture("textures/background.png");
+			this._background.spawn();
+
+			this._logo.setTranslation(0,0,-1);
+			this._logo.setOffset(0.5,0.5,0.5);
+			this._logo.setScale(0,0,0);
+			this._logo.setTexture("textures/menu/logo.png");
+			this._logo.setRotation(-Math.PI/2,0,0);
+			this._logo.spawn();
+			this._logo.setAlpha(0);
+		},
+
+		update: function(dt)
+		{
+			var scale = this._logo.scale();
+			if (scale.x < 1.5)
+			{
+				this._logo.setScale(scale.x+0.015,scale.y+0.005,scale.z+0.01);
+			}
+
+			if (this._logo.alpha() < 1)
+			{
+				this._logo.setAlpha(this._logo.alpha() + 0.01);
+			}
+			this._logo.setRotation(-Math.PI/2,0,Math.sin(Game.timer*2)*0.1);
+		},
+
+		draw: function(dt)
+		{
+			Game.render(this._camera);
+		},
+
+		destroy: function()
+		{
+
+		}
+	});
+
+	StateManager.switchState("menu");
 }
-
-for(var i = 0; i < 100; ++i)
-{
-	blocks.push(Billboard.new());
-	blocks[i].setTranslation(i*10,-20,0);
-	blocks[i].setOffset(0.5,0.5,0.5);
-	blocks[i].setScale(30,30,30);
-	blocks[i].setTexture("textures/sprAlphaTest.png");
-	blocks[i].setRotation(-Math.PI/2,0,0);
-	blocks[i].spawn();
-}
-
-terrain.spawn();
-
 Game.Update = function(dt)
 {	
-	var mx = 0,
-		mz = 0;
-
-	var speed = 2;
-
-	if(Keyboard.isDown("W")) mz = -speed;
-	if(Keyboard.isDown("S")) mz = speed;
-	if(Keyboard.isDown("A")) mx = -speed;
-	if(Keyboard.isDown("D")) mx = speed;
-
-	var movement = Mouse.movement();
-	
-	if(Mouse.isDown(0))
-	{
-		camera.rotateBy(-movement.y/200,-movement.x/200,0);
-	}
-
-	for(var i = 0; i < blocks.length; ++i)
-	{
-		var translation = blocks[i].translation();
-		blocks[i].setTranslation(i*10,Math.sin(translation.x+timer)*10,Math.cos(translation.x+timer)*10);
-	}
-
-	camera.translateBy(mx,0,mz)
-	timer+=dt;
+	Game.timer += dt;
+	StateManager.updateState(dt);
 }
 
 Game.Draw = function(dt)
 {
-	Game.render(camera);
+	StateManager.drawState(dt);
 }
 
 Game.Shutdown = function()
@@ -68,5 +78,5 @@ Game.Shutdown = function()
 
 Game.OnReload = function()
 {
-
+	StateManager.switchState("menu");
 }
