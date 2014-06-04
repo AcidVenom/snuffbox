@@ -40,6 +40,7 @@ namespace snuffbox
 		void SetRotation(float x, float y, float z);
 
 		XMVECTOR translation(){ return translation_; }
+		XMVECTOR target(){ return target_; }
 		std::vector<float> rotation(){ std::vector<float> temp; temp.push_back(yaw_); temp.push_back(pitch_); temp.push_back(roll_); return temp; }
 
 		XMMATRIX& view();

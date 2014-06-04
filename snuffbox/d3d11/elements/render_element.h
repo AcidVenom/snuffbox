@@ -70,6 +70,7 @@ namespace snuffbox
 
 		XMMATRIX scaling(){ return XMMatrixScaling(sx_, sy_, sz_); }
 		XMMATRIX offset(){ return XMMatrixTranslation(ox_, oy_, oz_); }
+		XMVECTOR scale(){ return XMVectorSet(sx_, sy_, sz_,0); }
 		XMMATRIX rotation(){ return rotation_; }
 
 		/// Sets the translation on the X, Y, Z plane

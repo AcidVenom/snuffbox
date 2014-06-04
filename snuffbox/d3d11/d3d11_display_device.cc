@@ -510,64 +510,82 @@ namespace snuffbox
 		std::sort(renderElements_.begin(), renderElements_.end(), RenderSorter);
 	}
 
+	void D3D11DisplayDevice::DrawRenderElement(RenderElement* it)
+	{
+		RenderElement::ElementTypes elementType = it->element_type();
+		VertexBufferType type = it->type();
+		if (type != vbType_)
+		{
+			it->SetBuffers();
+			vbType_ = type;
+		}
+
+		if (elementType == RenderElement::ElementTypes::kBillboard)
+		{
+			Billboard* ptr = static_cast<Billboard*>(it);
+			if (camera_)
+			{
+				worldMatrix_ = ptr->WorldFromCamera(camera_);
+			}
+		}
+		else
+		{
+			worldMatrix_ = it->World();
+		}
+
+		D3D11_MAPPED_SUBRESOURCE cbData;
+		VS_CONSTANT_BUFFER* mappedData;
+
+		context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+
+		mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
+		mappedData->Time = time_;
+		mappedData->World = worldMatrix_;
+		mappedData->View = viewMatrix_;
+		mappedData->Projection = projectionMatrix_;
+		mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+
+		context_->Unmap(vsConstantBuffer_, 0);
+
+		if (it->texture())
+		{
+			if (currentTexture_ != it->texture())
+			{
+				auto tex = it->texture()->resource();
+				context_->PSSetShaderResources(0, 1, &tex);
+				currentTexture_ = it->texture();
+			}
+		}
+		else
+		{
+			context_->PSSetShaderResources(0, 1, &defaultResource_);
+			currentTexture_ = nullptr;
+		}
+
+		if (it->shader())
+		{
+			if (currentShader_ != it->shader())
+			{
+				auto shaders = it->shader()->shaders();
+				context_->PSSetShader(shaders.ps, 0, 0);
+				context_->VSSetShader(shaders.vs, 0, 0);
+				currentShader_ = it->shader();
+			}
+		}
+
+
+		context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+	}
+
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Draw()
 	{
 		for (auto& it : opaqueElements_)
 		{
-			RenderElement::ElementTypes elementType = it->element_type();
-			VertexBufferType type = it->type();
-			if (type != vbType_)
-			{
-				it->SetBuffers();
-				vbType_ = type;
-			}
-
-			D3D11_MAPPED_SUBRESOURCE cbData;
-			VS_CONSTANT_BUFFER* mappedData;
-
-			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
-
-			mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
-			mappedData->Time = time_;
-			mappedData->World = worldMatrix_;
-			mappedData->View = viewMatrix_;
-			mappedData->Projection = projectionMatrix_;
-			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
-
-			context_->Unmap(vsConstantBuffer_, 0);
-
-			if (it->texture())
-			{
-				if (currentTexture_ != it->texture())
-				{
-					auto tex = it->texture()->resource();
-					context_->PSSetShaderResources(0, 1, &tex);
-					currentTexture_ = it->texture();
-				}
-			}
-			else
-			{
-				context_->PSSetShaderResources(0, 1, &defaultResource_);
-				currentTexture_ = nullptr;
-			}
-
-			if (it->shader())
-			{
-				if (currentShader_ != it->shader())
-				{
-					auto shaders = it->shader()->shaders();
-					context_->PSSetShader(shaders.ps, 0, 0);
-					context_->VSSetShader(shaders.vs, 0, 0);
-					currentShader_ = it->shader();
-				}
-			}
-
-
-			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+			DrawRenderElement(it);
 		}
 
-		XMVECTOR camTranslation = camera_->translation();
+		XMVECTOR camTranslation = camera_->target();
 		XMVECTOR translation;
 		XMVECTOR delta;
 		float distance;
@@ -580,69 +598,7 @@ namespace snuffbox
 
 			it->SetDistanceFromCamera(distance);
 
-      RenderElement::ElementTypes elementType = it->element_type();
-      VertexBufferType type = it->type();
-      if (type != vbType_)
-      {
-        it->SetBuffers();
-        vbType_ = type;
-      }
-
-			if (elementType == RenderElement::ElementTypes::kBillboard)
-			{
-				Billboard* ptr = static_cast<Billboard*>(it);
-				if (camera_)
-				{
-					worldMatrix_ = ptr->WorldFromCamera(camera_);
-				}	
-			}
-			else
-			{
-				worldMatrix_ = it->World();
-			}
-				
-      D3D11_MAPPED_SUBRESOURCE cbData;
-      VS_CONSTANT_BUFFER* mappedData;
-
-      context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
-
-      mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
-      mappedData->Time = time_;
-      mappedData->World = worldMatrix_;
-      mappedData->View = viewMatrix_;
-      mappedData->Projection = projectionMatrix_;
-			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
-
-      context_->Unmap(vsConstantBuffer_, 0);
-
-			if (it->texture())
-			{
-				if (currentTexture_ != it->texture())
-				{
-					auto tex = it->texture()->resource();
-					context_->PSSetShaderResources(0, 1, &tex);
-					currentTexture_ = it->texture();
-				}
-			}
-			else
-			{
-				context_->PSSetShaderResources(0, 1, &defaultResource_);
-				currentTexture_ = nullptr;
-			}
-
-			if (it->shader())
-			{
-				if (currentShader_ != it->shader())
-				{
-					auto shaders = it->shader()->shaders();
-					context_->PSSetShader(shaders.ps, 0, 0);
-					context_->VSSetShader(shaders.vs, 0, 0);
-					currentShader_ = it->shader();
-				}
-			}
-			
-
-			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+			DrawRenderElement(it);
 		}
 	}
 

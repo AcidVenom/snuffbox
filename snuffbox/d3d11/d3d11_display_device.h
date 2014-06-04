@@ -171,6 +171,9 @@ namespace snuffbox
 		/// Creates the context blend state
 		void CreateBlendState();
 
+		/// Draws a given render element
+		void DrawRenderElement(RenderElement* it);
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device

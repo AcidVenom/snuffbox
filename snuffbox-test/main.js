@@ -17,9 +17,9 @@ Game.Initialise = function()
 for(var i = 0; i < 100; ++i)
 {
 	blocks.push(Billboard.new());
-	blocks[i].setTranslation(i*2,0,0);
+	blocks[i].setTranslation(i*10,-20,0);
 	blocks[i].setOffset(0.5,0.5,0.5);
-	blocks[i].setScale(2,2,2);
+	blocks[i].setScale(30,30,30);
 	blocks[i].setTexture("textures/sprAlphaTest.png");
 	blocks[i].setRotation(-Math.PI/2,0,0);
 	blocks[i].spawn();
@@ -46,7 +46,14 @@ Game.Update = function(dt)
 		camera.rotateBy(-movement.y/200,-movement.x/200,0);
 	}
 
+	for(var i = 0; i < blocks.length; ++i)
+	{
+		var translation = blocks[i].translation();
+		blocks[i].setTranslation(i*10,Math.sin(translation.x+timer)*10,Math.cos(translation.x+timer)*10);
+	}
+
 	camera.translateBy(mx,0,mz)
+	timer+=dt;
 }
 
 Game.Draw = function(dt)

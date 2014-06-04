@@ -32,6 +32,6 @@ float4 PS(VOut input) : SV_TARGET
 {	
   float4 textureColor = Texture.Sample(SampleType, input.texcoord);
   float4 color = (textureColor * input.color);
-
+  clip(color.a - 0.08);
 	return color;
 }
