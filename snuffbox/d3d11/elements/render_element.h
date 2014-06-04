@@ -62,9 +62,9 @@ namespace snuffbox
 
 		/// Returns the world matrix
     XMMATRIX& World(){ 
-      worldMatrix_ = XMMatrixTranslation(ox_, oy_, oz_) *  
+      worldMatrix_ = XMMatrixTranslation(ox_, oy_, oz_) *
+			XMMatrixScaling(sx_, sy_, sz_) *
       rotation_ *
-      XMMatrixScaling(sx_, sy_, sz_) *
       XMMatrixTranslation(x_, y_, z_);
       return worldMatrix_; 
     }
