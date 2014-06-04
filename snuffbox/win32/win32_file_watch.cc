@@ -83,6 +83,7 @@ namespace snuffbox
 						break;
 					}
 					it.lastTime = lastTime;
+					break;
 				}
 			}
 		}

@@ -62,8 +62,8 @@ namespace snuffbox
 			{
 				for (int x = w_ - 1; x >= 0; --x)
 				{
-					indices().push_back((y + 1)* w_ + x);
 					indices().push_back(y*w_ + x);
+					indices().push_back((y + 1)* w_ + x);
 
 					if (x == 0)
 					{

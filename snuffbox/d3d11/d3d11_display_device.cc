@@ -83,6 +83,9 @@ namespace snuffbox
 		swapDesc_.SampleDesc.Quality = 0;
 		swapDesc_.Windowed = TRUE;
 		swapDesc_.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+		swapDesc_.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapDesc_.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swapDesc_.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 		HRESULT result = S_OK;
 
@@ -208,7 +211,7 @@ namespace snuffbox
 
 		D3D11_RASTERIZER_DESC rasterizer;
 		ZeroMemory(&rasterizer, sizeof(D3D11_RASTERIZER_DESC));
-		rasterizer.CullMode = D3D11_CULL_NONE;
+		rasterizer.CullMode = D3D11_CULL_FRONT;
 		rasterizer.FillMode = D3D11_FILL_SOLID;
 
 		result = device_->CreateRasterizerState(&rasterizer, &rasterizerState_);
@@ -358,28 +361,53 @@ namespace snuffbox
 	{
 		HRESULT result = S_OK;
 
-		D3D11_TEXTURE2D_DESC dsDesc;
+		D3D11_TEXTURE2D_DESC dsvDesc;
 		DXGI_SWAP_CHAIN_DESC scDesc;
 		swapChain_->GetDesc(&scDesc);
 
-		dsDesc.Width = scDesc.BufferDesc.Width;
-		dsDesc.Height = scDesc.BufferDesc.Height;
-		dsDesc.MipLevels = 1;
-		dsDesc.ArraySize = 1;
-		dsDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		dsDesc.SampleDesc.Count = 1;
-		dsDesc.SampleDesc.Quality = 0;
-		dsDesc.Usage = D3D11_USAGE_DEFAULT;
-		dsDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		dsDesc.CPUAccessFlags = 0;
-		dsDesc.MiscFlags = 0;
+		dsvDesc.Width = scDesc.BufferDesc.Width;
+		dsvDesc.Height = scDesc.BufferDesc.Height;
+		dsvDesc.MipLevels = 1;
+		dsvDesc.ArraySize = 1;
+		dsvDesc.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+		dsvDesc.SampleDesc.Count = 1;
+		dsvDesc.SampleDesc.Quality = 0;
+		dsvDesc.Usage = D3D11_USAGE_DEFAULT;
+		dsvDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		dsvDesc.CPUAccessFlags = 0;
+		dsvDesc.MiscFlags = 0;
 
-		result = device_->CreateTexture2D(&dsDesc, NULL, &depthStencilBuffer_);
+		result = device_->CreateTexture2D(&dsvDesc, NULL, &depthStencilBuffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 		result = device_->CreateDepthStencilView(depthStencilBuffer_, NULL, &depthStencilView_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-	}
 
+		D3D11_DEPTH_STENCIL_DESC dsDesc;
+
+		// Depth test parameters
+		dsDesc.DepthEnable = true;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+		dsDesc.StencilEnable = true;
+		dsDesc.StencilReadMask = 0xFF;
+		dsDesc.StencilWriteMask = 0xFF;
+
+		dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+		dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+		dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		result = device_->CreateDepthStencilState(&dsDesc, &depthState_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		context_->OMSetDepthStencilState(depthState_,1);
+	}
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::CreateSamplerState()
 	{
@@ -453,13 +481,16 @@ namespace snuffbox
 		bDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 		bDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		bDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		bDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
-		bDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		bDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		bDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 		bDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		bDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 		result = device_->CreateBlendState(&bDesc, &blendState_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		float factor[4] = { 1, 1, 1, 1 };
+		context_->OMSetBlendState(blendState_,factor,0xFFFFFFFF);
 	}
 	
 	//---------------------------------------------------------------------------------
@@ -467,54 +498,95 @@ namespace snuffbox
 	{
 		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 		context_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		context_->OMSetBlendState(NULL, 0, 0xffffffff);
 
-		struct RenderElementSorter
+		struct RenderSorter
 		{
-			inline bool operator() (RenderElement* a, RenderElement* b)
+			inline bool operator()(RenderElement* a, RenderElement* b)
 			{
-				return (a->distanceToCamera() > b->distanceToCamera());
+				return (a->distanceFromCamera() > b->distanceFromCamera());
 			}
-		};
+		} RenderSorter;
 
-		std::sort(renderElements_.begin(), renderElements_.end(), RenderElementSorter());
+		std::sort(renderElements_.begin(), renderElements_.end(), RenderSorter);
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Draw()
 	{
-		float blendFactor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		context_->OMSetBlendState(blendState_, blendFactor, 0xffffffff);
+		for (auto& it : opaqueElements_)
+		{
+			RenderElement::ElementTypes elementType = it->element_type();
+			VertexBufferType type = it->type();
+			if (type != vbType_)
+			{
+				it->SetBuffers();
+				vbType_ = type;
+			}
+
+			D3D11_MAPPED_SUBRESOURCE cbData;
+			VS_CONSTANT_BUFFER* mappedData;
+
+			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+
+			mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
+			mappedData->Time = time_;
+			mappedData->World = worldMatrix_;
+			mappedData->View = viewMatrix_;
+			mappedData->Projection = projectionMatrix_;
+			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+
+			context_->Unmap(vsConstantBuffer_, 0);
+
+			if (it->texture())
+			{
+				if (currentTexture_ != it->texture())
+				{
+					auto tex = it->texture()->resource();
+					context_->PSSetShaderResources(0, 1, &tex);
+					currentTexture_ = it->texture();
+				}
+			}
+			else
+			{
+				context_->PSSetShaderResources(0, 1, &defaultResource_);
+				currentTexture_ = nullptr;
+			}
+
+			if (it->shader())
+			{
+				if (currentShader_ != it->shader())
+				{
+					auto shaders = it->shader()->shaders();
+					context_->PSSetShader(shaders.ps, 0, 0);
+					context_->VSSetShader(shaders.vs, 0, 0);
+					currentShader_ = it->shader();
+				}
+			}
+
+
+			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+		}
 
 		XMVECTOR camTranslation = camera_->translation();
 		XMVECTOR translation;
-
-		float distance = 0;
+		XMVECTOR delta;
+		float distance;
 
 		for (auto& it : renderElements_)
 		{
+			translation = it->translation;
+			delta = translation - camTranslation;
+			distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
+
+			it->SetDistanceFromCamera(distance);
+
       RenderElement::ElementTypes elementType = it->element_type();
-			translation = it->translation();
-			XMVECTOR delta = camTranslation - translation;
-			distance = abs(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
-
-      if (elementType != RenderElement::ElementTypes::kTerrain)
-      {
-        it->setDistanceToCamera(distance);
-      }
-      else
-      {
-        it->setDistanceToCamera(1000000000);
-      }
-
       VertexBufferType type = it->type();
       if (type != vbType_)
       {
         it->SetBuffers();
         vbType_ = type;
       }
-
-			
 
 			if (elementType == RenderElement::ElementTypes::kBillboard)
 			{
@@ -604,76 +676,27 @@ namespace snuffbox
 	{
 		swapChain_->SetFullscreenState(FALSE, NULL);
 
-		SNUFF_ASSERT_NOTNULL(device_);
-		device_->Release();
-		device_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(context_);
-		context_->Release();
-		context_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(swapChain_);
-		swapChain_->Release();
-		swapChain_ = NULL;
-
+		SNUFF_SAFE_RELEASE(device_);
+		SNUFF_SAFE_RELEASE(context_);
+		SNUFF_SAFE_RELEASE(swapChain_);
 		for (auto it : displayAdapters_)
 		{
-			SNUFF_ASSERT_NOTNULL(it);
-			it->Release();
-			it = NULL;
+			SNUFF_SAFE_RELEASE(it);
 		}
-
-		SNUFF_ASSERT_NOTNULL(renderTargetView_);
-		renderTargetView_->Release();
-		renderTargetView_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(backBuffer_);
-		backBuffer_->Release();
-		backBuffer_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(inputLayout_);
-		inputLayout_->Release();
-		inputLayout_ = NULL;
-		
-		SNUFF_ASSERT_NOTNULL(vsBuffer_);
-		vsBuffer_->Release();
-		vsBuffer_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(psBuffer_);
-		psBuffer_->Release();
-		psBuffer_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(vsConstantBuffer_);
-		vsConstantBuffer_->Release();
-		vsConstantBuffer_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(rasterizerState_);
-		rasterizerState_->Release();
-		rasterizerState_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(depthStencilBuffer_);
-		depthStencilBuffer_->Release();
-		depthStencilBuffer_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(depthStencilView_);
-		depthStencilView_->Release();
-		depthStencilView_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(samplerState_);
-		samplerState_->Release();
-		samplerState_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(noTexture_);
-		noTexture_->Release();
-		noTexture_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(defaultResource_);
-		defaultResource_->Release();
-		defaultResource_ = NULL;
-
-		SNUFF_ASSERT_NOTNULL(blendState_);
-		blendState_->Release();
-		blendState_ = NULL;
+		SNUFF_SAFE_RELEASE(renderTargetView_);
+		SNUFF_SAFE_RELEASE(backBuffer_);
+		SNUFF_SAFE_RELEASE(inputLayout_);
+		SNUFF_SAFE_RELEASE(vsBuffer_);
+		SNUFF_SAFE_RELEASE(psBuffer_);
+		SNUFF_SAFE_RELEASE(vsConstantBuffer_);
+		SNUFF_SAFE_RELEASE(rasterizerState_);
+		SNUFF_SAFE_RELEASE(depthStencilBuffer_);
+		SNUFF_SAFE_RELEASE(depthStencilView_);
+		SNUFF_SAFE_RELEASE(depthState_);
+		SNUFF_SAFE_RELEASE(samplerState_);
+		SNUFF_SAFE_RELEASE(noTexture_);
+		SNUFF_SAFE_RELEASE(defaultResource_);
+		SNUFF_SAFE_RELEASE(blendState_);
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");
 	}

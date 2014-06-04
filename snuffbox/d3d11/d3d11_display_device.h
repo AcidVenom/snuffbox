@@ -1,5 +1,7 @@
 #pragma once
 
+#define SNUFF_SAFE_RELEASE(ptr) SNUFF_ASSERT_NOTNULL(ptr); ptr->Release(); ptr = NULL;
+
 #define _WINSOCKAPI_
 #include <dxgi.h>
 #include <d3d11.h>
@@ -148,6 +150,9 @@ namespace snuffbox
 		/// Returns the list of render elements
 		std::vector<RenderElement*>& renderElements(){ return renderElements_; }
 
+		/// Returns the list of opaque render elements
+		std::vector<RenderElement*>& opaqueElements(){ return opaqueElements_; }
+
     /// Returns the current vertex buffer type
     VertexBufferType& vbType(){ return vbType_; }
 
@@ -185,15 +190,17 @@ namespace snuffbox
 		XMMATRIX											projectionMatrix_;	///< The projection matrix
 		ID3D11RasterizerState*				rasterizerState_;	  ///< The rasterizer state
 		std::vector<RenderElement*>		renderElements_;		///< The list of render elements
+		std::vector<RenderElement*>		opaqueElements_;		///< The list of opaque render elements
     VertexBufferType              vbType_;            ///< The vertex buffer type
 		ID3D11DepthStencilView*				depthStencilView_;	///< The depth stencil view
 		ID3D11Texture2D*							depthStencilBuffer_;///< The buffer of the depth stencil
+		ID3D11DepthStencilState*			depthState_;				///< The depth stencil state
 		ID3D11Texture2D*							noTexture_;					///< A white rectangular texture as default
 		ID3D11ShaderResourceView*			defaultResource_;		///< The default shader resource
 		ID3D11SamplerState*						samplerState_;			///< The texture sampler state
 		Texture*											currentTexture_;		///< The current texture being used
 		Shader*												currentShader_;			///< The current shader being used
 		Camera*												camera_;						///< The current camera being used
-		ID3D11BlendState*							blendState_;				///< The blend state of the context
+		ID3D11BlendState*							blendState_;				///< The blend state being used
 	};
 }

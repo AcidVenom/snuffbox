@@ -26,9 +26,9 @@ namespace snuffbox
 		*/
 		enum ElementTypes
 		{
+			kTerrain,
 			kQuad,
 			kBillboard,
-			kTerrain
 		};
 
 		/// Default constructor
@@ -41,8 +41,8 @@ namespace snuffbox
 			texture_(nullptr),
 			elementType_(type),
 			shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get()),
-			distanceToCamera_(0.0f),
-      destroyed_(true)
+			destroyed_(true),
+			distanceFromCamera_(0.0f)
 		{}
 
     /// Default destructor
@@ -85,6 +85,11 @@ namespace snuffbox
 		/// Sets the X, Y and Z offset
 		void SetOffset(float x, float y, float z);
 
+		/// Sets the distance from the camera
+		void SetDistanceFromCamera(float distance){ distanceFromCamera_ = distance; }
+		/// Returns the distance from the camera
+		float distanceFromCamera(){ return distanceFromCamera_; }
+
     /// Destroys the render element
     void Destroy();
 
@@ -92,7 +97,7 @@ namespace snuffbox
     void Spawn();
 
 		/// Returns the translation as a vector
-		XMVECTOR translation(){ return XMVectorSet(x_, y_, z_, 0.0); }
+		XMVECTOR translation(){ return XMVectorSet(x_, y_, z_, 0.0f); }
 
 		/// Returns the texture
 		Texture* texture(){ return texture_; }
@@ -106,12 +111,6 @@ namespace snuffbox
 		/// Returns the element type
 		ElementTypes& element_type(){ return elementType_; }
 
-		/// Sets the distance to the camera
-		void setDistanceToCamera(float distance){ distanceToCamera_ = distance; }
-
-		/// Returns the distance to the camera
-		float distanceToCamera(){ return distanceToCamera_; }
-
 	private:
 		std::vector<Vertex>						vertices_; ///< The vertices
 		std::vector<unsigned int>			indices_; ///< The indices
@@ -120,11 +119,11 @@ namespace snuffbox
     float                         x_, y_, z_; ///< Translation floats
     float                         ox_, oy_, oz_; ///< Offset floats
     float                         sx_, sy_, sz_; ///< Scaling floats
-		float													distanceToCamera_; ///< Distance to camera
 		Texture*											texture_;	///< The texture of this render element
 		Shader*												shader_; ///< The current shader used by this element
 		ElementTypes									elementType_;	///< The type of this render element
     bool                          destroyed_; ///< Is this element destroyed?
+		float													distanceFromCamera_; ///< The distance from the camera
 	public:
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);
@@ -149,7 +148,14 @@ namespace snuffbox
     if (destroyed_)
     {
       destroyed_ = false;
-      environment::render_device().renderElements().push_back(this);
+			if (type() != ElementTypes::kTerrain)
+			{
+				environment::render_device().renderElements().push_back(this);
+			}
+			else
+			{
+				environment::render_device().opaqueElements().push_back(this);
+			}
     }
   }
 
@@ -161,15 +167,30 @@ namespace snuffbox
       unsigned int index = 0;
       if (environment::has_game())
       {
-        for (auto& it : environment::render_device().renderElements())
-        {
-          if (it == this)
-          {
-            environment::render_device().renderElements().erase(environment::render_device().renderElements().begin() + index);
-            break;
-          }
-          ++index;
-        }
+				if (type() != ElementTypes::kTerrain)
+				{
+					for (auto& it : environment::render_device().renderElements())
+					{
+						if (it == this)
+						{
+							environment::render_device().renderElements().erase(environment::render_device().renderElements().begin() + index);
+							break;
+						}
+						++index;
+					}
+				}
+				else
+				{
+					for (auto& it : environment::render_device().opaqueElements())
+					{
+						if (it == this)
+						{
+							environment::render_device().opaqueElements().erase(environment::render_device().opaqueElements().begin() + index);
+							break;
+						}
+						++index;
+					}
+				}
       }
     }
 
