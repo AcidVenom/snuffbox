@@ -17,8 +17,6 @@ var LevelState = {
 		this._background.setRotation(-Math.PI/2,0,0);
 		this._background.setTexture("textures/background.png");
 		this._background.spawn();
-
-		StateManager.start();
 	},
 
 	update: function(dt)

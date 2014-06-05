@@ -2,6 +2,7 @@ var StateManager = StateManager || {
 	__state: null,
 	__states: {},
 	__started: false,
+	__newState: null,
 
 	getState: function()
 	{
@@ -10,42 +11,29 @@ var StateManager = StateManager || {
 
 	switchState: function(name)
 	{
-		this.__started = false;
-		if(this.__states[name] == undefined)
+		this.__newState = this.__states[name];
+		if(this.__newState == undefined)
 		{
 			Log.error("[StateManager] State '" + name + "' doesn't exist!");
 			return;
 		}
-
-		if (this.__state != null)
-		{
-			if(this.__state.destroy == undefined)
-			{
-				Log.error("[StateManager] Current state has no destroy function!");
-				return;
-			}
-			this.__state.destroy();
-			Game.cleanUp();
-		}
-
-		this.__state = this.__states[name];
 		
 		Log.debug("[StateManager] Switched to state: " + name);
 
-		if(this.__state.initialise == undefined)
+		if(this.__newState.initialise == undefined)
 		{
 			Log.error("[StateManager] Current state has no initiliase function!");
 			return;
 		}
 
-		if(this.__state.loadContent != undefined)
+		if(this.__newState.loadContent != undefined)
 		{
-			this.__state.loadContent();
-			ContentManager.idleCallback(this.__state.initialise);
+			this.__newState.loadContent();
+			ContentManager.idleCallback(this.initialise);
 		}
 		else
 		{
-			this.__state.initialise();
+			this.initialise()
 		}
 	},
 
@@ -85,5 +73,29 @@ var StateManager = StateManager || {
 	start: function()
 	{
 		this.__started = true;
+	},
+
+	stop: function()
+	{
+		this.__started = false;
+	},
+
+	initialise: function()
+	{
+		if (StateManager.__state != null)
+		{
+			if(StateManager.__state.destroy == undefined)
+			{
+				Log.error("[StateManager] Current state has no destroy function!");
+				return;
+			}
+			StateManager.__state.destroy();
+			Game.cleanUp();
+		}
+		
+		StateManager.stop();
+		StateManager.__newState.initialise();
+		StateManager.__state = StateManager.__newState;
+		StateManager.start();
 	}
 };

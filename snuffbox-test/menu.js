@@ -17,48 +17,45 @@ var MenuState = {
 	{
 		Log.info("Initialising menu");
 
-		MenuState._camera = Camera.new("orthographic"),
-		MenuState._background = Quad.new(),
-		MenuState._logo = Quad.new(),
-		MenuState._logoBackground = Quad.new(),
-		MenuState._splitter = Quad.new(),
+		this._camera = Camera.new("orthographic"),
+		this._background = Quad.new(),
+		this._logo = Quad.new(),
+		this._logoBackground = Quad.new(),
+		this._splitter = Quad.new(),
 
-		MenuState._camera.setTranslation(0,0,1000);
-		MenuState._camera.setFov(Math.PI/2);
+		this._camera.setTranslation(0,0,1000);
+		this._camera.setFov(Math.PI/2);
 
-		MenuState._background.setTranslation(0,0,0);
-		MenuState._background.setOffset(0.5,0.5,0.5);
-		MenuState._background.setScale(4,1.6,1.6);
-		MenuState._background.setRotation(-Math.PI/2,0,0);
-		MenuState._background.setTexture("textures/background.png");
-		MenuState._background.spawn();
+		this._background.setTranslation(0,0,0);
+		this._background.setOffset(0.5,0.5,0.5);
+		this._background.setScale(4,1.6,1.6);
+		this._background.setRotation(-Math.PI/2,0,0);
+		this._background.setTexture("textures/background.png");
+		this._background.spawn();
 
-		MenuState._logo.setTranslation(0,0,2);
-		MenuState._logo.setOffset(0.5,0.5,0.5);
-		MenuState._logo.setScale(0,0,0);
-		MenuState._logo.setTexture("textures/menu/logo.png");
-		MenuState._logo.setRotation(-Math.PI/2,0,0);
-		MenuState._logo.spawn();
-		MenuState._logo.setAlpha(0);
+		this._logo.setTranslation(0,0,2);
+		this._logo.setOffset(0.5,0.5,0.5);
+		this._logo.setScale(0,0,0);
+		this._logo.setTexture("textures/menu/logo.png");
+		this._logo.setRotation(-Math.PI/2,0,0);
+		this._logo.spawn();
+		this._logo.setAlpha(0);
 
-		MenuState._logoBackground.setTranslation(0,-0.2,1);
-		MenuState._logoBackground.setOffset(0.5,0.5,0.5);
-		MenuState._logoBackground.setScale(1,1,1);
-		MenuState._logoBackground.setTexture("textures/menu/logo_background.png");
-		MenuState._logoBackground.setRotation(-Math.PI/2,0,0);
-		MenuState._logoBackground.spawn();
-		MenuState._logoBackground.setAlpha(0);
+		this._logoBackground.setTranslation(0,-0.2,1);
+		this._logoBackground.setOffset(0.5,0.5,0.5);
+		this._logoBackground.setScale(1,1,1);
+		this._logoBackground.setTexture("textures/menu/logo_background.png");
+		this._logoBackground.setRotation(-Math.PI/2,0,0);
+		this._logoBackground.spawn();
+		this._logoBackground.setAlpha(0);
 
-		MenuState._splitter.setTranslation(0,0,3);
-		MenuState._splitter.setScale(0,0,0);
-		MenuState._splitter.setAlpha(0);
-		MenuState._splitter.setOffset(0.5,0,0.5);
-		MenuState._splitter.setRotation(-Math.PI/2,0,0);
-		MenuState._splitter.spawn();
-		MenuState._splitter.setTexture("textures/menu/splitter.png");
-
-		Log.info("Initialised menu");
-		StateManager.start();
+		this._splitter.setTranslation(0,0,3);
+		this._splitter.setScale(0,0,0);
+		this._splitter.setAlpha(0);
+		this._splitter.setOffset(0.5,0,0.5);
+		this._splitter.setRotation(-Math.PI/2,0,0);
+		this._splitter.spawn();
+		this._splitter.setTexture("textures/menu/splitter.png");
 	},
 
 	update: function(dt)
