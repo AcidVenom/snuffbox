@@ -86,10 +86,6 @@ void Game::Update()
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 	update_.Call(1,argv);
-  double sleep = 16 - deltaTime_*1000;
-  if (sleep < 0)
-    sleep = 0;
-  Sleep(static_cast<DWORD>(sleep));
 	high_resolution_clock::time_point now = high_resolution_clock::now();
 	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime);
 	deltaTime_ = dtDuration.count() * 1e-3f;

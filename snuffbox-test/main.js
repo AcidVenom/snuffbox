@@ -1,17 +1,17 @@
 require("loading");
 require("statemanager");
-require("states");
+require("menu");
+require("level");
 
 Game.timer = 0;
 
 Game.Initialise = function()
 {
-	LoadStates();
-	StateManager.switchState("menu");
+	StateManager.switchState(MenuState);
 }
 Game.Update = function(dt)
 {	
-	Game.timer += dt;
+	Game.timer += 0.01;
 	StateManager.updateState(dt);
 }
 
@@ -27,6 +27,5 @@ Game.Shutdown = function()
 
 Game.OnReload = function()
 {
-	LoadStates();
-	StateManager.switchState("menu");
+	StateManager.switchState(StateManager.getState());
 }

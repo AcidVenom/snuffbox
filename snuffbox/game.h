@@ -1,5 +1,4 @@
 #pragma once
-
 #define _WINSOCKAPI_
 #define NOMINMAX
 #include <thread>

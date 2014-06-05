@@ -10,6 +10,12 @@
 #include "../../snuffbox/content/content_manager.h"
 #include <comdef.h>
 
+#ifdef _DEBUG
+#define SNUFF_VSYNC 0
+#else
+#define SNUFF_VSYNC 1
+#endif
+
 namespace snuffbox
 {
 	namespace environment
@@ -627,7 +633,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::EndDraw()
 	{
-		swapChain_->Present(0, 0);
+		swapChain_->Present(SNUFF_VSYNC, 0);
 	}
 
 	//---------------------------------------------------------------------------------
