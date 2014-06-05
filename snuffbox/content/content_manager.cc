@@ -3,6 +3,7 @@
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/memory/allocated_memory.h"
 #include "../../snuffbox/game.h"
+#include "../../snuffbox/js/js_wrapper.h"
 
 namespace snuffbox
 {
@@ -102,7 +103,8 @@ namespace snuffbox
 
 		JSFunctionRegister funcs[] = {
 			JSFunctionRegister("load", JSLoad),
-			JSFunctionRegister("unload", JSUnload)
+			JSFunctionRegister("unload", JSUnload),
+			JSFunctionRegister("idleCallback", JSIdle)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
@@ -126,6 +128,17 @@ namespace snuffbox
 			}
 
 			pendingContent_.pop();
+		}
+
+		JS_CREATE_SCOPE;
+		Handle<Context> ctx = JS_CONTEXT;
+
+		while (!idleCallbacks_.empty())
+		{
+			auto& it = idleCallbacks_.front();
+
+			it->Call(0, 0);
+			idleCallbacks_.pop();
 		}
 	}
 
@@ -183,5 +196,16 @@ namespace snuffbox
 		}
 
 		SNUFF_XASSERT(isContent == true, std::string("Content type '" + contentType + "' does not exist!").c_str());
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void ContentManager::JSIdle(JS_ARGS)
+	{
+		JSWrapper wrapper(args);
+		JS_CREATE_SCOPE;
+		const Handle<Value>& value = wrapper.GetFunction(0);
+		SharedPtr<JSCallback> callback = environment::memory().ConstructShared<JSCallback>(Handle<Function>::Cast(value));
+		
+		environment::content_manager().idleCallbacks().emplace(callback);
 	}
 }

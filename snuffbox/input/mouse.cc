@@ -1,6 +1,7 @@
 #include "../../snuffbox/input/mouse.h"
 #include "../../snuffbox/logging.h"
 #include "../../snuffbox/environment.h"
+#include "../../snuffbox/js/js_wrapper.h"
 
 namespace snuffbox
 {
@@ -102,58 +103,62 @@ namespace snuffbox
 	void Mouse::JSWheelUp(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-
+		JSWrapper wrapper(args);
 		bool check = environment::mouse().IsPressed(MouseEnums::MouseButton::kWheelUp);
-		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------
 	void Mouse::JSWheelDown(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-
+		JSWrapper wrapper(args);
 		bool check = environment::mouse().IsPressed(MouseEnums::MouseButton::kWheelDown);
-		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------
 	void Mouse::JSIsPressed(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		int button = args[0]->Int32Value();
+		JSWrapper wrapper(args);
+		int button = wrapper.GetNumber<int>(0);
 
 		bool check = environment::mouse().IsPressed(static_cast<MouseEnums::MouseButton>(button));
-		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------
 	void Mouse::JSIsDown(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		int button = args[0]->Int32Value();
+		JSWrapper wrapper(args);
+		int button = wrapper.GetNumber<int>(0);
 
 		bool check = environment::mouse().IsDown(static_cast<MouseEnums::MouseButton>(button));
-		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------
 	void Mouse::JSIsReleased(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-    int button = args[0]->Int32Value();
+		JSWrapper wrapper(args);
+		int button = wrapper.GetNumber<int>(0);
 
 		bool check = environment::mouse().IsReleased(static_cast<MouseEnums::MouseButton>(button));
-    args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------
 	void Mouse::JSIsDoubleClicked(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		int button = args[0]->Int32Value();
+		JSWrapper wrapper(args);
+		int button = wrapper.GetNumber<int>(0);
 
 		bool check = environment::mouse().IsDoubleClicked(static_cast<MouseEnums::MouseButton>(button));
-		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------

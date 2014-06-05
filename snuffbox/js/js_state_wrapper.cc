@@ -2,6 +2,7 @@
 #include "../../snuffbox/js/js_object_register.h"
 #include "../../snuffbox/logging.h"
 #include "../../snuffbox/win32/win32_file_watch.h"
+#include "../../snuffbox/js/js_wrapper.h"
 #include <fstream>
 #include <algorithm>
 #include <comdef.h>

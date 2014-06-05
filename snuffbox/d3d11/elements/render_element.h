@@ -3,6 +3,7 @@
 #include "../../../snuffbox/d3d11/d3d11_display_device.h"
 #include "../../../snuffbox/logging.h"
 #include "../../../snuffbox/js/js_state_wrapper.h"
+#include "../../../snuffbox/js/js_wrapper.h"
 #include "../../../snuffbox/game.h"
 #include "../../../snuffbox/d3d11/d3d11_texture.h"
 
@@ -405,7 +406,7 @@ namespace snuffbox
 	{
 		JS_SETUP(RenderElement);
 
-		wrapper.ReturnValue<float>(self->alpha());
+		wrapper.ReturnNumber<float>(self->alpha());
 	}
 
 	//-------------------------------------------------------------------------------------------

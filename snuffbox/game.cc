@@ -1,5 +1,6 @@
 #include "../snuffbox/game.h"
 #include "../snuffbox/environment.h"
+#include "../snuffbox/js/js_wrapper.h"
 
 #include <chrono>
 

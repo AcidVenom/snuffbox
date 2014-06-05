@@ -1,4 +1,5 @@
 #include "../../snuffbox/d3d11/d3d11_camera.h"
+#include "../../snuffbox/js/js_wrapper.h"
 
 namespace snuffbox
 {

@@ -1,6 +1,7 @@
 var StateManager = StateManager || {
 	__state: null,
 	__states: {},
+	__started: false,
 
 	getState: function()
 	{
@@ -9,31 +10,43 @@ var StateManager = StateManager || {
 
 	switchState: function(name)
 	{
-		if (this.__state != null)
-		{
-			if(typeof(this.__state.destroy) == "undefined")
-			{
-				Log.error("[StateManager] Current state has no destroy function!");
-				return;
-			}
-			this.__state.destroy();
-		}
-
-		this.__state = this.__states[name];
-		if(typeof(this.__state) == "undefined")
+		this.__started = false;
+		if(this.__states[name] == undefined)
 		{
 			Log.error("[StateManager] State '" + name + "' doesn't exist!");
 			return;
 		}
 
+		if (this.__state != null)
+		{
+			if(this.__state.destroy == undefined)
+			{
+				Log.error("[StateManager] Current state has no destroy function!");
+				return;
+			}
+			this.__state.destroy();
+			Game.cleanUp();
+		}
+
+		this.__state = this.__states[name];
+		
 		Log.debug("[StateManager] Switched to state: " + name);
 
-		if(typeof(this.__state.initialise) == "undefined")
+		if(this.__state.initialise == undefined)
 		{
 			Log.error("[StateManager] Current state has no initiliase function!");
 			return;
 		}
-		this.__state.initialise();
+
+		if(this.__state.loadContent != undefined)
+		{
+			this.__state.loadContent();
+			ContentManager.idleCallback(this.__state.initialise);
+		}
+		else
+		{
+			this.__state.initialise();
+		}
 	},
 
 	addState: function(obj)
@@ -43,21 +56,34 @@ var StateManager = StateManager || {
 
 	updateState: function(dt)
 	{
-		if(typeof(this.__state.update) == "undefined")
+		if(this.__state == undefined) return;
+		if(this.__started)
 		{
-			Log.error("[StateManager] Current state has no update function!");
-			return;
+			if(this.__state.update == undefined)
+			{
+				Log.error("[StateManager] Current state has no update function!");
+				return;
+			}
+			this.__state.update(dt);
 		}
-		this.__state.update(dt);
 	},
 
 	drawState: function(dt)
 	{
-		if(typeof(this.__state.draw) == "undefined")
+		if(this.__state == undefined) return;
+		if(this.__started)
 		{
-			Log.error("[StateManager] Current state has no draw function!");
-			return;
+			if(this.__state.draw == undefined)
+			{
+				Log.error("[StateManager] Current state has no draw function!");
+				return;
+			}
+			this.__state.draw(dt);
 		}
-		this.__state.draw(dt);
+	},
+
+	start: function()
+	{
+		this.__started = true;
 	}
 };

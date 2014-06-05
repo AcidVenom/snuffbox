@@ -1,6 +1,5 @@
 #pragma once
 
-#include <v8.h>
 #include "../../snuffbox/js/js_state_wrapper.h"
 
 using namespace v8;
@@ -21,7 +20,10 @@ namespace snuffbox
 		/// Default destructor
 		~JSWrapper(){}
 
-		/// Retrieves a double value from a given argument index
+		/// Retrieves a function from a given argument index
+		const Handle<Value> GetFunction(int arg);
+
+		/// Retrieves a number value from a given argument index
 		template<typename T>
 		T GetNumber(int arg);
 
@@ -32,8 +34,12 @@ namespace snuffbox
 		/// Gets a string for the arguments
 		std::string GetString(int arg);
 
+		/// Returns a boolean
+		void ReturnBool(bool value);
+
+		/// Returns a number
 		template<typename T>
-		void ReturnValue(T value);
+		void ReturnNumber(T value);
 
 		/// Sets a tuple as the return value of the arguments in .x and .y (defaults)
 		template<typename T>
@@ -46,6 +52,21 @@ namespace snuffbox
 	private:
 		const FunctionCallbackInfo<Value>& args_; ///< The JavaScript arguments passed by a function
 	};
+
+	//------------------------------------------------------------------------------
+	inline const Handle<Value> JSWrapper::GetFunction(int arg)
+	{
+		JS_CREATE_SCOPE;
+		const Handle<Value>& func = args_[arg];
+
+		if (!func->IsFunction())
+		{
+			Local<Value> funcName = args_.Callee();
+			Local<String> functionName = funcName->ToString();
+			SNUFF_ASSERT(std::string("Tried to insert a non-function as argument in function " + std::string(*String::Utf8Value(functionName))).c_str());
+		}
+		return Handle<Function>::Cast(func);
+	}
 
 	//------------------------------------------------------------------------------
 	template<typename T>
@@ -73,21 +94,25 @@ namespace snuffbox
 	}
 
 	//------------------------------------------------------------------------------
-	template<typename T>
-	inline void JSWrapper::ReturnValue(T value)
+	inline void JSWrapper::ReturnBool(bool value)
 	{
-		auto isolate = environment::js_state_wrapper().isolate();
-		args_.GetReturnValue().Set(Number::New(isolate, static_cast<T>(value)));
+		args_.GetReturnValue().Set(Boolean::New(JS_ISOLATE, value));
+	}
+
+	//------------------------------------------------------------------------------
+	template<typename T>
+	inline void JSWrapper::ReturnNumber(T value)
+	{
+		args_.GetReturnValue().Set(Number::New(JS_ISOLATE, static_cast<T>(value)));
 	}
 
 	//------------------------------------------------------------------------------
 	template<typename T>
 	inline void JSWrapper::ReturnTuple(T x, T y, const char* n1, const char* n2)
 	{
-		auto isolate = environment::js_state_wrapper().isolate();
-		Local<Object> retVal = Object::New(isolate);
-		retVal->Set(String::NewFromUtf8(isolate, n1), Number::New(isolate, static_cast<T>(x)));
-		retVal->Set(String::NewFromUtf8(isolate, n2), Number::New(isolate, static_cast<T>(y)));
+		Local<Object> retVal = Object::New(JS_ISOLATE);
+		retVal->Set(String::NewFromUtf8(JS_ISOLATE, n1), Number::New(JS_ISOLATE, static_cast<T>(x)));
+		retVal->Set(String::NewFromUtf8(JS_ISOLATE, n2), Number::New(JS_ISOLATE, static_cast<T>(y)));
 
 		args_.GetReturnValue().Set(retVal);
 	}
@@ -96,11 +121,10 @@ namespace snuffbox
 	template<typename T>
 	inline void JSWrapper::ReturnTriple(T x, T y, T z, const char* n1, const char* n2, const char* n3)
 	{
-		auto isolate = environment::js_state_wrapper().isolate();
-		Local<Object> retVal = Object::New(isolate);
-		retVal->Set(String::NewFromUtf8(isolate, n1), Number::New(isolate, static_cast<T>(x)));
-		retVal->Set(String::NewFromUtf8(isolate, n2), Number::New(isolate, static_cast<T>(y)));
-		retVal->Set(String::NewFromUtf8(isolate, n3), Number::New(isolate, static_cast<T>(z)));
+		Local<Object> retVal = Object::New(JS_ISOLATE);
+		retVal->Set(String::NewFromUtf8(JS_ISOLATE, n1), Number::New(JS_ISOLATE, static_cast<T>(x)));
+		retVal->Set(String::NewFromUtf8(JS_ISOLATE, n2), Number::New(JS_ISOLATE, static_cast<T>(y)));
+		retVal->Set(String::NewFromUtf8(JS_ISOLATE, n3), Number::New(JS_ISOLATE, static_cast<T>(z)));
 
 		args_.GetReturnValue().Set(retVal);
 	}

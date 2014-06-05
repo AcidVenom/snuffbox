@@ -1,10 +1,10 @@
 #pragma once
 
+#include <v8.h>
 #include <string>
 #include <vector>
 #include <map>
 #include "../../snuffbox/memory/shared_ptr.h"
-#include "../../snuffbox/js/js_wrapper.h"
 
 using namespace v8;
 

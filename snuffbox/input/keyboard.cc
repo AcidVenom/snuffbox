@@ -1,6 +1,7 @@
 #include "../../snuffbox/input/keyboard.h"
 #include "../../snuffbox/logging.h"
 #include "../../snuffbox/environment.h"
+#include "../../snuffbox/js/js_wrapper.h"
 
 namespace snuffbox
 {
@@ -123,36 +124,36 @@ namespace snuffbox
 	void Keyboard::JSIsPressed(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		String::Utf8Value str(args[0]);
-		const char* keyStr = *str;
-		Key key = StringToKey(keyStr);
+		JSWrapper wrapper(args);
+
+		Key key = StringToKey(wrapper.GetString(0).c_str());
 
 		bool check = environment::keyboard().IsPressed(key);
-		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------
 	void Keyboard::JSIsDown(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		String::Utf8Value str(args[0]);
-		const char* keyStr = *str;
-		Key key = StringToKey(keyStr);
+		JSWrapper wrapper(args);
+
+		Key key = StringToKey(wrapper.GetString(0).c_str());
 
 		bool check = environment::keyboard().IsDown(key);
-		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------
 	void Keyboard::JSIsReleased(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		String::Utf8Value str(args[0]);
-		const char* keyStr = *str;
-		Key key = StringToKey(keyStr);
+		JSWrapper wrapper(args);
+
+		Key key = StringToKey(wrapper.GetString(0).c_str());
 
 		bool check = environment::keyboard().IsReleased(key);
-		args.GetReturnValue().Set(Boolean::New(JS_ISOLATE, check));
+		wrapper.ReturnBool(check);
 	}
 
 	//--------------------------------------------------------------------------------------
