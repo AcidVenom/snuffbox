@@ -53,6 +53,13 @@ namespace snuffbox
 		}
 		else
 		{
+      for (auto &it : files_)
+      {
+        if (strcmp(it.path.c_str(), file.path.c_str()) == 0)
+        {
+          return;
+        }
+      }
 			files_.push_back(file);
 		}
 	}
