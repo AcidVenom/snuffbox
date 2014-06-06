@@ -2,8 +2,6 @@
 #include "../snuffbox/environment.h"
 #include "../snuffbox/js/js_wrapper.h"
 
-#include <chrono>
-
 #define SNUFF_VERSION_MAJOR 0
 #define SNUFF_VERSION_MINOR 1
 
@@ -78,18 +76,13 @@ void Game::Update()
 
 	mouse_->Update();
 	keyboard_->Update();
-	high_resolution_clock::time_point startTime = high_resolution_clock::now();
-	high_resolution_clock::time_point lastTime = startTime;
+	lastTime_ = high_resolution_clock::now();
 
 	JS_CREATE_SCOPE;
 	Handle<Value> argv[1] = {
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 	update_.Call(1,argv);
-	high_resolution_clock::time_point now = high_resolution_clock::now();
-	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime);
-	deltaTime_ = dtDuration.count() * 1e-3f;
-	lastTime = now;
 
 	environment::render_device().IncrementTime();
 
@@ -114,6 +107,11 @@ void Game::Draw()
 	draw_.Call(1, argv);
 	environment::render_device().Draw();
 	environment::render_device().EndDraw();
+
+	high_resolution_clock::time_point now = high_resolution_clock::now();
+	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime_);
+	deltaTime_ = dtDuration.count() * 1e-3f;
+	lastTime_ = now;
 }
 
 //------------------------------------------------------------------------------------------------------

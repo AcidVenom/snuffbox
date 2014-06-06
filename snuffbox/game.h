@@ -2,6 +2,9 @@
 #define _WINSOCKAPI_
 #define NOMINMAX
 #include <thread>
+#include <chrono>
+
+using namespace std::chrono;
 
 #include "../snuffbox/memory/shared_ptr.h"
 
@@ -112,6 +115,7 @@ namespace snuffbox
 		bool consoleEnabled_; ///< Is the console enabled?
 		std::string path_; ///< The path the game is running in
 		int gameTime_; ///< The game time
+		high_resolution_clock::time_point lastTime_;	///< The last clock time for delta timing
 	public:
 		JS_NAME(Game);
 		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions

@@ -43,6 +43,7 @@ var World = function()
 	this.update = function(dt)
 	{
 		this._mountains.rotateBy(0,0,-0.002);
+		this._mountains.setUniform("float4","test4",1,0,1,1);
 		this._treeline2.rotateBy(0,0,0.003);
 	}
 }

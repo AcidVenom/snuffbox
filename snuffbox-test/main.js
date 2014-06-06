@@ -11,7 +11,7 @@ Game.Initialise = function()
 }
 Game.Update = function(dt)
 {	
-	Game.timer += 0.01;
+	Game.timer += dt;
 	StateManager.updateState(dt);
 }
 

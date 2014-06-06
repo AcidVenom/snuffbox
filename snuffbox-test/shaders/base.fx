@@ -6,6 +6,8 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 	float4x4 Projection;
 	float4x4 WorldViewProjection;
   float Alpha;
+  float dummy;
+  float4 test4;
 }
 
 struct VOut
@@ -35,5 +37,5 @@ float4 PS(VOut input) : SV_TARGET
   float4 color = (textureColor * input.color);
   color.a *= Alpha;
   
-	return color;
+	return test4;
 }

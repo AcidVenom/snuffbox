@@ -11,6 +11,32 @@ namespace snuffbox
 {
 
 	class D3D11DisplayDevice;
+	
+	/**
+	* @enum snuffbox::UniformType
+	* @brief An enumerator for shader uniform types
+	* @author Daniël Konings
+	*/
+	enum UniformType
+	{
+		kFloat,
+		kFloat2,
+		kFloat3,
+		kFloat4
+	};
+
+	/**
+	* @struct snuffbox::ShaderUniform
+	* @brief Holds data about a uniform for use with a shader
+	* @author Daniël Konings
+	*/
+	struct ShaderUniform
+	{
+		std::string name;
+		UniformType type;
+		float value[4];
+	};
+
 	/**
 	* @class snuffbox::RenderElement
 	* @brief Used as base class for all visual game objects
@@ -121,27 +147,33 @@ namespace snuffbox
 		float alpha(){ return alpha_; }
 
 		/// Sets a uniform for this element
-		void SetUniform(std::string name, float value);
+		void SetUniform(UniformType type, std::string name, float _1 = 0.0f, float _2 = 0.0f, float _3 = 0.0f, float _4 = 0.0f);
+
+		/// Removes all uniforms for the next loop
+		void ClearUniforms(){ uniforms_.clear(); }
+
+		/// Converts a given uniform type name to a uniform type
+		static UniformType TypeNameToUniformType(std::string type);
 
 		/// Returns a list of uniforms to assign to the constant buffer
 		std::vector<float> uniforms();
 
 	private:
-		std::vector<Vertex>						vertices_; ///< The vertices
-		std::vector<unsigned int>			indices_; ///< The indices
-		XMMATRIX											worldMatrix_; ///< The world matrix
-		XMMATRIX											rotation_;	///< Rotation
-    float                         x_, y_, z_; ///< Translation floats
-    float                         ox_, oy_, oz_; ///< Offset floats
-    float                         sx_, sy_, sz_; ///< Scaling floats
-		Texture*											texture_;	///< The texture of this render element
-		Shader*												shader_; ///< The current shader used by this element
-		ElementTypes									elementType_;	///< The type of this render element
-    bool                          destroyed_; ///< Is this element destroyed?
-		float													distanceFromCamera_; ///< The distance from the camera
-		float													alpha_;	///< The alpha value of this whole element
-		std::map<std::string, float>	uniforms_;	///< Uniforms for the constant buffer of the shader
-		std::vector<std::string>			uniformNames_; ///< A list of uniform names
+		std::vector<Vertex>										vertices_; ///< The vertices
+		std::vector<unsigned int>							indices_; ///< The indices
+		XMMATRIX															worldMatrix_; ///< The world matrix
+		XMMATRIX															rotation_;	///< Rotation
+    float																	x_, y_, z_; ///< Translation floats
+    float																	ox_, oy_, oz_; ///< Offset floats
+    float																	sx_, sy_, sz_; ///< Scaling floats
+		Texture*															texture_;	///< The texture of this render element
+		Shader*																shader_; ///< The current shader used by this element
+		ElementTypes													elementType_;	///< The type of this render element
+    bool																	destroyed_; ///< Is this element destroyed?
+		float																	distanceFromCamera_; ///< The distance from the camera
+		float																	alpha_;	///< The alpha value of this whole element
+		std::map<std::string, ShaderUniform>	uniforms_;	///< Uniforms for the constant buffer of the shader
+		
 	public:
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);
@@ -160,6 +192,7 @@ namespace snuffbox
     static void JSSpawn(JS_ARGS);
 		static void JSSetAlpha(JS_ARGS);
 		static void JSAlpha(JS_ARGS);
+		static void JSSetUniform(JS_ARGS);
 	};
 
   //-------------------------------------------------------------------------------------------
@@ -264,24 +297,70 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	inline void RenderElement::SetUniform(std::string name, float value)
+	inline void RenderElement::SetUniform(UniformType type, std::string name, float _1, float _2, float _3, float _4)
 	{
-		auto it = uniforms_.find(name);
-		if (it == uniforms_.end())
+		ShaderUniform uniform;
+
+		uniform.name = name;
+		uniform.type = type;
+		uniform.value[0] = _1;
+		uniform.value[1] = _2;
+		uniform.value[2] = _3;
+		uniform.value[3] = _4;
+
+		uniforms_.emplace(name, uniform);
+
+		auto& it = uniforms_.find(name);
+		if (it != uniforms_.end())
 		{
-			uniforms_.emplace(name, value);
+			it->second = uniform;
 		}
 		else
 		{
-			it->second = value;
+			uniforms_.emplace(name,uniform);
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	inline UniformType RenderElement::TypeNameToUniformType(std::string type)
+	{
+		if (strcmp(type.c_str(), "float") == 0) return UniformType::kFloat;
+		if (strcmp(type.c_str(), "float2") == 0) return UniformType::kFloat2;
+		if (strcmp(type.c_str(), "float3") == 0) return UniformType::kFloat3;
+		if (strcmp(type.c_str(), "float4") == 0) return UniformType::kFloat4;
+
+		SNUFF_ASSERT("Tried to set an invalid uniform type!");
+		return UniformType::kFloat;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	inline std::vector<float> RenderElement::uniforms()
 	{
 		std::vector<float> temp;
-
+		for (std::map<std::string, ShaderUniform>::iterator it = uniforms_.begin(); it != uniforms_.end(); ++it) {
+			switch(it->second.type)
+			{
+			case UniformType::kFloat:
+				temp.push_back(it->second.value[0]);
+				break;
+			case UniformType::kFloat2:
+				temp.push_back(it->second.value[0]);
+				temp.push_back(it->second.value[1]);
+				break;
+			case UniformType::kFloat3:
+				temp.push_back(it->second.value[0]);
+				temp.push_back(it->second.value[1]);
+				temp.push_back(it->second.value[2]);
+				break;
+			case UniformType::kFloat4:
+				temp.push_back(it->second.value[0]);
+				temp.push_back(it->second.value[1]);
+				temp.push_back(it->second.value[2]);
+				temp.push_back(it->second.value[3]);
+				break;
+			}
+			
+		}
 		return temp;
 	}
 
@@ -440,6 +519,43 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSSetUniform(JS_ARGS)
+	{
+		JS_SETUP(RenderElement);
+		float* value = 0;
+		std::string type = wrapper.GetString(0);
+		std::string name = wrapper.GetString(1);
+		
+		UniformType uniformType = RenderElement::TypeNameToUniformType(type);
+
+		switch (uniformType)
+		{
+		case UniformType::kFloat:
+			self->SetUniform(uniformType, name, 
+				wrapper.GetNumber<float>(2));
+			break;
+		case UniformType::kFloat2:
+			self->SetUniform(uniformType, name, 
+				wrapper.GetNumber<float>(2),
+				wrapper.GetNumber<float>(3));
+			break;
+		case UniformType::kFloat3:
+			self->SetUniform(uniformType, name, 
+				wrapper.GetNumber<float>(2),
+				wrapper.GetNumber<float>(3),
+				wrapper.GetNumber<float>(4));
+			break;
+		case UniformType::kFloat4:
+			self->SetUniform(uniformType, name, 
+				wrapper.GetNumber<float>(2),
+				wrapper.GetNumber<float>(3),
+				wrapper.GetNumber<float>(4),
+				wrapper.GetNumber<float>(5));
+			break;
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -460,7 +576,8 @@ namespace snuffbox
       JSFunctionRegister("destroy", JSDestroy),
       JSFunctionRegister("spawn", JSSpawn),
 			JSFunctionRegister("alpha", JSAlpha),
-			JSFunctionRegister("setAlpha", JSSetAlpha)
+			JSFunctionRegister("setAlpha", JSSetAlpha),
+			JSFunctionRegister("setUniform", JSSetUniform)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);

@@ -76,7 +76,7 @@ MenuState.update = function(dt)
 		this._splitter.setAlpha(this._splitter.alpha() + 0.01);
 		this._logoBackground.setAlpha(this._logoBackground.alpha() + 0.01)
 	}
-
+	
 	this._logo.setRotation(-Math.PI/2,0,Math.sin(Game.timer)*0.3);
 	this._logoBackground.setRotation(-Math.PI/2,0,Math.sin(Game.timer)*0.3);
 
