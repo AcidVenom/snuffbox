@@ -58,14 +58,23 @@ namespace snuffbox
 		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 3 + sizeof(D3DXCOLOR)+sizeof(XMFLOAT3)+sizeof(XMFLOAT2));
 	};
 
+	/**
+	* @struct snuffbox::VS_CONSTANT_BUFFER
+	* @brief The constant buffer used to pass variables to the shader
+	* @author Daniël Konings
+	*/
 	struct VS_CONSTANT_BUFFER
 	{
-		float Time;
-		XMMATRIX Projection;
-		XMMATRIX View;
-		XMMATRIX World;
-		XMMATRIX WorldViewProjection;
-		float Alpha;
+		float Time; // 4 bytes
+		XMMATRIX Projection; // 4*4*4 = 16*4 = 64 bytes
+		XMMATRIX View; // 4*4*4 = 16*4 = 64 bytes
+		XMMATRIX World; // 4*4*4 = 16*4 = 64 bytes
+		XMMATRIX WorldViewProjection; /// 4*4*4 = 16*4 = 64 bytes
+		float Alpha; // 4 bytes 
+		// 4 + 64 + 64 + 64 + 64 + 4 = 264 bytes
+		// 4096 - 264 = 3832
+		// 3832/4 = 958
+		float uniforms[958]; // 3832 remaining bytes
 	};
 
 	/**

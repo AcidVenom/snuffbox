@@ -551,7 +551,9 @@ namespace snuffbox
 		mappedData->Projection = projectionMatrix_;
 		mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
 		mappedData->Alpha = it->alpha();
-
+		mappedData->uniforms[0] = 1.0f;
+		mappedData->uniforms[1] = 0.0f;
+		mappedData->uniforms[2] = 1.0f;
 		context_->Unmap(vsConstantBuffer_, 0);
 
 		if (it->texture())

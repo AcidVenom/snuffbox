@@ -120,6 +120,12 @@ namespace snuffbox
 		/// Returns the alpha of this element
 		float alpha(){ return alpha_; }
 
+		/// Sets a uniform for this element
+		void SetUniform(std::string name, float value);
+
+		/// Returns a list of uniforms to assign to the constant buffer
+		std::vector<float> uniforms();
+
 	private:
 		std::vector<Vertex>						vertices_; ///< The vertices
 		std::vector<unsigned int>			indices_; ///< The indices
@@ -134,6 +140,8 @@ namespace snuffbox
     bool                          destroyed_; ///< Is this element destroyed?
 		float													distanceFromCamera_; ///< The distance from the camera
 		float													alpha_;	///< The alpha value of this whole element
+		std::map<std::string, float>	uniforms_;	///< Uniforms for the constant buffer of the shader
+		std::vector<std::string>			uniformNames_; ///< A list of uniform names
 	public:
 		static void RegisterJS(JS_TEMPLATE);
 		static void JSTranslateBy(JS_ARGS);
@@ -253,6 +261,28 @@ namespace snuffbox
     sx_ = x;
     sy_ = y;
     sz_ = z;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::SetUniform(std::string name, float value)
+	{
+		auto it = uniforms_.find(name);
+		if (it == uniforms_.end())
+		{
+			uniforms_.emplace(name, value);
+		}
+		else
+		{
+			it->second = value;
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	inline std::vector<float> RenderElement::uniforms()
+	{
+		std::vector<float> temp;
+
+		return temp;
 	}
 
   //-------------------------------------------------------------------------------------------
