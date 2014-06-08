@@ -1,0 +1,116 @@
+#include "../../snuffbox/d3d11/d3d11_settings.h"
+#include "../../snuffbox/js/js_wrapper.h"
+#include "../../snuffbox/environment.h"
+#include "../../snuffbox/game.h"
+
+namespace snuffbox
+{
+	namespace environment
+	{
+		namespace
+		{
+			D3D11Settings* globalInstance = nullptr;
+		}
+
+		bool has_render_settings(){ return globalInstance != nullptr; }
+		D3D11Settings& render_settings(){ 
+			SNUFF_ASSERT_NOTNULL(globalInstance); 
+			return *globalInstance; 
+		}
+	}
+}
+namespace snuffbox
+{
+	//-------------------------------------------------------------------------------
+	const char* D3D11Settings::CullModeToString(D3D11_CULL_MODE mode)
+	{
+		switch (mode)
+		{
+		case D3D11_CULL_NONE:
+			return "None";
+		case D3D11_CULL_FRONT:
+			return "Front";
+		case D3D11_CULL_BACK:
+			return "Back";
+		}
+
+		return "Unknown";
+	}
+
+	//-------------------------------------------------------------------------------
+	D3D11Settings::D3D11Settings()
+	{
+		environment::globalInstance = this;
+	}
+
+	//-------------------------------------------------------------------------------
+	D3D11Settings::~D3D11Settings()
+	{
+		environment::globalInstance = nullptr;
+	}
+
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSSetCullmode(JS_ARGS)
+	{
+		JSWrapper wrapper(args);
+		unsigned int mode = wrapper.GetNumber<unsigned int>(0);
+		environment::render_settings().settings().cullMode = static_cast<D3D11_CULL_MODE>(mode);
+		environment::render_device().SetCullMode(environment::render_settings().settings().cullMode);
+		SNUFF_LOG_INFO(std::string("[Settings] Cull mode: " + std::string(CullModeToString(environment::render_settings().settings().cullMode))).c_str());
+	}
+
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSSetFullscreen(JS_ARGS)
+	{
+		JSWrapper wrapper(args);
+		bool mode = wrapper.GetBool(0);
+		environment::render_settings().settings().fullscreen = mode;
+		environment::render_device().SetFullscreen(mode);
+		SNUFF_LOG_INFO(std::string("[Settings] Fullscreen: " + std::to_string(mode)).c_str());
+	}
+
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSSetResolution(JS_ARGS)
+	{
+		JSWrapper wrapper(args);
+		unsigned int w, h;
+
+		w = wrapper.GetNumber<unsigned int>(0);
+		h = wrapper.GetNumber<unsigned int>(1);
+
+		environment::render_settings().settings().resolution.w = w;
+		environment::render_settings().settings().resolution.h = h;
+
+		SetWindowPos(environment::game().window()->handle(), 0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		environment::render_device().ResizeBuffers();
+
+		SNUFF_LOG_INFO(std::string("[Settings] Resized the window to: " + std::to_string(w) + "x" + std::to_string(h)).c_str());
+	}
+
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSSetVsync(JS_ARGS)
+	{
+		JSWrapper wrapper(args);
+		int mode = static_cast<int>(wrapper.GetBool(0));
+		environment::render_settings().settings().vsync = mode;
+
+		SNUFF_LOG_INFO(std::string("[Settings] VSync: " + std::to_string(mode)).c_str());
+	}
+
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::RegisterJS(JS_TEMPLATE)
+	{
+		JSFunctionRegister funcs[] = {
+			JSFunctionRegister("setCullMode", JSSetCullmode),
+			JSFunctionRegister("setFullscreen", JSSetFullscreen),
+			JSFunctionRegister("setResolution", JSSetResolution),
+			JSFunctionRegister("setVsync", JSSetVsync)
+		};
+
+		obj->Set(JS_ISOLATE, "CullNone", Number::New(JS_ISOLATE, 1));
+		obj->Set(JS_ISOLATE, "CullFront", Number::New(JS_ISOLATE, 2));
+		obj->Set(JS_ISOLATE, "CullBack", Number::New(JS_ISOLATE, 3));
+
+		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
+	}
+}

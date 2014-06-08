@@ -72,6 +72,8 @@ namespace snuffbox
 		void OnKeyUp(LPARAM lParam, WPARAM wParam);
 		/// When the mouse wheel is scrolled
 		void OnWheel(LPARAM lParam, WPARAM wParam);
+		/// When the window is resized
+		void OnResize(LPARAM lParam, WPARAM wParam);
 		/// Processes all messages
 		void ProcessMessages();
 		/// Returns the parameters

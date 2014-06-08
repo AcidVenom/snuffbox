@@ -11,6 +11,7 @@ namespace snuffbox
 	class D3D11DisplayDevice;
 	class FileWatcher;
 	class ContentManager;
+	class D3D11Settings;
 
 	namespace environment
 	{
@@ -41,6 +42,9 @@ namespace snuffbox
 		/// Returns the content manager
 		ContentManager& content_manager();
 
+		/// Returns the render settings
+		D3D11Settings& render_settings();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -67,5 +71,8 @@ namespace snuffbox
 
 		/// Returns if there's a content manager or not
 		bool has_content_manager();
+
+		/// Returns if there are render settings or not
+		bool has_render_settings();
 	}
 }

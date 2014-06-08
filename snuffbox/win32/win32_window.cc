@@ -5,6 +5,7 @@
 #include "../../snuffbox/memory/allocated_memory.h"
 #include "../../snuffbox/input/mouse.h"
 #include "../../snuffbox/input/keyboard.h"
+#include "../../snuffbox/d3d11/d3d11_settings.h"
 #include <string>
 
 #define WIN32_GET_MOUSE_POS POINT p;if (GetCursorPos(&p)){ScreenToClient(hWnd, &p);}
@@ -25,7 +26,6 @@ namespace snuffbox
 		params().w = w;
 		params().h = h;
 		params().name = name;
-
 
 		std::string paramX = x == SNUFF_WINDOW_CENTERED ? "centered" : std::to_string(params().x);
 		std::string paramY = y == SNUFF_WINDOW_CENTERED ? "centered" : std::to_string(params().y);
@@ -74,7 +74,7 @@ namespace snuffbox
 		clientSize.right = params().w;
 		clientSize.bottom = params().h;
 
-    int style = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_MINIMIZEBOX;
+    int style = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 
 		AdjustWindowRect(&clientSize, style, FALSE);
 		unsigned int actualWidth = clientSize.right - clientSize.left;
@@ -209,6 +209,16 @@ namespace snuffbox
 		environment::game().NotifyEvent(GameEvents::kQuit);
 	}
 
+	void Win32Window::OnResize(LPARAM lParam, WPARAM wParam)
+	{
+		if (!environment::game().started())
+			return;
+
+		params().w = environment::render_settings().settings().resolution.w;
+		params().h = environment::render_settings().settings().resolution.h;
+		environment::render_device().ResizeBuffers();
+	}
+
 	//---------------------------------------------------------------------------
 	Win32Window::~Win32Window()
 	{
@@ -256,6 +266,10 @@ namespace snuffbox
 
 		case WM_KILLFOCUS:
 			window->OnKillFocus();
+			break;
+
+		case WM_SIZE:
+			window->OnResize(lParam, wParam);
 			break;
 
 		case WM_CLOSE:

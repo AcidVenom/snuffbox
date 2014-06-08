@@ -1,10 +1,12 @@
 require("world");
+require("player");
 
 var LevelState = LevelState || {
 	name: "level",
 	_camera: undefined,
 	_background: undefined,
 	_world: undefined,
+	_player: undefined
 }
 
 LevelState.loadContent = function()
@@ -15,12 +17,13 @@ LevelState.loadContent = function()
 	ContentManager.load("texture","textures/level/mountains.png");
 	ContentManager.load("texture","textures/level/treeline1.png");
 	ContentManager.load("texture","textures/level/treeline2.png");
+	ContentManager.load("texture","textures/characters/character_walk.png");
 }
 
 LevelState.initialise = function()
 {
-	this._camera = Camera.new("orthographic"),
-	this._background = Quad.new(),
+	this._camera = Camera.new("orthographic");
+	this._background = new GameObject("textures/background.png");
 
 	this._camera.setTranslation(0,0,1000);
 	this._camera.setFov(Math.PI/2);
@@ -28,15 +31,15 @@ LevelState.initialise = function()
 	this._background.setTranslation(0,0,0);
 	this._background.setOffset(0.5,0.5,0.5);
 	this._background.setScale(4,1.6,1.6);
-	this._background.setRotation(-Math.PI/2,0,0);
-	this._background.setTexture("textures/background.png");
-	this._background.spawn();
+
 	this._world = new World();
+	this._player = new Player();
 }
 
 LevelState.update = function(dt)
 {
 	this._world.update(dt);
+	this._player.update(dt);
 }
 
 LevelState.draw = function(dt)
@@ -46,7 +49,16 @@ LevelState.draw = function(dt)
 
 LevelState.destroy = function()
 {
+	ContentManager.unload("texture","textures/level/world.png");
+	ContentManager.unload("texture","textures/level/ground.png");
+	ContentManager.unload("texture","textures/level/clouds.png");
+	ContentManager.unload("texture","textures/level/mountains.png");
+	ContentManager.unload("texture","textures/level/treeline1.png");
+	ContentManager.unload("texture","textures/level/treeline2.png");
+	ContentManager.unload("texture","textures/characters/character_walk.png");
+
 	this._world = null;
 	this._camera = null;
 	this._background = null;
+	this._player = null;
 }

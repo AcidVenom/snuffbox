@@ -1,4 +1,4 @@
-cbuffer VS_CONSTANT_BUFFER : register(b0)
+cbuffer ConstantBuffer : register(b0)
 {
 	float Time;
 	float4x4 World;
@@ -6,8 +6,12 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 	float4x4 Projection;
 	float4x4 WorldViewProjection;
   float Alpha;
-  float dummy;
-  float4 test4;
+}
+
+cbuffer Uniforms : register(b1)
+{
+  float2 Frame;
+  float2 FrameOffset;
 }
 
 struct VOut
@@ -33,9 +37,10 @@ SamplerState SampleType;
 
 float4 PS(VOut input) : SV_TARGET
 {	
-  float4 textureColor = Texture.Sample(SampleType, input.texcoord);
+  float2 TexCoord = float2((input.texcoord.x+FrameOffset.x)*Frame.x,(input.texcoord.y+FrameOffset.y)*Frame.y);
+  float4 textureColor = Texture.Sample(SampleType,TexCoord);
   float4 color = (textureColor * input.color);
   color.a *= Alpha;
   
-	return test4;
+	return color;
 }

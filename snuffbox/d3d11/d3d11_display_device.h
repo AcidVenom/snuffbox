@@ -66,15 +66,11 @@ namespace snuffbox
 	struct VS_CONSTANT_BUFFER
 	{
 		float Time; // 4 bytes
-		XMMATRIX Projection; // 4*4*4 = 16*4 = 64 bytes
-		XMMATRIX View; // 4*4*4 = 16*4 = 64 bytes
-		XMMATRIX World; // 4*4*4 = 16*4 = 64 bytes
-		XMMATRIX WorldViewProjection; /// 4*4*4 = 16*4 = 64 bytes
-		float Alpha; // 4 bytes 
-		// 4 + 64 + 64 + 64 + 64 + 4 = 264 bytes
-		// 4096 - 264 = 3832
-		// 3832/4 = 958
-		float uniforms[958]; // 3832 remaining bytes
+		XMMATRIX Projection;
+		XMMATRIX View;
+		XMMATRIX World;
+		XMMATRIX WorldViewProjection;
+		float Alpha;
 	};
 
 	/**
@@ -184,6 +180,15 @@ namespace snuffbox
 		/// Draws a given render element
 		void DrawRenderElement(RenderElement* it);
 
+		/// Changes the buffer size
+		void ResizeBuffers();
+
+		/// Sets the cull mode
+		void SetCullMode(D3D11_CULL_MODE mode);
+
+		/// Sets the fullscreen mode
+		void SetFullscreen(bool mode);
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device
@@ -193,7 +198,8 @@ namespace snuffbox
 		DisplayAdapter*								primaryAdapter_;		///< The primary display adapter
 		D3DTexture2D*									backBuffer_;				///< The backbuffer of this device
 		D3DRenderTargetView*					renderTargetView_;	///< The render target view of this device
-		ID3D11Buffer*									vsConstantBuffer_;	///< The vertex buffer
+		ID3D11Buffer*									vsConstantBuffer_;	///< The constant buffer
+		ID3D11Buffer*									uniformBuffer_;			///< The constant buffer for uniforms
 		ID3D11InputLayout*						inputLayout_;				///< The vertex input layout
 		ID3D10Blob*										vsBuffer_;					///< Vertex shader buffer
 		ID3D10Blob*										psBuffer_;					///< Pixel shader buffer

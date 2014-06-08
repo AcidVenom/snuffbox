@@ -23,6 +23,9 @@ namespace snuffbox
 		/// Retrieves a function from a given argument index
 		const Handle<Value> GetFunction(int arg);
 
+		/// Retrieves a boolean value from a given argument index
+		bool GetBool(int arg);
+
 		/// Retrieves a number value from a given argument index
 		template<typename T>
 		T GetNumber(int arg);
@@ -66,6 +69,15 @@ namespace snuffbox
 			SNUFF_ASSERT(std::string("Tried to insert a non-function as argument in function " + std::string(*String::Utf8Value(functionName))).c_str());
 		}
 		return Handle<Function>::Cast(func);
+	}
+
+	//------------------------------------------------------------------------------
+	inline bool JSWrapper::GetBool(int arg)
+	{
+		JS_CREATE_SCOPE;
+		const Handle<Value>& boolean = args_[arg];
+
+		return boolean->BooleanValue();
 	}
 
 	//------------------------------------------------------------------------------

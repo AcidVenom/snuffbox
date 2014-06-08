@@ -79,6 +79,9 @@
     <ClCompile Include="d3d11\d3d11_shader.cc">
       <Filter>d3d11</Filter>
     </ClCompile>
+    <ClCompile Include="d3d11\d3d11_settings.cc">
+      <Filter>d3d11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -148,6 +151,9 @@
       <Filter>d3d11</Filter>
     </ClInclude>
     <ClInclude Include="content\content_manager.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\d3d11_settings.h">
       <Filter>d3d11</Filter>
     </ClInclude>
   </ItemGroup>

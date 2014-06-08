@@ -1,8 +1,9 @@
 #include "../snuffbox/game.h"
 #include "../snuffbox/environment.h"
 #include "../snuffbox/js/js_wrapper.h"
+#include "../snuffbox/d3d11/d3d11_settings.h"
 
-#define SNUFF_VERSION_MAJOR 0
+#define SNUFF_VERSION_MAJOR 1
 #define SNUFF_VERSION_MINOR 1
 
 #ifdef _DEBUG
@@ -237,10 +238,18 @@ void Game::RegisterJS(JS_TEMPLATE)
 
 	JSFunctionRegister funcs[] = {
     JSFunctionRegister("render", JSRender),
-    JSFunctionRegister("cleanUp", JSCleanUp)
+    JSFunctionRegister("cleanUp", JSCleanUp),
+		JSFunctionRegister("setName", JSSetName)
 	};
 
 	JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
+}
+
+//------------------------------------------------------------------------------------------------------
+void Game::JSSetName(JS_ARGS)
+{
+	JSWrapper wrapper(args);
+	SetWindowTextA(environment::game().window()->handle(), std::string(environment::game().window()->params().name + " " + wrapper.GetString(0)).c_str());
 }
 
 void Game::CreateCallbacks()
@@ -292,6 +301,7 @@ int SNUFF_MAIN
 	JSStateWrapper js_state_wrapper;
 	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
 	SharedPtr<ContentManager> content_manager = environment::memory().ConstructShared<ContentManager>();
+	SharedPtr<D3D11Settings> render_settings = environment::memory().ConstructShared<D3D11Settings>();
 
 	std::string windowName(
 		"Snuffbox_" + std::string(SNUFF_DEBUG_MODE) + "_V_" +

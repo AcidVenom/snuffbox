@@ -20,10 +20,10 @@ MenuState.initialise = function()
 	Log.info("Initialising menu");
 
 	this._camera = Camera.new("orthographic"),
-	this._background = Quad.new(),
-	this._logo = Quad.new(),
-	this._logoBackground = Quad.new(),
-	this._splitter = Quad.new(),
+	this._background = new GameObject("textures/background.png");
+	this._logo = new GameObject("textures/menu/logo.png");
+	this._logoBackground = new GameObject("textures/menu/logo_background.png");
+	this._splitter = new GameObject("textures/menu/splitter.png");
 
 	this._camera.setTranslation(0,0,500);
 	this._camera.setFov(Math.PI/2);
@@ -31,33 +31,21 @@ MenuState.initialise = function()
 	this._background.setTranslation(-1,0,0);
 	this._background.setOffset(0.5,0,0.5);
 	this._background.setScale(4,1.6,1.6);
-	this._background.setRotation(-Math.PI/2,0,0);
-	this._background.setTexture("textures/background.png");
-	this._background.spawn();
 
 	this._logo.setTranslation(0,0,2);
 	this._logo.setOffset(0.5,0,0.5);
 	this._logo.setScale(0,0,0);
-	this._logo.setTexture("textures/menu/logo.png");
-	this._logo.setRotation(-Math.PI/2,0,0);
-	this._logo.spawn();
 	this._logo.setAlpha(0);
 
 	this._logoBackground.setTranslation(0,-0.2,1);
 	this._logoBackground.setOffset(0.5,0,0.5);
 	this._logoBackground.setScale(1,1,1);
-	this._logoBackground.setTexture("textures/menu/logo_background.png");
-	this._logoBackground.setRotation(-Math.PI/2,0,0);
-	this._logoBackground.spawn();
 	this._logoBackground.setAlpha(0);
 
 	this._splitter.setTranslation(0,0,3);
 	this._splitter.setScale(0,0,0);
 	this._splitter.setAlpha(0);
 	this._splitter.setOffset(0.5,0,0.5);
-	this._splitter.setRotation(-Math.PI/2,0,0);
-	this._splitter.spawn();
-	this._splitter.setTexture("textures/menu/splitter.png");
 }
 
 MenuState.update = function(dt)

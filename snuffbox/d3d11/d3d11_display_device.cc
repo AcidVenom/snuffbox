@@ -6,15 +6,10 @@
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
 #include "../../snuffbox/d3d11/d3d11_shader.h"
+#include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/memory/allocated_memory.h"
 #include "../../snuffbox/content/content_manager.h"
 #include <comdef.h>
-
-#ifdef _DEBUG
-#define SNUFF_VSYNC 0
-#else
-#define SNUFF_VSYNC 1
-#endif
 
 namespace snuffbox
 {
@@ -87,7 +82,7 @@ namespace snuffbox
 		swapDesc_.OutputWindow = environment::game().window()->handle();
 		swapDesc_.SampleDesc.Count = 1;
 		swapDesc_.SampleDesc.Quality = 0;
-		swapDesc_.Windowed = TRUE;
+		swapDesc_.Windowed = !environment::render_settings().settings().fullscreen;
 		swapDesc_.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 		swapDesc_.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapDesc_.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
@@ -227,6 +222,28 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::SetCullMode(D3D11_CULL_MODE mode)
+	{
+		context_->RSSetState(0);
+		HRESULT result = S_OK;
+
+		D3D11_RASTERIZER_DESC rasterizer;
+		ZeroMemory(&rasterizer, sizeof(D3D11_RASTERIZER_DESC));
+		rasterizer.CullMode = mode;
+		rasterizer.FillMode = D3D11_FILL_SOLID;
+
+		SNUFF_SAFE_RELEASE(rasterizerState_);
+		result = device_->CreateRasterizerState(&rasterizer, &rasterizerState_);
+		context_->RSSetState(rasterizerState_);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::SetFullscreen(bool mode)
+	{
+		swapChain_->SetFullscreenState(mode, NULL);
+	}
+
+	//---------------------------------------------------------------------------------
 	Shaders D3D11DisplayDevice::LoadShader(const char* path)
 	{
 		VertexShader* vs;
@@ -280,6 +297,7 @@ namespace snuffbox
 	{
 		HRESULT result = S_OK;
 		VS_CONSTANT_BUFFER vsConstantBuffer;
+		float uniforms[4096];
 
 		D3D11_BUFFER_DESC constantBufferDesc;
 		constantBufferDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER)* 4;
@@ -297,8 +315,11 @@ namespace snuffbox
 		result = device_->CreateBuffer(&constantBufferDesc, &initData, &vsConstantBuffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
-		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+		constantBufferDesc.ByteWidth = sizeof(float)* 4096;
+		initData.pSysMem = &uniforms;
+
+		result = device_->CreateBuffer(&constantBufferDesc, &initData, &uniformBuffer_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 	}
 
 	void D3D11DisplayDevice::CreateViewport()
@@ -541,6 +562,10 @@ namespace snuffbox
 
 		D3D11_MAPPED_SUBRESOURCE cbData;
 		VS_CONSTANT_BUFFER* mappedData;
+		float* uniforms;
+
+		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 
 		context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
 
@@ -551,13 +576,22 @@ namespace snuffbox
 		mappedData->Projection = projectionMatrix_;
 		mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
 		mappedData->Alpha = it->alpha();
+
+		context_->Unmap(vsConstantBuffer_, 0);
+
+		context_->VSSetConstantBuffers(1, 1, &uniformBuffer_);
+		context_->PSSetConstantBuffers(1, 1, &uniformBuffer_);
+
+		context_->Map(uniformBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+
+		uniforms = static_cast<float*>(cbData.pData);
 		auto vec = it->uniforms();
 		for (unsigned int i = 0; i < vec.size(); ++i)
 		{
-			mappedData->uniforms[i] = vec[i];
+			uniforms[i] = vec[i];
 		}
-		it->ClearUniforms();
-		context_->Unmap(vsConstantBuffer_, 0);
+
+		context_->Unmap(uniformBuffer_, 0);
 
 		if (it->texture())
 		{
@@ -638,7 +672,39 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::EndDraw()
 	{
-		swapChain_->Present(SNUFF_VSYNC, 0);
+		swapChain_->Present(environment::render_settings().settings().vsync, 0);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::ResizeBuffers()
+	{
+		HRESULT result = S_OK;
+
+		context_->OMSetRenderTargets(0, 0, 0);
+		SNUFF_SAFE_RELEASE(depthStencilBuffer_);
+		SNUFF_SAFE_RELEASE(renderTargetView_);
+		SNUFF_SAFE_RELEASE(depthStencilView_);
+		SNUFF_SAFE_RELEASE(depthState_);
+		SNUFF_SAFE_RELEASE(samplerState_);
+		SNUFF_SAFE_RELEASE(blendState_);
+		SNUFF_SAFE_RELEASE(rasterizerState_);
+		SNUFF_SAFE_RELEASE(backBuffer_);
+		SNUFF_SAFE_RELEASE(inputLayout_);
+
+		unsigned int w = environment::game().window()->params().w;
+		unsigned int h = environment::game().window()->params().h;
+
+		result = swapChain_->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		CreateBackBuffer();
+		CreateViewport();
+		CreateLayout();
+		CreateDepthStencil();
+		CreateSamplerState();
+		CreateBlendState();
+
+		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -659,6 +725,7 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(vsBuffer_);
 		SNUFF_SAFE_RELEASE(psBuffer_);
 		SNUFF_SAFE_RELEASE(vsConstantBuffer_);
+		SNUFF_SAFE_RELEASE(uniformBuffer_);
 		SNUFF_SAFE_RELEASE(rasterizerState_);
 		SNUFF_SAFE_RELEASE(depthStencilBuffer_);
 		SNUFF_SAFE_RELEASE(depthStencilView_);
