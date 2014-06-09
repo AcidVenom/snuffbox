@@ -5,7 +5,7 @@ namespace snuffbox
 	class Game;
   class JSStateWrapper;
 	struct AllocatedMemory;
-	class Connection;
+	class Console;
 	class Mouse;
 	class Keyboard;
 	class D3D11DisplayDevice;
@@ -25,7 +25,7 @@ namespace snuffbox
     JSStateWrapper& js_state_wrapper();
 
 		/// Returns the remote console
-		Connection& console();
+		Console& console();
 
 		/// Returns the mouse
 		Mouse& mouse();

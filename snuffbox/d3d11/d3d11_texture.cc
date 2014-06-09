@@ -1,6 +1,7 @@
 #include "../../snuffbox/d3d11/d3d11_texture.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
+#include "../../snuffbox/win32/win32_file_watch.h"
 
 namespace snuffbox
 {

@@ -9,6 +9,7 @@
 #include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/memory/allocated_memory.h"
 #include "../../snuffbox/content/content_manager.h"
+#include "../../snuffbox/win32/win32_window.h"
 #include <comdef.h>
 
 namespace snuffbox
@@ -161,11 +162,11 @@ namespace snuffbox
 
 		_bstr_t name(adapterName);
 
-		std::string result = "";
+		std::string result = "Picked a video card to use for the display device";
 
-		result += "\n\nVideo card name: " + name + "\n";
-		result += "Virtual memory: " + std::to_string(vram) + "\n";
-		result += "Shared system memory: " + std::to_string(sharedmemory) + "\n";
+		result += "\n\tVideo card name: " + name + "\n";
+		result += "\tVirtual memory: " + std::to_string(vram) + "\n";
+		result += "\tShared system memory: " + std::to_string(sharedmemory);
 
 		SNUFF_LOG_INFO(result.c_str());
 

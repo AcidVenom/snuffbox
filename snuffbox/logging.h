@@ -1,20 +1,13 @@
 #pragma once
+#include <Windows.h>
 
 #include <string>
 #include "../snuffbox/environment.h"
-#include "../snuffbox/networking/connection.h"
+#include "../snuffbox/console/console.h"
 
 namespace snuffbox
 {
-	enum LogSeverity
-	{
-		kInfo,
-		kDebug,
-		kSuccess,
-		kError,
-		kFatal,
-    kWarning
-	};
+	static std::string lastLine = "";
 
 	inline const char* const SeverityToString(const LogSeverity& severity){
 		switch (severity)
@@ -45,8 +38,13 @@ namespace snuffbox
 		OutputDebugStringA(msg); 
 		OutputDebugStringA("\n");
 
-		if (environment::has_console())
-			environment::console().Send(severity, msg);
+		if (strcmp(lastLine.c_str(), msg) != 0)
+		{
+			environment::console().Receive(severity, msg);
+			lastLine = std::string(msg);
+		}
+
+		qApp->processEvents();
 	}
 }
 

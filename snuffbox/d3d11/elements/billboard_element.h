@@ -4,6 +4,8 @@
 
 namespace snuffbox
 {
+	class Camera;
+
 	/**
 	* @class snuffbox::Billboard
 	* @brief A simple billboard that always looks towards the camera

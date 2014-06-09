@@ -1,33 +1,25 @@
 #pragma once
-#define _WINSOCKAPI_
-#define NOMINMAX
+
 #include <thread>
 #include <chrono>
 
 using namespace std::chrono;
 
+#include <Windows.h>
 #include "../snuffbox/memory/shared_ptr.h"
-
-#include "../snuffbox/win32/win32_window.h"
-#include "../snuffbox/win32/win32_file_watch.h"
-
 #include "../snuffbox/js/js_state_wrapper.h"
 #include "../snuffbox/js/js_callback.h"
-
-#include "../snuffbox/networking/connection.h"
-
-#include "../snuffbox/input/mouse.h"
-#include "../snuffbox/input/keyboard.h"
-
-#include "../snuffbox/d3d11/d3d11_display_device.h"
-#include "../snuffbox/d3d11/d3d11_camera.h"
-
-#include "../snuffbox/content/content_manager.h"
+#include "../snuffbox/js/js_wrapper.h"
 
 #define SNUFF_MAIN CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 
 namespace snuffbox
 {
+	class Win32Window;
+	class Mouse;
+	class Keyboard;
+	class D3D11DisplayDevice;
+
 	/**
 	* @enum snuffbox::GameEvents
 	* @brief Contains all enumerations for the events of the game
@@ -46,11 +38,8 @@ namespace snuffbox
 	class Game : public JSObject
 	{
 	public:
-		/// Default constructor
-		Game();
-
 		/// Construct with a window
-		Game(Win32Window* window);
+		Game(Win32Window* window, QApplication& app);
 
 		/// Default destructor
 		~Game();
@@ -100,6 +89,9 @@ namespace snuffbox
 		/// Returns the path the game is running in
 		std::string path(){ return path_; }
 
+		/// Returns the qt application
+		QApplication& app(){ return qtApp_; }
+
 	private:
 		SharedPtr<Win32Window> window_; ///< The Win32 window hooked to the game
 		SharedPtr<Mouse> mouse_; ///< The mouse object
@@ -116,11 +108,13 @@ namespace snuffbox
 		std::string path_; ///< The path the game is running in
 		int gameTime_; ///< The game time
 		high_resolution_clock::time_point lastTime_;	///< The last clock time for delta timing
+		QApplication& qtApp_; ///< The qt application
 	public:
 		JS_NAME(Game);
 		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions
 		static void JSRender(JS_ARGS); ///< Renders the scene
     static void JSCleanUp(JS_ARGS); ///< Forces a garabage collection
 		static void JSSetName(JS_ARGS); ///< Sets the window name
+		static void JSShowConsole(JS_ARGS); ///< Shows the console
 	};
 }

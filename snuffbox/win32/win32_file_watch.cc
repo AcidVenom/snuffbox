@@ -4,6 +4,7 @@
 #include "../../snuffbox/game.h"
 #include "../../snuffbox/d3d11/d3d11_display_device.h"
 #include "../../snuffbox/js/js_state_wrapper.h"
+#include "../../snuffbox/content/content_manager.h"
 
 namespace snuffbox
 {

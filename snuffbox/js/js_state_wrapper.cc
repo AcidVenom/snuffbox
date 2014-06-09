@@ -75,6 +75,14 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------
+	void JSStateWrapper::JSLogWatch(JS_ARGS)
+	{
+		JSWrapper wrapper(args);
+
+		environment::console().Watch(wrapper.GetString(0), args[1]);
+	}
+
+	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSRequire(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
@@ -108,6 +116,7 @@ namespace snuffbox
 			JSFunctionRegister("success", JSLogSuccess),
 			JSFunctionRegister("error", JSLogError),
 			JSFunctionRegister("fatal", JSLogFatal),
+			JSFunctionRegister("watch", JSLogWatch)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, logFunctions, false);

@@ -162,6 +162,9 @@ namespace snuffbox
     /// JavaScript log success
 		static void JSLogSuccess(JS_ARGS);
 
+		/// JavaScript variable watch
+		static void JSLogWatch(JS_ARGS);
+
 		/// JavaScript require
 		static void JSRequire(JS_ARGS);
 

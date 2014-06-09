@@ -31,5 +31,7 @@ namespace snuffbox
 	{
 		SNUFF_XASSERT(allocations == 0 && allocatedMemory == 0, "Detected a memory leak on the heap!");
 		SNUFF_LOG_INFO("No memory leaks detected");
+		
+		Sleep(2000);
 	}
 }

@@ -2,6 +2,7 @@
 #include "../../snuffbox/js/js_wrapper.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
+#include "../../snuffbox/win32/win32_window.h"
 
 namespace snuffbox
 {

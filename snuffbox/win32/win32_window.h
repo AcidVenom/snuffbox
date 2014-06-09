@@ -1,7 +1,5 @@
 #pragma once
 
-#define _WINSOCKAPI_
-#define NOMINMAX
 #include <Windows.h>
 #include "../../snuffbox/input/mouse.h"
 

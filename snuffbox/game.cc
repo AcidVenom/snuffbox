@@ -1,7 +1,21 @@
 #include "../snuffbox/game.h"
-#include "../snuffbox/environment.h"
-#include "../snuffbox/js/js_wrapper.h"
+
+#include "../snuffbox/win32/win32_window.h"
+#include "../snuffbox/win32/win32_file_watch.h"
+
+#include "../snuffbox/input/mouse.h"
+#include "../snuffbox/input/keyboard.h"
+
+#include "../snuffbox/d3d11/d3d11_display_device.h"
+#include "../snuffbox/d3d11/d3d11_camera.h"
 #include "../snuffbox/d3d11/d3d11_settings.h"
+
+#include "../snuffbox/content/content_manager.h"
+
+#include "../snuffbox/environment.h"
+#include "../snuffbox/console/console.h"
+
+#include <QtCore>
 
 #define SNUFF_VERSION_MAJOR 1
 #define SNUFF_VERSION_MINOR 1
@@ -36,14 +50,15 @@ namespace snuffbox
 using namespace snuffbox;
 
 //------------------------------------------------------------------------------------------------------
-Game::Game(Win32Window* window) :
+Game::Game(Win32Window* window, QApplication& app) :
 started_(false),
 consoleEnabled_(false),
 mouse_(environment::memory().ConstructShared<Mouse>()),
 keyboard_(environment::memory().ConstructShared<Keyboard>()),
 device_(environment::memory().ConstructShared<D3D11DisplayDevice>()),
 path_(""),
-gameTime_(0)
+gameTime_(0),
+qtApp_(app)
 {
 	environment::globalInstance = this;
 	ParseCommandLine();
@@ -239,10 +254,20 @@ void Game::RegisterJS(JS_TEMPLATE)
 	JSFunctionRegister funcs[] = {
     JSFunctionRegister("render", JSRender),
     JSFunctionRegister("cleanUp", JSCleanUp),
-		JSFunctionRegister("setName", JSSetName)
+		JSFunctionRegister("setName", JSSetName),
+		JSFunctionRegister("showConsole", JSShowConsole)
 	};
 
 	JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
+}
+
+//------------------------------------------------------------------------------------------------------
+void Game::JSShowConsole(JS_ARGS)
+{
+	if (environment::game().consoleEnabled())
+	{
+		environment::console().Show();
+	}
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -264,7 +289,7 @@ void Game::CreateCallbacks()
 	JS_SETUP_CALLBACKS;
 
 	SNUFF_XASSERT(game->IsObject(), "Could not find 'Game' object!");
-	Local<Object> obj = game->ToObject();
+	Handle<Object> obj = game->ToObject();
 
 	JS_OBJECT_CALLBACK("Initialise", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Initialise()' function! Please add it to your main.js");
@@ -296,12 +321,18 @@ void Game::Reload()
 //------------------------------------------------------------------------------------------------------
 int SNUFF_MAIN
 {
-	Connection connection;
+	QApplication app(__argc, __argv);
+	QWidget console_window;
+	ConsoleWidget console_widget(console_window);
+	Console console(console_window, console_widget);
+	
 	AllocatedMemory memory;
+	
 	JSStateWrapper js_state_wrapper;
 	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
 	SharedPtr<ContentManager> content_manager = environment::memory().ConstructShared<ContentManager>();
 	SharedPtr<D3D11Settings> render_settings = environment::memory().ConstructShared<D3D11Settings>();
+	
 
 	std::string windowName(
 		"Snuffbox_" + std::string(SNUFF_DEBUG_MODE) + "_V_" +
@@ -309,12 +340,13 @@ int SNUFF_MAIN
 		std::to_string(SNUFF_VERSION_MINOR)
 		);
 	SharedPtr<Game> game = environment::memory().ConstructShared<Game>(
-		environment::memory().ConstructShared<Win32Window>(windowName.c_str(), 1280, 720));
-
+		environment::memory().ConstructShared<Win32Window>(windowName.c_str(), 1280, 720),
+		app);
+	
 	if (game->consoleEnabled())
 	{
-		connection.Initialise();
-		Sleep(1000);
+		console.Initialise(app);
+		console_window.show();
 	}
 	environment::render_device().Initialise();
   js_state_wrapper.Initialise();
@@ -323,6 +355,10 @@ int SNUFF_MAIN
 
 	while (game->started())
 	{
+		if (game->consoleEnabled())
+		{
+			app.processEvents();
+		}
 		game->window()->ProcessMessages();
 		game->Update();
 		game->Draw();

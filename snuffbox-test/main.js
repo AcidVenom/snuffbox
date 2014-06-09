@@ -19,6 +19,11 @@ Game.Update = function(dt)
 {	
 	Game.timer += dt;
 	StateManager.updateState(dt);
+
+	if(Keyboard.isReleased("F9"))
+	{
+		Game.showConsole();
+	}
 }
 
 Game.Draw = function(dt)

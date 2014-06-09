@@ -6,6 +6,7 @@
 #include "../../../snuffbox/js/js_wrapper.h"
 #include "../../../snuffbox/game.h"
 #include "../../../snuffbox/d3d11/d3d11_texture.h"
+#include "../../../snuffbox/content/content_manager.h"
 
 namespace snuffbox
 {

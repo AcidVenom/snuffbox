@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#define _WINSOCKAPI_
 #include <Windows.h>
 
 namespace snuffbox

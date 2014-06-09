@@ -10,9 +10,6 @@
     <Filter Include="js">
       <UniqueIdentifier>{ee2da02a-d3c7-4f41-b8d2-c580d0a32fc4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="networking">
-      <UniqueIdentifier>{c88568b5-fea8-403b-8d02-b561f0578cc6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="input">
       <UniqueIdentifier>{0401b396-4bd5-414c-ba79-dd2a9394e46c}</UniqueIdentifier>
     </Filter>
@@ -25,6 +22,9 @@
     <Filter Include="content">
       <UniqueIdentifier>{63f74a0c-47f6-49dd-bcea-c9e9fd110c33}</UniqueIdentifier>
     </Filter>
+    <Filter Include="console">
+      <UniqueIdentifier>{7e96930c-4e4c-46f5-a98a-8af2c5db5b55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -36,9 +36,6 @@
     </ClCompile>
     <ClCompile Include="js\js_state_wrapper.cc">
       <Filter>js</Filter>
-    </ClCompile>
-    <ClCompile Include="networking\connection.cc">
-      <Filter>networking</Filter>
     </ClCompile>
     <ClCompile Include="input\keyboard.cc">
       <Filter>input</Filter>
@@ -82,6 +79,15 @@
     <ClCompile Include="d3d11\d3d11_settings.cc">
       <Filter>d3d11</Filter>
     </ClCompile>
+    <ClCompile Include="console\console_widget.cc">
+      <Filter>console</Filter>
+    </ClCompile>
+    <ClCompile Include="console\moc_console_widget.cc">
+      <Filter>console</Filter>
+    </ClCompile>
+    <ClCompile Include="console\console.cc">
+      <Filter>console</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -104,9 +110,6 @@
     </ClInclude>
     <ClInclude Include="js\js_callback.h">
       <Filter>js</Filter>
-    </ClInclude>
-    <ClInclude Include="networking\connection.h">
-      <Filter>networking</Filter>
     </ClInclude>
     <ClInclude Include="input\mouse.h">
       <Filter>input</Filter>
@@ -155,6 +158,15 @@
     </ClInclude>
     <ClInclude Include="d3d11\d3d11_settings.h">
       <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="console\console_widget.h">
+      <Filter>console</Filter>
+    </ClInclude>
+    <ClInclude Include="console\console.h">
+      <Filter>console</Filter>
+    </ClInclude>
+    <ClInclude Include="console\console_ui.h">
+      <Filter>console</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

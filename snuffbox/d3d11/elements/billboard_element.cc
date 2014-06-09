@@ -1,4 +1,5 @@
 #include "../../../snuffbox/d3d11/elements/billboard_element.h"
+#include "../../../snuffbox/d3d11/d3d11_camera.h"
 
 namespace snuffbox
 {

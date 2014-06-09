@@ -1,5 +1,4 @@
 var StateManager = StateManager || {
-	_states: [],
 	_state: undefined,
 	_newState: undefined,
 	_loaded: false,

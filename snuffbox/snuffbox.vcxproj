@@ -74,6 +74,8 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <CustomBuildAfterTargets>Compile</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -106,19 +108,23 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\V8\include;$(DXSDK_DIR)\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE;C:\V8\include;$(DXSDK_DIR)\Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>Ws2_32.lib;WINMM.lib;C:/V8/build/Debug/lib/icui18n.lib;C:/V8/build/Debug/lib/icuuc.lib;C:/V8/build/Debug/lib/v8_snapshot.lib;C:/V8/build/Debug/lib/v8_nosnapshot.x64.lib;C:/V8/build/Debug/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgetsd.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Cored.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Guid.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmaind.lib;WINMM.lib;C:/V8/build/Debug/lib/icui18n.lib;C:/V8/build/Debug/lib/icuuc.lib;C:/V8/build/Debug/lib/v8_snapshot.lib;C:/V8/build/Debug/lib/v8_nosnapshot.x64.lib;C:/V8/build/Debug/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>
-      </Command>
+      <Command>moc -o console/moc_console_widget.cc console/console_widget.h
+uic -o console/console_ui.h console/console_ui.ui</Command>
+      <Message>Compiling Qt files</Message>
+      <Outputs>console/moc_console_widget.cc</Outputs>
+      <Inputs>$(QTDIR)\bin\moc.exe;</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,18 +155,22 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\V8\include;$(DXSDK_DIR)\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE;C:\V8\include;$(DXSDK_DIR)\Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Ws2_32.lib;WINMM.lib;C:/V8/build/Release/lib/icui18n.lib;C:/V8/build/Release/lib/icuuc.lib;C:/V8/build/Release/lib/v8_snapshot.lib;C:/V8/build/Release/lib/v8_nosnapshot.x64.lib;C:/V8/build/Release/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgets.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Core.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Gui.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmain.lib;WINMM.lib;C:/V8/build/Release/lib/icui18n.lib;C:/V8/build/Release/lib/icuuc.lib;C:/V8/build/Release/lib/v8_snapshot.lib;C:/V8/build/Release/lib/v8_nosnapshot.x64.lib;C:/V8/build/Release/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="console\console.cc" />
+    <ClCompile Include="console\console_widget.cc" />
+    <ClCompile Include="console\moc_console_widget.cc" />
     <ClCompile Include="content\content.cc" />
     <ClCompile Include="content\content_manager.cc" />
     <ClCompile Include="d3d11\d3d11_camera.cc" />
@@ -177,11 +187,13 @@
     <ClCompile Include="js\js_state_wrapper.cc" />
     <ClCompile Include="js\js_wrapper.cc" />
     <ClCompile Include="memory\allocated_memory.cc" />
-    <ClCompile Include="networking\connection.cc" />
     <ClCompile Include="win32\win32_file_watch.cc" />
     <ClCompile Include="win32\win32_window.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="console\console.h" />
+    <ClInclude Include="console\console_ui.h" />
+    <ClInclude Include="console\console_widget.h" />
     <ClInclude Include="content\content.h" />
     <ClInclude Include="content\content_manager.h" />
     <ClInclude Include="d3d11\d3d11_camera.h" />
@@ -205,7 +217,6 @@
     <ClInclude Include="logging.h" />
     <ClInclude Include="memory\allocated_memory.h" />
     <ClInclude Include="memory\shared_ptr.h" />
-    <ClInclude Include="networking\connection.h" />
     <ClInclude Include="win32\win32_file_watch.h" />
     <ClInclude Include="win32\win32_window.h" />
   </ItemGroup>
