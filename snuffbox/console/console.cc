@@ -24,7 +24,8 @@ namespace snuffbox
 	//----------------------------------------------------------------------
 	Console::Console(QWidget& window, ConsoleWidget& console_widget) :
 		window_(window),
-		console_widget_(console_widget)
+		console_widget_(console_widget),
+		is_loaded_(false)
 	{
 		environment::globalInstance = this;
 	}
@@ -58,6 +59,7 @@ namespace snuffbox
 		steamPalette.setColor(QPalette::HighlightedText, Qt::black);
 
 		app.setPalette(steamPalette);
+		is_loaded_ = true;
 	}
 
 	//----------------------------------------------------------------------

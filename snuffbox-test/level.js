@@ -40,6 +40,8 @@ LevelState.update = function(dt)
 {
 	this._world.update(dt);
 	this._player.update(dt);
+	Log.watch("Player Angle",this._player.angle);
+	Log.watch("Position",this._player.position);
 }
 
 LevelState.draw = function(dt)

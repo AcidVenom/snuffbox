@@ -32,8 +32,11 @@ namespace snuffbox
 		/// Shows the console when hidden
 		void Show();
 
+		bool isLoaded(){ return is_loaded_; }
+
 	private:
 		QWidget& window_; ///< The Qt window
 		ConsoleWidget& console_widget_; ///< The console widget
+		bool is_loaded_; ///< Is the console loaded?
 	};
 }

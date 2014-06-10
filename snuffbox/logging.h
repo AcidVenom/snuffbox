@@ -13,19 +13,19 @@ namespace snuffbox
 		switch (severity)
 		{
 		case LogSeverity::kInfo:
-			return "INFO";
+			return "Info";
 		case LogSeverity::kDebug:
-			return "DEBUG";
+			return "Debug";
 		case LogSeverity::kSuccess:
-			return "SUCCESS";
+			return "Success";
 		case LogSeverity::kError:
-			return "ERROR";
+			return "Error";
 		case LogSeverity::kFatal:
-			return "FATAL";
+			return "Fatal";
     case LogSeverity::kWarning:
-      return "WARNING";
+      return "Warning";
 		default:
-			return "<UNKNOWN>";
+			return "Unknown";
 		}
 	}
 
@@ -54,6 +54,6 @@ namespace snuffbox
 #define SNUFF_LOG_SUCCESS(msg) snuffbox::log(snuffbox::LogSeverity::kSuccess,msg)
 #define SNUFF_LOG_ERROR(msg) snuffbox::log(snuffbox::LogSeverity::kError,msg)
 #define SNUFF_LOG_FATAL(msg) snuffbox::log(snuffbox::LogSeverity::kFatal,msg)
-#define SNUFF_XASSERT(expr,msg) if (!(expr)){ std::string message = ##msg; std::string result = "\n\nSnuffbox assertion!\n----------------------\n" + message + "\n"; SNUFF_LOG_FATAL(result.c_str()); do{__debugbreak();}while(true);}
-#define SNUFF_ASSERT(msg)	std::string message = ##msg; std::string result = "\n\nSnuffbox assertion!\n----------------------\n" + message + "\n"; SNUFF_LOG_FATAL(result.c_str()); do{__debugbreak();}while(true)
+#define SNUFF_XASSERT(expr,msg) if (!(expr)){ std::string message = ##msg; std::string result = "\n\nSnuffbox assertion!\n----------------------\n" + message + "\n"; SNUFF_LOG_FATAL(result.c_str()); if(environment::console().isLoaded()){ qApp->exec(); } do{__debugbreak();}while(true);}
+#define SNUFF_ASSERT(msg)	std::string message = ##msg; std::string result = "\n\nSnuffbox assertion!\n----------------------\n" + message + "\n"; SNUFF_LOG_FATAL(result.c_str()); if(environment::console().isLoaded()){ qApp->exec(); } do{__debugbreak();}while(true)
 #define SNUFF_ASSERT_NOTNULL(ptr) SNUFF_XASSERT(ptr != nullptr, "Attempt to get a nullptr!")

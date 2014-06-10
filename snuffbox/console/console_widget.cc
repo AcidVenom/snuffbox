@@ -11,6 +11,7 @@ namespace snuffbox
 		ui_(new Ui::ConsoleUI())
 	{
 		window_->setMinimumSize(QSize(400, 480));
+		window_->setWindowFlags(Qt::WindowStaysOnTopHint);
 		ui_->setupUi(window_);
 		
 		QFont monospace;
@@ -39,6 +40,8 @@ namespace snuffbox
 	//---------------------------------------------------------------
 	void ConsoleWidget::HandleCommand()
 	{
+		if (!environment::has_js_state_wrapper())
+			AddLine(LogSeverity::kError, "Cannot execute JavaScript commands when the game is shut down!");
 		JS_CREATE_SCOPE;
 		std::string txt = ui_->commandLine->text().toStdString();
 
@@ -73,24 +76,19 @@ namespace snuffbox
 		auto it = watchedVariables_.find(name);
 		if (it != watchedVariables_.end())
 		{
-			item = it->second;
-			found = true;
-			std::vector<QTreeWidgetItem*> temp;
-			for (unsigned int i = 0; i != item->childCount(); ++i)
+			QList<QTreeWidgetItem*> list = it->second->takeChildren();
+			for (auto child : list)
 			{
-				temp.push_back(item->child(i));
+				it->second->removeChild(child);
 			}
 
-			for (auto it : temp)
-			{
-				item->removeChild(it);
-				delete it;
-			}
+			item = it->second;
 		}
 		else
 		{
 			item = new QTreeWidgetItem();
 		}
+
 		SNUFF_ASSERT_NOTNULL(item);
 		item->setText(0, name.c_str());
 		if (variable->IsFunction())
@@ -233,7 +231,16 @@ namespace snuffbox
 		cursor.movePosition(QTextCursor::End);
 		cursor.insertBlock(format, textFormat);
 
-		cursor.insertText((timeStamp + std::string(" ") + std::string(msg)).c_str());
+		std::string prefix = "";
+
+		if (sev != LogSeverity::kDebug)
+		{
+			cursor.insertText((timeStamp + std::string(" [") + SeverityToString(sev) + "] " + std::string(msg)).c_str());
+		}
+		else
+		{
+			cursor.insertText((timeStamp + std::string(" ") + std::string(msg)).c_str());
+		}
 		ui_->terminal->verticalScrollBar()->setSliderPosition(ui_->terminal->verticalScrollBar()->maximum());
 	}
 
