@@ -1,6 +1,7 @@
 #include "../../snuffbox/console/console_widget.h"
 #include "../../snuffbox/logging.h"
 #include "../../snuffbox/js/js_state_wrapper.h"
+#include "../../snuffbox/game.h"
 #include <time.h>
 
 namespace snuffbox
@@ -40,8 +41,13 @@ namespace snuffbox
 	//---------------------------------------------------------------
 	void ConsoleWidget::HandleCommand()
 	{
-		if (!environment::has_js_state_wrapper())
-			AddLine(LogSeverity::kError, "Cannot execute JavaScript commands when the game is shut down!");
+    if ((environment::has_game() && !environment::game().started()) || !environment::has_game())
+    {
+      AddLine(LogSeverity::kFatal, "Cannot execute JavaScript commands when the game is shut down!");
+      ui_->commandLine->clear();
+      return;
+    }
+
 		JS_CREATE_SCOPE;
 		std::string txt = ui_->commandLine->text().toStdString();
 
@@ -56,10 +62,10 @@ namespace snuffbox
 			std::string exception(environment::js_state_wrapper().GetException(&try_catch, &failed));
 			AddLine(LogSeverity::kError,exception.c_str());
 		}
-		else if (!res->IsUndefined())
+		else
 		{
-			AddLine(LogSeverity::kDebug,*String::Utf8Value(res->ToString()));
-			if (ui_->toggleWatch->isChecked())
+      AddLine(LogSeverity::kDebug, *String::Utf8Value(res->ToString()));
+			if (ui_->toggleWatch->isChecked() && !res->IsUndefined())
 			{
 				AddToWatch(txt.c_str(),res);
 			}

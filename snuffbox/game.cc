@@ -157,7 +157,6 @@ void Game::Shutdown()
 	started_ = false;
 	device_->Destroy();
 	window_->Destroy();
-	SNUFF_LOG_INFO(".. Shutdown succesful");
 
 	environment::globalInstance = nullptr;
 }
