@@ -1,8 +1,14 @@
 #pragma once
 #include <QtGui>
-#include "../../snuffbox/console/console_ui.h"
-#include "v8.h"
 #include <map>
+
+#include "qcompleter.h"
+
+#include "v8.h"
+
+#include "../../snuffbox/console/console_ui.h"
+
+
 
 using namespace v8;
 
@@ -106,7 +112,9 @@ namespace snuffbox
 		std::map<std::string,QTreeWidgetItem*> watchedVariables_; ///< A list of watched variables
 		JavaScriptSyntaxHighlighter* highlighter_; ///< Highlight JavaScript syntax
 		bool shiftPressed_; ///< If shift is pressed..
-    std::vector<QString> history_;
-    unsigned int historyIndex_;
+    std::vector<QString> history_; ///< A list for the history of the console
+    unsigned int historyIndex_; ///< The current history index
+		std::string lastLine_; ///< The last line added to the console
+		unsigned int repeatCount_; ///< The repeat count for a console line
 	};
 }

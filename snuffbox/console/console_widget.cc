@@ -4,6 +4,8 @@
 #include "../../snuffbox/game.h"
 #include <time.h>
 
+#define SNUFF_SAFE_DELETE(ptr) SNUFF_ASSERT_NOTNULL(ptr); delete ptr; ptr = NULL;
+
 namespace snuffbox
 {
 	//---------------------------------------------------------------
@@ -118,7 +120,9 @@ namespace snuffbox
 		window_(&parent),
 		ui_(new Ui::ConsoleUI()),
 		shiftPressed_(false),
-    historyIndex_(0)
+    historyIndex_(0),
+		lastLine_(""),
+		repeatCount_(0)
 	{
 		window_->setMinimumSize(QSize(400, 480));
 		window_->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -346,6 +350,36 @@ namespace snuffbox
 	//---------------------------------------------------------------
 	void ConsoleWidget::AddLine(LogSeverity sev, const char* msg)
 	{
+		if (strcmp(lastLine_.c_str(), msg) == 0)
+		{
+			++repeatCount_;
+			QTextCursor cursor = ui_->terminal->textCursor();
+			cursor.movePosition(QTextCursor::End);
+			if (repeatCount_ > 1)
+			{
+				unsigned int width = static_cast<unsigned int>(std::strlen(std::to_string(repeatCount_-1).c_str()));
+				for (unsigned int i = 0; i < width+5; ++i)
+				{
+					cursor.deletePreviousChar();
+					cursor.movePosition(QTextCursor::End);
+				}
+			}
+
+			cursor.insertText(" ");
+
+			QTextCharFormat format;
+			format.setBackground(QColor(128, 158, 182, 255));
+			format.setForeground(QColor(255, 255, 255, 255));
+
+			cursor.setCharFormat(format);
+
+			cursor.insertText((std::string(" [") + std::to_string(repeatCount_) + std::string("] ")).c_str());
+			return;
+		}
+
+		repeatCount_ = 0;
+
+		lastLine_ = std::string(msg);
 		time_t t = time(0);
 		struct tm now;
 		localtime_s(&now, &t);
@@ -425,6 +459,21 @@ namespace snuffbox
 	//---------------------------------------------------------------
 	ConsoleWidget::~ConsoleWidget()
 	{
-		
+		SNUFF_SAFE_DELETE(highlighter_);
+
+		for (auto it = watchedVariables_.begin(); it != watchedVariables_.end(); ++it)
+		{
+			QList<QTreeWidgetItem*> list = it->second->takeChildren();
+			for (auto child : list)
+			{
+				it->second->removeChild(child);
+				SNUFF_SAFE_DELETE(child);
+			}
+
+			watchedVariables_.erase(it);
+			SNUFF_SAFE_DELETE(it->second);
+		}
+
+		SNUFF_SAFE_DELETE(ui_);
 	}
 }

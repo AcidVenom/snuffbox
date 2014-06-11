@@ -58,7 +58,8 @@ keyboard_(environment::memory().ConstructShared<Keyboard>()),
 device_(environment::memory().ConstructShared<D3D11DisplayDevice>()),
 path_(""),
 gameTime_(0),
-qtApp_(app)
+qtApp_(app),
+shouldQuit_(false)
 {
 	environment::globalInstance = this;
 	ParseCommandLine();
@@ -87,6 +88,7 @@ void Game::Update()
 {
 	environment::content_manager().LoadPendingContent();
 	++gameTime_;
+	
 	if (!started_)
 		return;
 
@@ -105,6 +107,11 @@ void Game::Update()
 	if (gameTime_ % 20 == 0)
 	{
 		environment::file_watcher().WatchFiles();
+	}
+
+	if (shouldQuit_)
+	{
+		Shutdown();
 	}
 }
 
@@ -221,7 +228,7 @@ void Game::NotifyEvent(GameEvents evt)
 	switch (evt)
 	{
 	case GameEvents::kQuit:
-		Shutdown();
+		shouldQuit_ = true;
 		break;
 	case GameEvents::kReload:
 		Reload();

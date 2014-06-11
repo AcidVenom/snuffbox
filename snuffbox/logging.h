@@ -7,7 +7,6 @@
 
 namespace snuffbox
 {
-	static std::string lastLine = "";
 
 	inline const char* const SeverityToString(const LogSeverity& severity){
 		switch (severity)
@@ -38,12 +37,7 @@ namespace snuffbox
 		OutputDebugStringA(msg); 
 		OutputDebugStringA("\n");
 
-		if (strcmp(lastLine.c_str(), msg) != 0)
-		{
-			environment::console().Receive(severity, msg);
-			lastLine = std::string(msg);
-		}
-
+		environment::console().Receive(severity, msg);
 		qApp->processEvents();
 	}
 }
