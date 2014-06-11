@@ -7,14 +7,123 @@
 namespace snuffbox
 {
 	//---------------------------------------------------------------
+	JavaScriptSyntaxHighlighter::JavaScriptSyntaxHighlighter(QObject* parent) : QSyntaxHighlighter(parent)
+	{
+		Initialise();
+	}
+
+	//---------------------------------------------------------------
+	JavaScriptSyntaxHighlighter::JavaScriptSyntaxHighlighter(QTextDocument* parent) : QSyntaxHighlighter(parent)
+	{
+		Initialise();
+	}
+
+	//---------------------------------------------------------------
+	void JavaScriptSyntaxHighlighter::Initialise()
+	{
+		HighlightingRule rule;
+
+		keywordFormat.setForeground(QColor(159, 164, 98));
+		keywordFormat.setFontWeight(QFont::Bold);
+		QStringList keywordPatterns;
+		keywordPatterns << "\\bvoid\\b" << "\\bbreak\\b" << "\\bconst\\b"
+			<< "\\b?\\b" << "\\bcontinue\\b" << "\\bdelete\\b"
+			<< "\\bdo\\b" << "\\bwhile\\b" << "\\bexport\\b"
+			<< "\\bfor\\b" << "\\bin\\b" << "\\bimport\\b"
+			<< "\\binstanceOf\\b" << "\\blabel\\b" << "\\blet\\b"
+			<< "\\bnew\\b" << "\\breturn\\b" << "\\bswitch\\b"
+			<< "\\bthis\\b" << "\\bthrow\\b" << "\\btry\\b"
+			<< "\\bcatch\\b" << "\\btypeof\\b" << "\\bvar\\b"
+			<< "\\bwith\\b" << "\\byield\\b" << "\\bassert\\b"
+			<< "\\bLog\\b" << "\\bGame\\b" << "\\bfunction\\b";
+		foreach(const QString &pattern, keywordPatterns) {
+			rule.pattern = QRegExp(pattern);
+			rule.format = keywordFormat;
+			highlightingRules.append(rule);
+		}
+
+		quotationFormat.setForeground(QColor(240,165,110));
+		rule.pattern = QRegExp("\".*\"");
+		rule.format = quotationFormat;
+		highlightingRules.append(rule);
+
+		functionFormat.setFontWeight(QFont::Bold);
+		functionFormat.setFontItalic(true);
+		functionFormat.setForeground(QColor(225,210,140));
+		rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+		rule.format = functionFormat;
+		highlightingRules.append(rule);
+
+		singleLineCommentFormat.setForeground(Qt::gray);
+		rule.pattern = QRegExp("//[^\n]*");
+		rule.format = singleLineCommentFormat;
+		highlightingRules.append(rule);
+
+		multiLineCommentFormat.setForeground(Qt::gray);
+
+		numberFormat.setForeground(QColor(155,220,195));
+		rule.pattern = QRegExp("[0-9]");
+		rule.format = numberFormat;
+		highlightingRules.append(rule);
+
+		paramsFormat.setForeground(Qt::GlobalColor::darkGray);
+		rule.pattern = QRegExp("[(].*[)]");
+		rule.format = paramsFormat;
+		highlightingRules.append(rule);
+
+		commentStartExpression = QRegExp("/\\*");
+		commentEndExpression = QRegExp("\\*/");
+	}
+
+	//---------------------------------------------------------------
+	void JavaScriptSyntaxHighlighter::highlightBlock(const QString& text)
+	{
+		foreach(const HighlightingRule &rule, highlightingRules) {
+			QRegExp expression(rule.pattern);
+			int index = expression.indexIn(text);
+			while (index >= 0) {
+				int length = expression.matchedLength();
+				setFormat(index, length, rule.format);
+				if (length == 0)
+					break;
+				index = expression.indexIn(text, index + length);
+			}
+		}
+
+		setCurrentBlockState(0);
+
+		int startIndex = 0;
+		if (previousBlockState() != 1)
+			startIndex = commentStartExpression.indexIn(text);
+
+		while (startIndex >= 0) {
+			int endIndex = commentEndExpression.indexIn(text, startIndex);
+			int commentLength;
+			if (endIndex == -1) {
+				setCurrentBlockState(1);
+				commentLength = text.length() - startIndex;
+			}
+			else {
+				commentLength = endIndex - startIndex
+					+ commentEndExpression.matchedLength();
+			}
+			setFormat(startIndex, commentLength, multiLineCommentFormat);
+			startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
+		}
+	}
+
+	//---------------------------------------------------------------
 	ConsoleWidget::ConsoleWidget(QWidget& parent) :
 		window_(&parent),
-		ui_(new Ui::ConsoleUI())
+		ui_(new Ui::ConsoleUI()),
+		shiftPressed_(false)
 	{
 		window_->setMinimumSize(QSize(400, 480));
 		window_->setWindowFlags(Qt::WindowStaysOnTopHint);
-		ui_->setupUi(window_);
 		
+		ui_->setupUi(window_);
+		highlighter_ = new JavaScriptSyntaxHighlighter(ui_->commandLine->document());
+
 		QFont monospace;
 		monospace.setFamily("Arial");
 		monospace.setStyleHint(QFont::Monospace);
@@ -28,8 +137,40 @@ namespace snuffbox
 		QFontMetrics metrics(monospace);
 		ui_->terminal->setTabStopWidth(2 * metrics.width(" "));
 		ui_->variableTree->header()->setVisible(true);
+		
+		ui_->commandLine->installEventFilter(this);
+	}
 
-		QObject::connect(ui_->commandLine, SIGNAL(returnPressed()), this, SLOT(HandleCommand()));
+	bool ConsoleWidget::eventFilter(QObject *obj, QEvent *event)
+	{
+		if (obj == ui_->commandLine)  
+		{
+			if (event->type() == QEvent::KeyPress)  
+			{
+				QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+				if (keyEvent->key() == Qt::Key_Return && !shiftPressed_)
+				{
+					HandleCommand();
+					return true;
+				}
+
+				if (keyEvent->key() == Qt::Key_Shift)
+				{
+					shiftPressed_ = true;
+				}
+			}
+
+			if (event->type() == QEvent::KeyRelease)
+			{
+				QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+				if (keyEvent->key() == Qt::Key_Shift)
+				{
+					shiftPressed_ = false;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	//---------------------------------------------------------------
@@ -49,7 +190,7 @@ namespace snuffbox
     }
 
 		JS_CREATE_SCOPE;
-		std::string txt = ui_->commandLine->text().toStdString();
+		std::string txt = ui_->commandLine->toPlainText().toStdString();
 
 		TryCatch try_catch;
 

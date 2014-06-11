@@ -16,9 +16,9 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -35,7 +35,7 @@ public:
     QCheckBox *toggleWatch;
     QVBoxLayout *terminalLayout;
     QTextBrowser *terminal;
-    QLineEdit *commandLine;
+    QTextEdit *commandLine;
     QWidget *variableWatch;
     QVBoxLayout *verticalLayout_3;
     QVBoxLayout *variableLayout;
@@ -72,7 +72,7 @@ public:
 
         terminalLayout->addWidget(terminal);
 
-        commandLine = new QLineEdit(javascript);
+        commandLine = new QTextEdit(javascript);
         commandLine->setObjectName(QStringLiteral("commandLine"));
         commandLine->setMinimumSize(QSize(0, 24));
         commandLine->setMaximumSize(QSize(16777215, 24));
@@ -98,7 +98,7 @@ public:
         variableTree->setAnimated(false);
         variableTree->setAllColumnsShowFocus(true);
         variableTree->setWordWrap(false);
-        variableTree->setHeaderHidden(false);
+        variableTree->setHeaderHidden(true);
         variableTree->setColumnCount(2);
         variableTree->header()->setVisible(false);
         variableTree->header()->setCascadingSectionResizes(false);

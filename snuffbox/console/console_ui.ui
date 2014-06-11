@@ -65,7 +65,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="commandLine">
+          <widget class="QTextEdit" name="commandLine">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -121,7 +121,7 @@
             <bool>false</bool>
            </property>
            <property name="headerHidden">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="columnCount">
             <number>2</number>

@@ -9,6 +9,48 @@ using namespace v8;
 namespace snuffbox
 {
 	/**
+	* @class snuffbox::JavaScriptSyntaxHighlighter
+	* @brief Highlights JavaScript syntax in the console
+	* @author Daniël Konings
+	*/
+	class JavaScriptSyntaxHighlighter : public QSyntaxHighlighter
+	{
+	public:
+		/// Constructor by Qt object
+		JavaScriptSyntaxHighlighter(QObject* parent);
+		/// Constructor by Qt text document
+		JavaScriptSyntaxHighlighter(QTextDocument* parent);
+		/// Default destructor
+		~JavaScriptSyntaxHighlighter(){}
+
+		/// Initialises the highlighter
+		void Initialise();
+
+	protected:
+		/// The overridden highlightBlock function
+		void highlightBlock(const QString& text);
+
+	private:
+		struct HighlightingRule
+		{
+			QRegExp pattern;
+			QTextCharFormat format;
+		};
+		QVector<HighlightingRule> highlightingRules;
+
+		QRegExp commentStartExpression;
+		QRegExp commentEndExpression;
+
+		QTextCharFormat keywordFormat;
+		QTextCharFormat singleLineCommentFormat;
+		QTextCharFormat multiLineCommentFormat;
+		QTextCharFormat quotationFormat;
+		QTextCharFormat functionFormat;
+		QTextCharFormat numberFormat;
+		QTextCharFormat paramsFormat;
+	};
+
+	/**
 	* @enum snuffbox::LogSeverity
 	* @brief Different log severities
 	* @author Daniël Konings
@@ -51,13 +93,18 @@ namespace snuffbox
 		/// Adds a variable to the watch tree
 		void AddToWatch(std::string name, Local<Value>& obj);
 
-	private slots:
+	private:
 		/// Handles a command entered in the command line
 		void HandleCommand();
+
+	protected:
+		bool eventFilter(QObject *obj, QEvent *evt);
 
 	private:
 		QWidget* window_;	///< The parent window
 		Ui::ConsoleUI* ui_;	///< The actual console UI
 		std::map<std::string,QTreeWidgetItem*> watchedVariables_; ///< A list of watched variables
+		JavaScriptSyntaxHighlighter* highlighter_; ///< Highlight JavaScript syntax
+		bool shiftPressed_; ///< If shift is pressed..
 	};
 }
