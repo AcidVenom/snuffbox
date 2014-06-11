@@ -35,7 +35,8 @@ namespace snuffbox
 			<< "\\bthis\\b" << "\\bthrow\\b" << "\\btry\\b"
 			<< "\\bcatch\\b" << "\\btypeof\\b" << "\\bvar\\b"
 			<< "\\bwith\\b" << "\\byield\\b" << "\\bassert\\b"
-			<< "\\bLog\\b" << "\\bGame\\b" << "\\bfunction\\b";
+			<< "\\bLog\\b" << "\\bGame\\b" << "\\bfunction\\b" << "\\bnull\\b"
+      << "\\bundefined\\b";
 		foreach(const QString &pattern, keywordPatterns) {
 			rule.pattern = QRegExp(pattern);
 			rule.format = keywordFormat;
@@ -116,7 +117,8 @@ namespace snuffbox
 	ConsoleWidget::ConsoleWidget(QWidget& parent) :
 		window_(&parent),
 		ui_(new Ui::ConsoleUI()),
-		shiftPressed_(false)
+		shiftPressed_(false),
+    historyIndex_(0)
 	{
 		window_->setMinimumSize(QSize(400, 480));
 		window_->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -167,6 +169,33 @@ namespace snuffbox
 				{
 					shiftPressed_ = false;
 				}
+
+        if (shiftPressed_)
+        {
+          if (keyEvent->key() == Qt::Key_Up)
+          {
+            if (historyIndex_ > 0)
+            {
+              --historyIndex_;
+              ui_->commandLine->setText(history_[historyIndex_]);
+              return true;
+            }
+          }
+
+          if (keyEvent->key() == Qt::Key_Down)
+          {
+            if (historyIndex_ < static_cast<unsigned int>(history_.size()))
+            {
+              ++historyIndex_;
+              ui_->commandLine->setText(history_[historyIndex_-1]);
+              return true;
+            }
+            else
+            {
+              ui_->commandLine->setText("");
+            }
+          }
+        }
 			}
 		}
 
@@ -212,6 +241,8 @@ namespace snuffbox
 			}
 		}
 
+    history_.push_back(ui_->commandLine->toPlainText());
+    historyIndex_ = static_cast<unsigned int>(history_.size());
 		ui_->commandLine->clear();
 	}
 

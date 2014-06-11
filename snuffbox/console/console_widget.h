@@ -106,5 +106,7 @@ namespace snuffbox
 		std::map<std::string,QTreeWidgetItem*> watchedVariables_; ///< A list of watched variables
 		JavaScriptSyntaxHighlighter* highlighter_; ///< Highlight JavaScript syntax
 		bool shiftPressed_; ///< If shift is pressed..
+    std::vector<QString> history_;
+    unsigned int historyIndex_;
 	};
 }
