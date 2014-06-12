@@ -86,16 +86,16 @@ var Player = function()
 		this.setTranslation(this.position.x,this.position.y,6);
 		this.setAnimationSpeed(Math.abs(this.speed*(50/2.5)));
 		this.updateAnimation(dt);
-		this.updateCamera(camera);
+		this.updateCamera(dt,camera);
 
 		this.speedPreviousTick = this.speed;
 	}
 
-	this.updateCamera = function(camera)
+	this.updateCamera = function(dt,camera)
 	{
 		var position = {x: this.position.x-Math.sin(this.angle)*0.2, y: this.position.y-Math.cos(this.angle)*0.2}
 		var camTranslation = camera.translation();
-		var movement = Math.smoothLerp(camTranslation.x,camTranslation.y,position.x-Math.sin(this.angle)*0.1,position.y,0.01);
+		var movement = Math.smoothLerp(camTranslation.x,camTranslation.y,position.x-Math.sin(this.angle)*0.1,position.y,dt*2);
 		
 		if (movement != true)
 		{
