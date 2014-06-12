@@ -30,7 +30,7 @@ LevelState.initialise = function()
 
 	this._background.setTranslation(0,0,0);
 	this._background.setOffset(0.5,0.5,0.5);
-	this._background.setScale(4,1.6,1.6);
+	this._background.setScale(4,2,2);
 
 	this._world = new World();
 	this._player = new Player();
@@ -39,7 +39,7 @@ LevelState.initialise = function()
 LevelState.update = function(dt)
 {
 	this._world.update(dt);
-	this._player.update(dt);
+	this._player.update(dt,this._camera);
 }
 
 LevelState.draw = function(dt)

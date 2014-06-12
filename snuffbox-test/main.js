@@ -1,4 +1,5 @@
 require("loading");
+require("mathextension");
 require("gameobject");
 require("statemanager");
 require("menu");
