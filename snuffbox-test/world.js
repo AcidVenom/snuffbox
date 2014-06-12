@@ -2,7 +2,7 @@ var World = function()
 {
 	this._mountains = new GameObject("textures/level/mountains.png");
 	this._mountains.setOffset(0.5,0,0.5);
-	this._mountains.setTranslation(0,0,1);
+	this._mountains.setTranslation(0,0,1.5);
 	this._mountains.setScale(1.6,1.6,1.6);
 
 	this._ground = new GameObject("textures/level/ground.png");

@@ -704,6 +704,7 @@ namespace snuffbox
 		CreateDepthStencil();
 		CreateSamplerState();
 		CreateBlendState();
+    SetCullMode(environment::render_settings().settings().cullMode);
 
 		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
 	}

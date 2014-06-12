@@ -38,7 +38,7 @@ var Player = function()
 		{
 			if(this.speed > -this.maxSpeed)
 			{
-				this.speed -= 0.05;
+				this.speed -= 5*dt;
 			}
 
 			this.setScale(0.075,0.075,0.075);
@@ -48,7 +48,7 @@ var Player = function()
 		{
 			if(this.speed < this.maxSpeed)
 			{
-				this.speed += 0.05;
+				this.speed += 5*dt;
 			}
 
 			this.setScale(-0.075,0.075,0.075);
@@ -63,12 +63,12 @@ var Player = function()
 
 			if(this.speed > 0)
 			{
-				this.speed -=0.05;
+				this.speed -=10*dt;
 			}
 
 			if(this.speed < 0)
 			{
-				this.speed +=0.05;
+				this.speed +=10*dt;
 			}
 		}
 

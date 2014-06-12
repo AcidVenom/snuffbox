@@ -1,10 +1,8 @@
-﻿Build started 6/11/2014 9:03:50 PM.
+﻿Build started 12/06/2014 04:45:17 PM.
      1>Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /IC:\V8\include /I"C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\\Include" /Zi /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt /DNOMINMAX console\console_widget.cc console\moc_console_widget.cc
-         moc_console_widget.cc
-         console_widget.cc
-         Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /IC:\V8\include /I"C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\\Include" /Zi /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt /DNOMINMAX d3d11\d3d11_display_device.cc
+         d3d11_display_device.cc
        CustomBuildStep:
          moc -o console/moc_console_widget.cc console/console_widget.h
          uic -o console/console_ui.h console/console_ui.ui
@@ -31,9 +29,10 @@
          x64\Debug\allocated_memory.obj
          x64\Debug\win32_file_watch.obj
          x64\Debug\win32_window.obj
+         LINK : C:\Snuff\src\x64\Debug\snuffbox.exe not found or not built by the last incremental link; performing full link
          snuffbox.vcxproj -> C:\Snuff\src\x64\Debug\snuffbox.exe
      1>Done Building Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:09.70
+Time Elapsed 00:00:26.45
