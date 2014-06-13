@@ -38,7 +38,8 @@ namespace snuffbox
 			<< "\\bcatch\\b" << "\\btypeof\\b" << "\\bvar\\b"
 			<< "\\bwith\\b" << "\\byield\\b" << "\\bassert\\b"
 			<< "\\bLog\\b" << "\\bGame\\b" << "\\bfunction\\b" << "\\bnull\\b"
-      << "\\bundefined\\b";
+      << "\\bundefined\\b" << "\\btrue\\b" << "\\bfalse\\b" << "\\bdefault\\b"
+      << "\\bcase\\b" << "\\bif\\b" << "\\belse\\b";
 		foreach(const QString &pattern, keywordPatterns) {
 			rule.pattern = QRegExp(pattern);
 			rule.format = keywordFormat;
