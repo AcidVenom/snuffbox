@@ -42,6 +42,7 @@ namespace snuffbox
 	D3D11Settings::D3D11Settings()
 	{
 		environment::globalInstance = this;
+		settings_.bufferColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	//-------------------------------------------------------------------------------
@@ -99,13 +100,29 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSSetBackBufferColor(JS_ARGS)
+	{
+		JSWrapper wrapper(args);
+		float rgb[4] = { 
+			wrapper.GetNumber<float>(0), 
+			wrapper.GetNumber<float>(1), 
+			wrapper.GetNumber<float>(2), 
+			wrapper.GetNumber<float>(3) 
+		};
+		environment::render_settings().settings().bufferColor = D3DXCOLOR(rgb);
+		
+		SNUFF_LOG_INFO(std::string("[Settings] Changed back buffer color to: (" + std::to_string(rgb[0]) + "," + std::to_string(rgb[1]) + "," + std::to_string(rgb[2]) + "," + std::to_string(rgb[3]) + ")").c_str());
+	}
+
+	//-------------------------------------------------------------------------------
 	void D3D11Settings::RegisterJS(JS_TEMPLATE)
 	{
 		JSFunctionRegister funcs[] = {
 			JSFunctionRegister("setCullMode", JSSetCullmode),
 			JSFunctionRegister("setFullscreen", JSSetFullscreen),
 			JSFunctionRegister("setResolution", JSSetResolution),
-			JSFunctionRegister("setVsync", JSSetVsync)
+			JSFunctionRegister("setVsync", JSSetVsync),
+			JSFunctionRegister("setBackBufferColor", JSSetBackBufferColor)
 		};
 
 		obj->Set(JS_ISOLATE, "CullNone", Number::New(JS_ISOLATE, 1));

@@ -524,7 +524,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
-		context_->ClearRenderTargetView(renderTargetView_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+		context_->ClearRenderTargetView(renderTargetView_, environment::render_settings().settings().bufferColor);
 		context_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		struct RenderSorter

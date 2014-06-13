@@ -28,6 +28,7 @@ namespace snuffbox
 		unsigned int vsync;
 		bool fullscreen;
 		D3D11_CULL_MODE cullMode;
+		D3DXCOLOR bufferColor;
 	};
 	/**
 	* @class snuffbox::D3D11Settings
@@ -58,5 +59,6 @@ namespace snuffbox
 		static void JSSetResolution(JS_ARGS);
 		static void JSSetFullscreen(JS_ARGS);
 		static void JSSetVsync(JS_ARGS);
+		static void JSSetBackBufferColor(JS_ARGS);
 	};
 }

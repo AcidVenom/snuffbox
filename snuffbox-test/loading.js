@@ -1,1 +1,0 @@
-ContentManager.load("texture","textures/background.png");
