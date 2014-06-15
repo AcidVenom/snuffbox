@@ -368,7 +368,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   inline void RenderElement::JSSpawn(JS_ARGS)
   {
-    JS_SETUP(RenderElement);
+    JS_SETUP(RenderElement,"V");
 
     self->Spawn();
   }
@@ -376,7 +376,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetTranslation(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -388,7 +388,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSTranslateBy(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -400,7 +400,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetRotation(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -412,7 +412,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSRotateBy(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -424,7 +424,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetScale(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -436,7 +436,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetOffset(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"NNN");
 
 		float x = -wrapper.GetNumber<float>(0);
 		float y = -wrapper.GetNumber<float>(1);
@@ -448,7 +448,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSOffset(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"V");
 
     wrapper.ReturnTriple<float>(-self->ox_, -self->oy_, -self->oz_);
 	}
@@ -456,7 +456,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSScale(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"V");
 
     wrapper.ReturnTriple<float>(self->sx_, self->sy_, self->sz_);
 	}
@@ -464,7 +464,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSTranslation(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"V");
 
     wrapper.ReturnTriple<float>(self->x_, self->y_, self->z_);
 	}
@@ -472,7 +472,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSRotation(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"V");
 		float roll = atan2(self->rotation_._31, self->rotation_._32);
 		float pitch = acos(self->rotation_._33);
 		float yaw = -atan2(self->rotation_._13, self->rotation_._23);
@@ -482,7 +482,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetTexture(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"S");
 
 		self->texture_ = environment::content_manager().Get<Texture>(wrapper.GetString(0)).get();
 	}
@@ -490,7 +490,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetShader(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"S");
 
 		self->shader_ = environment::content_manager().Get<Shader>(wrapper.GetString(0)).get();
 	}
@@ -498,7 +498,7 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   inline void RenderElement::JSDestroy(JS_ARGS)
   {
-    JS_SETUP(RenderElement);
+    JS_SETUP(RenderElement,"V");
 
     self->Destroy();
   }
@@ -506,7 +506,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetAlpha(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"N");
 		
 		self->SetAlpha(wrapper.GetNumber<float>(0));
 	}
@@ -514,7 +514,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSAlpha(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"V");
 
 		wrapper.ReturnNumber<float>(self->alpha());
 	}
@@ -522,7 +522,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetUniform(JS_ARGS)
 	{
-		JS_SETUP(RenderElement);
+		JS_SETUP(RenderElement,"SSN");
 		float* value = 0;
 		std::string type = wrapper.GetString(0);
 		std::string name = wrapper.GetString(1);

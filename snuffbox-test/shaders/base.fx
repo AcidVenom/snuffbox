@@ -10,7 +10,7 @@ cbuffer ConstantBuffer : register(b0)
 
 cbuffer Uniforms : register(b1)
 {
-  float3 Color;
+
 }
 
 struct VOut
@@ -36,19 +36,9 @@ SamplerState SampleType;
 
 float4 PS(VOut input) : SV_TARGET
 {	
-  float borderWidth = 0.05;
   float4 textureColor = Texture.Sample(SampleType,input.texcoord);
   float4 color = (textureColor * input.color);
   color.a *= Alpha;
-  float4 normal = mul(float4(input.normal,1), mul(World,Projection));
-  float3 rgb = lerp(color.rgb*(saturate(dot(normal,float4(-0.5,-1,0.7,0)))+0.01),Color,0.8);
-	
-  if (input.texcoord.x < borderWidth || input.texcoord.x > 1-borderWidth || input.texcoord.y < borderWidth || input.texcoord.y > 1-borderWidth)
-  {
-    return float4(0,0,0,1);
-  }
-  else
-  {
-    return float4(rgb,color.a);
-  }
+
+  return color;
 }

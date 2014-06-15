@@ -79,4 +79,10 @@ namespace snuffbox
 	{
 		console_widget_.Show();
 	}
+
+	//----------------------------------------------------------------------
+	void Console::Hide()
+	{
+		console_widget_.Hide();
+	}
 }

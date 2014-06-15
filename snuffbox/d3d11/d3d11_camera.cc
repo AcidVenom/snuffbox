@@ -12,7 +12,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	Camera::Camera(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("S");
 		up_ = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		translation_ = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 		target_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -39,7 +39,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	Camera::~Camera()
 	{
-
+		
 	}
 
 	//------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::JSTranslateBy(JS_ARGS)
 	{
-		JS_SETUP(Camera);
+		JS_SETUP(Camera,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -146,7 +146,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::JSRotateBy(JS_ARGS)
 	{
-		JS_SETUP(Camera);
+		JS_SETUP(Camera,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -158,7 +158,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::JSSetTranslation(JS_ARGS)
 	{
-		JS_SETUP(Camera);
+		JS_SETUP(Camera,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -170,7 +170,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::JSSetRotation(JS_ARGS)
 	{
-		JS_SETUP(Camera);
+		JS_SETUP(Camera,"NNN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
@@ -182,7 +182,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::JSRotation(JS_ARGS)
 	{
-		JS_SETUP(Camera);
+		JS_SETUP(Camera,"V");
 		std::vector<float> rotation = self->rotation();
 		float x = rotation[0];
 		float y = rotation[1];
@@ -194,7 +194,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::JSTranslation(JS_ARGS)
 	{
-		JS_SETUP(Camera);
+		JS_SETUP(Camera,"V");
 		XMVECTOR translation = self->translation();
 
 		float x = XMVectorGetX(translation);
@@ -207,7 +207,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::JSSetFov(JS_ARGS)
 	{
-		JS_SETUP(Camera);
+		JS_SETUP(Camera,"N");
 
 		self->fov_ = wrapper.GetNumber<float>(0);
 	}
@@ -215,15 +215,19 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::JSSetType(JS_ARGS)
 	{
-		JS_SETUP(Camera);
+		JS_SETUP(Camera,"S");
 		std::string typing = wrapper.GetString(0);
 		if (strcmp(typing.c_str(), "perspective") == 0)
 		{
 			self->type_ = Camera::CameraType::kPerspective;
 		}
-		if (strcmp(typing.c_str(), "orthographic") == 0)
+		else if (strcmp(typing.c_str(), "orthographic") == 0)
 		{
 			self->type_ = Camera::CameraType::kOrthographic;
+		}
+		else
+		{
+			SNUFF_LOG_ERROR(std::string("Unknown camera type '" + typing).c_str());
 		}
 	}
 }

@@ -90,6 +90,9 @@ namespace snuffbox
 		/// Shows the console when hidden
 		void Show();
 
+		/// Hides the console
+		void Hide();
+
 		/// Add a log message
 		void AddLine(LogSeverity sev, const char* msg);
 
@@ -98,6 +101,9 @@ namespace snuffbox
 
 		/// Adds a variable to the watch tree
 		void AddToWatch(std::string name, Local<Value>& obj);
+
+		/// Returns if the window is visible
+		bool isVisible(){ return window_->isVisible(); }
 
 	private:
 		/// Handles a command entered in the command line

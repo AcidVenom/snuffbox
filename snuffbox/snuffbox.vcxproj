@@ -181,6 +181,8 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClCompile Include="d3d11\elements\billboard_element.cc" />
     <ClCompile Include="d3d11\elements\quad_element.cc" />
     <ClCompile Include="d3d11\elements\terrain_element.cc" />
+    <ClCompile Include="d3d11\gui\d3d11_gui.cc" />
+    <ClCompile Include="d3d11\gui\d3d11_ui_widget.cc" />
     <ClCompile Include="game.cc" />
     <ClCompile Include="input\keyboard.cc" />
     <ClCompile Include="input\mouse.cc" />
@@ -205,6 +207,8 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClInclude Include="d3d11\elements\quad_element.h" />
     <ClInclude Include="d3d11\elements\render_element.h" />
     <ClInclude Include="d3d11\elements\terrain_element.h" />
+    <ClInclude Include="d3d11\gui\d3d11_gui.h" />
+    <ClInclude Include="d3d11\gui\d3d11_ui_widget.h" />
     <ClInclude Include="environment.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="input\key.h" />

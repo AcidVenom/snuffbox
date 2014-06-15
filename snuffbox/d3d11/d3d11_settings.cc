@@ -54,7 +54,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------
 	void D3D11Settings::JSSetCullmode(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("N");
 		unsigned int mode = wrapper.GetNumber<unsigned int>(0);
 		environment::render_settings().settings().cullMode = static_cast<D3D11_CULL_MODE>(mode);
 		environment::render_device().SetCullMode(environment::render_settings().settings().cullMode);
@@ -64,7 +64,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------
 	void D3D11Settings::JSSetFullscreen(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("B");
 		bool mode = wrapper.GetBool(0);
 		environment::render_settings().settings().fullscreen = mode;
 		environment::render_device().SetFullscreen(mode);
@@ -74,7 +74,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------
 	void D3D11Settings::JSSetResolution(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("NN");
 		unsigned int w, h;
 
 		w = wrapper.GetNumber<unsigned int>(0);
@@ -92,7 +92,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------
 	void D3D11Settings::JSSetVsync(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("B");
 		int mode = static_cast<int>(wrapper.GetBool(0));
 		environment::render_settings().settings().vsync = mode;
 
@@ -102,7 +102,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------
 	void D3D11Settings::JSSetBackBufferColor(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("NNNN");
 		float rgb[4] = { 
 			wrapper.GetNumber<float>(0), 
 			wrapper.GetNumber<float>(1), 

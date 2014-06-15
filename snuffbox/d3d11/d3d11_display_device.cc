@@ -536,6 +536,7 @@ namespace snuffbox
 		} RenderSorter;
 
 		std::sort(renderElements_.begin(), renderElements_.end(), RenderSorter);
+		camera_ = nullptr;
 	}
 
 	void D3D11DisplayDevice::DrawRenderElement(RenderElement* it)
@@ -649,6 +650,12 @@ namespace snuffbox
 
 			DrawRenderElement(it);
 		}
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::SetCamera(Camera* camera)
+	{
+		camera_ = camera;
 	}
 
 	//---------------------------------------------------------------------------------

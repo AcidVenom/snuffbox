@@ -77,7 +77,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSLogWatch(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("SV");
 
 		environment::console().Watch(wrapper.GetString(0), args[1]);
 	}
@@ -86,16 +86,16 @@ namespace snuffbox
 	void JSStateWrapper::JSRequire(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		String::Utf8Value str(args[0]);
-		environment::js_state_wrapper().CompileAndRun(*str);
+		JS_CHECK_PARAMS("S");
+		environment::js_state_wrapper().CompileAndRun(wrapper.GetString(0).c_str());
 	}
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSAssert(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		String::Utf8Value str(args[0]);
-		SNUFF_ASSERT(*str);
+		JS_CHECK_PARAMS("S");
+		SNUFF_ASSERT(wrapper.GetString(0).c_str());
 	}
 
 	//---------------------------------------------------------------------------

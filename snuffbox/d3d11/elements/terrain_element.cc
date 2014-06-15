@@ -11,7 +11,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	Terrain::Terrain(JS_ARGS) : RenderElement(RenderElement::ElementTypes::kTerrain)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("NN");
 
 		w_ = wrapper.GetNumber<unsigned int>(0);
 		h_ = wrapper.GetNumber<unsigned int>(1);

@@ -117,8 +117,14 @@ namespace snuffbox
 		/// Draws every render element
 		void Draw();
 
+		/// Sets the camera
+		void SetCamera(Camera* camera);
+
 		/// Updates the constant buffer
 		void UpdateCamera(Camera* camera);
+
+		/// Returns the camera
+		Camera* camera(){ return camera_; }
 
 		/// Ends the draw
 		void EndDraw();

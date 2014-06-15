@@ -124,7 +124,7 @@ namespace snuffbox
 	void Keyboard::JSIsPressed(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("S");
 
 		Key key = StringToKey(wrapper.GetString(0).c_str());
 
@@ -136,7 +136,7 @@ namespace snuffbox
 	void Keyboard::JSIsDown(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("S");
 
 		Key key = StringToKey(wrapper.GetString(0).c_str());
 
@@ -148,7 +148,7 @@ namespace snuffbox
 	void Keyboard::JSIsReleased(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("S");
 
 		Key key = StringToKey(wrapper.GetString(0).c_str());
 

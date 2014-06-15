@@ -100,7 +100,13 @@ void Game::Update()
 	Handle<Value> argv[1] = {
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
+	
 	update_.Call(1,argv);
+
+	if (environment::render_device().camera())
+	{
+		environment::render_device().UpdateCamera(environment::render_device().camera());
+	}
 
 	environment::render_device().IncrementTime();
 
@@ -148,7 +154,15 @@ void Game::Shutdown()
 	Local<Array> names = global->GetPropertyNames();
 	Local<String> src;
 	std::string c_src = "";
+	std::string game_member_src = "";
 
+	Local<Array> gameMembers = global->Get(String::NewFromUtf8(JS_ISOLATE,"Game"))->ToObject()->GetPropertyNames();
+	for (unsigned int i = 0; i < gameMembers->Length(); ++i)
+	{
+		game_member_src += "Game.";
+		game_member_src += *String::Utf8Value(gameMembers->Get(i).As<String>());
+		game_member_src += "=null;";
+	}
 	for (unsigned int i = 0; i < names->Length(); ++i)
 	{
 		Local<Value> str = names->Get(i);
@@ -156,8 +170,12 @@ void Game::Shutdown()
 		c_src += "=null;";
 	}
 
+	src = String::NewFromUtf8(JS_ISOLATE, game_member_src.c_str());
+	Local<Script> script = Script::Compile(src, String::NewFromUtf8(JS_ISOLATE, "shutdown"));
+	script->Run();
+
 	src = String::NewFromUtf8(JS_ISOLATE,c_src.c_str());
-	Local<Script> script = Script::Compile(src, String::NewFromUtf8(JS_ISOLATE,"shutdown"));
+	script = Script::Compile(src, String::NewFromUtf8(JS_ISOLATE,"shutdown"));
 	script->Run();
 	
 	SNUFF_LOG_INFO("Snuffbox shutdown..");
@@ -239,11 +257,11 @@ void Game::NotifyEvent(GameEvents evt)
 //------------------------------------------------------------------------------------------------------
 void Game::JSRender(JS_ARGS)
 {
-	JSWrapper wrapper(args);
+	JS_CHECK_PARAMS("O");
 
 	Camera* camera = wrapper.GetPointer<Camera>(0);
 
-	environment::render_device().UpdateCamera(camera);
+	environment::render_device().SetCamera(camera);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -279,7 +297,7 @@ void Game::JSShowConsole(JS_ARGS)
 //------------------------------------------------------------------------------------------------------
 void Game::JSSetName(JS_ARGS)
 {
-	JSWrapper wrapper(args);
+	JS_CHECK_PARAMS("S");
 	SetWindowTextA(environment::game().window()->handle(), std::string(environment::game().window()->params().name + " " + wrapper.GetString(0)).c_str());
 }
 

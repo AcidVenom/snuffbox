@@ -145,7 +145,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void ContentManager::JSLoad(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("SS");
 
 		bool isContent = false;
 		std::string contentType = wrapper.GetString(0).c_str();
@@ -178,7 +178,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void ContentManager::JSUnload(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("SS");
 
 		bool isContent = false;
 		std::string contentType = wrapper.GetString(0).c_str();
@@ -201,7 +201,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void ContentManager::JSIdle(JS_ARGS)
 	{
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("F");
 		JS_CREATE_SCOPE;
 		const Handle<Value>& value = wrapper.GetFunction(0);
 		SharedPtr<JSCallback> callback = environment::memory().ConstructShared<JSCallback>(Handle<Function>::Cast(value));

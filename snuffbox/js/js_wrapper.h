@@ -1,5 +1,7 @@
 #pragma once
 
+#define JS_CHECK_PARAMS(format) JSWrapper wrapper(args); bool validParams = wrapper.CheckParams(format); if(!validParams){ SNUFF_ASSERT("Invalid parameters!"); }
+
 #include "../../snuffbox/js/js_state_wrapper.h"
 
 using namespace v8;
@@ -51,6 +53,15 @@ namespace snuffbox
 		/// Sets a tuple as the return value of the arguments in .x, .y and .z (defaults)
 		template<typename T>
 		void ReturnTriple(T x, T y, T z, const char* n1 = "x", const char* n2 = "y", const char* n3 = "z");
+
+		/// Returns the type as a string
+		std::string TypeOf(Local<Value> value);
+
+		/// Throws an error with the callee as prefix
+		void Error(std::string error);
+
+		/// Checks if the parameters given in the function are of the right type
+		bool CheckParams(std::string format);
 
 	private:
 		const FunctionCallbackInfo<Value>& args_; ///< The JavaScript arguments passed by a function
@@ -145,5 +156,130 @@ namespace snuffbox
 	inline std::string JSWrapper::GetString(int arg)
 	{
 		return std::string(*String::Utf8Value(args_[arg]->ToString()));
+	}
+
+	//------------------------------------------------------------------------------
+	inline void JSWrapper::Error(std::string error)
+	{
+		std::string objName = *String::Utf8Value(args_.This()->ToString());
+		std::string functionName = *String::Utf8Value(args_.Callee()->ToString());
+
+		SNUFF_LOG_ERROR(std::string("\n" + objName + "\n\t" + functionName + "\n\t\t" + error).c_str());
+	}
+
+	//------------------------------------------------------------------------------
+	inline std::string JSWrapper::TypeOf(Local<Value> value)
+	{
+		if (value->IsFunction())
+		{
+			return "Function";
+		}
+		else if (value->IsArray())
+		{
+			return "Array";
+		}
+		else if (value->IsObject())
+		{
+			return "Object";
+		}
+		else if (value->IsNumber())
+		{
+			return "Number";
+		}
+		else if (value->IsNull())
+		{
+			return "Null";
+		}
+		else if (value->IsBoolean())
+		{
+			return "Boolean";
+		}
+		else if (value->IsUndefined())
+		{
+			return "Undefined";
+		}
+		else
+		{
+			return "Unknown";
+		}
+	}
+
+	//------------------------------------------------------------------------------
+	inline bool JSWrapper::CheckParams(std::string format)
+	{
+		unsigned int count = 0;
+
+		for (auto it = format.c_str(); *it; it++)
+		{
+			char type = *it;
+
+			if (tolower(type) == *"s")
+			{
+				if (!args_[count]->IsString())
+				{
+					Error(std::string("Expected String but got ") + TypeOf(args_[count]) + ", at argument " + std::to_string(count + 1));
+					return false;
+				}
+			}
+			else if (tolower(type) == *"f")
+			{
+				if (!args_[count]->IsFunction())
+				{
+					Error(std::string("Expected Function but got ") + TypeOf(args_[count]) + ", at argument " + std::to_string(count + 1));
+					return false;
+				}
+			}
+			else if (tolower(type) == *"a")
+			{
+				if (!args_[count]->IsArray())
+				{
+					Error(std::string("Expected Array but got ") + TypeOf(args_[count]) + ", at argument " + std::to_string(count + 1));
+					return false;
+				}
+			}
+			else if (tolower(type) == *"o")
+			{
+				if (!args_[count]->IsObject())
+				{
+					Error(std::string("Expected Object but got ") + TypeOf(args_[count]) + ", at argument " + std::to_string(count + 1));
+					return false;
+				}
+			}
+			else if (tolower(type) == *"n")
+			{
+				if (!args_[count]->IsNumber())
+				{
+					Error(std::string("Expected Number but got ") + TypeOf(args_[count]) + ", at argument" + std::to_string(count + 1));
+					return false;
+				}
+			}
+			else if (tolower(type) == *"b")
+			{
+				if (!args_[count]->IsBoolean())
+				{
+					Error(std::string("Expected Boolean but got ") + TypeOf(args_[count]) + ", at argument " + std::to_string(count + 1));
+					return false;
+				}
+			}
+			else if (tolower(type) == *"v")
+			{
+				return true;
+			}
+			else
+			{
+				SNUFF_ASSERT("Unknown parameter format!");
+			}
+
+			++count;
+
+			if (count > static_cast<unsigned int>(args_.Length()))
+			{
+				Error("Not enough actual parameters!");
+				return false;
+			}
+			
+		}
+
+		return true;
 	}
 }

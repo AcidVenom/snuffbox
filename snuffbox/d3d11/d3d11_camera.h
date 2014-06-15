@@ -62,6 +62,7 @@ namespace snuffbox
 		float yaw_, pitch_, roll_;
 		float moveLeftRight_, moveBackForward_, moveUpDown_;
 		float fov_;
+		float ox_, oy_, oz_;
 		CameraType type_;
 	public:
 		JS_NAME(Camera);

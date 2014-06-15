@@ -1,3 +1,6 @@
 *.sdf
 *.ilk
 *.pdb
+*.obj
+*.exe
+*.tlog

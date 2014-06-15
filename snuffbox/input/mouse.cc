@@ -85,7 +85,7 @@ namespace snuffbox
 	void Mouse::JSGetPosition(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("V");
 		std::tuple<double, double> pos = environment::mouse().position();
 		wrapper.ReturnTuple<double>(std::get<0>(pos), std::get<1>(pos));
 	}
@@ -94,7 +94,7 @@ namespace snuffbox
 	void Mouse::JSGetMovement(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("V");
 		std::tuple<double, double> movement = environment::mouse().movement();
 		wrapper.ReturnTuple<double>(std::get<0>(movement), std::get<1>(movement));
 	}
@@ -103,7 +103,7 @@ namespace snuffbox
 	void Mouse::JSWheelUp(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("V");
 		bool check = environment::mouse().IsPressed(MouseEnums::MouseButton::kWheelUp);
 		wrapper.ReturnBool(check);
 	}
@@ -112,7 +112,7 @@ namespace snuffbox
 	void Mouse::JSWheelDown(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("V");
 		bool check = environment::mouse().IsPressed(MouseEnums::MouseButton::kWheelDown);
 		wrapper.ReturnBool(check);
 	}
@@ -121,7 +121,7 @@ namespace snuffbox
 	void Mouse::JSIsPressed(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("N");
 		int button = wrapper.GetNumber<int>(0);
 
 		bool check = environment::mouse().IsPressed(static_cast<MouseEnums::MouseButton>(button));
@@ -132,7 +132,7 @@ namespace snuffbox
 	void Mouse::JSIsDown(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("N");
 		int button = wrapper.GetNumber<int>(0);
 
 		bool check = environment::mouse().IsDown(static_cast<MouseEnums::MouseButton>(button));
@@ -143,7 +143,7 @@ namespace snuffbox
 	void Mouse::JSIsReleased(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("N");
 		int button = wrapper.GetNumber<int>(0);
 
 		bool check = environment::mouse().IsReleased(static_cast<MouseEnums::MouseButton>(button));
@@ -154,7 +154,7 @@ namespace snuffbox
 	void Mouse::JSIsDoubleClicked(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JSWrapper wrapper(args);
+		JS_CHECK_PARAMS("N");
 		int button = wrapper.GetNumber<int>(0);
 
 		bool check = environment::mouse().IsDoubleClicked(static_cast<MouseEnums::MouseButton>(button));
