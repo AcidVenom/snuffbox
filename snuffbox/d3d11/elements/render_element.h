@@ -71,7 +71,8 @@ namespace snuffbox
 			shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get()),
 			destroyed_(true),
 			distanceFromCamera_(0.0f),
-			alpha_(1.0f)
+			alpha_(1.0f),
+			blend_(1.0f,1.0f,1.0f)
 		{}
 
     /// Default destructor
@@ -114,6 +115,10 @@ namespace snuffbox
 		void SetScale(float x, float y, float z);
 		/// Sets the X, Y and Z offset
 		void SetOffset(float x, float y, float z);
+		/// Sets the blend color of this render element
+		void SetBlend(float x, float y, float z);
+		/// Returns the blend color of this render element
+		XMFLOAT3 blend(){ return blend_; }
 
 		/// Sets the distance from the camera
 		void SetDistanceFromCamera(float distance){ distanceFromCamera_ = distance; }
@@ -174,6 +179,7 @@ namespace snuffbox
 		float																	distanceFromCamera_; ///< The distance from the camera
 		float																	alpha_;	///< The alpha value of this whole element
 		std::map<std::string, ShaderUniform>	uniforms_;	///< Uniforms for the constant buffer of the shader
+		XMFLOAT3															blend_;	///< The blend color of this render element
 		
 	public:
 		static void RegisterJS(JS_TEMPLATE);
@@ -194,6 +200,8 @@ namespace snuffbox
 		static void JSSetAlpha(JS_ARGS);
 		static void JSAlpha(JS_ARGS);
 		static void JSSetUniform(JS_ARGS);
+		static void JSSetBlend(JS_ARGS);
+		static void JSBlend(JS_ARGS);
 	};
 
   //-------------------------------------------------------------------------------------------
@@ -295,6 +303,14 @@ namespace snuffbox
     sx_ = x;
     sy_ = y;
     sz_ = z;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::SetBlend(float x, float y, float z)
+	{
+		blend_.x = x;
+		blend_.y = y;
+		blend_.z = z;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -557,6 +573,22 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSSetBlend(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "NNN");
+
+		self->SetBlend(wrapper.GetNumber<float>(0), wrapper.GetNumber<float>(1), wrapper.GetNumber<float>(2));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSBlend(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "V");
+		XMFLOAT3 blend = self->blend();
+		wrapper.ReturnTriple<float>(blend.x,blend.y,blend.z,"r","g","b");
+	}
+
+	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -578,7 +610,9 @@ namespace snuffbox
       JSFunctionRegister("spawn", JSSpawn),
 			JSFunctionRegister("alpha", JSAlpha),
 			JSFunctionRegister("setAlpha", JSSetAlpha),
-			JSFunctionRegister("setUniform", JSSetUniform)
+			JSFunctionRegister("setUniform", JSSetUniform),
+			JSFunctionRegister("setBlend", JSSetBlend),
+			JSFunctionRegister("blend", JSBlend)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);

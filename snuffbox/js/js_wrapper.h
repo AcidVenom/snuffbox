@@ -249,7 +249,7 @@ namespace snuffbox
 			{
 				if (!args_[count]->IsNumber())
 				{
-					Error(std::string("Expected Number but got ") + TypeOf(args_[count]) + ", at argument" + std::to_string(count + 1));
+					Error(std::string("Expected Number but got ") + TypeOf(args_[count]) + ", at argument " + std::to_string(count + 1));
 					return false;
 				}
 			}

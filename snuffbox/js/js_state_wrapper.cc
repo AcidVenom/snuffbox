@@ -138,6 +138,7 @@ namespace snuffbox
 		isolate_ = Isolate::GetCurrent();
 
 		environment::globalInstance = this;
+		SNUFF_LOG_INFO("Initialised V8");
 	}
 
 	//---------------------------------------------------------------------------
@@ -157,6 +158,7 @@ namespace snuffbox
 		}
 
 		CompileAndRun("main");
+		SNUFF_LOG_SUCCESS("Succesfully initialised the JavaScript state");
 	}
 
 	//---------------------------------------------------------------------------
@@ -254,7 +256,7 @@ namespace snuffbox
 			error += "\n\n";
 
 			std::string srcline = *sourceline;
-
+			
 			auto it = std::remove_if(std::begin(srcline), std::end(srcline), [](char c){ return (c == '\t'); });
 			srcline.erase(it, std::end(srcline));
 

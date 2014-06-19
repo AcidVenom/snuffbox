@@ -1,7 +1,7 @@
-﻿Build started 6/15/2014 8:37:50 PM.
+﻿Build started 6/17/2014 6:39:06 PM.
      1>Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /IC:\V8\include /I"C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\\Include" /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _MBCS /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt /DNOMINMAX console\console.cc console\console_widget.cc console\moc_console_widget.cc content\content.cc content\content_manager.cc d3d11\d3d11_camera.cc d3d11\d3d11_display_device.cc d3d11\d3d11_settings.cc d3d11\d3d11_shader.cc d3d11\d3d11_texture.cc d3d11\elements\billboard_element.cc d3d11\elements\quad_element.cc d3d11\elements\terrain_element.cc d3d11\gui\d3d11_gui.cc d3d11\gui\d3d11_ui_widget.cc game.cc input\keyboard.cc input\mouse.cc js\js_state_wrapper.cc js\js_wrapper.cc memory\allocated_memory.cc win32\win32_file_watch.cc win32\win32_window.cc
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /IC:\V8\include /I"C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\\Include" /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _MBCS /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt /DNOMINMAX console\console.cc console\console_widget.cc console\moc_console_widget.cc content\content.cc content\content_manager.cc d3d11\d3d11_camera.cc d3d11\d3d11_display_device.cc d3d11\d3d11_settings.cc d3d11\d3d11_shader.cc d3d11\d3d11_texture.cc d3d11\elements\billboard_element.cc d3d11\elements\quad_element.cc d3d11\elements\terrain_element.cc game.cc input\keyboard.cc input\mouse.cc js\js_wrapper.cc memory\allocated_memory.cc win32\win32_file_watch.cc win32\win32_window.cc
          console.cc
          console_widget.cc
          moc_console_widget.cc
@@ -15,14 +15,10 @@
          billboard_element.cc
          quad_element.cc
          terrain_element.cc
-         d3d11_gui.cc
-         d3d11_ui_widget.cc
          game.cc
          keyboard.cc
          mouse.cc
-         js_state_wrapper.cc
          js_wrapper.cc
-         Compiling...
          allocated_memory.cc
          win32_file_watch.cc
          win32_window.cc
@@ -40,8 +36,6 @@
          x64\Release\billboard_element.obj
          x64\Release\quad_element.obj
          x64\Release\terrain_element.obj
-         x64\Release\d3d11_gui.obj
-         x64\Release\d3d11_ui_widget.obj
          x64\Release\game.obj
          x64\Release\keyboard.obj
          x64\Release\mouse.obj
@@ -57,4 +51,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:03:04.78
+Time Elapsed 00:02:53.57

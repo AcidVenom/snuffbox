@@ -65,6 +65,8 @@ namespace snuffbox
 		CreateDefaultTexture();
 		CreateBlendState();
 		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
+
+		SNUFF_LOG_SUCCESS("Succesfully initialised the D3D11 display device");
 	}
 
 	//---------------------------------------------------------------------------------
@@ -200,13 +202,12 @@ namespace snuffbox
 		D3D11_INPUT_ELEMENT_DESC layout[] = 
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		result = device_->CreateInputLayout(layout, 4, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
-		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+		result = device_->CreateInputLayout(layout, 3, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result, "Input Layout").c_str());
 
 		context_->IASetInputLayout(inputLayout_);
 		context_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -578,6 +579,7 @@ namespace snuffbox
 		mappedData->Projection = projectionMatrix_;
 		mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
 		mappedData->Alpha = it->alpha();
+		mappedData->Blend = it->blend();
 
 		context_->Unmap(vsConstantBuffer_, 0);
 
@@ -648,6 +650,14 @@ namespace snuffbox
 
 			it->SetDistanceFromCamera(distance);
 
+			DrawRenderElement(it);
+		}
+		SwapChainDescription swapDesc;
+		swapChain_->GetDesc(&swapDesc);
+		projectionMatrix_ = XMMatrixOrthographicRH(XM_PI/2, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f) * XMMatrixOrthographicRH(swapDesc.BufferDesc.Width,swapDesc.BufferDesc.Height,1.0f,1000.0f);
+		viewMatrix_ = XMMatrixIdentity();
+		for (auto& it : renderElements_)
+		{
 			DrawRenderElement(it);
 		}
 	}

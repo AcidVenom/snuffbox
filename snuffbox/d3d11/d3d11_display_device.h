@@ -52,10 +52,9 @@ namespace snuffbox
 	struct Vertex
 	{
 		float x, y, z;
-		D3DXCOLOR colour;
 		XMFLOAT3 normal;
 		XMFLOAT2 texCoord;
-		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 3 + sizeof(D3DXCOLOR)+sizeof(XMFLOAT3)+sizeof(XMFLOAT2));
+		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 3 +sizeof(XMFLOAT3)+sizeof(XMFLOAT2));
 	};
 
 	/**
@@ -65,12 +64,13 @@ namespace snuffbox
 	*/
 	struct VS_CONSTANT_BUFFER
 	{
-		float Time; // 4 bytes
+		float Time;
 		XMMATRIX Projection;
 		XMMATRIX View;
 		XMMATRIX World;
 		XMMATRIX WorldViewProjection;
 		float Alpha;
+		XMFLOAT3 Blend;
 	};
 
 	/**
@@ -216,6 +216,7 @@ namespace snuffbox
 		ID3D11RasterizerState*				rasterizerState_;	  ///< The rasterizer state
 		std::vector<RenderElement*>		renderElements_;		///< The list of render elements
 		std::vector<RenderElement*>		opaqueElements_;		///< The list of opaque render elements
+		std::vector<RenderElement*>		uiElements_;				///< The list of ui render elements
     VertexBufferType              vbType_;            ///< The vertex buffer type
 		ID3D11DepthStencilView*				depthStencilView_;	///< The depth stencil view
 		ID3D11Texture2D*							depthStencilBuffer_;///< The buffer of the depth stencil

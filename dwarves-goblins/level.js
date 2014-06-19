@@ -31,7 +31,7 @@ LevelState.initialise = function()
 
 	this._background.setTranslation(0,0,0);
 	this._background.setOffset(0.5,0.5,0.5);
-	this._background.setScale(4,2,2);
+	this._background.setScale(2,3,3);
 
 	this._world = new World();
 	this._player = new Player();

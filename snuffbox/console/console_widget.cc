@@ -477,9 +477,10 @@ namespace snuffbox
 				SNUFF_SAFE_DELETE(child);
 			}
 
-			watchedVariables_.erase(it);
 			SNUFF_SAFE_DELETE(it->second);
 		}
+
+		watchedVariables_.clear();
 
 		SNUFF_SAFE_DELETE(ui_);
 	}

@@ -1,4 +1,17 @@
-var terrain;
+var terrain = terrain || undefined;
+var quad = quad || Quad.new();
+
+quad.spawn();
+quad.setBlend(1,0,0);
+quad.setRotation(-Math.PI/2,0,0);
+quad.setScale(100,0,100);
+quad.setOffset(0.5,0,0.5);
+quad.setTranslation(-400,0,0);
+
+if(terrain != undefined)
+{
+	terrain.setBlend(1,0.8,0.5);
+}
 
 Game.Initialise = function()
 {
