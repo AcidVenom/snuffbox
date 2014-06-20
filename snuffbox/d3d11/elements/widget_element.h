@@ -61,6 +61,7 @@ namespace snuffbox
 		ID3D11Buffer* indexBuffer_; ///< The index buffer of this element
 		int						anchors_[4]; ///< Booleans to check if a widget should be anchored
 		XMMATRIX			world_; ///< The world matrix
+		Widget*				parent_; ///< The widget's parent
 	public:
 		JS_NAME(Widget);
 

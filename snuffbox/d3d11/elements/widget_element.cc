@@ -3,16 +3,26 @@
 namespace snuffbox
 {
 	//-------------------------------------------------------------------------------------------
-	Widget::Widget() : RenderElement(RenderElement::ElementTypes::kWidget)
+	Widget::Widget() : 
+		RenderElement(RenderElement::ElementTypes::kWidget),
+		parent_(nullptr)
 	{
 
 	}
 
 	//-------------------------------------------------------------------------------------------
-	Widget::Widget(JS_ARGS) : RenderElement(RenderElement::ElementTypes::kWidget)
+	Widget::Widget(JS_ARGS) : 
+		RenderElement(RenderElement::ElementTypes::kWidget),
+		parent_(nullptr)
 	{
+		JSWrapper wrapper(args);
 		Create();
 		SetScale(64, 0, 64);
+
+		if (args.Length() > 0)
+		{
+			parent_ = wrapper.GetPointer<Widget>(0);
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -118,8 +128,34 @@ namespace snuffbox
 		float w = static_cast<float>(environment::render_settings().settings().resolution.w);
 		float h = static_cast<float>(environment::render_settings().settings().resolution.h);
 
-		float anchorLeftRight = static_cast<float>(anchors_[WidgetAnchor::kRight] - anchors_[WidgetAnchor::kLeft]) * w;
-		float anchorTopBottom = static_cast<float>(anchors_[WidgetAnchor::kBottom] - anchors_[WidgetAnchor::kTop]) * h;
+		if (parent_)
+		{
+			w = XMVectorGetX(parent_->scale());
+			h = XMVectorGetZ(parent_->scale());
+		}
+
+		float offsetX, offsetZ;
+
+		if (!parent_)
+		{
+			offsetX = anchors_[WidgetAnchor::kLeft] == 0 ? -XMVectorGetX(scale()) : 0;
+			offsetZ = anchors_[WidgetAnchor::kBottom] == 0 ? -XMVectorGetZ(scale()) : 0;
+		}
+		else
+		{
+			offsetX = anchors_[WidgetAnchor::kLeft] == 1 ? XMVectorGetX(scale()) : 0;
+			offsetZ = anchors_[WidgetAnchor::kBottom] == 1 ? XMVectorGetZ(scale()) : 0;
+		}
+		
+		float anchorLeftRight = static_cast<float>(anchors_[WidgetAnchor::kRight] - anchors_[WidgetAnchor::kLeft]) * w / 2 + offsetX;
+		float anchorTopBottom = static_cast<float>(anchors_[WidgetAnchor::kTop] - anchors_[WidgetAnchor::kBottom]) * h / 2 + offsetZ;
+
+		if (parent_)
+		{
+			XMVECTOR trans = XMVectorSet(parent_->World(nullptr)._41, parent_->World(nullptr)._42, parent_->World(nullptr)._43, parent_->World(nullptr)._44);
+			anchorLeftRight += XMVectorGetX(trans);
+			anchorTopBottom += XMVectorGetY(trans);
+		}
 
 		return XMMatrixTranslation(anchorLeftRight, anchorTopBottom, 0);
 	}

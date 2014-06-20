@@ -104,7 +104,7 @@ namespace snuffbox
     }
 
 		XMMATRIX scaling(){ return XMMatrixScaling(sx_, sy_, sz_); }
-		XMMATRIX offset(){ return XMMatrixTranslation(ox_, oy_, oz_); }
+		XMMATRIX offset(){ return XMMatrixTranslation(ox_*sx_, oy_*sy_, oz_*sz_); }
 		XMVECTOR scale(){ return XMVectorSet(sx_, sy_, sz_,0); }
 		XMMATRIX rotation(){ return rotation_; }
 

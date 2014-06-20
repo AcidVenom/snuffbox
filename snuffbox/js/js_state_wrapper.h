@@ -40,7 +40,7 @@ namespace snuffbox
 
 		JS_NAME(JSObject);
 		static void RegisterJS(JS_TEMPLATE);
-    virtual void RegisterExtraFunctions(JS_EXTRA){};
+		virtual void RegisterExtraFunctions(JS_EXTRA){};
 
 		Persistent<Object>& persistent(){ return persistent_; }
 

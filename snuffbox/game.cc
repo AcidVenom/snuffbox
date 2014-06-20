@@ -18,7 +18,7 @@
 #include <QtCore>
 
 #define SNUFF_VERSION_MAJOR 1
-#define SNUFF_VERSION_MINOR 1
+#define SNUFF_VERSION_MINOR 5
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"

@@ -1,6 +1,7 @@
 ContentManager.load("shader","shaders/custom.fx");
 var terrain = terrain || undefined;
 var widget = widget || undefined; 
+var widget2 = widget2 || undefined;
 var billboard = billboard || Billboard.new();
 billboard.setScale(40,0,40);
 
@@ -30,6 +31,11 @@ Game.Initialise = function()
 	widget = Widget.new();
 	widget.setAnchorLeft();
 	widget.spawn();
+
+	widget2 = Widget.new(widget);
+	widget2.setScale(32,0,32);
+	widget2.setBlend(1,0,0);
+	widget2.spawn();
 }
 Game.Update = function(dt)
 {	
