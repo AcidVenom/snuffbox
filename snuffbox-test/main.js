@@ -2,7 +2,7 @@ ContentManager.load("shader","shaders/custom.fx");
 var terrain = terrain || undefined;
 var quad = quad || Quad.new();
 var quad2 = quad2 || Quad.new();
-var widget = widget || Widget.new();
+var widget = widget || undefined; 
 
 quad2.spawn();
 quad2.setRotation(-Math.PI/2,0,0);
@@ -35,6 +35,7 @@ Game.Initialise = function()
 	terrain = Terrain.new(128,128);
 	terrain.spawn();
 	terrain.setShader("shaders/custom.fx");
+	widget = Widget.new();
 }
 Game.Update = function(dt)
 {	

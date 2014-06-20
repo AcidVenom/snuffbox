@@ -357,6 +357,8 @@ namespace snuffbox
 	//---------------------------------------------------------------
 	void ConsoleWidget::AddLine(LogSeverity sev, const char* msg)
 	{
+    if (msg == nullptr) return;
+
 		if (strcmp(lastLine_.c_str(), msg) == 0)
 		{
 			++repeatCount_;

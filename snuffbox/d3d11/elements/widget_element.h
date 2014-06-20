@@ -50,9 +50,6 @@ namespace snuffbox
 		/// Removes an anchor
 		void RemoveAnchor(WidgetAnchor anchor);
 
-		/// Registers extra functions for this render element
-		void RegisterExtraFunctions();
-
 	private:
 		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer of this element
 		ID3D11Buffer* indexBuffer_; ///< The index buffer of this element
@@ -62,5 +59,6 @@ namespace snuffbox
 
 		static void JSSetAnchor(JS_ARGS);
 		static void JSRemoveAnchor(JS_ARGS);
+    void RegisterExtraFunctions(JS_EXTRA);
 	};
 }

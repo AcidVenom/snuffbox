@@ -13,6 +13,7 @@ using namespace v8;
 #define JS_GLOBAL environment::js_state_wrapper().global()
 #define JS_ARGS const v8::FunctionCallbackInfo<v8::Value>& args
 #define JS_TEMPLATE const Handle<FunctionTemplate>& obj
+#define JS_EXTRA const Handle<Object>& obj
 #define JS_REGISTER_OBJECT_FUNCTIONS(obj,func,cons) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){if (cons){ obj->PrototypeTemplate()->Set(String::NewFromUtf8(JS_ISOLATE, func[i].name), FunctionTemplate::New(JS_ISOLATE, func[i].cb)); }else{obj->Set(String::NewFromUtf8(JS_ISOLATE, func[i].name), FunctionTemplate::New(JS_ISOLATE, func[i].cb)); }} 
 #define JS_CREATE_SCOPE HandleScope handle_scope(JS_ISOLATE);
 #define JS_CREATE_ARGUMENT_SCOPE HandleScope handle_scope(args.GetIsolate());
@@ -39,6 +40,7 @@ namespace snuffbox
 
 		JS_NAME(JSObject);
 		static void RegisterJS(JS_TEMPLATE);
+    virtual void RegisterExtraFunctions(JS_EXTRA){};
 
 		Persistent<Object>& persistent(){ return persistent_; }
 

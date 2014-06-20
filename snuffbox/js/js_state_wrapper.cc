@@ -314,6 +314,7 @@ namespace snuffbox
 		int64_t size = static_cast<int64_t>(sizeof(ptr));
 
 		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size*100);
+    static_cast<JSObject*>(ptr)->RegisterExtraFunctions(obj);
 		args.GetReturnValue().Set(obj);
 	}
 }

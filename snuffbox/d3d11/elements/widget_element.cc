@@ -14,7 +14,6 @@ namespace snuffbox
 		Create();
 		SetAspect(true);
 		SetScale(64, 0, 64);
-		RegisterExtraFunctions();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -54,12 +53,11 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------
-	void Widget::RegisterExtraFunctions()
+	void Widget::RegisterExtraFunctions(JS_EXTRA)
 	{
-		/*JS_CREATE_SCOPE;
-		Local<Object> obj = Local<Object>::New(JS_ISOLATE, persistent());
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "setAnchor"), Function::New(JS_ISOLATE, JSSetAnchor));
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "removeAnchor"), Function::New(JS_ISOLATE, JSRemoveAnchor));*/
+		JS_CREATE_SCOPE;
+    obj->Set(String::NewFromUtf8(JS_ISOLATE, "setAnchor"), Function::New(JS_ISOLATE, JSSetAnchor));
+    obj->Set(String::NewFromUtf8(JS_ISOLATE, "removeAnchor"), Function::New(JS_ISOLATE, JSRemoveAnchor));
 	}
 
 	//-------------------------------------------------------------------------------
