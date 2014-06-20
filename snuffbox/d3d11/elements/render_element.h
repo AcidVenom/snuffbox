@@ -7,6 +7,7 @@
 #include "../../../snuffbox/game.h"
 #include "../../../snuffbox/d3d11/d3d11_texture.h"
 #include "../../../snuffbox/content/content_manager.h"
+#include "../../../snuffbox/d3d11/d3d11_settings.h"
 
 namespace snuffbox
 {
@@ -57,6 +58,7 @@ namespace snuffbox
 			kTerrain,
 			kQuad,
 			kBillboard,
+			kWidget
 		};
 
 		/// Default constructor
@@ -72,8 +74,15 @@ namespace snuffbox
 			destroyed_(true),
 			distanceFromCamera_(0.0f),
 			alpha_(1.0f),
-			blend_(1.0f,1.0f,1.0f)
-		{}
+			blend_(1.0f,1.0f,1.0f),
+			visible_(true),
+			aspect_(false)
+		{
+			if (elementType_ == ElementTypes::kWidget)
+			{
+				RotateBy(-XM_PI / 2, 0, 0);
+			}
+		}
 
     /// Default destructor
     ~RenderElement()
@@ -90,9 +99,17 @@ namespace snuffbox
 		std::vector<unsigned int>& indices(){ return indices_; };
 
 		/// Returns the world matrix
-    XMMATRIX& World(){ 
-			worldMatrix_ = XMMatrixScaling(sx_, sy_, sz_) *
-			XMMatrixTranslation(ox_*sx_, oy_*sy_, oz_*sz_) *
+    XMMATRIX& World(){
+			float w = 1, h = 1;
+
+			if (aspect_)
+			{
+				w = environment::render_settings().settings().resolution.w;
+				h = environment::render_settings().settings().resolution.h;
+			}
+
+			worldMatrix_ = XMMatrixScaling(sx_, sy_, sz_*h/w) *
+			XMMatrixTranslation(ox_*sx_, oy_*sy_, oz_*sz_*h/w) *
       rotation_ *
       XMMatrixTranslation(x_, y_, z_);
       return worldMatrix_; 
@@ -164,6 +181,18 @@ namespace snuffbox
 		/// Returns a list of uniforms to assign to the constant buffer
 		std::vector<float> uniforms();
 
+		/// Sets the visibility of this render element
+		void SetVisible(bool visible){ visible_ = visible; }
+
+		/// Returns the visibility of this render element
+		bool visible(){ return visible_; }
+
+		/// Is this render element drawn with the aspect ratio of the screen taken into account?
+		bool aspect(){ return aspect_; }
+
+		/// Set the aspect ratio boolean
+		void SetAspect(bool aspect){ aspect_ = aspect; }
+
 	private:
 		std::vector<Vertex>										vertices_; ///< The vertices
 		std::vector<unsigned int>							indices_; ///< The indices
@@ -176,10 +205,12 @@ namespace snuffbox
 		Shader*																shader_; ///< The current shader used by this element
 		ElementTypes													elementType_;	///< The type of this render element
     bool																	destroyed_; ///< Is this element destroyed?
+		bool																	aspect_;	///< Should this render element be in the aspect ratio of the screen?
 		float																	distanceFromCamera_; ///< The distance from the camera
 		float																	alpha_;	///< The alpha value of this whole element
 		std::map<std::string, ShaderUniform>	uniforms_;	///< Uniforms for the constant buffer of the shader
 		XMFLOAT3															blend_;	///< The blend color of this render element
+		bool																	visible_; ///< Is this element visible?
 		
 	public:
 		static void RegisterJS(JS_TEMPLATE);
@@ -202,6 +233,7 @@ namespace snuffbox
 		static void JSSetUniform(JS_ARGS);
 		static void JSSetBlend(JS_ARGS);
 		static void JSBlend(JS_ARGS);
+		static void JSSetVisible(JS_ARGS);
 	};
 
   //-------------------------------------------------------------------------------------------
@@ -210,13 +242,17 @@ namespace snuffbox
     if (destroyed_)
     {
       destroyed_ = false;
-			if (element_type() != ElementTypes::kTerrain)
+			if (element_type() == ElementTypes::kTerrain)
 			{
-				environment::render_device().renderElements().push_back(this);
+				environment::render_device().opaqueElements().push_back(this);
+			}
+			else if (element_type() == ElementTypes::kWidget)
+			{
+				environment::render_device().uiElements().push_back(this);
 			}
 			else
 			{
-				environment::render_device().opaqueElements().push_back(this);
+				environment::render_device().renderElements().push_back(this);
 			}
     }
   }
@@ -229,13 +265,25 @@ namespace snuffbox
       unsigned int index = 0;
       if (environment::has_game())
       {
-				if (element_type() != ElementTypes::kTerrain)
+				if (element_type() == ElementTypes::kTerrain)
 				{
-					for (auto& it : environment::render_device().renderElements())
+					for (auto& it : environment::render_device().opaqueElements())
 					{
 						if (it == this)
 						{
-							environment::render_device().renderElements().erase(environment::render_device().renderElements().begin() + index);
+							environment::render_device().opaqueElements().erase(environment::render_device().opaqueElements().begin() + index);
+							break;
+						}
+						++index;
+					}
+				}
+				else if (element_type() == ElementTypes::kWidget)
+				{
+					for (auto& it : environment::render_device().uiElements())
+					{
+						if (it == this)
+						{
+							environment::render_device().uiElements().erase(environment::render_device().uiElements().begin() + index);
 							break;
 						}
 						++index;
@@ -243,11 +291,11 @@ namespace snuffbox
 				}
 				else
 				{
-					for (auto& it : environment::render_device().opaqueElements())
+					for (auto& it : environment::render_device().renderElements())
 					{
 						if (it == this)
 						{
-							environment::render_device().opaqueElements().erase(environment::render_device().opaqueElements().begin() + index);
+							environment::render_device().renderElements().erase(environment::render_device().renderElements().begin() + index);
 							break;
 						}
 						++index;
@@ -586,6 +634,13 @@ namespace snuffbox
 		JS_SETUP(RenderElement, "V");
 		XMFLOAT3 blend = self->blend();
 		wrapper.ReturnTriple<float>(blend.x,blend.y,blend.z,"r","g","b");
+	}
+
+	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSSetVisible(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "B");
+		self->SetVisible(wrapper.GetBool(0));
 	}
 
 	//-------------------------------------------------------------------------------------------

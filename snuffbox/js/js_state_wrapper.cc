@@ -104,8 +104,6 @@ namespace snuffbox
 		Handle<ObjectTemplate> global = ObjectTemplate::New(isolate_);
 		global_.Reset(isolate_, global);
 
-		RegisterJSObjects();
-
 		JS_REGISTER_GLOBAL_TYPELESS("Log");
 
 		JSFunctionRegister logFunctions[] =
@@ -128,6 +126,7 @@ namespace snuffbox
 		};
 
 		JS_REGISTER_FUNCTIONS(funcRegister);
+		RegisterJSObjects();
 
 		return Context::New(isolate_, NULL, global);
 	}
@@ -145,7 +144,7 @@ namespace snuffbox
 	void JSStateWrapper::Initialise()
 	{
 		HandleScope scope(isolate_);
-		Local<Context> context = CreateContext();
+		Handle<Context> context = CreateContext();
 		context_.Reset(isolate_, context);
     context->Enter();
 

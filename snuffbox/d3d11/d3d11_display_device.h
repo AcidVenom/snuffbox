@@ -165,6 +165,9 @@ namespace snuffbox
 		/// Returns the list of opaque render elements
 		std::vector<RenderElement*>& opaqueElements(){ return opaqueElements_; }
 
+		/// Returns the list of ui render elements
+		std::vector<RenderElement*>& uiElements(){ return uiElements_; }
+
     /// Returns the current vertex buffer type
     VertexBufferType& vbType(){ return vbType_; }
 

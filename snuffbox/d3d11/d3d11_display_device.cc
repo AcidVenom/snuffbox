@@ -64,7 +64,6 @@ namespace snuffbox
 		CreateSamplerState();
 		CreateDefaultTexture();
 		CreateBlendState();
-		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
 
 		SNUFF_LOG_SUCCESS("Succesfully initialised the D3D11 display device");
 	}
@@ -525,6 +524,7 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
+		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
 		context_->ClearRenderTargetView(renderTargetView_, environment::render_settings().settings().bufferColor);
 		context_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -542,89 +542,91 @@ namespace snuffbox
 
 	void D3D11DisplayDevice::DrawRenderElement(RenderElement* it)
 	{
-		RenderElement::ElementTypes elementType = it->element_type();
-		VertexBufferType type = it->type();
-		if (type != vbType_)
+		if (it->visible())
 		{
-			it->SetBuffers();
-			vbType_ = type;
-		}
-
-		if (elementType == RenderElement::ElementTypes::kBillboard)
-		{
-			Billboard* ptr = static_cast<Billboard*>(it);
-			if (camera_)
+			RenderElement::ElementTypes elementType = it->element_type();
+			VertexBufferType type = it->type();
+			if (type != vbType_)
 			{
-				worldMatrix_ = ptr->WorldFromCamera(camera_);
+				it->SetBuffers();
+				vbType_ = type;
 			}
-		}
-		else
-		{
-			worldMatrix_ = it->World();
-		}
 
-		D3D11_MAPPED_SUBRESOURCE cbData;
-		VS_CONSTANT_BUFFER* mappedData;
-		float* uniforms;
-
-		context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-		context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-
-		context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
-
-		mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
-		mappedData->Time = time_;
-		mappedData->World = worldMatrix_;
-		mappedData->View = viewMatrix_;
-		mappedData->Projection = projectionMatrix_;
-		mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
-		mappedData->Alpha = it->alpha();
-		mappedData->Blend = it->blend();
-
-		context_->Unmap(vsConstantBuffer_, 0);
-
-		context_->VSSetConstantBuffers(1, 1, &uniformBuffer_);
-		context_->PSSetConstantBuffers(1, 1, &uniformBuffer_);
-
-		context_->Map(uniformBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
-
-		uniforms = static_cast<float*>(cbData.pData);
-		auto vec = it->uniforms();
-		for (unsigned int i = 0; i < vec.size(); ++i)
-		{
-			uniforms[i] = vec[i];
-		}
-
-		context_->Unmap(uniformBuffer_, 0);
-
-		if (it->texture())
-		{
-			if (currentTexture_ != it->texture())
+			if (elementType == RenderElement::ElementTypes::kBillboard)
 			{
-				auto tex = it->texture()->resource();
-				context_->PSSetShaderResources(0, 1, &tex);
-				currentTexture_ = it->texture();
+				Billboard* ptr = static_cast<Billboard*>(it);
+				if (camera_)
+				{
+					worldMatrix_ = ptr->WorldFromCamera(camera_);
+				}
 			}
-		}
-		else
-		{
-			context_->PSSetShaderResources(0, 1, &defaultResource_);
-			currentTexture_ = nullptr;
-		}
-
-		if (it->shader())
-		{
-			if (currentShader_ != it->shader())
+			else
 			{
-				auto shaders = it->shader()->shaders();
-				context_->PSSetShader(shaders.ps, 0, 0);
-				context_->VSSetShader(shaders.vs, 0, 0);
-				currentShader_ = it->shader();
+				worldMatrix_ = it->World();
 			}
+
+			D3D11_MAPPED_SUBRESOURCE cbData;
+			VS_CONSTANT_BUFFER* mappedData;
+			float* uniforms;
+
+			context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+			context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+
+			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+
+			mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
+			mappedData->Time = time_;
+			mappedData->World = worldMatrix_;
+			mappedData->View = viewMatrix_;
+			mappedData->Projection = projectionMatrix_;
+			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+			mappedData->Alpha = it->alpha();
+			mappedData->Blend = it->blend();
+
+			context_->Unmap(vsConstantBuffer_, 0);
+
+			context_->VSSetConstantBuffers(1, 1, &uniformBuffer_);
+			context_->PSSetConstantBuffers(1, 1, &uniformBuffer_);
+
+			context_->Map(uniformBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+
+			uniforms = static_cast<float*>(cbData.pData);
+			auto vec = it->uniforms();
+			for (unsigned int i = 0; i < vec.size(); ++i)
+			{
+				uniforms[i] = vec[i];
+			}
+
+			context_->Unmap(uniformBuffer_, 0);
+
+			if (it->texture())
+			{
+				if (currentTexture_ != it->texture())
+				{
+					auto tex = it->texture()->resource();
+					context_->PSSetShaderResources(0, 1, &tex);
+					currentTexture_ = it->texture();
+				}
+			}
+			else
+			{
+				context_->PSSetShaderResources(0, 1, &defaultResource_);
+				currentTexture_ = nullptr;
+			}
+
+			if (it->shader())
+			{
+				if (currentShader_ != it->shader())
+				{
+					auto shaders = it->shader()->shaders();
+					context_->PSSetShader(shaders.ps, 0, 0);
+					context_->VSSetShader(shaders.vs, 0, 0);
+					currentShader_ = it->shader();
+				}
+			}
+
+			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 		}
-
-
-		context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -652,11 +654,14 @@ namespace snuffbox
 
 			DrawRenderElement(it);
 		}
+
+		context_->OMSetRenderTargets(1, &renderTargetView_, NULL);
+
 		SwapChainDescription swapDesc;
 		swapChain_->GetDesc(&swapDesc);
 		projectionMatrix_ = XMMatrixOrthographicRH(XM_PI/2, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f) * XMMatrixOrthographicRH(swapDesc.BufferDesc.Width,swapDesc.BufferDesc.Height,1.0f,1000.0f);
 		viewMatrix_ = XMMatrixIdentity();
-		for (auto& it : renderElements_)
+		for (auto& it : uiElements_)
 		{
 			DrawRenderElement(it);
 		}
