@@ -209,6 +209,7 @@ namespace snuffbox
 		environment::game().NotifyEvent(GameEvents::kQuit);
 	}
 
+	//---------------------------------------------------------------------------
 	void Win32Window::OnResize(LPARAM lParam, WPARAM wParam)
 	{
 		if (!environment::game().started())

@@ -552,18 +552,7 @@ namespace snuffbox
 				vbType_ = type;
 			}
 
-			if (elementType == RenderElement::ElementTypes::kBillboard)
-			{
-				Billboard* ptr = static_cast<Billboard*>(it);
-				if (camera_)
-				{
-					worldMatrix_ = ptr->WorldFromCamera(camera_);
-				}
-			}
-			else
-			{
-				worldMatrix_ = it->World();
-			}
+			worldMatrix_ = it->World(camera_);
 
 			D3D11_MAPPED_SUBRESOURCE cbData;
 			VS_CONSTANT_BUFFER* mappedData;
@@ -659,7 +648,8 @@ namespace snuffbox
 
 		SwapChainDescription swapDesc;
 		swapChain_->GetDesc(&swapDesc);
-		projectionMatrix_ = XMMatrixOrthographicRH(XM_PI/2, static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f) * XMMatrixOrthographicRH(swapDesc.BufferDesc.Width,swapDesc.BufferDesc.Height,1.0f,1000.0f);
+
+		projectionMatrix_ = XMMatrixOrthographicRH(swapDesc.BufferDesc.Width, swapDesc.BufferDesc.Height, 1.0f, 1000.0f);
 		viewMatrix_ = XMMatrixIdentity();
 		for (auto& it : uiElements_)
 		{
@@ -684,7 +674,7 @@ namespace snuffbox
 		swapChain_->GetDesc(&swapDesc);
 		if (camera->type() == Camera::CameraType::kOrthographic)
 		{
-			projectionMatrix_ = XMMatrixOrthographicRH(camera->fov(), static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
+			projectionMatrix_ = XMMatrixOrthographicRH(swapDesc.BufferDesc.Width, swapDesc.BufferDesc.Height, 1.0f, 1000.0f);
 		}
 		else
 		{
@@ -714,8 +704,8 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(backBuffer_);
 		SNUFF_SAFE_RELEASE(inputLayout_);
 
-		unsigned int w = environment::game().window()->params().w;
-		unsigned int h = environment::game().window()->params().h;
+		unsigned int w = environment::render_settings().settings().resolution.w;
+		unsigned int h = environment::render_settings().settings().resolution.h;
 
 		result = swapChain_->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());

@@ -47,15 +47,25 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	XMMATRIX Billboard::WorldFromCamera(Camera* camera)
+	XMMATRIX& Billboard::World(Camera* camera)
 	{
 		XMMATRIX baseMatrix(XMMatrixTranspose(camera->view()));
 
 		baseMatrix._14 = baseMatrix._24 = baseMatrix._34 = baseMatrix._41 = baseMatrix._42 = baseMatrix._43 = 0;
 		baseMatrix._44 = 1;
 
-		XMMATRIX transformation = XMMatrixMultiply(offset() * XMMatrixRotationX(-XM_PI / 2) * baseMatrix, scaling() * XMMatrixTranslationFromVector(translation()));
+		XMVECTOR trans = translation();
+		float x = XMVectorGetX(trans);
+		float y = XMVectorGetY(trans);
+		float z = XMVectorGetZ(trans);
 
-		return transformation;
+		XMVECTOR s = scale();
+		float sx = XMVectorGetX(s);
+		float sy = XMVectorGetY(s);
+		float sz = XMVectorGetZ(s);
+
+		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * baseMatrix * XMMatrixTranslation(x*sx,y*sy,z*sz);
+
+		return world_;
 	}
 }

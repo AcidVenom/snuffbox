@@ -75,13 +75,9 @@ namespace snuffbox
 			distanceFromCamera_(0.0f),
 			alpha_(1.0f),
 			blend_(1.0f,1.0f,1.0f),
-			visible_(true),
-			aspect_(false)
+			visible_(true)
 		{
-			if (elementType_ == ElementTypes::kWidget)
-			{
-				RotateBy(-XM_PI / 2, 0, 0);
-			}
+
 		}
 
     /// Default destructor
@@ -99,17 +95,9 @@ namespace snuffbox
 		std::vector<unsigned int>& indices(){ return indices_; };
 
 		/// Returns the world matrix
-    XMMATRIX& World(){
-			float w = 1, h = 1;
-
-			if (aspect_)
-			{
-				w = environment::render_settings().settings().resolution.w;
-				h = environment::render_settings().settings().resolution.h;
-			}
-
-			worldMatrix_ = XMMatrixScaling(sx_, sy_, sz_*h/w) *
-			XMMatrixTranslation(ox_*sx_, oy_*sy_, oz_*sz_*h/w) *
+    virtual XMMATRIX& World(Camera* camera){
+			worldMatrix_ = XMMatrixScaling(sx_, sy_, sz_) *
+			XMMatrixTranslation(ox_*sx_, oy_*sy_, oz_*sz_) *
       rotation_ *
       XMMatrixTranslation(x_, y_, z_);
       return worldMatrix_; 
@@ -187,12 +175,6 @@ namespace snuffbox
 		/// Returns the visibility of this render element
 		bool visible(){ return visible_; }
 
-		/// Is this render element drawn with the aspect ratio of the screen taken into account?
-		bool aspect(){ return aspect_; }
-
-		/// Set the aspect ratio boolean
-		void SetAspect(bool aspect){ aspect_ = aspect; }
-
 	private:
 		std::vector<Vertex>										vertices_; ///< The vertices
 		std::vector<unsigned int>							indices_; ///< The indices
@@ -205,7 +187,6 @@ namespace snuffbox
 		Shader*																shader_; ///< The current shader used by this element
 		ElementTypes													elementType_;	///< The type of this render element
     bool																	destroyed_; ///< Is this element destroyed?
-		bool																	aspect_;	///< Should this render element be in the aspect ratio of the screen?
 		float																	distanceFromCamera_; ///< The distance from the camera
 		float																	alpha_;	///< The alpha value of this whole element
 		std::map<std::string, ShaderUniform>	uniforms_;	///< Uniforms for the constant buffer of the shader

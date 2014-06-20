@@ -28,7 +28,7 @@ namespace snuffbox
 		void SetBuffers();
 
 		/// Override the world function, to use our own billboard matrix
-		XMMATRIX WorldFromCamera(Camera* camera);
+		XMMATRIX& World(Camera* camera);
 
 		/// Returns the vertex buffer type
 		VertexBufferType type(){ return VertexBufferType::kQuad; }
@@ -36,7 +36,7 @@ namespace snuffbox
 	private:
 		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer
 		ID3D11Buffer* indexBuffer_; ///< The index buffer
-		XMMATRIX previous_; ///< The previous transformation
+		XMMATRIX world_; ///< The previous transformation
 	public:
 		JS_NAME(Billboard);
 	};

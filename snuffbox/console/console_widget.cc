@@ -126,7 +126,6 @@ namespace snuffbox
 		repeatCount_(0)
 	{
 		window_->setMinimumSize(QSize(400, 480));
-		window_->setWindowFlags(Qt::WindowStaysOnTopHint);
 		
 		ui_->setupUi(window_);
 		highlighter_ = new JavaScriptSyntaxHighlighter(ui_->commandLine->document());

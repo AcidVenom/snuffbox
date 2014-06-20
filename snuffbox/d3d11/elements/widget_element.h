@@ -50,15 +50,25 @@ namespace snuffbox
 		/// Removes an anchor
 		void RemoveAnchor(WidgetAnchor anchor);
 
+		/// Returns a matrix for anchoring
+		XMMATRIX anchor();
+
+		/// Override the world matrix to use our own ui world matrix
+		XMMATRIX& World(Camera* camera);
+
 	private:
 		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer of this element
 		ID3D11Buffer* indexBuffer_; ///< The index buffer of this element
-		bool					anchors_[4]; ///< Booleans to check if a widget should be anchored
+		int						anchors_[4]; ///< Booleans to check if a widget should be anchored
+		XMMATRIX			world_; ///< The world matrix
 	public:
 		JS_NAME(Widget);
 
-		static void JSSetAnchor(JS_ARGS);
-		static void JSRemoveAnchor(JS_ARGS);
+		static void JSSetAnchorLeft(JS_ARGS);
+		static void JSSetAnchorRight(JS_ARGS);
+		static void JSSetAnchorTop(JS_ARGS);
+		static void JSSetAnchorBottom(JS_ARGS);
+
     void RegisterExtraFunctions(JS_EXTRA);
 	};
 }
