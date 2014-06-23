@@ -1,12 +1,15 @@
 ContentManager.load("shader","shaders/custom.fx");
 ContentManager.load("texture","textures/snuffbox.png");
 ContentManager.load("model","models/axew.fbx");
+ContentManager.load("texture","textures/axew.png");
 var terrain = terrain || undefined;
 var widget = widget || undefined; 
 var widget2 = widget2 || undefined;
 var mesh = mesh || Mesh.new("models/axew.fbx");
 
 mesh.spawn();
+mesh.setTexture("textures/axew.png");
+mesh.setScale(10,10,10);
 
 var timer = timer || 0;
 

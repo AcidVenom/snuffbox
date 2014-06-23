@@ -68,22 +68,28 @@ namespace snuffbox
 				continue;
 
 			FbxMesh* mesh = static_cast<FbxMesh*>(childNode->GetNodeAttribute());
-
 			FbxVector4* vertices = mesh->GetControlPoints();
 
-			for (int j = 0; j < mesh->GetPolygonCount(); j++)
+			FbxLayerElementArrayTemplate<FbxVector2>* uvVertices = nullptr;
+			mesh->GetTextureUV(&uvVertices, FbxLayerElement::eTextureDiffuse);
+
+			for (int j = 0; j < mesh->GetPolygonCount(); ++j)
 			{
 				unsigned int numVerts = mesh->GetPolygonSize(j);
-				SNUFF_XASSERT(numVerts == 3,"As for currently, you cannot have polygons in your model with more than 3 vertices");
+				SNUFF_XASSERT(numVerts == 3, "As for currently, you cannot have polygons in your model with more than 3 vertices");
 
-				for (unsigned int k = 0; k < numVerts; k++)
+				for (unsigned int k = 0; k < numVerts; ++k)
 				{
 					unsigned int controlPointIdx = mesh->GetPolygonVertex(j, k);
+
+					FbxVector2 uv = uvVertices->GetAt(controlPointIdx);
 
 					Vertex vertex;
 					vertex.x = static_cast<float>(vertices[controlPointIdx].mData[0]);
 					vertex.z = static_cast<float>(vertices[controlPointIdx].mData[1]);
 					vertex.y = static_cast<float>(vertices[controlPointIdx].mData[2]);
+					vertex.texCoord.x = uv[0];
+					vertex.texCoord.y = -uv[1];
 					temp.push_back(vertex);
 				}
 			}
