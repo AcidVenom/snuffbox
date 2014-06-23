@@ -4,6 +4,9 @@ ContentManager.load("model","models/axew.fbx");
 var terrain = terrain || undefined;
 var widget = widget || undefined; 
 var widget2 = widget2 || undefined;
+var mesh = mesh || Mesh.new("models/axew.fbx");
+
+mesh.spawn();
 
 var timer = timer || 0;
 

@@ -58,7 +58,8 @@ namespace snuffbox
 			kTerrain,
 			kQuad,
 			kBillboard,
-			kWidget
+			kWidget,
+			kMesh
 		};
 
 		/// Default constructor

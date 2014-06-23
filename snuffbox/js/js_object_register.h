@@ -9,6 +9,7 @@
 #include "../../snuffbox/d3d11/elements/quad_element.h"
 #include "../../snuffbox/d3d11/elements/billboard_element.h"
 #include "../../snuffbox/d3d11/elements/widget_element.h"
+#include "../../snuffbox/d3d11/elements/mesh_element.h"
 #include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/content/content_manager.h"
 
@@ -25,6 +26,7 @@ namespace snuffbox
 		JSRegister<Quad, true>::Register();
 		JSRegister<Billboard, true>::Register();
 		JSRegister<Widget, true>::Register();
+		JSRegister<Mesh, true>::Register();
 		JSRegister<ContentManager, false>::Register();
 		JSRegister<D3D11Settings, false>::Register();		
 	}

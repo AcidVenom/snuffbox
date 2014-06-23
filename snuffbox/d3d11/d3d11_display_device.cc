@@ -2,6 +2,7 @@
 #include "../../snuffbox/d3d11/elements/render_element.h"
 #include "../../snuffbox/d3d11/elements/quad_element.h"
 #include "../../snuffbox/d3d11/elements/billboard_element.h"
+#include "../../snuffbox/d3d11/elements/mesh_element.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
@@ -546,7 +547,7 @@ namespace snuffbox
 		{
 			RenderElement::ElementTypes elementType = it->element_type();
 			VertexBufferType type = it->type();
-			if (type != vbType_)
+			if (type != vbType_ || type == VertexBufferType::kMesh)
 			{
 				it->SetBuffers();
 				vbType_ = type;
@@ -614,7 +615,17 @@ namespace snuffbox
 				}
 			}
 
-			context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+			if (elementType != RenderElement::ElementTypes::kMesh)
+			{
+				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+			}
+			else
+			{
+				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				Mesh* mesh = static_cast<Mesh*>(it);
+				context_->Draw(mesh->model()->vertexCount(), 0);
+			}
 		}
 	}
 

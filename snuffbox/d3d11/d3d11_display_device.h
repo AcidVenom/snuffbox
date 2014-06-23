@@ -40,7 +40,8 @@ namespace snuffbox
   {
     kNone,
     kQuad,
-    kTerrain
+    kTerrain,
+		kMesh
   };
 
 	/**

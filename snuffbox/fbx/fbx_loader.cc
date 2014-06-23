@@ -82,8 +82,8 @@ namespace snuffbox
 
 					Vertex vertex;
 					vertex.x = static_cast<float>(vertices[controlPointIdx].mData[0]);
-					vertex.y = static_cast<float>(vertices[controlPointIdx].mData[1]);
-					vertex.z = static_cast<float>(vertices[controlPointIdx].mData[2]);
+					vertex.z = static_cast<float>(vertices[controlPointIdx].mData[1]);
+					vertex.y = static_cast<float>(vertices[controlPointIdx].mData[2]);
 					temp.push_back(vertex);
 				}
 			}

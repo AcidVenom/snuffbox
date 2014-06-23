@@ -21,7 +21,11 @@ namespace snuffbox
 		/// Returns the vertex buffer
 		ID3D11Buffer* vertices(){ return vertices_; }
 
+		/// Returns the vertex count
+		unsigned int vertexCount(){ return vertexCount_; }
+
 	private:
 		ID3D11Buffer* vertices_;
+		unsigned int vertexCount_;
 	};
 }

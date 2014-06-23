@@ -179,6 +179,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClCompile Include="d3d11\d3d11_shader.cc" />
     <ClCompile Include="d3d11\d3d11_texture.cc" />
     <ClCompile Include="d3d11\elements\billboard_element.cc" />
+    <ClCompile Include="d3d11\elements\mesh_element.cc" />
     <ClCompile Include="d3d11\elements\quad_element.cc" />
     <ClCompile Include="d3d11\elements\terrain_element.cc" />
     <ClCompile Include="d3d11\elements\widget_element.cc" />
@@ -205,6 +206,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClInclude Include="d3d11\d3d11_shader.h" />
     <ClInclude Include="d3d11\d3d11_texture.h" />
     <ClInclude Include="d3d11\elements\billboard_element.h" />
+    <ClInclude Include="d3d11\elements\mesh_element.h" />
     <ClInclude Include="d3d11\elements\quad_element.h" />
     <ClInclude Include="d3d11\elements\render_element.h" />
     <ClInclude Include="d3d11\elements\terrain_element.h" />
