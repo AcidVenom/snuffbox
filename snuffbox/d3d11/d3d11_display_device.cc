@@ -38,7 +38,9 @@ namespace snuffbox
 	D3D11DisplayDevice::D3D11DisplayDevice() : 
 		time_(0.0f), 
 		vbType_(VertexBufferType::kNone), 
-		camera_(nullptr)
+		camera_(nullptr),
+    currentModel_(nullptr),
+    topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
 	{
 		environment::globalInstance = this;
 	}
@@ -549,7 +551,20 @@ namespace snuffbox
 			VertexBufferType type = it->type();
 			if (type != vbType_ || type == VertexBufferType::kMesh)
 			{
-				it->SetBuffers();
+        if (type == VertexBufferType::kMesh)
+        {
+          Mesh* mesh = static_cast<Mesh*>(it);
+          FBXModel* model = mesh->model();
+          if (model != currentModel_ || type != vbType_)
+          {
+            it->SetBuffers();
+            currentModel_ = model;
+          }
+        }
+        else
+        {
+          it->SetBuffers();
+        }
 				vbType_ = type;
 			}
 
@@ -617,14 +632,21 @@ namespace snuffbox
 
 			if (elementType != RenderElement::ElementTypes::kMesh)
 			{
-				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+        if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
+				  context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
 				context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+
+        topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 			}
 			else
 			{
-				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
+				  context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 				Mesh* mesh = static_cast<Mesh*>(it);
-				context_->Draw(mesh->model()->vertexCount(), 0);
+        context_->Draw(mesh->model()->vertexCount(), 0);
+        topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 			}
 		}
 	}

@@ -29,6 +29,7 @@ namespace snuffbox
 	class RenderElement;
 	class Texture;
 	class Shader;
+  class FBXModel;
 	struct Shaders;
 
   /**
@@ -231,5 +232,7 @@ namespace snuffbox
 		Shader*												currentShader_;			///< The current shader being used
 		Camera*												camera_;						///< The current camera being used
 		ID3D11BlendState*							blendState_;				///< The blend state being used
+    FBXModel*                     currentModel_;      ///< The current model being used
+    D3D11_PRIMITIVE_TOPOLOGY      topology_;          ///< The current primitive topology
 	};
 }
