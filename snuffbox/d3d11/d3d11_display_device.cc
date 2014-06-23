@@ -578,13 +578,14 @@ namespace snuffbox
 			context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 
 			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
-
+      XMVECTOR deter;
 			mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
 			mappedData->Time = time_;
 			mappedData->World = worldMatrix_;
 			mappedData->View = viewMatrix_;
 			mappedData->Projection = projectionMatrix_;
 			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+      mappedData->InvWorld = XMMatrixTranspose(XMMatrixInverse(&deter, worldMatrix_));
 			mappedData->Alpha = it->alpha();
 			mappedData->Blend = it->blend();
 

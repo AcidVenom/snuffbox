@@ -72,6 +72,7 @@ namespace snuffbox
 		XMMATRIX WorldViewProjection;
 		float Alpha;
 		XMFLOAT3 Blend;
+    XMMATRIX InvWorld;
 	};
 
 	/**

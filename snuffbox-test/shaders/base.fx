@@ -7,6 +7,7 @@ cbuffer ConstantBuffer : register(b0)
 	float4x4 WorldViewProjection;
   float Alpha;
   float3 Blend;
+  float4x4 InvWorld;
 }
 
 cbuffer Uniforms : register(b1)
@@ -25,7 +26,7 @@ VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TE
 {
   VOut output;
   output.position = mul(position, WorldViewProjection);
-	output.normal = normal;
+  output.normal = normalize(mul(float4(normal, 0), InvWorld).xyz);
 	output.texcoord = texcoord;
   return output;
 }
@@ -39,5 +40,8 @@ float4 PS(VOut input) : SV_TARGET
   float4 color = float4(textureColor.rgb * Blend.rgb, textureColor.a);
   color.a *= Alpha;
 
-  return color;
+  float3 lightDir = float3(sin(Time),sin(Time),-1);
+
+
+  return float4(color.rgb*saturate(dot(lightDir,input.normal)),color.a);
 }

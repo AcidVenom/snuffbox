@@ -83,13 +83,22 @@ namespace snuffbox
 					unsigned int controlPointIdx = mesh->GetPolygonVertex(j, k);
 
 					FbxVector2 uv = uvVertices->GetAt(controlPointIdx);
+          FbxVector4 normal;
+
+          mesh->GetPolygonVertexNormal(j,k, normal);
 
 					Vertex vertex;
 					vertex.x = static_cast<float>(vertices[controlPointIdx].mData[0]);
 					vertex.z = static_cast<float>(vertices[controlPointIdx].mData[1]);
 					vertex.y = static_cast<float>(vertices[controlPointIdx].mData[2]);
-					vertex.texCoord.x = uv[0];
+					
+          vertex.texCoord.x = uv[0];
 					vertex.texCoord.y = -uv[1];
+
+          vertex.normal.x = normal[0];
+          vertex.normal.z = normal[1];
+          vertex.normal.y = normal[2];
+          
 					temp.push_back(vertex);
 				}
 			}

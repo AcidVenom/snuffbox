@@ -10,6 +10,7 @@ var mesh = mesh || Mesh.new("models/axew.fbx");
 mesh.spawn();
 mesh.setTexture("textures/axew.png");
 mesh.setScale(10,10,10);
+mesh.setTranslation(-30,0,0);
 
 var timer = timer || 0;
 
@@ -56,10 +57,12 @@ Game.Update = function(dt)
 	ry = -delta.x;
 	rx = -delta.y;
 
-	if (Keyboard.isDown("W")) mz = -1;
-	if (Keyboard.isDown("S")) mz = 1;
-	if (Keyboard.isDown("A")) mx = -1;
-	if (Keyboard.isDown("D")) mx = 1;
+	var speed = 100;
+
+	if (Keyboard.isDown("W")) mz = -dt*speed;
+	if (Keyboard.isDown("S")) mz = dt*speed;
+	if (Keyboard.isDown("A")) mx = -dt*speed;
+	if (Keyboard.isDown("D")) mx = dt*speed;
 
 	if (Mouse.isDown(0)) Game.camera.rotateBy(rx/100,ry/100,0);
 	
@@ -71,6 +74,11 @@ Game.Update = function(dt)
 	widget2.setScale(64+Math.sin(timer)*40,64+Math.sin(timer)*40,64+Math.sin(timer)*40);
 	widget2.setAlpha(0.5);
 	widget2.setTranslation(66,71,0);
+
+	if (Mouse.isDown(1))
+	{
+		mesh.rotateBy(-rx/100,-ry/100,0);
+	}
 }
 
 Game.Draw = function(dt)
