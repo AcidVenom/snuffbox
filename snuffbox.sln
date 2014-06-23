@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+MinimumVisualStudioVersion = 10.0.40218.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "snuffbox", "snuffbox\snuffbox.vcxproj", "{E0DE2C64-3C65-49E0-AC4C-49B7323625B7}"
 EndProject
 Global

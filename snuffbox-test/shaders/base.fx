@@ -43,5 +43,5 @@ float4 PS(VOut input) : SV_TARGET
   float3 lightDir = float3(sin(Time),sin(Time),-1);
 
 
-  return float4(color.rgb*clamp(dot(lightDir,input.normal),0.8,1.2),color.a);
+  return float4(color.rgb*clamp(dot(lightDir,input.normal),0.8,1.4),color.a);
 }

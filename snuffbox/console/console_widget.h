@@ -52,8 +52,6 @@ namespace snuffbox
 		QTextCharFormat multiLineCommentFormat;
 		QTextCharFormat quotationFormat;
 		QTextCharFormat functionFormat;
-		QTextCharFormat numberFormat;
-		QTextCharFormat paramsFormat;
 	};
 
 	/**

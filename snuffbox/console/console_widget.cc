@@ -65,16 +65,6 @@ namespace snuffbox
 
 		multiLineCommentFormat.setForeground(Qt::gray);
 
-		numberFormat.setForeground(QColor(155,220,195));
-		rule.pattern = QRegExp("[0-9]");
-		rule.format = numberFormat;
-		highlightingRules.append(rule);
-
-		paramsFormat.setForeground(Qt::GlobalColor::darkGray);
-		rule.pattern = QRegExp("[(].*[)]");
-		rule.format = paramsFormat;
-		highlightingRules.append(rule);
-
 		commentStartExpression = QRegExp("/\\*");
 		commentEndExpression = QRegExp("\\*/");
 	}
