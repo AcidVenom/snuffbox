@@ -24,8 +24,7 @@ struct VOut
 
 float4 GetVertexPos(float4 position)
 {
-  float4 pos = float4(position.x+position.z/20*position.z/20*sin(Time/400),position.y+sin(position.z/20+Time/100)*30+sin(position.x/10 + Time/100)*13+cos(position.z/5)*10,position.z + sin(position.x/3), position.w);
-  pos.x = position.x+30*sin(Time/200);
+  float4 pos = float4(position.x+position.z/20*position.z/20*sin(Time/400),position.y+sin(position.z/20+Time/100)*20+sin(position.x/10 + Time/100)*13+cos(position.z/5)*10,position.z + sin(position.x/3), position.w);
   return pos;
 }
 

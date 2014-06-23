@@ -12,6 +12,7 @@ namespace snuffbox
 	class FileWatcher;
 	class ContentManager;
 	class D3D11Settings;
+	class FBXLoader;
 
 	namespace environment
 	{
@@ -45,6 +46,9 @@ namespace snuffbox
 		/// Returns the render settings
 		D3D11Settings& render_settings();
 
+		/// Returns the FBX loader
+		FBXLoader& fbx_loader();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -74,5 +78,8 @@ namespace snuffbox
 
 		/// Returns if there are render settings or not
 		bool has_render_settings();
+
+		/// Returns if there is an FBX loader or not
+		bool has_fbx_loader();
 	}
 }

@@ -1,41 +1,37 @@
 ContentManager.load("shader","shaders/custom.fx");
+ContentManager.load("texture","textures/snuffbox.png");
+ContentManager.load("model","models/axew.fbx");
 var terrain = terrain || undefined;
 var widget = widget || undefined; 
 var widget2 = widget2 || undefined;
-var billboard = billboard || Billboard.new();
-billboard.setScale(40,0,40);
 
 var timer = timer || 0;
-
-billboard.spawn();
-
-if(terrain != undefined)
-{
-	terrain.setBlend(1,0.8,0.5);
-	RenderSettings.setResolution(320,240);
-}
 
 Game.Initialise = function()
 {
 	Game.setName("Snuffbox Test Project");
-	RenderSettings.setResolution(320,240);
+	RenderSettings.setResolution(1280,720);
 	RenderSettings.setVsync(false);
 	RenderSettings.setFullscreen(false);
 	RenderSettings.setCullMode(RenderSettings.CullNone);
-	RenderSettings.setBackBufferColor(0,0,0,1);
+	RenderSettings.setBackBufferColor(0,0,0.5,1);
 	Game.camera = Camera.new("perspective");
 	Game.camera.setTranslation(0,0,0);
 	terrain = Terrain.new(128,128);
-	//terrain.spawn();
+	terrain.spawn();
 	terrain.setShader("shaders/custom.fx");
 	widget = Widget.new();
+	widget.setScale(256,0,256);
+	widget.setTexture("textures/snuffbox.png");
+	widget.setAnchorTop();
 	widget.setAnchorLeft();
 	widget.spawn();
 
 	widget2 = Widget.new(widget);
-	widget2.setScale(32,0,32);
+	widget2.setScale(64,0,64);
 	widget2.setBlend(1,0,0);
 	widget2.spawn();
+	widget2.setOffset(0.5,0,0.5);
 }
 Game.Update = function(dt)
 {	
@@ -63,9 +59,12 @@ Game.Update = function(dt)
 	
 	Game.camera.translateBy(mx,0,mz);
 
-	++timer;
+	timer += dt;
 
-
+	widget2.rotateBy(dt*2,dt*6,dt*4);
+	widget2.setScale(64+Math.sin(timer)*40,64+Math.sin(timer)*40,64+Math.sin(timer)*40);
+	widget2.setAlpha(0.5);
+	widget2.setTranslation(66,71,0);
 }
 
 Game.Draw = function(dt)

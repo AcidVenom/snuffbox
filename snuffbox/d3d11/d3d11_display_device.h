@@ -2,7 +2,6 @@
 
 #define SNUFF_SAFE_RELEASE(ptr) SNUFF_ASSERT_NOTNULL(ptr); ptr->Release(); ptr = NULL;
 
-#define _WINSOCKAPI_
 #include <dxgi.h>
 #include <d3d11.h>
 #include <d3dcommon.h>
@@ -130,7 +129,7 @@ namespace snuffbox
 		void EndDraw();
 
 		/// Increases the elapsed time
-		void IncrementTime(){ ++time_; }
+		void IncrementTime(float dt){ time_ += dt; }
 
 		/// Creates the depth stencil view/buffer
 		void CreateDepthStencil();

@@ -6,6 +6,7 @@
 #include "../../snuffbox/js/js_callback.h"
 #include "../../snuffbox/d3d11/d3d11_texture.h"
 #include "../../snuffbox/d3d11/d3d11_shader.h"
+#include "../../snuffbox/fbx/fbx_model.h"
 
 namespace snuffbox
 {
@@ -28,7 +29,8 @@ namespace snuffbox
 		enum ContentTypes
 		{
 			kTexture,
-			kShader
+			kShader,
+			kModel
 		};
 
 		/**
@@ -72,9 +74,13 @@ namespace snuffbox
 		/// Returns the list of idle callbacks
 		std::queue<SharedPtr<JSCallback>>& idleCallbacks(){ return idleCallbacks_; }
 
+		/// Unloads all loaded content
+		void UnloadAll();
+
 	private:
 		std::map<std::string, SharedPtr<Content<Texture>>> loadedTextures_; ///< A map by path of all loaded textures
 		std::map<std::string, SharedPtr<Content<Shader>>> loadedShaders_; ///< A map by path of all loaded shaders
+		std::map<std::string, SharedPtr<Content<FBXModel>>> loadedModels_; ///< A map by path of all loaded models
 		std::queue<PendingContent>												pendingContent_; ///< A queue for pending content
 		std::queue<SharedPtr<JSCallback>>									idleCallbacks_;	///< A queue for idle callbacks
 	public:
@@ -83,5 +89,6 @@ namespace snuffbox
 		static void JSLoad(JS_ARGS);
 		static void JSUnload(JS_ARGS);
 		static void JSIdle(JS_ARGS);
+		static void JSUnloadAll(JS_ARGS);
 	};
 }

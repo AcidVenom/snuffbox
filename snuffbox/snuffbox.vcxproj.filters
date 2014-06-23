@@ -25,6 +25,9 @@
     <Filter Include="console">
       <UniqueIdentifier>{7e96930c-4e4c-46f5-a98a-8af2c5db5b55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="fbx">
+      <UniqueIdentifier>{a4f4d101-3b7a-4ed9-80d8-716b8a93d721}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -90,6 +93,12 @@
     </ClCompile>
     <ClCompile Include="d3d11\elements\widget_element.cc">
       <Filter>d3d11\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="fbx\fbx_loader.cc">
+      <Filter>fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="fbx\fbx_model.cc">
+      <Filter>fbx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +182,12 @@
     </ClInclude>
     <ClInclude Include="d3d11\elements\widget_element.h">
       <Filter>d3d11\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="fbx\fbx_loader.h">
+      <Filter>fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="fbx\fbx_model.h">
+      <Filter>fbx</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

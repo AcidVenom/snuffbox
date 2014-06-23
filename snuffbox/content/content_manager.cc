@@ -4,6 +4,7 @@
 #include "../../snuffbox/memory/allocated_memory.h"
 #include "../../snuffbox/game.h"
 #include "../../snuffbox/js/js_wrapper.h"
+#include "../../snuffbox/fbx/fbx_loader.h"
 
 namespace snuffbox
 {
@@ -34,6 +35,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	ContentManager::~ContentManager()
 	{
+		UnloadAll();
 		environment::globalInstance = nullptr;
 	}
 
@@ -55,10 +57,22 @@ namespace snuffbox
 	{
 		if (loadedShaders_.find(path) != loadedShaders_.end())
 			return;
-		SharedPtr<Shader> texture = environment::memory().ConstructShared<Shader>(std::string(path));
-		SharedPtr<Content<Shader>> content = environment::memory().ConstructShared<Content<Shader>>(ContentTypes::kShader, texture);
+		SharedPtr<Shader> shader = environment::memory().ConstructShared<Shader>(std::string(path));
+		SharedPtr<Content<Shader>> content = environment::memory().ConstructShared<Content<Shader>>(ContentTypes::kShader, shader);
 
 		loadedShaders_.emplace(path, content);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	void ContentManager::Load<FBXModel>(std::string path)
+	{
+		if (loadedModels_.find(path) != loadedModels_.end())
+			return;
+		SharedPtr<FBXModel> model = environment::fbx_loader().Load(path);
+		SharedPtr<Content<FBXModel>> content = environment::memory().ConstructShared<Content<FBXModel>>(ContentTypes::kModel, model);
+
+		loadedModels_.emplace(path, content);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -68,6 +82,24 @@ namespace snuffbox
 		SNUFF_XASSERT(loadedTextures_.find(path) != loadedTextures_.end(), "The texture '" + path + "' was never loaded!");
 
 		loadedTextures_.erase(loadedTextures_.find(path));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	void ContentManager::Unload<Shader>(std::string path)
+	{
+		SNUFF_XASSERT(loadedShaders_.find(path) != loadedShaders_.end(), "The shader '" + path + "' was never loaded!");
+
+		loadedShaders_.erase(loadedShaders_.find(path));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	void ContentManager::Unload<FBXModel>(std::string path)
+	{
+		SNUFF_XASSERT(loadedModels_.find(path) != loadedModels_.end(), "The model '" + path + "' was never loaded!");
+
+		loadedModels_.erase(loadedModels_.find(path));
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -97,6 +129,19 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	template<>
+	SharedPtr<FBXModel>& ContentManager::Get<FBXModel>(std::string path)
+	{
+		Content<FBXModel>* contentPtr = nullptr;
+
+		SNUFF_XASSERT(loadedModels_.find(path) != loadedModels_.end(), std::string("Model not loaded '" + path + "'!"));
+
+		contentPtr = loadedModels_.find(path)->second.get();
+
+		return contentPtr->Get();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void ContentManager::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -104,6 +149,7 @@ namespace snuffbox
 		JSFunctionRegister funcs[] = {
 			JSFunctionRegister("load", JSLoad),
 			JSFunctionRegister("unload", JSUnload),
+			JSFunctionRegister("unloadAll", JSUnloadAll),
 			JSFunctionRegister("idleCallback", JSIdle)
 		};
 
@@ -117,6 +163,8 @@ namespace snuffbox
 		{
 			auto& it = pendingContent_.front();
 
+			SNUFF_LOG_INFO(std::string("Loading " + it.path).c_str());
+
 			switch (it.type)
 			{
 			case ContentTypes::kTexture:
@@ -125,8 +173,12 @@ namespace snuffbox
 			case ContentTypes::kShader:
 				Load<Shader>(it.path);
 				break;
+			case ContentTypes::kModel:
+				Load<FBXModel>(it.path);
+				break;
 			}
 
+			SNUFF_LOG_DEBUG(std::string("Loaded " + it.path).c_str());
 			pendingContent_.pop();
 		}
 
@@ -140,6 +192,14 @@ namespace snuffbox
 			it->Call(0, 0);
 			idleCallbacks_.pop();
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void ContentManager::UnloadAll()
+	{
+		loadedTextures_.clear();
+		loadedShaders_.clear();
+		loadedModels_.clear();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -164,6 +224,13 @@ namespace snuffbox
 		{
 			isContent = true;
 			content.type = ContentManager::ContentTypes::kShader;
+			environment::content_manager().AddPendingContent(content);
+		}
+
+		if (strcmp(contentType.c_str(), "model") == 0)
+		{
+			isContent = true;
+			content.type = ContentManager::ContentTypes::kModel;
 			environment::content_manager().AddPendingContent(content);
 		}
 
@@ -193,9 +260,18 @@ namespace snuffbox
 		if (strcmp(contentType.c_str(), "shader") == 0)
 		{
 			isContent = true;
+			environment::content_manager().Unload<Shader>(contentPath);
 		}
 
 		SNUFF_XASSERT(isContent == true, std::string("Content type '" + contentType + "' does not exist!").c_str());
+		SNUFF_LOG_DEBUG(std::string("Unloaded " + contentPath).c_str());
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void ContentManager::JSUnloadAll(JS_ARGS)
+	{
+		JS_CHECK_PARAMS("V");
+		environment::content_manager().UnloadAll();
 	}
 
 	//-------------------------------------------------------------------------------------------

@@ -15,6 +15,8 @@
 #include "../snuffbox/environment.h"
 #include "../snuffbox/console/console.h"
 
+#include "../snuffbox/fbx/fbx_loader.h"
+
 #include <QtCore>
 
 #define SNUFF_VERSION_MAJOR 1
@@ -22,6 +24,7 @@
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
+#define SNUFF_DEBUG
 #else
 #define SNUFF_DEBUG_MODE "Release"
 #endif
@@ -108,11 +111,12 @@ void Game::Update()
 		environment::render_device().UpdateCamera(environment::render_device().camera());
 	}
 
-	environment::render_device().IncrementTime();
 
 	if (gameTime_ % 20 == 0)
 	{
+#ifdef SNUFF_DEBUG
 		environment::file_watcher().WatchFiles();
+#endif
 	}
 
 	if (shouldQuit_)
@@ -141,6 +145,8 @@ void Game::Draw()
 	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime_);
 	deltaTime_ = dtDuration.count() * 1e-3f;
 	lastTime_ = now;
+
+	environment::render_device().IncrementTime(deltaTime_);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -354,6 +360,7 @@ int SNUFF_MAIN
 	
 	JSStateWrapper js_state_wrapper;
 	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
+	SharedPtr<FBXLoader> fbx_loader = environment::memory().ConstructShared<FBXLoader>();
 	SharedPtr<ContentManager> content_manager = environment::memory().ConstructShared<ContentManager>();
 	SharedPtr<D3D11Settings> render_settings = environment::memory().ConstructShared<D3D11Settings>();
 	
