@@ -6,11 +6,17 @@ var terrain = terrain || undefined;
 var widget = widget || undefined; 
 var widget2 = widget2 || undefined;
 var mesh = mesh || Mesh.new("models/axew.fbx");
+var mesh2 = mesh2 || Mesh.new("models/axew.fbx");
 
 mesh.spawn();
 mesh.setTexture("textures/axew.png");
 mesh.setScale(10,10,10);
 mesh.setTranslation(-30,0,0);
+
+mesh2.spawn();
+mesh2.setTexture("textures/axew.png");
+mesh2.setScale(5,5,5);
+mesh2.setTranslation(-60,0,0);
 
 var timer = timer || 0;
 
