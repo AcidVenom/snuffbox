@@ -37,11 +37,8 @@ SamplerState SampleType;
 float4 PS(VOut input) : SV_TARGET
 {	
   float4 textureColor = Texture.Sample(SampleType,input.texcoord);
-  float4 color = float4(textureColor.rgb * Blend.rgb, textureColor.a);
+  float4 color = float4(textureColor.rgb * Blend, textureColor.a);
   color.a *= Alpha;
 
-  float3 lightDir = float3(sin(Time),sin(Time),-1);
-
-
-  return float4(color.rgb*clamp(dot(lightDir,input.normal),0.8,1.4),color.a);
+  return color;
 }

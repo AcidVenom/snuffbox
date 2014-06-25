@@ -69,7 +69,7 @@ namespace snuffbox
 	{
 		if (loadedModels_.find(path) != loadedModels_.end())
 			return;
-		SharedPtr<FBXModel> model = environment::fbx_loader().Load(path);
+		SharedPtr<FBXModel> model = environment::memory().ConstructShared<FBXModel>(environment::fbx_loader().Load(path), path);
 		SharedPtr<Content<FBXModel>> content = environment::memory().ConstructShared<Content<FBXModel>>(ContentTypes::kModel, model);
 
 		loadedModels_.emplace(path, content);

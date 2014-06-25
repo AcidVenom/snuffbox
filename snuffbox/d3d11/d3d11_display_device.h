@@ -184,6 +184,9 @@ namespace snuffbox
 
 		/// Resets the current shader for reloading
 		void ResetCurrentShader(){ currentShader_ = nullptr; }
+
+		/// Resets the current model for reloading
+		void ResetCurrentModel(){ currentModel_ = nullptr; }
 		
 		/// Creates the context blend state
 		void CreateBlendState();

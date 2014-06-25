@@ -2,6 +2,8 @@
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
 
+using namespace fbxsdk_2015_1;
+
 namespace snuffbox
 {
 	namespace environment
@@ -24,90 +26,173 @@ namespace snuffbox
 namespace snuffbox
 {
 	//----------------------------------------------------------------------------------------
-	FBXLoader::FBXLoader()
-		: fbxManager_(FbxManager::Create())
+	FBXLoader::FBXLoader() : 
+		fbxManager_(nullptr),
+		fbxScene_(nullptr)
 	{
-		ioSettings_ = FbxIOSettings::Create(fbxManager_, IOSROOT);
-		fbxManager_->SetIOSettings(ioSettings_);
+		fbxManager_ = FbxManager::Create();
+		SNUFF_ASSERT_NOTNULL(fbxManager_);
+		SNUFF_LOG_INFO(std::string("FBX SDK version " + std::string(fbxManager_->GetVersion())).c_str());
+
+		FbxIOSettings* ioSettings = FbxIOSettings::Create(fbxManager_, IOSROOT);
+		fbxManager_->SetIOSettings(ioSettings);
+
+		fbxScene_ = FbxScene::Create(fbxManager_, "FBX_Scene");
+		SNUFF_ASSERT_NOTNULL(fbxScene_);
+
 		environment::globalInstance = this;
 	}
 
 	//----------------------------------------------------------------------------------------
-	SharedPtr<FBXModel> FBXLoader::Load(std::string path)
+	std::vector<Vertex> FBXLoader::Load(std::string path)
 	{
-		std::string full_path = environment::game().path() + "/" + path;
 		SNUFF_ASSERT_NOTNULL(fbxManager_);
-
-		FbxImporter* fbxImporter = FbxImporter::Create(fbxManager_, "");
-		FbxScene* fbxScene = FbxScene::Create(fbxManager_, "");
-
-		bool success = fbxImporter->Initialize(full_path.c_str(), -1, fbxManager_->GetIOSettings());
-		SNUFF_XASSERT(success == true, "Failed initialising the FBX loader importer!");
-
-		success = fbxImporter->Import(fbxScene);
-		SNUFF_XASSERT(success == true, "Failed importing the model into the FBX scene!");
-
-		fbxImporter->Destroy();
-
-		FbxNode* rootNode = fbxScene->GetRootNode();
-
-		SNUFF_ASSERT_NOTNULL(rootNode);
-
+		bool result = true;
+		std::string full_path = environment::game().path() + "/" + path;
+		LoadScene(full_path);
+		
+		SNUFF_ASSERT_NOTNULL(fbxScene_);
 		std::vector<Vertex> temp;
 
-		for (int i = 0; i < rootNode->GetChildCount(); ++i)
+		FbxNode* node = fbxScene_->GetRootNode()->GetChild(0);
+		if (node)
 		{
-			FbxNode* childNode = rootNode->GetChild(i);
+			FbxMesh* mesh = node->GetMesh();
+			if (mesh)
+			{
+				GetMeshData(&temp,mesh);
+			}
+		}
 
-			if (childNode->GetNodeAttribute() == NULL)
+		return temp;
+	}
+
+	//----------------------------------------------------------------------------------------
+	void FBXLoader::LoadScene(std::string path)
+	{
+		SNUFF_ASSERT_NOTNULL(fbxManager_);
+		int fileMajorVersion, fileMinorVersion, fileRevision;
+		bool result = true;
+
+		FbxImporter* fbxImporter = FbxImporter::Create(fbxManager_, "");
+
+		result = fbxImporter->Initialize(path.c_str(), -1, fbxManager_->GetIOSettings());
+		SNUFF_XASSERT(result == true, std::string("Failed importing " + path + " into the FBX manager!\n" + std::string(fbxImporter->GetStatus().GetErrorString())).c_str());
+		fbxImporter->GetFileVersion(fileMajorVersion, fileMinorVersion, fileRevision);
+
+		if (fbxImporter->IsFBX())
+		{
+			SNUFF_LOG_DEBUG(std::string("FBX file version " + std::to_string(fileMajorVersion) + "." + std::to_string(fileMinorVersion) + "." + std::to_string(fileRevision)).c_str());
+			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_MATERIAL, false);
+			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_TEXTURE, true);
+			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_LINK, false);
+			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_SHAPE, true);
+			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_GOBO, false);
+			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_ANIMATION, false);
+			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_GLOBAL_SETTINGS, true);
+		}
+
+		result = fbxImporter->Import(fbxScene_);
+		SNUFF_XASSERT(result == true, "Failed importing the file to the FBX scene!");
+
+		fbxImporter->Destroy();
+	}
+
+	//----------------------------------------------------------------------------------------
+	void FBXLoader::GetMeshData(std::vector<Vertex>* vertsOut, FbxMesh* mesh)
+	{
+		FbxStringList uvNames;
+		mesh->GetUVSetNames(uvNames);
+
+		for (unsigned int i = 0; i < static_cast<unsigned int>(uvNames.GetCount()); ++i)
+		{
+			const char* uvName = uvNames.GetStringAt(i);
+			const FbxGeometryElementUV* uvElement = mesh->GetElementUV(uvName);
+
+			if (!uvElement)
 				continue;
 
-			FbxNodeAttribute::EType AttributeType = childNode->GetNodeAttribute()->GetAttributeType();
+			SNUFF_XASSERT(uvElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex || uvElement->GetMappingMode() == FbxGeometryElement::eByControlPoint, "Invalid UV mapping mode!");
 
-			if (AttributeType != FbxNodeAttribute::eMesh)
-				continue;
+			bool useIndex = uvElement->GetReferenceMode() != FbxGeometryElement::eDirect;
+			unsigned int indexCount = useIndex ? uvElement->GetIndexArray().GetCount() : 0;
 
-			FbxMesh* mesh = static_cast<FbxMesh*>(childNode->GetNodeAttribute());
+			unsigned int polyCount = mesh->GetPolygonCount();
 			FbxVector4* vertices = mesh->GetControlPoints();
 
-			FbxLayerElementArrayTemplate<FbxVector2>* uvVertices = nullptr;
-			mesh->GetTextureUV(&uvVertices, FbxLayerElement::eTextureDiffuse);
-
-			for (int j = 0; j < mesh->GetPolygonCount(); ++j)
+			for (unsigned int polygon = 0; polygon < polyCount; ++polygon)
 			{
-				unsigned int numVerts = mesh->GetPolygonSize(j);
-				SNUFF_XASSERT(numVerts == 3, "As for currently, you cannot have polygons in your model with more than 3 vertices");
+				unsigned int polySize = mesh->GetPolygonSize(polygon);
+				SNUFF_XASSERT(polySize == 3, "You should triangulate the mesh before using it");
 
-				for (unsigned int k = 0; k < numVerts; ++k)
+				for (unsigned int vertex = 0; vertex < polySize; ++vertex)
 				{
-					unsigned int controlPointIdx = mesh->GetPolygonVertex(j, k);
+					unsigned int controlPoint = mesh->GetPolygonVertex(polygon, vertex);
+					Vertex vert;
+					FbxVector4 normal;
+					mesh->GetPolygonVertexNormal(polygon, vertex, normal);
+					vert.x = vertices[controlPoint].mData[0];
+					vert.z = vertices[controlPoint].mData[1];
+					vert.y = vertices[controlPoint].mData[2];
+					vert.normal.x = normal.mData[0];
+					vert.normal.z = normal.mData[1];
+					vert.normal.y = normal.mData[2];
 
-					FbxVector2 uv = uvVertices->GetAt(controlPointIdx);
-          FbxVector4 normal;
+					vertsOut->push_back(vert);
+				}
+			}
 
-          mesh->GetPolygonVertexNormal(j,k, normal);
+			unsigned int count = 0;
 
-					Vertex vertex;
-					vertex.x = static_cast<float>(vertices[controlPointIdx].mData[0]);
-					vertex.z = static_cast<float>(vertices[controlPointIdx].mData[1]);
-					vertex.y = static_cast<float>(vertices[controlPointIdx].mData[2]);
-					
-          vertex.texCoord.x = uv[0];
-					vertex.texCoord.y = -uv[1];
+			if (uvElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+			{
+				for (unsigned int polygon = 0; polygon < polyCount; ++polygon)
+				{
+					unsigned int polySize = mesh->GetPolygonSize(polygon);
+					SNUFF_XASSERT(polySize == 3, "You should triangulate the mesh before using it");
 
-          vertex.normal.x = normal[0];
-          vertex.normal.z = normal[1];
-          vertex.normal.y = normal[2];
-          
-					temp.push_back(vertex);
+					for (unsigned int vertex = 0; vertex < polySize; ++vertex)
+					{
+						unsigned int controlPoint = mesh->GetPolygonVertex(polygon, vertex);
+						unsigned int uvIndex = useIndex ? uvElement->GetIndexArray().GetAt(controlPoint) : controlPoint;
+
+						FbxVector2 uv = uvElement->GetDirectArray().GetAt(uvIndex);
+						
+						vertsOut->at(count).texCoord.x = uv.mData[0];
+						vertsOut->at(count).texCoord.y = -uv.mData[1];
+
+						++count;
+					}
+				}
+			}
+			else if (uvElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+			{
+				unsigned int polyCounter = 0;
+				for (unsigned int polygon = 0; polygon < polyCount; ++polygon)
+				{
+					unsigned int polySize = mesh->GetPolygonSize(polygon);
+					SNUFF_XASSERT(polySize == 3, "You should triangulate the mesh before using it");
+
+					for (unsigned int vertex = 0; vertex < polySize; ++vertex)
+					{
+						if (polyCounter < indexCount)
+						{
+							unsigned int uvIndex = useIndex ? uvElement->GetIndexArray().GetAt(polyCounter) : polyCounter;
+
+							FbxVector2 uv = uvElement->GetDirectArray().GetAt(uvIndex);
+
+							vertsOut->at(count).texCoord.x = uv.mData[0];
+							vertsOut->at(count).texCoord.y = -uv.mData[1];
+
+							++count;
+							++polyCounter;
+						}
+					}
 				}
 			}
 		}
 
-		fbxScene->Destroy();
-
-		SNUFF_XASSERT(temp.size() > 0, "Cannot create a model from an empty list of vertices!");
-		return environment::memory().ConstructShared<FBXModel>(temp);
+		SNUFF_LOG_DEBUG(std::string("Vertices: " + std::to_string(vertsOut->size())).c_str());
 	}
 
 	//----------------------------------------------------------------------------------------

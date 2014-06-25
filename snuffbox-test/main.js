@@ -1,22 +1,46 @@
 ContentManager.load("shader","shaders/custom.fx");
+ContentManager.load("shader","shaders/lighting.fx");
 ContentManager.load("texture","textures/snuffbox.png");
 ContentManager.load("model","models/axew.fbx");
 ContentManager.load("texture","textures/axew.png");
+ContentManager.load("model","models/totodile.fbx");
+ContentManager.load("texture","textures/totodile.png");
+ContentManager.load("model","models/gible.fbx");
+ContentManager.load("texture","textures/gible.png");
+ContentManager.load("model","models/scraggy.fbx");
+ContentManager.load("texture","textures/scraggy.png");
 var terrain = terrain || undefined;
 var widget = widget || undefined; 
 var widget2 = widget2 || undefined;
 var mesh = mesh || Mesh.new("models/axew.fbx");
-var mesh2 = mesh2 || Mesh.new("models/axew.fbx");
+var mesh2 = mesh2 || Mesh.new("models/totodile.fbx");
+var mesh3 = mesh3 || Mesh.new("models/gible.fbx");
+var mesh4 = mesh4 || Mesh.new("models/scraggy.fbx");
 
 mesh.spawn();
 mesh.setTexture("textures/axew.png");
+mesh.setShader("shaders/lighting.fx");
 mesh.setScale(10,10,10);
 mesh.setTranslation(-30,0,0);
+mesh.setRotation(0,0,0);
 
 mesh2.spawn();
-mesh2.setTexture("textures/axew.png");
-mesh2.setScale(5,5,5);
-mesh2.setTranslation(-60,0,0);
+mesh2.setTexture("textures/totodile.png");
+mesh2.setShader("shaders/lighting.fx");
+mesh2.setScale(10,10,10);
+mesh2.setTranslation(-90,0,0);
+
+mesh3.spawn();
+mesh3.setTexture("textures/gible.png");
+mesh3.setShader("shaders/lighting.fx");
+mesh3.setScale(10,10,10);
+mesh3.setTranslation(-150,0,0);
+
+mesh4.spawn();
+mesh4.setTexture("textures/scraggy.png");
+mesh4.setShader("shaders/lighting.fx");
+mesh4.setScale(10,10,10);
+mesh4.setTranslation(-210,0,0);
 
 var timer = timer || 0;
 
@@ -48,6 +72,7 @@ Game.Initialise = function()
 }
 Game.Update = function(dt)
 {	
+	Log.watch("dt",dt);
 	if(Keyboard.isReleased("F9"))
 	{
 		Game.showConsole();
@@ -84,6 +109,9 @@ Game.Update = function(dt)
 	if (Mouse.isDown(1))
 	{
 		mesh.rotateBy(-rx/100,-ry/100,0);
+		mesh2.rotateBy(-rx/100,-ry/100,0);
+		mesh3.rotateBy(-rx/100,-ry/100,0);
+		mesh4.rotateBy(-rx/100,-ry/100,0);
 	}
 }
 

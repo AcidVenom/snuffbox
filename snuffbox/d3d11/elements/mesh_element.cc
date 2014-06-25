@@ -31,6 +31,15 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Mesh::SetBuffers()
 	{
+		if (vertexBuffer_ == model_->vertices() && model_->shouldReload())
+		{
+			model_->disableReload();
+		}
+
+		if (model_->shouldReload())
+		{
+			Create();
+		}
 		environment::render_device().SetVertexBuffer(vertexBuffer_);
 		environment::render_device().SetIndexBuffer(nullptr);
 	}

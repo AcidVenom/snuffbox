@@ -20,10 +20,16 @@ namespace snuffbox
 		~FBXLoader();
 
 		/// Loads a model from a given path, returning the list of vertices
-		SharedPtr<FBXModel> Load(std::string path);
+		std::vector<Vertex> Load(std::string path);
+
+		/// Loads an FBX scene from a file path
+		void LoadScene(std::string path);
+
+		/// Retrieves mesh data
+		void GetMeshData(std::vector<Vertex>* vertsOut, FbxMesh* mesh);
 
 	private:
 		FbxManager*			fbxManager_; ///< The FBX manager from the SDK
-		FbxIOSettings*	ioSettings_; ///< The IO settings for the FBX manager to use
+		FbxScene*				fbxScene_; ///< The FBX scene to use
 	};
 }

@@ -5,6 +5,7 @@
 #include "../../snuffbox/d3d11/d3d11_display_device.h"
 #include "../../snuffbox/js/js_state_wrapper.h"
 #include "../../snuffbox/content/content_manager.h"
+#include <strsafe.h>
 
 namespace snuffbox
 {
@@ -89,6 +90,9 @@ namespace snuffbox
 					case FileType::kTexture:
 						ReloadTextureFile(it);
 						break;
+					case FileType::kModel:
+						ReloadModelFile(it);
+						break;
 					}
 					it.lastTime = lastTime;
 					break;
@@ -126,6 +130,15 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------
+	void FileWatcher::ReloadModelFile(WatchedFile& file)
+	{
+		FBXModel* model = environment::content_manager().Get<FBXModel>(file.relativePath).get();
+		model->Reload(file.relativePath);
+		environment::render_device().ResetCurrentModel();
+		SNUFF_LOG_INFO(std::string("Hot reloaded FBX Model file: " + file.path).c_str());
+	}
+
+	//-------------------------------------------------------------------
 	FILETIME FileWatcher::GetTimeForFile(std::string& path, bool* failed)
 	{
 		FILETIME creationTime;
@@ -137,6 +150,21 @@ namespace snuffbox
 		if (file == INVALID_HANDLE_VALUE)
 		{
 			*failed = true;
+			LPTSTR msg = nullptr;
+			DWORD err = GetLastError();
+			FormatMessageA(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				FORMAT_MESSAGE_FROM_SYSTEM |
+				FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL,
+				err,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				(LPTSTR)&msg,
+				0, NULL);
+
+			SNUFF_LOG_ERROR(msg);
+
+			LocalFree(msg);
 			FILETIME error = {};
 			return error;
 		}

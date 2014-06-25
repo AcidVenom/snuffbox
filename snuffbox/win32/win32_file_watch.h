@@ -15,7 +15,8 @@ namespace snuffbox
 	{
 		kScript,
 		kShader,
-		kTexture
+		kTexture,
+		kModel
 	};
 
 	/**
@@ -55,6 +56,9 @@ namespace snuffbox
 
 		/// Reloads a watched texture when it has been changed
 		void ReloadTextureFile(WatchedFile& file);
+
+		/// Reloads a watched model when it has been changed
+		void ReloadModelFile(WatchedFile& file);
 
 		/// Adds a file to the watched files list
 		void AddFile(std::string& path, std::string& relativePath, FileType type);

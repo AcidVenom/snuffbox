@@ -13,7 +13,7 @@ namespace snuffbox
 	{
 	public:
 		/// Constructs an FBX model from a vector of vertices
-		FBXModel(const std::vector<Vertex>& verts);
+		FBXModel(const std::vector<Vertex>& verts, std::string relativePath);
 
 		/// Destroys the model itself and the buffers
 		~FBXModel();
@@ -24,8 +24,18 @@ namespace snuffbox
 		/// Returns the vertex count
 		unsigned int vertexCount(){ return vertexCount_; }
 
+		/// Reloads this model
+		void Reload(std::string relativePath);
+
+		/// Should all meshes using this model reload?
+		bool shouldReload(){ return shouldReload_; }
+
+		/// Stop reloading
+		void disableReload(){ shouldReload_ = false; }
+
 	private:
 		ID3D11Buffer* vertices_;
 		unsigned int vertexCount_;
+		bool shouldReload_;
 	};
 }
