@@ -52,10 +52,11 @@ namespace snuffbox
 	*/
 	struct Vertex
 	{
-		float x, y, z;
+		float x, y, z, w;
 		XMFLOAT3 normal;
 		XMFLOAT2 texCoord;
-		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 3 +sizeof(XMFLOAT3)+sizeof(XMFLOAT2));
+		XMFLOAT4 color;
+		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 4 + sizeof(XMFLOAT3)+sizeof(XMFLOAT2)+sizeof(XMFLOAT4));
 	};
 
 	/**
@@ -203,6 +204,9 @@ namespace snuffbox
 		/// Sets the fullscreen mode
 		void SetFullscreen(bool mode);
 
+		/// Adds a line to the line queue
+		void DrawLine(float x1, float y1, float z1, float r1, float g1, float b1, float x2, float y2, float z2, float r2, float g2, float b2);
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device
@@ -238,5 +242,7 @@ namespace snuffbox
 		ID3D11BlendState*							blendState_;				///< The blend state being used
     FBXModel*                     currentModel_;      ///< The current model being used
     D3D11_PRIMITIVE_TOPOLOGY      topology_;          ///< The current primitive topology
+		std::vector<Vertex>						lines_;							///< The vector for lines to draw
+		ID3D11Buffer*									lineBuffer_;				///< The line vertex buffer
 	};
 }

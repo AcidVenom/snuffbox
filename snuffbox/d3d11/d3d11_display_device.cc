@@ -203,12 +203,13 @@ namespace snuffbox
 
 		D3D11_INPUT_ELEMENT_DESC layout[] = 
 		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		result = device_->CreateInputLayout(layout, 3, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
+		result = device_->CreateInputLayout(layout, 4, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "Input Layout").c_str());
 
 		context_->IASetInputLayout(inputLayout_);
@@ -523,6 +524,39 @@ namespace snuffbox
 		float factor[4] = { 1, 1, 1, 1 };
 		context_->OMSetBlendState(blendState_,factor,0xFFFFFFFF);
 	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::DrawLine(float x1, float y1, float z1, float r1, float g1, float b1, float x2, float y2, float z2, float r2, float g2, float b2)
+	{
+		Vertex vert;
+		vert.x = x1;
+		vert.y = y1;
+		vert.z = z1;
+		vert.w = 1.0f;
+		vert.texCoord.x = 0;
+		vert.texCoord.y = 0;
+		vert.normal = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		vert.color.x = r1;
+		vert.color.y = g1;
+		vert.color.z = b1;
+		vert.color.w = 1.0f;
+
+		lines_.push_back(vert);
+
+		vert.x = x2;
+		vert.y = y2;
+		vert.z = z2;
+		vert.w = 1.0f;
+		vert.texCoord.x = 0;
+		vert.texCoord.y = 0;
+		vert.normal = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		vert.color.x = r2;
+		vert.color.y = g2;
+		vert.color.z = b2;
+		vert.color.w = 1.0f;
+
+		lines_.push_back(vert);
+	}
 	
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
@@ -657,6 +691,47 @@ namespace snuffbox
 	{
 		if (!camera_) return;
 
+		if (lines_.size() > 0)
+		{
+			if (lineBuffer_)
+			{
+				lineBuffer_->Release();
+				lineBuffer_ = nullptr;
+			}
+			lineBuffer_ = CreateVertexBuffer(lines_);
+			if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP)
+				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+			SetVertexBuffer(lineBuffer_);
+
+			worldMatrix_ = XMMatrixIdentity();
+
+			D3D11_MAPPED_SUBRESOURCE cbData;
+			VS_CONSTANT_BUFFER* mappedData;
+
+			context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+			context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+
+			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+			XMVECTOR deter;
+			mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
+			mappedData->Time = time_;
+			mappedData->World = worldMatrix_;
+			mappedData->View = viewMatrix_;
+			mappedData->Projection = projectionMatrix_;
+			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
+			mappedData->InvWorld = XMMatrixTranspose(XMMatrixInverse(&deter, worldMatrix_));
+			mappedData->Alpha = 1;
+			mappedData->Blend = XMFLOAT3(1,1,1);
+
+			context_->Unmap(vsConstantBuffer_, 0);
+			Shaders shaders = environment::content_manager().Get<Shader>("shaders/base.fx").get()->shaders();
+			context_->PSSetShader(shaders.ps, 0, 0);
+			context_->VSSetShader(shaders.vs, 0, 0);
+
+			topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+			context_->Draw(static_cast<UINT>(lines_.size()), static_cast<UINT>(0));
+		}
+
 		for (auto& it : opaqueElements_)
 		{
 			DrawRenderElement(it);
@@ -720,6 +795,12 @@ namespace snuffbox
 	void D3D11DisplayDevice::EndDraw()
 	{
 		swapChain_->Present(environment::render_settings().settings().vsync, 0);
+		lines_.clear();
+		if (lineBuffer_)
+		{
+			lineBuffer_->Release();
+			lineBuffer_ = nullptr;
+		}
 	}
 
 	//---------------------------------------------------------------------------------
@@ -782,6 +863,12 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(noTexture_);
 		SNUFF_SAFE_RELEASE(defaultResource_);
 		SNUFF_SAFE_RELEASE(blendState_);
+
+		if (lineBuffer_)
+		{
+			lineBuffer_->Release();
+			lineBuffer_ = nullptr;
+		}
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");
 	}

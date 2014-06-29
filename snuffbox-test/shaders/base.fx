@@ -18,16 +18,18 @@ cbuffer Uniforms : register(b1)
 struct VOut
 {
   float4 position : SV_POSITION;
+  float4 color : COLOR;
   float3 normal : NORMAL;
   float2 texcoord : TEXCOORD0;
 };
 
-VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0)
+VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 color : COLOR)
 {
   VOut output;
   output.position = mul(position, WorldViewProjection);
   output.normal = normalize(mul(float4(normal, 0), InvWorld).xyz);
 	output.texcoord = texcoord;
+  output.color = color;
   return output;
 }
 
@@ -40,5 +42,5 @@ float4 PS(VOut input) : SV_TARGET
   float4 color = float4(textureColor.rgb * Blend, textureColor.a);
   color.a *= Alpha;
 
-  return color;
+  return float4(input.color.rgb,1);
 }

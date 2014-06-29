@@ -11,6 +11,7 @@
 #include "../../snuffbox/d3d11/elements/widget_element.h"
 #include "../../snuffbox/d3d11/elements/mesh_element.h"
 #include "../../snuffbox/d3d11/d3d11_settings.h"
+#include "../../snuffbox/d3d11/d3d11_line.h"
 #include "../../snuffbox/content/content_manager.h"
 
 namespace snuffbox
@@ -29,5 +30,6 @@ namespace snuffbox
 		JSRegister<Mesh, true>::Register();
 		JSRegister<ContentManager, false>::Register();
 		JSRegister<D3D11Settings, false>::Register();		
+		JSRegister<D3D11Line, false>::Register();
 	}
 }

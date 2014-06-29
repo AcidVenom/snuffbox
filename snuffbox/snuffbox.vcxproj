@@ -175,6 +175,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClCompile Include="content\content_manager.cc" />
     <ClCompile Include="d3d11\d3d11_camera.cc" />
     <ClCompile Include="d3d11\d3d11_display_device.cc" />
+    <ClCompile Include="d3d11\d3d11_line.cc" />
     <ClCompile Include="d3d11\d3d11_settings.cc" />
     <ClCompile Include="d3d11\d3d11_shader.cc" />
     <ClCompile Include="d3d11\d3d11_texture.cc" />
@@ -202,6 +203,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClInclude Include="content\content_manager.h" />
     <ClInclude Include="d3d11\d3d11_camera.h" />
     <ClInclude Include="d3d11\d3d11_display_device.h" />
+    <ClInclude Include="d3d11\d3d11_line.h" />
     <ClInclude Include="d3d11\d3d11_settings.h" />
     <ClInclude Include="d3d11\d3d11_shader.h" />
     <ClInclude Include="d3d11\d3d11_texture.h" />

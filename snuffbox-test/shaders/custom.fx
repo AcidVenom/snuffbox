@@ -24,7 +24,7 @@ struct VOut
 
 float4 GetVertexPos(float4 position)
 {
-  float4 pos = float4(position.x+position.z/10*position.z/20*sin(Time/4),position.y+sin(position.z/20+Time/1)*20+sin(position.x/10 + Time/1)*13+cos(position.z/5)*10,position.z + sin(position.x/3), position.w);
+  float4 pos = float4(position.x+position.z/10*position.z/70*sin(Time),position.y+sin(position.z/20+Time/1)*10+sin(position.x/10 + Time/1)*5+cos(position.z/5)*3,position.z + sin(position.x/4)*2, position.w);
   return pos;
 }
 
@@ -52,8 +52,9 @@ float4 PS(VOut input) : SV_TARGET
   float3 C = GetVertexPos(float4(input.unmodified.x+1,input.unmodified.y,input.unmodified.z+1,input.unmodified.w)).xyz;
   
   float3 normal = normalize(cross(B-A,B-C));
-  color.r *= input.texcoord.x+sin(Time/10);
-
-  color.g *= abs(sin(Time/200));
+  color.r = 1;
+  color.g = 0.2;
+  color.b = 0.5+(input.texcoord.x*2*sin(Time))/3;
+  
   return float4(color.rgb*saturate(dot(normal,float3(0.5,1,0))),color.a);
 }

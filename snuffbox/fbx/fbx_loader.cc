@@ -134,9 +134,11 @@ namespace snuffbox
 					vert.x = vertices[controlPoint].mData[0];
 					vert.z = vertices[controlPoint].mData[1];
 					vert.y = vertices[controlPoint].mData[2];
+					vert.w = 1.0f;
 					vert.normal.x = normal.mData[0];
 					vert.normal.z = normal.mData[1];
 					vert.normal.y = normal.mData[2];
+					vert.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 					vertsOut->push_back(vert);
 				}
