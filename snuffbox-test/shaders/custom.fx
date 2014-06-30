@@ -17,6 +17,7 @@ cbuffer Uniforms : register(b1)
 struct VOut
 {
   float4 position : SV_POSITION;
+  float4 color: COLOR;
   float4 unmodified : POSITION;
   float3 normal : NORMAL;
   float2 texcoord : TEXCOORD0;
@@ -28,13 +29,14 @@ float4 GetVertexPos(float4 position)
   return pos;
 }
 
-VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0)
+VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 color : COLOR)
 {
   VOut output;
   output.unmodified = position;
   output.position = mul(GetVertexPos(position), WorldViewProjection);
 	output.normal = normal;
 	output.texcoord = texcoord;
+  output.color = color;
   return output;
 }
 

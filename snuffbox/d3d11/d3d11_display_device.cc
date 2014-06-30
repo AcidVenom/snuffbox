@@ -699,8 +699,8 @@ namespace snuffbox
 				lineBuffer_ = nullptr;
 			}
 			lineBuffer_ = CreateVertexBuffer(lines_);
-			if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP)
-				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+			if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST)
+				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
 			SetVertexBuffer(lineBuffer_);
 
 			worldMatrix_ = XMMatrixIdentity();
@@ -728,7 +728,7 @@ namespace snuffbox
 			context_->PSSetShader(shaders.ps, 0, 0);
 			context_->VSSetShader(shaders.vs, 0, 0);
 
-			topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+			topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST;
 			context_->Draw(static_cast<UINT>(lines_.size()), static_cast<UINT>(0));
 		}
 

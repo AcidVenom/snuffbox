@@ -52,7 +52,7 @@ namespace snuffbox
 
 		/// Loads a piece of content from a path
 		template<typename T>
-		void Load(std::string path);
+		bool Load(std::string path);
 
 		/// Unloads a piece of content from a path
 		template<typename T>

@@ -41,38 +41,45 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	template<>
-	void ContentManager::Load<Texture>(std::string path)
+	bool ContentManager::Load<Texture>(std::string path)
 	{
 		if (loadedTextures_.find(path) != loadedTextures_.end())
-			return;
+			return false;
+		SNUFF_LOG_INFO(std::string("Loading texture " + path).c_str());
 		SharedPtr<Texture> texture = environment::memory().ConstructShared<Texture>(std::string(path));
 		SharedPtr<Content<Texture>> content = environment::memory().ConstructShared<Content<Texture>>(ContentTypes::kTexture, texture);
 
 		loadedTextures_.emplace(path, content);
+		return true;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	template<>
-	void ContentManager::Load<Shader>(std::string path)
+	bool ContentManager::Load<Shader>(std::string path)
 	{
 		if (loadedShaders_.find(path) != loadedShaders_.end())
-			return;
+			return false;
+		SNUFF_LOG_INFO(std::string("Loading shader " + path).c_str());
 		SharedPtr<Shader> shader = environment::memory().ConstructShared<Shader>(std::string(path));
 		SharedPtr<Content<Shader>> content = environment::memory().ConstructShared<Content<Shader>>(ContentTypes::kShader, shader);
 
 		loadedShaders_.emplace(path, content);
+		return true;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	template<>
-	void ContentManager::Load<FBXModel>(std::string path)
+	bool ContentManager::Load<FBXModel>(std::string path)
 	{
 		if (loadedModels_.find(path) != loadedModels_.end())
-			return;
+			return false;
+
+		SNUFF_LOG_INFO(std::string("Loading model " + path).c_str());
 		SharedPtr<FBXModel> model = environment::memory().ConstructShared<FBXModel>(environment::fbx_loader().Load(path), path);
 		SharedPtr<Content<FBXModel>> content = environment::memory().ConstructShared<Content<FBXModel>>(ContentTypes::kModel, model);
 
 		loadedModels_.emplace(path, content);
+		return true;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -82,6 +89,7 @@ namespace snuffbox
 		SNUFF_XASSERT(loadedTextures_.find(path) != loadedTextures_.end(), "The texture '" + path + "' was never loaded!");
 
 		loadedTextures_.erase(loadedTextures_.find(path));
+		SNUFF_LOG_INFO(std::string("Unloaded texture " + path).c_str());
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -91,6 +99,7 @@ namespace snuffbox
 		SNUFF_XASSERT(loadedShaders_.find(path) != loadedShaders_.end(), "The shader '" + path + "' was never loaded!");
 
 		loadedShaders_.erase(loadedShaders_.find(path));
+		SNUFF_LOG_INFO(std::string("Unloaded shader " + path).c_str());
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -100,6 +109,7 @@ namespace snuffbox
 		SNUFF_XASSERT(loadedModels_.find(path) != loadedModels_.end(), "The model '" + path + "' was never loaded!");
 
 		loadedModels_.erase(loadedModels_.find(path));
+		SNUFF_LOG_INFO(std::string("Unloaded model " + path).c_str());
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -159,26 +169,29 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void ContentManager::LoadPendingContent()
 	{
+		bool result = false;
 		while (!pendingContent_.empty())
 		{
 			auto& it = pendingContent_.front();
 
-			SNUFF_LOG_INFO(std::string("Loading " + it.path).c_str());
-
 			switch (it.type)
 			{
 			case ContentTypes::kTexture:
-				Load<Texture>(it.path);
+				result = Load<Texture>(it.path);
 				break;
 			case ContentTypes::kShader:
-				Load<Shader>(it.path);
+				result = Load<Shader>(it.path);
 				break;
 			case ContentTypes::kModel:
-				Load<FBXModel>(it.path);
+				result = Load<FBXModel>(it.path);
 				break;
 			}
 
-			SNUFF_LOG_DEBUG(std::string("Loaded " + it.path).c_str());
+			if (result)
+			{
+				SNUFF_LOG_DEBUG(std::string("Loaded " + it.path).c_str());
+			}
+			
 			pendingContent_.pop();
 		}
 

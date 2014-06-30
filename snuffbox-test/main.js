@@ -117,8 +117,11 @@ Game.Update = function(dt)
 
 Game.Draw = function(dt)
 {
-	Line.draw(0,0,0,1,0,0,10,0,0,1,0,0);
-	Line.draw(0,10,10,1,0,0,10,0,0,1,0,0);
+	for(var i = 0; i < 10; ++i)
+	{
+		Line.draw(i*10,Math.sin(timer*5)*3,-20, 1,0,0, (i*10)+10,0,-20, 0,1,1);
+		Line.draw(i*10,0,-20, 1,1,0, i*10,Math.sin(timer*5)*3,0, 1,0,0);
+	}
 	Game.render(Game.camera);
 }
 

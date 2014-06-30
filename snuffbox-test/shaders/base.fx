@@ -39,8 +39,8 @@ SamplerState SampleType;
 float4 PS(VOut input) : SV_TARGET
 {	
   float4 textureColor = Texture.Sample(SampleType,input.texcoord);
-  float4 color = float4(textureColor.rgb * Blend, textureColor.a);
+  float4 color = float4(textureColor.rgb * Blend * input.color.rgb, textureColor.a);
   color.a *= Alpha;
 
-  return float4(input.color.rgb,1);
+  return color;
 }
