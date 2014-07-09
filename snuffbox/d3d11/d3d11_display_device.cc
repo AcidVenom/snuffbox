@@ -206,10 +206,12 @@ namespace snuffbox
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		result = device_->CreateInputLayout(layout, 4, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
+		result = device_->CreateInputLayout(layout, 6, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "Input Layout").c_str());
 
 		context_->IASetInputLayout(inputLayout_);
@@ -471,14 +473,14 @@ namespace snuffbox
 	void D3D11DisplayDevice::CreateDefaultTexture()
 	{
 		HRESULT result = S_OK;
-		uint32_t color = 0xffffffff;
+		D3DXCOLOR color(1.0f, 1.0f, 1.0f, 1.0f);
 
 		D3D11_TEXTURE2D_DESC whiteTexture;
 		ZeroMemory(&whiteTexture, sizeof(D3D11_TEXTURE2D_DESC));
 		whiteTexture.ArraySize = 1;
 		whiteTexture.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		whiteTexture.CPUAccessFlags = 0;
-		whiteTexture.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		whiteTexture.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		whiteTexture.Height = 1;
 		whiteTexture.MipLevels = 1;
 		whiteTexture.MiscFlags = 0;
@@ -496,6 +498,33 @@ namespace snuffbox
 		result = device_->CreateTexture2D(&whiteTexture, &initData, &noTexture_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 		result = device_->CreateShaderResourceView(noTexture_, NULL, &defaultResource_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		D3DXCOLOR col(0.51f, 0.54f, 0.98f, 1.0f);
+
+		D3D11_TEXTURE2D_DESC normalTexture;
+		ZeroMemory(&normalTexture, sizeof(D3D11_TEXTURE2D_DESC));
+		normalTexture.ArraySize = 1;
+		normalTexture.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		normalTexture.CPUAccessFlags = 0;
+		normalTexture.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		normalTexture.Height = 1;
+		normalTexture.MipLevels = 1;
+		normalTexture.MiscFlags = 0;
+		normalTexture.SampleDesc.Count = 1;
+		normalTexture.SampleDesc.Quality = 0;
+		normalTexture.Usage = D3D11_USAGE_DEFAULT;
+		normalTexture.Width = 1;
+
+		D3D11_SUBRESOURCE_DATA iData;
+		ZeroMemory(&iData, sizeof(D3D11_SUBRESOURCE_DATA));
+		iData.pSysMem = &col;
+		iData.SysMemPitch = sizeof(col);
+		iData.SysMemSlicePitch = sizeof(col);
+
+		result = device_->CreateTexture2D(&normalTexture, &iData, &noNormal_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+		result = device_->CreateShaderResourceView(noNormal_, NULL, &defaultNormal_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 	}
 
@@ -639,20 +668,27 @@ namespace snuffbox
 
 			context_->Unmap(uniformBuffer_, 0);
 
+			ID3D11ShaderResourceView* textures[2];
+			textures[0] = defaultResource_;
+			textures[1] = defaultNormal_;
+
+			if (it->normalMap())
+			{
+				textures[1] = it->normalMap()->resource();
+			}
+
 			if (it->texture())
 			{
-				if (currentTexture_ != it->texture())
-				{
-					auto tex = it->texture()->resource();
-					context_->PSSetShaderResources(0, 1, &tex);
-					currentTexture_ = it->texture();
-				}
+				textures[0] = it->texture()->resource();
 			}
-			else
+
+			if (currentTexture_ != it->texture() || currentNormal_ != it->normalMap())
 			{
-				context_->PSSetShaderResources(0, 1, &defaultResource_);
-				currentTexture_ = nullptr;
+				context_->PSSetShaderResources(0, 2, textures);
 			}
+
+			currentTexture_ = it->texture();
+			currentNormal_ = it->normalMap();
 
 			if (it->shader())
 			{
@@ -703,6 +739,8 @@ namespace snuffbox
 				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
 			SetVertexBuffer(lineBuffer_);
 
+			vbType_ = VertexBufferType::kLine;
+
 			worldMatrix_ = XMMatrixIdentity();
 
 			D3D11_MAPPED_SUBRESOURCE cbData;
@@ -725,6 +763,16 @@ namespace snuffbox
 
 			context_->Unmap(vsConstantBuffer_, 0);
 			Shaders shaders = environment::content_manager().Get<Shader>("shaders/base.fx").get()->shaders();
+
+			ID3D11ShaderResourceView* textures[2];
+			textures[0] = defaultResource_;
+			textures[1] = defaultNormal_;
+
+			context_->PSSetShaderResources(0, 2, textures);
+
+			currentTexture_ = nullptr;
+			currentNormal_ = nullptr;
+
 			context_->PSSetShader(shaders.ps, 0, 0);
 			context_->VSSetShader(shaders.vs, 0, 0);
 
@@ -862,6 +910,8 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(samplerState_);
 		SNUFF_SAFE_RELEASE(noTexture_);
 		SNUFF_SAFE_RELEASE(defaultResource_);
+		SNUFF_SAFE_RELEASE(noNormal_);
+		SNUFF_SAFE_RELEASE(defaultNormal_);
 		SNUFF_SAFE_RELEASE(blendState_);
 
 		if (lineBuffer_)

@@ -120,5 +120,6 @@ namespace snuffbox
     unsigned int historyIndex_; ///< The current history index
 		std::string lastLine_; ///< The last line added to the console
 		unsigned int repeatCount_; ///< The repeat count for a console line
+		LogSeverity lastSev_;
 	};
 }

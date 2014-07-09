@@ -25,10 +25,11 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Billboard::Create()
 	{
-		vertices().push_back({ 0.0f, 0.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) });
-		vertices().push_back({ 1.0f, 0.0f, 1.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) });
-		vertices().push_back({ 0.0f, 0.0f, 1.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) });
-		vertices().push_back({ 1.0f, 0.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) });
+		vertices().push_back({ 0.0f, 0.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)});
+		vertices().push_back({ 1.0f, 0.0f, 1.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)});
+		vertices().push_back({ 0.0f, 0.0f, 1.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)});
+		vertices().push_back({ 1.0f, 0.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)});
+
 
 		indices().push_back(2);
 		indices().push_back(0);
@@ -54,17 +55,7 @@ namespace snuffbox
 		baseMatrix._14 = baseMatrix._24 = baseMatrix._34 = baseMatrix._41 = baseMatrix._42 = baseMatrix._43 = 0;
 		baseMatrix._44 = 1;
 
-		XMVECTOR trans = translation();
-		float x = XMVectorGetX(trans);
-		float y = XMVectorGetY(trans);
-		float z = XMVectorGetZ(trans);
-
-		XMVECTOR s = scale();
-		float sx = XMVectorGetX(s);
-		float sy = XMVectorGetY(s);
-		float sz = XMVectorGetZ(s);
-
-		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * baseMatrix * XMMatrixTranslation(x*sx,y*sy,z*sz);
+		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * baseMatrix * XMMatrixTranslationFromVector(translation());
 
 		return world_;
 	}

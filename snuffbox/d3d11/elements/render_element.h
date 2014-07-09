@@ -70,6 +70,7 @@ namespace snuffbox
 			sx_(1.0f), sy_(1.0f), sz_(1.0f),
 			rotation_(XMMatrixIdentity()),
 			texture_(nullptr),
+			normalMap_(nullptr),
 			elementType_(type),
 			shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get()),
 			destroyed_(true),
@@ -143,6 +144,9 @@ namespace snuffbox
 		/// Returns the texture
 		Texture* texture(){ return texture_; }
 
+		/// Returns the normal map
+		Texture* normalMap(){ return normalMap_; }
+
 		/// Returns the shader
 		Shader* shader(){ return shader_; }
 
@@ -185,6 +189,7 @@ namespace snuffbox
     float																	ox_, oy_, oz_; ///< Offset floats
     float																	sx_, sy_, sz_; ///< Scaling floats
 		Texture*															texture_;	///< The texture of this render element
+		Texture*															normalMap_; ///< The normal map of this render element
 		Shader*																shader_; ///< The current shader used by this element
 		ElementTypes													elementType_;	///< The type of this render element
     bool																	destroyed_; ///< Is this element destroyed?
@@ -207,6 +212,7 @@ namespace snuffbox
 		static void JSRotation(JS_ARGS);
 		static void JSTranslation(JS_ARGS);
 		static void JSSetTexture(JS_ARGS);
+		static void JSSetNormalMap(JS_ARGS);
 		static void JSSetShader(JS_ARGS);
     static void JSDestroy(JS_ARGS);
     static void JSSpawn(JS_ARGS);
@@ -534,6 +540,14 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSSetNormalMap(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+
+		self->normalMap_ = environment::content_manager().Get<Texture>(wrapper.GetString(0)).get();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::JSSetShader(JS_ARGS)
 	{
 		JS_SETUP(RenderElement,"S");
@@ -642,6 +656,7 @@ namespace snuffbox
 			JSFunctionRegister("setScale", JSSetScale),
 			JSFunctionRegister("setOffset", JSSetOffset),
 			JSFunctionRegister("setTexture", JSSetTexture),
+			JSFunctionRegister("setNormalMap", JSSetNormalMap),
 			JSFunctionRegister("setShader", JSSetShader),
       JSFunctionRegister("destroy", JSDestroy),
       JSFunctionRegister("spawn", JSSpawn),

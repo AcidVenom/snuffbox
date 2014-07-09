@@ -42,7 +42,8 @@ namespace snuffbox
     kNone,
     kQuad,
     kTerrain,
-		kMesh
+		kMesh,
+		kLine
   };
 
 	/**
@@ -56,7 +57,9 @@ namespace snuffbox
 		XMFLOAT3 normal;
 		XMFLOAT2 texCoord;
 		XMFLOAT4 color;
-		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 4 + sizeof(XMFLOAT3)+sizeof(XMFLOAT2)+sizeof(XMFLOAT4));
+		XMFLOAT3 tangent;
+		XMFLOAT3 binormal;
+		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 4 + (sizeof(XMFLOAT3)*3)+sizeof(XMFLOAT2)+sizeof(XMFLOAT4));
 	};
 
 	/**
@@ -234,9 +237,12 @@ namespace snuffbox
 		ID3D11Texture2D*							depthStencilBuffer_;///< The buffer of the depth stencil
 		ID3D11DepthStencilState*			depthState_;				///< The depth stencil state
 		ID3D11Texture2D*							noTexture_;					///< A white rectangular texture as default
+		ID3D11Texture2D*							noNormal_;					///< A green rectangular texture as default normal
 		ID3D11ShaderResourceView*			defaultResource_;		///< The default shader resource
+		ID3D11ShaderResourceView*     defaultNormal_;			///< The default shader normal map
 		ID3D11SamplerState*						samplerState_;			///< The texture sampler state
 		Texture*											currentTexture_;		///< The current texture being used
+		Texture*											currentNormal_;			///< The current normal map being used
 		Shader*												currentShader_;			///< The current shader being used
 		Camera*												camera_;						///< The current camera being used
 		ID3D11BlendState*							blendState_;				///< The blend state being used

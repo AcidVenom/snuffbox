@@ -39,11 +39,17 @@ namespace snuffbox
 			return;
 		}
 
-		vs_->Release();
-		vs_ = NULL;
-
-		ps_->Release();
-		ps_ = NULL;
+		if (vs_)
+		{
+			vs_->Release();
+			vs_ = NULL;
+		}
+	
+		if (ps_)
+		{
+			ps_->Release();
+			ps_ = NULL;
+		}
 
 		vs_ = shaders.vs;
 		ps_ = shaders.ps;

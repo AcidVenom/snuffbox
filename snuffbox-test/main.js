@@ -9,6 +9,9 @@ ContentManager.load("model","models/gible.fbx");
 ContentManager.load("texture","textures/gible.png");
 ContentManager.load("model","models/scraggy.fbx");
 ContentManager.load("texture","textures/scraggy.png");
+ContentManager.load("texture","textures/normal.png");
+ContentManager.load("texture","textures/bricks.png");
+
 var terrain = terrain || undefined;
 var widget = widget || undefined; 
 var widget2 = widget2 || undefined;
@@ -21,26 +24,26 @@ mesh.spawn();
 mesh.setTexture("textures/axew.png");
 mesh.setShader("shaders/lighting.fx");
 mesh.setScale(10,10,10);
-mesh.setTranslation(-30,0,0);
+mesh.setTranslation(30,0,-30);
 mesh.setRotation(0,0,0);
 
 mesh2.spawn();
 mesh2.setTexture("textures/totodile.png");
 mesh2.setShader("shaders/lighting.fx");
 mesh2.setScale(10,10,10);
-mesh2.setTranslation(-90,0,0);
+mesh2.setTranslation(90,0,-30);
 
 mesh3.spawn();
 mesh3.setTexture("textures/gible.png");
 mesh3.setShader("shaders/lighting.fx");
 mesh3.setScale(10,10,10);
-mesh3.setTranslation(-150,0,0);
+mesh3.setTranslation(150,0,-30);
 
 mesh4.spawn();
 mesh4.setTexture("textures/scraggy.png");
 mesh4.setShader("shaders/lighting.fx");
 mesh4.setScale(10,10,10);
-mesh4.setTranslation(-210,0,0);
+mesh4.setTranslation(210,0,-30);
 
 var timer = timer || 0;
 
@@ -54,9 +57,10 @@ Game.Initialise = function()
 	RenderSettings.setBackBufferColor(0,0,0.5,1);
 	Game.camera = Camera.new("perspective");
 	Game.camera.setTranslation(0,0,0);
-	terrain = Terrain.new(128,128);
+	terrain = Terrain.new(256,256);
 	terrain.spawn();
 	terrain.setShader("shaders/custom.fx");
+	terrain.setTranslation(30,0,0);
 	widget = Widget.new();
 	widget.setScale(256,0,256);
 	widget.setTexture("textures/snuffbox.png");
@@ -72,7 +76,8 @@ Game.Initialise = function()
 }
 Game.Update = function(dt)
 {	
-	Log.watch("dt",dt);
+	Log.debug("Bleh");
+	Log.error("Bleh");
 	if(Keyboard.isReleased("F9"))
 	{
 		Game.showConsole();
@@ -105,23 +110,11 @@ Game.Update = function(dt)
 	widget2.setScale(64+Math.sin(timer)*40,64+Math.sin(timer)*40,64+Math.sin(timer)*40);
 	widget2.setAlpha(0.5);
 	widget2.setTranslation(66,71,0);
-
-	if (Mouse.isDown(1))
-	{
-		mesh.rotateBy(-rx/100,-ry/100,0);
-		mesh2.rotateBy(-rx/100,-ry/100,0);
-		mesh3.rotateBy(-rx/100,-ry/100,0);
-		mesh4.rotateBy(-rx/100,-ry/100,0);
-	}
+	
 }
 
 Game.Draw = function(dt)
 {
-	for(var i = 0; i < 10; ++i)
-	{
-		Line.draw(i*10,Math.sin(timer*5)*3,-20, 1,0,0, (i*10)+10,0,-20, 0,1,1);
-		Line.draw(i*10,0,-20, 1,1,0, i*10,Math.sin(timer*5)*3,0, 1,0,0);
-	}
 	Game.render(Game.camera);
 }
 

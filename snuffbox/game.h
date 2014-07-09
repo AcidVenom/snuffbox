@@ -110,6 +110,7 @@ namespace snuffbox
 		high_resolution_clock::time_point lastTime_;	///< The last clock time for delta timing
 		QApplication& qtApp_; ///< The qt application
 		bool shouldQuit_; ///< If the application should quit
+		bool doReload_; ///< Should all content be reloaded?
 	public:
 		JS_NAME(Game);
 		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions

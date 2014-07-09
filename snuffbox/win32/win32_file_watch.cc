@@ -55,14 +55,9 @@ namespace snuffbox
 		}
 		else
 		{
-      for (auto &it : files_)
-      {
-        if (strcmp(it.path.c_str(), file.path.c_str()) == 0)
-        {
-          return;
-        }
-      }
-			files_.push_back(file);
+			if (files_.find(file.relativePath) != files_.end())
+				return;
+			queue_.push(file);
 		}
 	}
 
@@ -71,8 +66,24 @@ namespace snuffbox
 	{
 		if (!environment::has_game())
 			return;
-		for (auto &it : files_)
+
+		while (!queue_.empty())
 		{
+			auto it = queue_.front();
+			files_.emplace(it.relativePath, it);
+			queue_.pop();
+		}
+
+		while (!toDelete_.empty())
+		{
+			auto it = toDelete_.front();
+			files_.erase(it);
+			toDelete_.pop();
+		}
+
+		for (auto& pair = files_.begin(); pair != files_.end(); ++pair)
+		{
+			auto& it = pair->second;
 			bool failed = false;
 			FILETIME lastTime = GetTimeForFile(it.path, &failed);
 			if (!failed)
@@ -136,6 +147,21 @@ namespace snuffbox
 		model->Reload(file.relativePath);
 		environment::render_device().ResetCurrentModel();
 		SNUFF_LOG_INFO(std::string("Hot reloaded FBX Model file: " + file.path).c_str());
+	}
+
+	//-------------------------------------------------------------------
+	void FileWatcher::RemoveWatchedFile(std::string path)
+	{
+		auto it = files_.find(path);
+
+		if (it == files_.end())
+		{
+			return;
+		}
+		else
+		{
+			toDelete_.push(it);
+		}
 	}
 
 	//-------------------------------------------------------------------

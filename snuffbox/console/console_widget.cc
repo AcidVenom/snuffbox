@@ -113,7 +113,8 @@ namespace snuffbox
 		shiftPressed_(false),
     historyIndex_(0),
 		lastLine_(""),
-		repeatCount_(0)
+		repeatCount_(0),
+		lastSev_(LogSeverity::kDebug)
 	{
 		window_->setMinimumSize(QSize(400, 480));
 		
@@ -348,7 +349,7 @@ namespace snuffbox
 	{
     if (msg == nullptr) return;
 
-		if (strcmp(lastLine_.c_str(), msg) == 0)
+		if (strcmp(lastLine_.c_str(), msg) == 0 && lastSev_ == sev)
 		{
 			++repeatCount_;
 			QTextCursor cursor = ui_->terminal->textCursor();
@@ -377,6 +378,7 @@ namespace snuffbox
 
 		repeatCount_ = 0;
 
+		lastSev_ = sev;
 		lastLine_ = std::string(msg);
 		time_t t = time(0);
 		struct tm now;

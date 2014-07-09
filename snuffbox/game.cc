@@ -18,6 +18,8 @@
 #include "../snuffbox/fbx/fbx_loader.h"
 
 #include <QtCore>
+#include <stdio.h>
+#include <fstream>
 
 #define SNUFF_VERSION_MAJOR 1
 #define SNUFF_VERSION_MINOR 5
@@ -56,6 +58,7 @@ using namespace snuffbox;
 Game::Game(Win32Window* window, QApplication& app) :
 started_(false),
 consoleEnabled_(false),
+doReload_(false),
 mouse_(environment::memory().ConstructShared<Mouse>()),
 keyboard_(environment::memory().ConstructShared<Keyboard>()),
 device_(environment::memory().ConstructShared<D3D11DisplayDevice>()),
@@ -89,7 +92,6 @@ void Game::Initialise()
 //------------------------------------------------------------------------------------------------------
 void Game::Update()
 {
-	environment::content_manager().LoadPendingContent();
 	++gameTime_;
 	
 	if (!started_)
@@ -112,11 +114,9 @@ void Game::Update()
 	}
 
 
-	if (gameTime_ % 20 == 0)
+	if (gameTime_ % 20 == 0 && doReload_)
 	{
-#ifdef SNUFF_DEBUG
 		environment::file_watcher().WatchFiles();
-#endif
 	}
 
 	if (shouldQuit_)
@@ -196,16 +196,45 @@ void Game::Shutdown()
 void Game::ParseCommandLine()
 {
   std::string cmdLine = GetCommandLineA();
+	char currentPath[FILENAME_MAX];
+	std::string path = "";
+	std::string temp = "";
 
-  SNUFF_XASSERT(CommandExists(cmdLine, "-source-directory="),"Could not find '-source-directory' argument in the command line!\nYou have to specify a directory to work with.");
+	if (CommandExists(cmdLine, "-source-directory="))
+	{
+		path = GetCommand(cmdLine, "-source-directory=");
+	}
+	else
+	{
+		GetCurrentDirectoryA(sizeof(currentPath), currentPath);
+		temp = currentPath;
 
-  std::string path = GetCommand(cmdLine, "-source-directory=");
+		for (auto it = temp.begin(); it != temp.end(); ++it)
+		{
+			auto ch = it[0];
+			if (ch == *"\\")
+			{
+				path += "/";
+			}
+			else
+			{
+				path += ch;
+			}
+		}
+	}
+  
   environment::js_state_wrapper().path() = path;
 	path_ = path;
 
-	if (CommandExists(cmdLine, "-console"))
+	consoleEnabled_ = CommandExists(cmdLine, "-console");
+	doReload_ = CommandExists(cmdLine, "-reload");
+
+	std::fstream fin(path + "/main.js");
+
+	if (!fin)
 	{
-		consoleEnabled_ = true;
+		MessageBoxA(GetDesktopWindow(), "Snuffbox cannot be ran from this directory.\nMissing 'main.js'", "Snuffbox Error", MB_ICONERROR);
+		exit(1);
 	}
 }
 
@@ -379,9 +408,10 @@ int SNUFF_MAIN
 		console.Initialise(app);
 		console_window.show();
 	}
-	environment::render_device().Initialise();
-  js_state_wrapper.Initialise();
 	
+	environment::render_device().Initialise();
+	js_state_wrapper.Initialise();
+
 	game->Initialise();
 
 	while (game->started())

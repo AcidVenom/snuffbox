@@ -1,7 +1,8 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <map>
+#include <queue>
 #include <Windows.h>
 
 namespace snuffbox
@@ -66,7 +67,12 @@ namespace snuffbox
 		/// Get file time
 		FILETIME GetTimeForFile(std::string& path, bool* failed);
 
+		/// Removes a watched file
+		void RemoveWatchedFile(std::string path);
+
 	private:
-		std::vector<WatchedFile> files_; ///< The vector containing all files to watch
+		std::map<std::string,WatchedFile> files_; ///< The vector containing all files to watch
+		std::queue<WatchedFile> queue_; ///< The queue for files that have to be added
+		std::queue<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,WatchedFile>>>>> toDelete_; ///< The queue for files that have to be removed
 	};
 }

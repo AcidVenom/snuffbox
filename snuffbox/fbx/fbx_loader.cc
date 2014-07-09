@@ -120,24 +120,48 @@ namespace snuffbox
 			unsigned int polyCount = mesh->GetPolygonCount();
 			FbxVector4* vertices = mesh->GetControlPoints();
 
+			FbxLayerElementArrayTemplate<FbxVector4>* binormals;
+			mesh->GetBinormals(&binormals);
+
+			FbxLayerElementArrayTemplate<FbxVector4>* tangents;
+			mesh->GetTangents(&tangents);
+
+			bool doBinormals = true;
+			bool doTangents = true;
+
+			if (!binormals)
+				doBinormals = false;
+			
+			if (!tangents)
+				doTangents = false;
+
 			for (unsigned int polygon = 0; polygon < polyCount; ++polygon)
 			{
 				unsigned int polySize = mesh->GetPolygonSize(polygon);
-				SNUFF_XASSERT(polySize == 3, "You should triangulate the mesh before using it");
+				SNUFF_XASSERT(polySize == 3, "You should triangulate the mesh before using it (Is actually an export option in any Autodesk FBX exporter)");
 
 				for (unsigned int vertex = 0; vertex < polySize; ++vertex)
 				{
+
 					unsigned int controlPoint = mesh->GetPolygonVertex(polygon, vertex);
 					Vertex vert;
 					FbxVector4 normal;
+					FbxVector4 tangent = doTangents ? tangents->GetAt(controlPoint) : FbxVector4(0, 0, 0);
+					FbxVector4 binormal = doBinormals ? binormals->GetAt(controlPoint) : FbxVector4(0, 0, 0);
 					mesh->GetPolygonVertexNormal(polygon, vertex, normal);
 					vert.x = vertices[controlPoint].mData[0];
-					vert.z = vertices[controlPoint].mData[1];
+					vert.z = -vertices[controlPoint].mData[1];
 					vert.y = vertices[controlPoint].mData[2];
 					vert.w = 1.0f;
 					vert.normal.x = normal.mData[0];
-					vert.normal.z = normal.mData[1];
+					vert.normal.z = -normal.mData[1];
 					vert.normal.y = normal.mData[2];
+					vert.tangent.x = tangent.mData[0];
+					vert.tangent.y = -tangent.mData[1];
+					vert.tangent.z = tangent.mData[2];
+					vert.binormal.x = binormal.mData[0];
+					vert.binormal.z = -binormal.mData[1];
+					vert.binormal.y = binormal.mData[2];
 					vert.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 					vertsOut->push_back(vert);
@@ -157,7 +181,7 @@ namespace snuffbox
 					{
 						unsigned int controlPoint = mesh->GetPolygonVertex(polygon, vertex);
 						unsigned int uvIndex = useIndex ? uvElement->GetIndexArray().GetAt(controlPoint) : controlPoint;
-
+				
 						FbxVector2 uv = uvElement->GetDirectArray().GetAt(uvIndex);
 						
 						vertsOut->at(count).texCoord.x = uv.mData[0];
