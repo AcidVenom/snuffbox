@@ -74,7 +74,7 @@ namespace snuffbox
 		clientSize.right = params().w;
 		clientSize.bottom = params().h;
 
-    int style = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+    int style = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX;
 
 		AdjustWindowRect(&clientSize, style, FALSE);
 		unsigned int actualWidth = clientSize.right - clientSize.left;
@@ -215,8 +215,9 @@ namespace snuffbox
 		if (!environment::game().started())
 			return;
 
-		params().w = environment::render_settings().settings().resolution.w;
-		params().h = environment::render_settings().settings().resolution.h;
+		params_.w = LOWORD(lParam);
+		params_.h = HIWORD(lParam);
+
 		environment::render_device().ResizeBuffers();
 	}
 

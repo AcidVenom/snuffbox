@@ -180,6 +180,9 @@ namespace snuffbox
 		/// Returns the visibility of this render element
 		bool visible(){ return visible_; }
 
+		/// Returns the z index
+		float z(){ return z_; }
+
 	private:
 		std::vector<Vertex>										vertices_; ///< The vertices
 		std::vector<unsigned int>							indices_; ///< The indices

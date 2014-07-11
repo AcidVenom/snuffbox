@@ -2,6 +2,9 @@
 #include "../../snuffbox/logging.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/js/js_wrapper.h"
+#include "../../snuffbox/d3d11/d3d11_display_device.h"
+#include "../../snuffbox/win32/win32_window.h"
+#include "../../snuffbox/game.h"
 
 namespace snuffbox
 {
@@ -78,6 +81,9 @@ namespace snuffbox
 			JSFunctionRegister("wheelDown", JSWheelDown)
 		};
 
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Pixel"), Number::New(JS_ISOLATE, 0));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Screen"), Number::New(JS_ISOLATE, 1));
+
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
 	}
 
@@ -85,9 +91,27 @@ namespace snuffbox
 	void Mouse::JSGetPosition(JS_ARGS)
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
-		JS_CHECK_PARAMS("V");
+		JS_CHECK_PARAMS("N");
+
 		std::tuple<double, double> pos = environment::mouse().position();
-		wrapper.ReturnTuple<double>(std::get<0>(pos), std::get<1>(pos));
+		double x = std::get<0>(pos);
+		double y = std::get<1>(pos);
+		unsigned int type = wrapper.GetNumber<unsigned int>(0);
+
+		switch (type)
+		{
+		case 0:
+			wrapper.ReturnTuple<double>(x, y);
+			break;
+		case 1:
+			float nx = x / (environment::game().window()->params().w - SM_CXFIXEDFRAME*2);
+			float ny = y / (environment::game().window()->params().h - 100);
+
+			nx = nx * 2 - 1;
+			ny = ny * 2 - 1;
+			wrapper.ReturnTuple<double>(nx, ny);
+			break;
+		}
 	}
 
 	//--------------------------------------------------------------------------------------

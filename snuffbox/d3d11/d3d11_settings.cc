@@ -83,8 +83,6 @@ namespace snuffbox
 		environment::render_settings().settings().resolution.w = w;
 		environment::render_settings().settings().resolution.h = h;
 
-		SetWindowPos(environment::game().window()->handle(), 0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
-		environment::render_device().ResizeBuffers();
 
 		SNUFF_LOG_INFO(std::string("[Settings] Resized the window to: " + std::to_string(w) + "x" + std::to_string(h)).c_str());
 	}

@@ -336,10 +336,31 @@ namespace snuffbox
 
 		swapChain_->GetDesc(&scDesc);
 
-		viewport.TopLeftX = 0.0f;
-		viewport.TopLeftY = 0.0f;
-		viewport.Width = static_cast<float>(scDesc.BufferDesc.Width);
-		viewport.Height = static_cast<float>(scDesc.BufferDesc.Height);
+		float windowWidth = environment::game().window()->params().w;
+		float windowHeight = environment::game().window()->params().h;
+
+		float targetAspectRatio = environment::render_settings().settings().resolution.w / environment::render_settings().settings().resolution.h * 2;
+		float currentAspectRatio = windowWidth / windowHeight;
+
+		float w = windowWidth;
+		float h = windowHeight;
+
+		if (targetAspectRatio > currentAspectRatio) {
+			w = windowWidth;
+			h = w / targetAspectRatio;
+		}
+		else {
+			h = windowHeight;
+			w = h * targetAspectRatio;
+		}
+
+		float topLeftX = windowWidth / 2 - w / 2;
+		float topLeftY = windowHeight / 2 - h / 2;
+
+		viewport.TopLeftX = topLeftX;
+		viewport.TopLeftY = topLeftY;
+		viewport.Width = w;
+		viewport.Height = h;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 
@@ -594,15 +615,33 @@ namespace snuffbox
 		context_->ClearRenderTargetView(renderTargetView_, environment::render_settings().settings().bufferColor);
 		context_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		struct RenderSorter
+		struct RenderSorterByZ
+		{
+			inline bool operator()(RenderElement* a, RenderElement* b)
+			{
+				return (a->z() > b->z());
+			}
+		} RenderSorterByZ;
+
+		struct RenderSorterDistance
 		{
 			inline bool operator()(RenderElement* a, RenderElement* b)
 			{
 				return (a->distanceFromCamera() > b->distanceFromCamera());
 			}
-		} RenderSorter;
+		} RenderSorterDistance;
 
-		std::sort(renderElements_.begin(), renderElements_.end(), RenderSorter);
+		if (camera_)
+		{
+			if (camera_->type() == Camera::CameraType::kOrthographic)
+			{
+				std::sort(renderElements_.begin(), renderElements_.end(), RenderSorterByZ);
+			}
+			else
+			{
+				std::sort(renderElements_.begin(), renderElements_.end(), RenderSorterDistance);
+			}
+		}
 		camera_ = nullptr;
 	}
 
@@ -831,7 +870,7 @@ namespace snuffbox
 		swapChain_->GetDesc(&swapDesc);
 		if (camera->type() == Camera::CameraType::kOrthographic)
 		{
-			projectionMatrix_ = XMMatrixOrthographicRH(swapDesc.BufferDesc.Width, swapDesc.BufferDesc.Height, 1.0f, 1000.0f);
+			projectionMatrix_ = XMMatrixOrthographicRH(environment::render_settings().settings().resolution.w, environment::render_settings().settings().resolution.h, 1.0f, 1000.0f);
 		}
 		else
 		{
@@ -867,8 +906,8 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(backBuffer_);
 		SNUFF_SAFE_RELEASE(inputLayout_);
 
-		unsigned int w = environment::render_settings().settings().resolution.w;
-		unsigned int h = environment::render_settings().settings().resolution.h;
+		unsigned int w = environment::game().window()->params().w;
+		unsigned int h = environment::game().window()->params().h;
 
 		result = swapChain_->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
@@ -882,6 +921,20 @@ namespace snuffbox
     SetCullMode(environment::render_settings().settings().cullMode);
 
 		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
+	}
+
+	//---------------------------------------------------------------------------------
+	std::array<float,2> D3D11DisplayDevice::ScreenSize()
+	{
+		SwapChainDescription swapDesc;
+		swapChain_->GetDesc(&swapDesc);
+
+		std::array<float,2> retVal = {
+			static_cast<float>(swapDesc.BufferDesc.Width),
+			static_cast<float>(swapDesc.BufferDesc.Height)
+		};
+
+		return retVal;
 	}
 
 	//---------------------------------------------------------------------------------
