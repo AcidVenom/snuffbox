@@ -155,6 +155,8 @@ namespace snuffbox
 		MouseData evt;
 		evt.type = MouseEnums::MouseEvent::kDblClk;
 		evt.button = button;
+		evt.x = x;
+		evt.y = y;
 
 		environment::mouse().ReceiveEvent(evt);
 	}

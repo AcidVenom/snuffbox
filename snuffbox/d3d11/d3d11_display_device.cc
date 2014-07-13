@@ -365,6 +365,14 @@ namespace snuffbox
 		viewport.MaxDepth = 1.0f;
 
 		context_->RSSetViewports(1, &viewport);
+
+		viewport_ = viewport;
+	}
+
+	//---------------------------------------------------------------------------------
+	D3D11_VIEWPORT& D3D11DisplayDevice::viewport()
+	{
+		return viewport_;
 	}
 
 	//---------------------------------------------------------------------------------

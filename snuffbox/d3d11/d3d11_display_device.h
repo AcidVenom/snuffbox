@@ -214,6 +214,9 @@ namespace snuffbox
 		/// Returns the current screen size
 		std::array<float, 2> ScreenSize();
 
+		/// Returns the current viewport
+		D3D11_VIEWPORT& viewport();
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device
@@ -254,5 +257,6 @@ namespace snuffbox
     D3D11_PRIMITIVE_TOPOLOGY      topology_;          ///< The current primitive topology
 		std::vector<Vertex>						lines_;							///< The vector for lines to draw
 		ID3D11Buffer*									lineBuffer_;				///< The line vertex buffer
+		D3D11_VIEWPORT								viewport_;					///< The viewport of the device
 	};
 }

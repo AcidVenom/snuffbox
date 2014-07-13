@@ -4,6 +4,7 @@
 #include "../../snuffbox/js/js_wrapper.h"
 #include "../../snuffbox/d3d11/d3d11_display_device.h"
 #include "../../snuffbox/win32/win32_window.h"
+#include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/game.h"
 
 namespace snuffbox
@@ -104,12 +105,48 @@ namespace snuffbox
 			wrapper.ReturnTuple<double>(x, y);
 			break;
 		case 1:
-			float nx = x / (environment::game().window()->params().w - SM_CXFIXEDFRAME*2);
-			float ny = y / (environment::game().window()->params().h - 100);
+			D3D11_VIEWPORT* vp = &environment::render_device().viewport();
 
-			nx = nx * 2 - 1;
-			ny = ny * 2 - 1;
-			wrapper.ReturnTuple<double>(nx, ny);
+			if (vp)
+			{
+				float x1 = vp->TopLeftX;
+				float y1 = vp->TopLeftY;
+				float x2 = vp->Width;
+				float y2 = vp->Height;
+
+				float xx = (x - x1) / x2;
+				float yy = (y - y1) / y2;
+
+				xx = xx * 2 - 1;
+				yy = yy * 2 - 1;
+
+				if (xx < -1)
+				{
+					xx = -1;
+				}
+
+				if (yy < -1)
+				{
+					yy = -1;
+				}
+
+				if (xx > 1)
+				{
+					xx = 1;
+				}
+
+				if (yy > 1)
+				{
+					yy = 1;
+				}
+
+				wrapper.ReturnTuple<double>(xx, yy);
+			}
+			else
+			{
+				wrapper.ReturnTuple<double>(0, 0);
+			}
+			
 			break;
 		}
 	}
