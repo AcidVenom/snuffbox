@@ -212,18 +212,6 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------
-	void Win32Window::OnResize(LPARAM lParam, WPARAM wParam)
-	{
-		if (!environment::game().started())
-			return;
-
-		params_.w = LOWORD(lParam);
-		params_.h = HIWORD(lParam);
-
-		environment::render_device().ResizeBuffers();
-	}
-
-	//---------------------------------------------------------------------------
 	Win32Window::~Win32Window()
 	{
 		
@@ -255,25 +243,29 @@ namespace snuffbox
 
 		Win32Window *window = reinterpret_cast<Win32Window*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
 
+		if (!window)
+		{
+			return DefWindowProcA(hWnd, message, wParam, lParam);
+		}
+
+		if (message == WM_SIZE && environment::game().started())
+		{
+			window->params().w = LOWORD(lParam);
+			window->params().h = HIWORD(lParam);
+
+			environment::render_device().ResizeBuffers();
+		}
+
     WIN32_GET_MOUSE_POS;
 
 		switch (message)
 		{
-		case WM_SYSCOMMAND:
-			if (wParam == SC_KEYMENU && (lParam >> 16) <= 0)
-				return 0;
-			break;
-
 		case WM_SETFOCUS:
 			window->OnSetFocus();
 			break;
 
 		case WM_KILLFOCUS:
 			window->OnKillFocus();
-			break;
-
-		case WM_SIZE:
-			window->OnResize(lParam, wParam);
 			break;
 
 		case WM_CLOSE:

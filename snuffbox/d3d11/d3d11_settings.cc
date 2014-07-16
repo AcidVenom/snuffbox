@@ -120,7 +120,9 @@ namespace snuffbox
 			JSFunctionRegister("setFullscreen", JSSetFullscreen),
 			JSFunctionRegister("setResolution", JSSetResolution),
 			JSFunctionRegister("setVsync", JSSetVsync),
-			JSFunctionRegister("setBackBufferColor", JSSetBackBufferColor)
+			JSFunctionRegister("setBackBufferColor", JSSetBackBufferColor),
+			JSFunctionRegister("resolution", JSResolution),
+			JSFunctionRegister("setWindowSize", JSSetWindowSize)
 		};
 
 		obj->Set(JS_ISOLATE, "CullNone", Number::New(JS_ISOLATE, 1));
@@ -128,5 +130,43 @@ namespace snuffbox
 		obj->Set(JS_ISOLATE, "CullBack", Number::New(JS_ISOLATE, 3));
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
+	}
+
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSResolution(JS_ARGS)
+	{
+		JS_CHECK_PARAMS("V");
+
+		float w = environment::render_settings().settings().resolution.w;
+		float h = environment::render_settings().settings().resolution.h;
+
+		wrapper.ReturnTuple(w, h, "w", "h");
+	}
+
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSSetWindowSize(JS_ARGS)
+	{
+		JS_CHECK_PARAMS("NN");
+
+		float w = wrapper.GetNumber<float>(0);
+		float h = wrapper.GetNumber<float>(1);
+
+		RECT clientSize;
+		clientSize.left = clientSize.top = 0;
+		clientSize.right = w;
+		clientSize.bottom = h;
+
+		int style = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX;
+
+		AdjustWindowRect(&clientSize, style, FALSE);
+		unsigned int actualWidth = clientSize.right - clientSize.left;
+		unsigned int actualHeight = clientSize.bottom - clientSize.top;
+
+		environment::game().window()->params().w = w;
+		environment::game().window()->params().h = h;
+
+		SetWindowPos(environment::game().window()->handle(), HWND_TOP, (GetSystemMetrics(SM_CXSCREEN) - actualWidth) / 2, (GetSystemMetrics(SM_CYSCREEN) - actualHeight) / 2, actualWidth, actualHeight, NULL);
+
+		environment::render_device().ResizeBuffers();
 	}
 }

@@ -86,6 +86,9 @@ namespace snuffbox
 		/// Checks if the console is enabled
 		bool consoleEnabled(){ return consoleEnabled_; }
 
+		/// Runs the game
+		void Run();
+
 		/// Returns the path the game is running in
 		std::string path(){ return path_; }
 

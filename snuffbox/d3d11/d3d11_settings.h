@@ -60,5 +60,7 @@ namespace snuffbox
 		static void JSSetFullscreen(JS_ARGS);
 		static void JSSetVsync(JS_ARGS);
 		static void JSSetBackBufferColor(JS_ARGS);
+		static void JSResolution(JS_ARGS);
+		static void JSSetWindowSize(JS_ARGS);
 	};
 }

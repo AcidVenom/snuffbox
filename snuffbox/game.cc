@@ -22,7 +22,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 1
-#define SNUFF_VERSION_MINOR 5
+#define SNUFF_VERSION_MINOR 61
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -85,8 +85,8 @@ void Game::Initialise()
 {
 	CreateCallbacks();
 	window_->Show();
-	initialise_.Call(0);
 	started_ = true;
+	initialise_.Call(0);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -378,6 +378,13 @@ void Game::Reload()
 }
 
 //------------------------------------------------------------------------------------------------------
+void Game::Run()
+{
+	Update();
+	Draw();
+}
+
+//------------------------------------------------------------------------------------------------------
 int SNUFF_MAIN
 {
 	QApplication app(__argc, __argv);
@@ -400,7 +407,7 @@ int SNUFF_MAIN
 		std::to_string(SNUFF_VERSION_MINOR)
 		);
 	SharedPtr<Game> game = environment::memory().ConstructShared<Game>(
-		environment::memory().ConstructShared<Win32Window>(windowName.c_str(), 1280, 720),
+		environment::memory().ConstructShared<Win32Window>(windowName.c_str(), 640, 480),
 		app);
 	
 	if (game->consoleEnabled())
@@ -421,8 +428,7 @@ int SNUFF_MAIN
 			app.processEvents();
 		}
 		game->window()->ProcessMessages();
-		game->Update();
-		game->Draw();
+		game->Run();
 	}
 	return EXIT_SUCCESS;
 }

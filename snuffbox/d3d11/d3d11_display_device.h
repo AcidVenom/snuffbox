@@ -211,9 +211,6 @@ namespace snuffbox
 		/// Adds a line to the line queue
 		void DrawLine(float x1, float y1, float z1, float r1, float g1, float b1, float x2, float y2, float z2, float r2, float g2, float b2);
 
-		/// Returns the current screen size
-		std::array<float, 2> ScreenSize();
-
 		/// Returns the current viewport
 		D3D11_VIEWPORT& viewport();
 

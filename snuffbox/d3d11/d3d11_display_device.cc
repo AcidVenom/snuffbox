@@ -339,7 +339,10 @@ namespace snuffbox
 		float windowWidth = environment::game().window()->params().w;
 		float windowHeight = environment::game().window()->params().h;
 
-		float targetAspectRatio = environment::render_settings().settings().resolution.w / environment::render_settings().settings().resolution.h * 2;
+		float rw = environment::render_settings().settings().resolution.w;
+		float rh = environment::render_settings().settings().resolution.h;
+
+		float targetAspectRatio =  rw / rh;
 		float currentAspectRatio = windowWidth / windowHeight;
 
 		float w = windowWidth;
@@ -929,20 +932,6 @@ namespace snuffbox
     SetCullMode(environment::render_settings().settings().cullMode);
 
 		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
-	}
-
-	//---------------------------------------------------------------------------------
-	std::array<float,2> D3D11DisplayDevice::ScreenSize()
-	{
-		SwapChainDescription swapDesc;
-		swapChain_->GetDesc(&swapDesc);
-
-		std::array<float,2> retVal = {
-			static_cast<float>(swapDesc.BufferDesc.Width),
-			static_cast<float>(swapDesc.BufferDesc.Height)
-		};
-
-		return retVal;
 	}
 
 	//---------------------------------------------------------------------------------
