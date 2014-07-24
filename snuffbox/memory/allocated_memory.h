@@ -47,5 +47,7 @@ namespace snuffbox
 		allocatedMemory -= sizeof(ptr);
 
 		delete ptr;
+
+		ptr = nullptr;
 	}
 }

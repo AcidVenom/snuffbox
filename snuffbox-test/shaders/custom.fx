@@ -28,7 +28,11 @@ struct VOut
 
 float4 GetVertexPos(float4 position)
 {
-  float4 pos = float4(position.x,position.y+sin(position.z/10+Time*3)*4+sin(position.x/20 + Time*2)*20+cos(position.z/15)*3,position.z + sin(position.x/4)*2, position.w);
+  float4 pos = float4(position.x,position.y+sin(position.z*2+Time*3)*4+sin(position.x/10 + Time*2)+cos(position.z/15)*3,position.z + sin(position.x/4)*2, position.w);
+  
+  pos.x = sin(Time)*40 + sin(Time)*pos.x;
+  pos.z += sin(Time)*40;
+  pos.y += sin(Time)*100;
   return pos;
 }
 
@@ -63,5 +67,6 @@ float4 PS(VOut input) : SV_TARGET
   color.g = 0.2;
   color.b = 0.5+(input.texcoord.x*2*sin(Time))/3;
   
+  color.r = sin(Time*10);
   return float4(color.rgb*saturate(dot(normal,float3(0.5,1,0.5))),color.a);
 }

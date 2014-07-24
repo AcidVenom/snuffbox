@@ -95,7 +95,7 @@ namespace snuffbox
 		void AddLine(LogSeverity sev, const char* msg);
 
 		/// Adds a value to a tree
-		void AddToTree(Local<Value>& obj, QTreeWidgetItem* parent);
+		void AddToTree(Local<Value>& obj, QTreeWidgetItem* parent, bool next = true);
 
 		/// Adds a variable to the watch tree
 		void AddToWatch(std::string name, Local<Value>& obj);

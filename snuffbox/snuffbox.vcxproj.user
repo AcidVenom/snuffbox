@@ -9,7 +9,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-source-directory=C:/Snuff/src/snuffbox-test -console</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-source-directory=C:/Users/Administrator/Desktop/tiny-quest -console</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

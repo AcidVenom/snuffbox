@@ -299,12 +299,11 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------
-	void ConsoleWidget::AddToTree(Local<Value>& value, QTreeWidgetItem* parent)
+	void ConsoleWidget::AddToTree(Local<Value>& value, QTreeWidgetItem* parent, bool next)
 	{
 		if (value->IsObject() || value->IsArray())
 		{
 			Local<Object> obj = value->ToObject();
-
 			Local<Array> names = obj->GetPropertyNames();
 
 			for (unsigned int i = 0; i < names->Length(); ++i)
@@ -330,7 +329,10 @@ namespace snuffbox
 					else
 						child->setText(1, "[Object]");
 
-					AddToTree(childValue, child);
+					if (next)
+					{
+						AddToTree(childValue, child, false);
+					}
 				}
 				else
 				{

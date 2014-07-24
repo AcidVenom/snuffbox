@@ -288,11 +288,19 @@ namespace snuffbox
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSDestroy(const v8::WeakCallbackData<v8::Object, JSObject>& data)
 	{
-		int64_t size = -static_cast<int64_t>(sizeof(data.GetParameter()));
-		data.GetParameter()->persistent().Reset();
-		environment::memory().Destruct<JSObject>(data.GetParameter());
+		JSObject* ptr = data.GetParameter();
+		RenderElement* renderPtr = dynamic_cast<RenderElement*>(ptr);
+
+		if (renderPtr)
+		{
+			RenderElement::RemoveFromRenderer(renderPtr);
+		}
+
+		int64_t size = -static_cast<int64_t>(sizeof(ptr));
+		ptr->persistent().Reset();
+		environment::memory().Destruct<JSObject>(ptr);
 		data.GetValue().Clear();
-		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size*100);
+		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size*10);
 	}
 
 	//---------------------------------------------------------------------------
@@ -313,7 +321,7 @@ namespace snuffbox
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "__ptr"), External::New(JS_ISOLATE, static_cast<void*>(ptr)));
 		int64_t size = static_cast<int64_t>(sizeof(ptr));
 
-		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size*100);
+		JS_ISOLATE->AdjustAmountOfExternalAllocatedMemory(size*10);
     static_cast<JSObject*>(ptr)->RegisterExtraFunctions(obj);
 		args.GetReturnValue().Set(obj);
 	}

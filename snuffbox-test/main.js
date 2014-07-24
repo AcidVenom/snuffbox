@@ -22,26 +22,26 @@ var mesh4 = mesh4 || Mesh.new("models/scraggy.fbx");
 
 mesh.spawn();
 mesh.setTexture("textures/axew.png");
-mesh.setShader("shaders/lighting.fx");
+mesh.setShader("shaders/custom.fx");
 mesh.setScale(10,10,10);
 mesh.setTranslation(30,0,-30);
 mesh.setRotation(0,0,0);
 
 mesh2.spawn();
 mesh2.setTexture("textures/totodile.png");
-mesh2.setShader("shaders/lighting.fx");
+mesh2.setShader("shaders/custom.fx");
 mesh2.setScale(10,10,10);
 mesh2.setTranslation(90,0,-30);
 
 mesh3.spawn();
 mesh3.setTexture("textures/gible.png");
-mesh3.setShader("shaders/lighting.fx");
+mesh3.setShader("shaders/custom.fx");
 mesh3.setScale(10,10,10);
 mesh3.setTranslation(150,0,-30);
 
 mesh4.spawn();
 mesh4.setTexture("textures/scraggy.png");
-mesh4.setShader("shaders/lighting.fx");
+mesh4.setShader("shaders/custom.fx");
 mesh4.setScale(10,10,10);
 mesh4.setTranslation(210,0,-30);
 
@@ -55,6 +55,7 @@ Game.Initialise = function()
 	RenderSettings.setFullscreen(false);
 	RenderSettings.setCullMode(RenderSettings.CullNone);
 	RenderSettings.setBackBufferColor(0,0,0.5,1);
+	RenderSettings.setWindowSize(1280,720);
 	Game.camera = Camera.new("perspective");
 	Game.camera.setTranslation(0,0,0);
 	terrain = Terrain.new(256,256);
@@ -76,8 +77,6 @@ Game.Initialise = function()
 }
 Game.Update = function(dt)
 {	
-	Log.debug("Bleh");
-	Log.error("Bleh");
 	if(Keyboard.isReleased("F9"))
 	{
 		Game.showConsole();
@@ -110,6 +109,8 @@ Game.Update = function(dt)
 	widget2.setScale(64+Math.sin(timer)*40,64+Math.sin(timer)*40,64+Math.sin(timer)*40);
 	widget2.setAlpha(0.5);
 	widget2.setTranslation(66,71,0);
+
+	RenderSettings.setBackBufferColor(Math.random(),Math.random(),Math.random(),Math.random());
 	
 }
 

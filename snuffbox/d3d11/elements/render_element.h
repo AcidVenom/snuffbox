@@ -11,6 +11,7 @@
 
 namespace snuffbox
 {
+	static int element_uuid = 0;
 
 	class D3D11DisplayDevice;
 	
@@ -79,14 +80,67 @@ namespace snuffbox
 			blend_(1.0f,1.0f,1.0f),
 			visible_(true)
 		{
-
+			name_ = "RenderElement_" + std::to_string(++element_uuid);
 		}
 
     /// Default destructor
     ~RenderElement()
     {
-      Destroy();
+			
     }
+
+		static void RemoveFromRenderer(RenderElement* ptr)
+		{
+			if (!environment::has_render_device())
+			{
+				return;
+			}
+			std::vector<RenderElement*>& vec = environment::render_device().opaqueElements();
+			ptr->Destroy();
+			if (ptr->element_type() == ElementTypes::kTerrain)
+			{
+				for (unsigned int i = 0; i < vec.size(); ++i)
+				{
+					RenderElement* it = vec[i];
+
+					if (it == ptr)
+					{
+						vec.erase(vec.begin() + i);
+						break;
+					}
+				}
+			}
+			else if (ptr->element_type() == ElementTypes::kWidget)
+			{
+				vec = environment::render_device().uiElements();
+
+				for (unsigned int i = 0; i < vec.size(); ++i)
+				{
+					RenderElement* it = vec[i];
+
+					if (it == ptr)
+					{
+						vec.erase(vec.begin() + i);
+						break;
+					}
+				}
+			}
+			else
+			{
+				vec = environment::render_device().renderElements();
+
+				for (unsigned int i = 0; i < vec.size(); ++i)
+				{
+					RenderElement* it = vec[i];
+
+					if (it == ptr)
+					{
+						vec.erase(vec.begin() + i);
+						break;
+					}
+				}
+			}
+		}
 
 		/// Sets the buffers of the render element
 		virtual void SetBuffers() = 0;
@@ -109,6 +163,8 @@ namespace snuffbox
 		XMMATRIX offset(){ return XMMatrixTranslation(ox_*sx_, oy_*sy_, oz_*sz_); }
 		XMVECTOR scale(){ return XMVectorSet(sx_, sy_, sz_,0); }
 		XMMATRIX rotation(){ return rotation_; }
+
+		bool destroyed();
 
 		/// Sets the translation on the X, Y, Z plane
 		void SetTranslation(float x, float y, float z);
@@ -201,6 +257,7 @@ namespace snuffbox
 		std::map<std::string, ShaderUniform>	uniforms_;	///< Uniforms for the constant buffer of the shader
 		XMFLOAT3															blend_;	///< The blend color of this render element
 		bool																	visible_; ///< Is this element visible?
+		std::string														name_;	 ///< The render element name
 		
 	public:
 		static void RegisterJS(JS_TEMPLATE);
@@ -225,6 +282,8 @@ namespace snuffbox
 		static void JSSetBlend(JS_ARGS);
 		static void JSBlend(JS_ARGS);
 		static void JSSetVisible(JS_ARGS);
+		static void JSSetName(JS_ARGS);
+		static void JSName(JS_ARGS);
 	};
 
   //-------------------------------------------------------------------------------------------
@@ -248,53 +307,15 @@ namespace snuffbox
     }
   }
 
+	//-------------------------------------------------------------------------------------------
+	inline bool RenderElement::destroyed()
+	{
+		return destroyed_;
+	}
+
   //-------------------------------------------------------------------------------------------
   inline void RenderElement::Destroy()
   {
-    if (!destroyed_)
-    {
-      unsigned int index = 0;
-      if (environment::has_game())
-      {
-				if (element_type() == ElementTypes::kTerrain)
-				{
-					for (auto& it : environment::render_device().opaqueElements())
-					{
-						if (it == this)
-						{
-							environment::render_device().opaqueElements().erase(environment::render_device().opaqueElements().begin() + index);
-							break;
-						}
-						++index;
-					}
-				}
-				else if (element_type() == ElementTypes::kWidget)
-				{
-					for (auto& it : environment::render_device().uiElements())
-					{
-						if (it == this)
-						{
-							environment::render_device().uiElements().erase(environment::render_device().uiElements().begin() + index);
-							break;
-						}
-						++index;
-					}
-				}
-				else
-				{
-					for (auto& it : environment::render_device().renderElements())
-					{
-						if (it == this)
-						{
-							environment::render_device().renderElements().erase(environment::render_device().renderElements().begin() + index);
-							break;
-						}
-						++index;
-					}
-				}
-      }
-    }
-
     destroyed_ = true;
   }
 
@@ -643,6 +664,20 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSSetName(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+		self->name_ = wrapper.GetString(0);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::JSName(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "V");
+		wrapper.ReturnString(self->name_.c_str());
+	}
+
+	//-------------------------------------------------------------------------------------------
 	inline void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -667,7 +702,9 @@ namespace snuffbox
 			JSFunctionRegister("setAlpha", JSSetAlpha),
 			JSFunctionRegister("setUniform", JSSetUniform),
 			JSFunctionRegister("setBlend", JSSetBlend),
-			JSFunctionRegister("blend", JSBlend)
+			JSFunctionRegister("blend", JSBlend),
+			JSFunctionRegister("setName", JSSetName),
+			JSFunctionRegister("name", JSName)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);

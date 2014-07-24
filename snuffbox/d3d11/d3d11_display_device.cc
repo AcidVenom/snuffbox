@@ -622,7 +622,14 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
-		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
+		if (camera_ && camera_->type() == Camera::CameraType::kPerspective)
+		{
+			context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
+		}
+		else
+		{
+			context_->OMSetRenderTargets(1, &renderTargetView_, NULL);
+		}
 		context_->ClearRenderTargetView(renderTargetView_, environment::render_settings().settings().bufferColor);
 		context_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -630,7 +637,7 @@ namespace snuffbox
 		{
 			inline bool operator()(RenderElement* a, RenderElement* b)
 			{
-				return (a->z() > b->z());
+				return (a->z() < b->z());
 			}
 		} RenderSorterByZ;
 
@@ -656,9 +663,10 @@ namespace snuffbox
 		camera_ = nullptr;
 	}
 
+	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::DrawRenderElement(RenderElement* it)
 	{
-		if (it->visible())
+		if (it && it->visible())
 		{
 			RenderElement::ElementTypes elementType = it->element_type();
 			VertexBufferType type = it->type();
@@ -777,6 +785,47 @@ namespace snuffbox
 	{
 		if (!camera_) return;
 
+
+		for (unsigned int idx = 0; idx < opaqueElements_.size(); ++idx)
+		{
+			auto* it = opaqueElements_[idx];
+
+			if (!it->destroyed())
+			{
+				DrawRenderElement(it);
+			}
+			else
+			{
+				opaqueElements_.erase(opaqueElements_.begin() + idx);
+				--idx;
+			}
+		}
+
+		XMVECTOR camTranslation = camera_->target();
+		XMVECTOR translation;
+		XMVECTOR delta;
+		float distance;
+
+		for (unsigned int idx = 0; idx < renderElements_.size(); ++idx)
+		{
+			auto* it = renderElements_[idx];
+			if (!it->destroyed())
+			{
+				translation = it->translation();
+				delta = translation - camTranslation;
+				distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
+
+				it->SetDistanceFromCamera(distance);
+
+				DrawRenderElement(it);
+			}
+			else
+			{
+				renderElements_.erase(renderElements_.begin() + idx);
+				--idx;
+			}
+		}
+
 		if (lines_.size() > 0)
 		{
 			if (lineBuffer_)
@@ -809,7 +858,7 @@ namespace snuffbox
 			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
 			mappedData->InvWorld = XMMatrixTranspose(XMMatrixInverse(&deter, worldMatrix_));
 			mappedData->Alpha = 1;
-			mappedData->Blend = XMFLOAT3(1,1,1);
+			mappedData->Blend = XMFLOAT3(1, 1, 1);
 
 			context_->Unmap(vsConstantBuffer_, 0);
 			Shaders shaders = environment::content_manager().Get<Shader>("shaders/base.fx").get()->shaders();
@@ -830,27 +879,6 @@ namespace snuffbox
 			context_->Draw(static_cast<UINT>(lines_.size()), static_cast<UINT>(0));
 		}
 
-		for (auto& it : opaqueElements_)
-		{
-			DrawRenderElement(it);
-		}
-
-		XMVECTOR camTranslation = camera_->target();
-		XMVECTOR translation;
-		XMVECTOR delta;
-		float distance;
-
-		for (auto& it : renderElements_)
-		{
-			translation = it->translation();
-			delta = translation - camTranslation;
-			distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
-
-			it->SetDistanceFromCamera(distance);
-
-			DrawRenderElement(it);
-		}
-
 		context_->OMSetRenderTargets(1, &renderTargetView_, NULL);
 
 		SwapChainDescription swapDesc;
@@ -858,9 +886,20 @@ namespace snuffbox
 
 		projectionMatrix_ = XMMatrixOrthographicRH(swapDesc.BufferDesc.Width, swapDesc.BufferDesc.Height, 1.0f, 1000.0f);
 		viewMatrix_ = XMMatrixIdentity();
-		for (auto& it : uiElements_)
+
+		for (unsigned int idx = 0; idx < uiElements_.size(); ++idx)
 		{
-			DrawRenderElement(it);
+			auto* it = uiElements_[idx];
+
+			if (!it->destroyed())
+			{
+				DrawRenderElement(it);
+			}
+			else
+			{
+				uiElements_.erase(uiElements_.begin() + idx);
+				--idx;
+			}
 		}
 	}
 
@@ -971,5 +1010,6 @@ namespace snuffbox
 		}
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");
+		environment::globalInstance = nullptr;
 	}
 }

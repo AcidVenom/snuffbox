@@ -54,6 +54,9 @@ namespace snuffbox
 		template<typename T>
 		void ReturnTriple(T x, T y, T z, const char* n1 = "x", const char* n2 = "y", const char* n3 = "z");
 
+		/// Returns a string to JavaScript
+		void ReturnString(const char* str);
+
 		/// Returns the type as a string
 		std::string TypeOf(Local<Value> value);
 
@@ -150,6 +153,12 @@ namespace snuffbox
 		retVal->Set(String::NewFromUtf8(JS_ISOLATE, n3), Number::New(JS_ISOLATE, static_cast<T>(z)));
 
 		args_.GetReturnValue().Set(retVal);
+	}
+
+	//------------------------------------------------------------------------------
+	inline void JSWrapper::ReturnString(const char* str)
+	{
+		args_.GetReturnValue().Set(String::NewFromUtf8(JS_ISOLATE, str));
 	}
 
 	//------------------------------------------------------------------------------
