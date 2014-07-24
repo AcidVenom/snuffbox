@@ -236,6 +236,9 @@ namespace snuffbox
 		/// Returns the visibility of this render element
 		bool visible(){ return visible_; }
 
+		/// Resets the destroyed state
+		void Respawn();
+
 		/// Returns the z index
 		float z(){ return z_; }
 
@@ -289,23 +292,28 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   inline void RenderElement::Spawn()
   {
-    if (destroyed_)
+    if (destroyed_ == true)
     {
-      destroyed_ = false;
 			if (element_type() == ElementTypes::kTerrain)
 			{
-				environment::render_device().opaqueElements().push_back(this);
+				environment::render_device().opaqueElementQueue().push(this);
 			}
 			else if (element_type() == ElementTypes::kWidget)
 			{
-				environment::render_device().uiElements().push_back(this);
+				environment::render_device().uiElementQueue().push(this);
 			}
 			else
 			{
-				environment::render_device().renderElements().push_back(this);
+				environment::render_device().renderElementQueue().push(this);
 			}
     }
   }
+
+	//-------------------------------------------------------------------------------------------
+	inline void RenderElement::Respawn()
+	{
+		destroyed_ = false;
+	}
 
 	//-------------------------------------------------------------------------------------------
 	inline bool RenderElement::destroyed()

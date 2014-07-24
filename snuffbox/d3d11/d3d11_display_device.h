@@ -9,6 +9,7 @@
 #include <D3DX11.h>
 #include <xnamath.h>
 #include <array>
+#include <queue>
 
 #include <vector>
 
@@ -214,6 +215,10 @@ namespace snuffbox
 		/// Returns the current viewport
 		D3D11_VIEWPORT& viewport();
 
+		std::queue<RenderElement*>& renderElementQueue(){ return renderElementQueue_; }
+		std::queue<RenderElement*>& opaqueElementQueue(){ return opaqueElementQueue_; }
+		std::queue<RenderElement*>& uiElementQueue(){ return uiElementQueue_; }
+
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device
@@ -245,8 +250,8 @@ namespace snuffbox
 		ID3D11ShaderResourceView*			defaultResource_;		///< The default shader resource
 		ID3D11ShaderResourceView*     defaultNormal_;			///< The default shader normal map
 		ID3D11SamplerState*						samplerState_;			///< The texture sampler state
-		Texture*											currentTexture_;		///< The current texture being used
-		Texture*											currentNormal_;			///< The current normal map being used
+		ID3D11ShaderResourceView*			currentTexture_;		///< The current texture being used
+		ID3D11ShaderResourceView*			currentNormal_;			///< The current normal map being used
 		Shader*												currentShader_;			///< The current shader being used
 		Camera*												camera_;						///< The current camera being used
 		ID3D11BlendState*							blendState_;				///< The blend state being used
@@ -255,5 +260,8 @@ namespace snuffbox
 		std::vector<Vertex>						lines_;							///< The vector for lines to draw
 		ID3D11Buffer*									lineBuffer_;				///< The line vertex buffer
 		D3D11_VIEWPORT								viewport_;					///< The viewport of the device
+		std::queue<RenderElement*>		renderElementQueue_;
+		std::queue<RenderElement*>		uiElementQueue_;
+		std::queue<RenderElement*>		opaqueElementQueue_;
 	};
 }

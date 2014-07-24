@@ -740,13 +740,13 @@ namespace snuffbox
 				textures[0] = it->texture()->resource();
 			}
 
-			if (currentTexture_ != it->texture() || currentNormal_ != it->normalMap())
+			if (currentTexture_ != textures[0] || currentNormal_ != textures[1])
 			{
 				context_->PSSetShaderResources(0, 2, textures);
 			}
 
-			currentTexture_ = it->texture();
-			currentNormal_ = it->normalMap();
+			currentTexture_ = textures[0];
+			currentNormal_ = textures[1];
 
 			if (it->shader())
 			{
@@ -761,8 +761,11 @@ namespace snuffbox
 
 			if (elementType != RenderElement::ElementTypes::kMesh)
 			{
-        if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
-				  context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
+				{
+					context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				}
+				 
 
 				context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 
@@ -770,8 +773,10 @@ namespace snuffbox
 			}
 			else
 			{
-        if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
-				  context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
+				{
+					context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				}
 
 				Mesh* mesh = static_cast<Mesh*>(it);
         context_->Draw(mesh->model()->vertexCount(), 0);
@@ -796,6 +801,7 @@ namespace snuffbox
 			}
 			else
 			{
+				DrawRenderElement(it);
 				opaqueElements_.erase(opaqueElements_.begin() + idx);
 				--idx;
 			}
@@ -809,18 +815,19 @@ namespace snuffbox
 		for (unsigned int idx = 0; idx < renderElements_.size(); ++idx)
 		{
 			auto* it = renderElements_[idx];
+			translation = it->translation();
+			delta = translation - camTranslation;
+			distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
+
+			it->SetDistanceFromCamera(distance);
+
 			if (!it->destroyed())
 			{
-				translation = it->translation();
-				delta = translation - camTranslation;
-				distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
-
-				it->SetDistanceFromCamera(distance);
-
 				DrawRenderElement(it);
 			}
 			else
 			{
+				DrawRenderElement(it);
 				renderElements_.erase(renderElements_.begin() + idx);
 				--idx;
 			}
@@ -835,7 +842,9 @@ namespace snuffbox
 			}
 			lineBuffer_ = CreateVertexBuffer(lines_);
 			if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST)
+			{
 				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
+			}
 			SetVertexBuffer(lineBuffer_);
 
 			vbType_ = VertexBufferType::kLine;
@@ -897,6 +906,7 @@ namespace snuffbox
 			}
 			else
 			{
+				DrawRenderElement(it);
 				uiElements_.erase(uiElements_.begin() + idx);
 				--idx;
 			}
@@ -937,6 +947,30 @@ namespace snuffbox
 		{
 			lineBuffer_->Release();
 			lineBuffer_ = nullptr;
+		}
+
+		while (!renderElementQueue_.empty())
+		{
+			auto it = renderElementQueue_.front();
+			renderElements_.push_back(it);
+			it->Respawn();
+			renderElementQueue_.pop();
+		}
+
+		while (!opaqueElementQueue_.empty())
+		{
+			auto it = opaqueElementQueue_.front();
+			opaqueElements_.push_back(it);
+			it->Respawn();
+			opaqueElementQueue_.pop();
+		}
+
+		while (!uiElementQueue_.empty())
+		{
+			auto it = uiElementQueue_.front();
+			uiElements_.push_back(it);
+			it->Respawn();
+			uiElementQueue_.pop();
 		}
 	}
 
