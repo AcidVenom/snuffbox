@@ -27,6 +27,7 @@ using namespace v8;
 
 namespace snuffbox
 {
+	class JSWrapper;
 
 	/**
 	* @class snuffbox::JSObject
@@ -114,7 +115,7 @@ namespace snuffbox
     std::string& path(){ return path_; }
 
     /// Compiles and runs a JavaScript file
-    void CompileAndRun(const char* path, bool reloading = false);
+		void CompileAndRun(const char* path, bool reloading = false, JSWrapper* wrapper = nullptr);
 
     /// Returns an error of a TryCatch object
 		std::string GetException(TryCatch* try_catch, bool* failed);

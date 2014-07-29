@@ -95,47 +95,47 @@ namespace snuffbox
 			{
 				return;
 			}
-			std::vector<RenderElement*>& vec = environment::render_device().opaqueElements();
+			std::vector<RenderElement*>* vec = &environment::render_device().opaqueElements();
 			ptr->Destroy();
 			if (ptr->element_type() == ElementTypes::kTerrain)
 			{
-				for (unsigned int i = 0; i < vec.size(); ++i)
+				for (unsigned int i = 0; i < vec->size(); ++i)
 				{
-					RenderElement* it = vec[i];
+					RenderElement* it = vec->at(i);
 
 					if (it == ptr)
 					{
-						vec.erase(vec.begin() + i);
+						vec->erase(vec->begin() + i);
 						break;
 					}
 				}
 			}
 			else if (ptr->element_type() == ElementTypes::kWidget)
 			{
-				vec = environment::render_device().uiElements();
+				vec = &environment::render_device().uiElements();
 
-				for (unsigned int i = 0; i < vec.size(); ++i)
+				for (unsigned int i = 0; i < vec->size(); ++i)
 				{
-					RenderElement* it = vec[i];
+					RenderElement* it = vec->at(i);
 
 					if (it == ptr)
 					{
-						vec.erase(vec.begin() + i);
+						vec->erase(vec->begin() + i);
 						break;
 					}
 				}
 			}
 			else
 			{
-				vec = environment::render_device().renderElements();
+				vec = &environment::render_device().renderElements();
 
-				for (unsigned int i = 0; i < vec.size(); ++i)
+				for (unsigned int i = 0; i < vec->size(); ++i)
 				{
-					RenderElement* it = vec[i];
+					RenderElement* it = vec->at(i);
 
 					if (it == ptr)
 					{
-						vec.erase(vec.begin() + i);
+						vec->erase(vec->begin() + i);
 						break;
 					}
 				}

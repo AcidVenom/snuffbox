@@ -57,6 +57,9 @@ namespace snuffbox
 		/// Returns a string to JavaScript
 		void ReturnString(const char* str);
 
+		/// Returns a JavaScript value
+		void ReturnValue(Handle<Value> val);
+
 		/// Returns the type as a string
 		std::string TypeOf(Local<Value> value);
 
@@ -90,6 +93,11 @@ namespace snuffbox
 	{
 		JS_CREATE_SCOPE;
 		const Handle<Value>& boolean = args_[arg];
+
+		if (boolean->IsUndefined())
+		{
+			return false;
+		}
 
 		return boolean->BooleanValue();
 	}
@@ -159,6 +167,12 @@ namespace snuffbox
 	inline void JSWrapper::ReturnString(const char* str)
 	{
 		args_.GetReturnValue().Set(String::NewFromUtf8(JS_ISOLATE, str));
+	}
+
+	//------------------------------------------------------------------------------
+	inline void JSWrapper::ReturnValue(Handle<Value> val)
+	{
+		args_.GetReturnValue().Set(val);
 	}
 
 	//------------------------------------------------------------------------------

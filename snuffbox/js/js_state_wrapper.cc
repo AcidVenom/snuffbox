@@ -87,7 +87,17 @@ namespace snuffbox
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
 		JS_CHECK_PARAMS("S");
-		environment::js_state_wrapper().CompileAndRun(wrapper.GetString(0).c_str());
+
+		bool doReturn = wrapper.GetBool(1);
+
+		if (doReturn)
+		{
+			environment::js_state_wrapper().CompileAndRun(wrapper.GetString(0).c_str(), false, &wrapper);
+		}
+		else
+		{
+			environment::js_state_wrapper().CompileAndRun(wrapper.GetString(0).c_str());
+		}
 	}
 
 	//---------------------------------------------------------------------------
@@ -179,12 +189,13 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------
-	void JSStateWrapper::CompileAndRun(const char* path, bool reloading)
+	void JSStateWrapper::CompileAndRun(const char* path, bool reloading, JSWrapper* wrapper)
 	{
 		JS_CREATE_SCOPE;
 		std::string file_path = path_ + "/" + path + ".js";
 		std::string error = "Couldn't find JavaScript file '" + file_path + "'";
 		std::string src;
+		Local<Value> res;
 
 		char ch;
 		std::fstream fin(file_path);
@@ -198,7 +209,7 @@ namespace snuffbox
 			TryCatch try_catch;
 
 			Local<Script> script = Script::Compile(String::NewFromUtf8(isolate_, src.c_str()), String::NewFromUtf8(isolate_, file_path.c_str()));
-			Local<Value> res = script->Run();
+			res = script->Run();
 
 			if (res.IsEmpty())
 			{
@@ -210,6 +221,10 @@ namespace snuffbox
 				}
 				else
 				{
+					if (wrapper != nullptr)
+					{
+						wrapper->ReturnString("error");
+					}
 					SNUFF_LOG_ERROR(exception.c_str());
 					return;
 				}
@@ -218,9 +233,14 @@ namespace snuffbox
 			{
 				if (PRINT_RESULTS && !res->IsUndefined())
 				{
-					std::string result = "'" + file_path + "' returned: " + *String::Utf8Value(res);
+					std::string result = "'" + file_path + "' returned:\n" + *String::Utf8Value(res);
 
 					SNUFF_LOG_INFO(result.c_str());
+				}
+
+				if (wrapper != nullptr)
+				{
+					wrapper->ReturnValue(res);
 				}
 			}
 		}
