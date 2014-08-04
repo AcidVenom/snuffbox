@@ -89,28 +89,29 @@ namespace snuffbox
 			
     }
 
-		static void RemoveFromRenderer(RenderElement* ptr)
+		/// Removes an element from the display device
+		void RemoveFromRenderer()
 		{
 			if (!environment::has_render_device())
 			{
 				return;
 			}
 			std::vector<RenderElement*>* vec = &environment::render_device().opaqueElements();
-			ptr->Destroy();
-			if (ptr->element_type() == ElementTypes::kTerrain)
+			Destroy();
+			if (element_type() == ElementTypes::kTerrain)
 			{
 				for (unsigned int i = 0; i < vec->size(); ++i)
 				{
 					RenderElement* it = vec->at(i);
 
-					if (it == ptr)
+					if (it == this)
 					{
 						vec->erase(vec->begin() + i);
 						break;
 					}
 				}
 			}
-			else if (ptr->element_type() == ElementTypes::kWidget)
+			else if (element_type() == ElementTypes::kWidget)
 			{
 				vec = &environment::render_device().uiElements();
 
@@ -118,7 +119,7 @@ namespace snuffbox
 				{
 					RenderElement* it = vec->at(i);
 
-					if (it == ptr)
+					if (it == this)
 					{
 						vec->erase(vec->begin() + i);
 						break;
@@ -133,7 +134,7 @@ namespace snuffbox
 				{
 					RenderElement* it = vec->at(i);
 
-					if (it == ptr)
+					if (it == this)
 					{
 						vec->erase(vec->begin() + i);
 						break;
@@ -236,9 +237,6 @@ namespace snuffbox
 		/// Returns the visibility of this render element
 		bool visible(){ return visible_; }
 
-		/// Resets the destroyed state
-		void Respawn();
-
 		/// Returns the z index
 		float z(){ return z_; }
 
@@ -296,24 +294,20 @@ namespace snuffbox
     {
 			if (element_type() == ElementTypes::kTerrain)
 			{
-				environment::render_device().opaqueElementQueue().push(this);
+				environment::render_device().opaqueElements().push_back(this);
 			}
 			else if (element_type() == ElementTypes::kWidget)
 			{
-				environment::render_device().uiElementQueue().push(this);
+				environment::render_device().uiElements().push_back(this);
 			}
 			else
 			{
-				environment::render_device().renderElementQueue().push(this);
+				environment::render_device().renderElements().push_back(this);
 			}
+
+			destroyed_ = false;
     }
   }
-
-	//-------------------------------------------------------------------------------------------
-	inline void RenderElement::Respawn()
-	{
-		destroyed_ = false;
-	}
 
 	//-------------------------------------------------------------------------------------------
 	inline bool RenderElement::destroyed()

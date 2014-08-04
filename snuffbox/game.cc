@@ -59,6 +59,7 @@ Game::Game(Win32Window* window, QApplication& app) :
 started_(false),
 consoleEnabled_(false),
 doReload_(false),
+shouldReload_(false),
 mouse_(environment::memory().ConstructShared<Mouse>()),
 keyboard_(environment::memory().ConstructShared<Keyboard>()),
 device_(environment::memory().ConstructShared<D3D11DisplayDevice>()),
@@ -122,6 +123,12 @@ void Game::Update()
 	if (shouldQuit_)
 	{
 		Shutdown();
+	}
+
+	if (shouldReload_)
+	{
+		onReload_.Call(0);
+		shouldReload_ = false;
 	}
 }
 
@@ -284,7 +291,7 @@ void Game::NotifyEvent(GameEvents evt)
 		shouldQuit_ = true;
 		break;
 	case GameEvents::kReload:
-		Reload();
+		shouldReload_ = true;
 		break;
 	}
 }
@@ -369,12 +376,6 @@ void Game::CreateCallbacks()
 	JS_OBJECT_CALLBACK("OnReload", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.OnReload()' function! Please add it to your main.js");
 	onReload_.SetFunction(cb);
-}
-
-//------------------------------------------------------------------------------------------------------
-void Game::Reload()
-{
-	onReload_.Call(0);
 }
 
 //------------------------------------------------------------------------------------------------------

@@ -81,6 +81,12 @@ namespace snuffbox
 			toDelete_.pop();
 		}
 
+		ReloadAll();
+	}
+
+	//-------------------------------------------------------------------
+	void FileWatcher::ReloadAll()
+	{
 		for (auto& pair = files_.begin(); pair != files_.end(); ++pair)
 		{
 			auto& it = pair->second;

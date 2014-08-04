@@ -309,11 +309,12 @@ namespace snuffbox
 	void JSStateWrapper::JSDestroy(const v8::WeakCallbackData<v8::Object, JSObject>& data)
 	{
 		JSObject* ptr = data.GetParameter();
+
 		RenderElement* renderPtr = dynamic_cast<RenderElement*>(ptr);
 
 		if (renderPtr)
 		{
-			RenderElement::RemoveFromRenderer(renderPtr);
+			renderPtr->RemoveFromRenderer();
 		}
 
 		int64_t size = -static_cast<int64_t>(sizeof(ptr));

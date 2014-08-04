@@ -80,9 +80,6 @@ namespace snuffbox
 		/// Creates the JavaScript callbacks
 		void CreateCallbacks();
 
-		/// When a file is hot reloaded
-		void Reload();
-
 		/// Checks if the console is enabled
 		bool consoleEnabled(){ return consoleEnabled_; }
 
@@ -113,6 +110,7 @@ namespace snuffbox
 		high_resolution_clock::time_point lastTime_;	///< The last clock time for delta timing
 		QApplication& qtApp_; ///< The qt application
 		bool shouldQuit_; ///< If the application should quit
+		bool shouldReload_; ///< If the application should reload
 		bool doReload_; ///< Should all content be reloaded?
 	public:
 		JS_NAME(Game);

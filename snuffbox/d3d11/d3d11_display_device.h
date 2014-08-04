@@ -215,10 +215,6 @@ namespace snuffbox
 		/// Returns the current viewport
 		D3D11_VIEWPORT& viewport();
 
-		std::queue<RenderElement*>& renderElementQueue(){ return renderElementQueue_; }
-		std::queue<RenderElement*>& opaqueElementQueue(){ return opaqueElementQueue_; }
-		std::queue<RenderElement*>& uiElementQueue(){ return uiElementQueue_; }
-
 	private:
 		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
 		SwapChain*										swapChain_;					///< The swap chain for this device
@@ -260,8 +256,5 @@ namespace snuffbox
 		std::vector<Vertex>						lines_;							///< The vector for lines to draw
 		ID3D11Buffer*									lineBuffer_;				///< The line vertex buffer
 		D3D11_VIEWPORT								viewport_;					///< The viewport of the device
-		std::queue<RenderElement*>		renderElementQueue_;
-		std::queue<RenderElement*>		uiElementQueue_;
-		std::queue<RenderElement*>		opaqueElementQueue_;
 	};
 }

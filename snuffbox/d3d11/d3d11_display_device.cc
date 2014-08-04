@@ -637,7 +637,7 @@ namespace snuffbox
 		{
 			inline bool operator()(RenderElement* a, RenderElement* b)
 			{
-				return (a->z() < b->z());
+				return (a->z() > b->z());
 			}
 		} RenderSorterByZ;
 
@@ -645,7 +645,7 @@ namespace snuffbox
 		{
 			inline bool operator()(RenderElement* a, RenderElement* b)
 			{
-				return (a->distanceFromCamera() > b->distanceFromCamera());
+				return (a->distanceFromCamera() < b->distanceFromCamera());
 			}
 		} RenderSorterDistance;
 
@@ -790,20 +790,16 @@ namespace snuffbox
 	{
 		if (!camera_) return;
 
+		RenderElement* it = nullptr;
 
-		for (unsigned int idx = 0; idx < opaqueElements_.size(); ++idx)
+		for (int idx = static_cast<int>(opaqueElements_.size()-1); idx >= 0; --idx)
 		{
-			auto* it = opaqueElements_[idx];
+			it = opaqueElements_[idx];
+			DrawRenderElement(it);
 
-			if (!it->destroyed())
+			if (it->destroyed())
 			{
-				DrawRenderElement(it);
-			}
-			else
-			{
-				DrawRenderElement(it);
 				opaqueElements_.erase(opaqueElements_.begin() + idx);
-				--idx;
 			}
 		}
 
@@ -812,24 +808,23 @@ namespace snuffbox
 		XMVECTOR delta;
 		float distance;
 
-		for (unsigned int idx = 0; idx < renderElements_.size(); ++idx)
+		for (int idx = static_cast<int>(renderElements_.size() - 1); idx >= 0; --idx)
 		{
-			auto* it = renderElements_[idx];
-			translation = it->translation();
-			delta = translation - camTranslation;
-			distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
+			it = renderElements_[idx];
 
-			it->SetDistanceFromCamera(distance);
-
-			if (!it->destroyed())
+			if (camera_->type() == Camera::CameraType::kPerspective)
 			{
-				DrawRenderElement(it);
+				translation = it->translation();
+				delta = translation - camTranslation;
+				distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
+
+				it->SetDistanceFromCamera(distance);
 			}
-			else
+			DrawRenderElement(it);
+
+			if (it->destroyed())
 			{
-				DrawRenderElement(it);
 				renderElements_.erase(renderElements_.begin() + idx);
-				--idx;
 			}
 		}
 
@@ -896,19 +891,14 @@ namespace snuffbox
 		projectionMatrix_ = XMMatrixOrthographicRH(swapDesc.BufferDesc.Width, swapDesc.BufferDesc.Height, 1.0f, 1000.0f);
 		viewMatrix_ = XMMatrixIdentity();
 
-		for (unsigned int idx = 0; idx < uiElements_.size(); ++idx)
+		for (int idx = static_cast<int>(uiElements_.size() - 1); idx >= 0; --idx)
 		{
-			auto* it = uiElements_[idx];
+			it = uiElements_[idx];
+			DrawRenderElement(it);
 
-			if (!it->destroyed())
+			if (it->destroyed())
 			{
-				DrawRenderElement(it);
-			}
-			else
-			{
-				DrawRenderElement(it);
 				uiElements_.erase(uiElements_.begin() + idx);
-				--idx;
 			}
 		}
 	}
@@ -947,30 +937,6 @@ namespace snuffbox
 		{
 			lineBuffer_->Release();
 			lineBuffer_ = nullptr;
-		}
-
-		while (!renderElementQueue_.empty())
-		{
-			auto it = renderElementQueue_.front();
-			renderElements_.push_back(it);
-			it->Respawn();
-			renderElementQueue_.pop();
-		}
-
-		while (!opaqueElementQueue_.empty())
-		{
-			auto it = opaqueElementQueue_.front();
-			opaqueElements_.push_back(it);
-			it->Respawn();
-			opaqueElementQueue_.pop();
-		}
-
-		while (!uiElementQueue_.empty())
-		{
-			auto it = uiElementQueue_.front();
-			uiElements_.push_back(it);
-			it->Respawn();
-			uiElementQueue_.pop();
 		}
 	}
 

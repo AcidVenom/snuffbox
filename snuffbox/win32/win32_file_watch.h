@@ -61,6 +61,9 @@ namespace snuffbox
 		/// Reloads a watched model when it has been changed
 		void ReloadModelFile(WatchedFile& file);
 
+		/// Reload all content
+		void ReloadAll();
+
 		/// Adds a file to the watched files list
 		void AddFile(std::string& path, std::string& relativePath, FileType type);
 
