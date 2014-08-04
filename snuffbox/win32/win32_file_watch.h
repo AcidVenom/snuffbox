@@ -74,8 +74,8 @@ namespace snuffbox
 		void RemoveWatchedFile(std::string path);
 
 	private:
-		std::map<std::string,WatchedFile> files_; ///< The vector containing all files to watch
-		std::queue<WatchedFile> queue_; ///< The queue for files that have to be added
-		std::queue<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,WatchedFile>>>>> toDelete_; ///< The queue for files that have to be removed
+		std::map<std::string,WatchedFile> files_; //!< The vector containing all files to watch
+		std::queue<WatchedFile> queue_; //!< The queue for files that have to be added
+		std::queue<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,WatchedFile>>>>> toDelete_; //!< The queue for files that have to be removed
 	};
 }

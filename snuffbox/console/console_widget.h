@@ -22,18 +22,14 @@ namespace snuffbox
 	class JavaScriptSyntaxHighlighter : public QSyntaxHighlighter
 	{
 	public:
-		/// Constructor by Qt object
 		JavaScriptSyntaxHighlighter(QObject* parent);
-		/// Constructor by Qt text document
 		JavaScriptSyntaxHighlighter(QTextDocument* parent);
-		/// Default destructor
 		~JavaScriptSyntaxHighlighter(){}
 
 		/// Initialises the highlighter
 		void Initialise();
 
 	protected:
-		/// The overridden highlightBlock function
 		void highlightBlock(const QString& text);
 
 	private:
@@ -79,7 +75,10 @@ namespace snuffbox
 	public:
 		Q_OBJECT
 	public:
-		/// Default constructor
+		/**
+		* @brief Constructs a Console Widget class
+		* @param[in] parent (QWidget&) The Qt widget parent
+		*/
 		ConsoleWidget(QWidget& parent);
 
 		/// Default destructor
@@ -91,17 +90,30 @@ namespace snuffbox
 		/// Hides the console
 		void Hide();
 
-		/// Add a log message
+		/**
+		* @brief Adds a line to the console
+		* @param[in] sev (snuffbox::LogSeverity) The severity of the message
+		* @param[in] msg (const char*) The actual message
+		*/
 		void AddLine(LogSeverity sev, const char* msg);
 
-		/// Adds a value to a tree
+		/**
+		* @brief Adds a value to the watch tree
+		* @param[in] obj (v8::Local<Value>&) The actual value to pass on
+		* @param[in] parent (QTreeWidgetItem*) The parent item this value should come from
+		* @param[in] next (bool) Recurse from here or stop
+		*/
 		void AddToTree(Local<Value>& obj, QTreeWidgetItem* parent, bool next = true);
 
-		/// Adds a variable to the watch tree
+		/**
+		* @brief Adds a variable to the watch tree
+		* @param[in] name (std::string) The name the variable should lie under
+		* @param[in] obj (v8::Local<Value>&) The JavaScript variable
+		*/
 		void AddToWatch(std::string name, Local<Value>& obj);
 
 		/// Returns if the window is visible
-		bool isVisible(){ return window_->isVisible(); }
+		bool is_visible(){ return window_->isVisible(); }
 
 	private:
 		/// Handles a command entered in the command line
@@ -111,15 +123,15 @@ namespace snuffbox
 		bool eventFilter(QObject *obj, QEvent *evt);
 
 	private:
-		QWidget* window_;	///< The parent window
-		Ui::ConsoleUI* ui_;	///< The actual console UI
-		std::map<std::string,QTreeWidgetItem*> watchedVariables_; ///< A list of watched variables
-		JavaScriptSyntaxHighlighter* highlighter_; ///< Highlight JavaScript syntax
-		bool shiftPressed_; ///< If shift is pressed..
-    std::vector<QString> history_; ///< A list for the history of the console
-    unsigned int historyIndex_; ///< The current history index
-		std::string lastLine_; ///< The last line added to the console
-		unsigned int repeatCount_; ///< The repeat count for a console line
-		LogSeverity lastSev_;
+		QWidget* window_;	//!< The parent window
+		Ui::ConsoleUI* ui_;	//!< The actual console UI
+		std::map<std::string, QTreeWidgetItem*> watched_variables_; //!< A list of watched variables
+		JavaScriptSyntaxHighlighter* highlighter_; //!< Highlight JavaScript syntax
+		bool shift_pressed_; //!< If shift is pressed..
+		std::vector<QString> history_; //!< A list for the history of the console
+		unsigned int history_index_; //!< The current history index
+		std::string last_line_; //!< The last line added to the console
+		unsigned int repeat_count_; //!< The repeat count for a console line
+		LogSeverity last_sev_;	//!< The last type of severity
 	};
 }

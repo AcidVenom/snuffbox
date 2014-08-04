@@ -89,6 +89,7 @@ namespace snuffbox
 			roll_ = XM_PI*2.0f;
 	}
 
+	//------------------------------------------------------------------------------
 	XMMATRIX& Camera::view()
 	{
 		rotation_ = XMMatrixRotationRollPitchYaw(yaw_, pitch_, roll_);

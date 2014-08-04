@@ -17,8 +17,8 @@ namespace snuffbox
 		/// Default destructor (Checks for leaks)
 		~AllocatedMemory();
 
-		unsigned int allocations; ///< The number of allocations of this allocator
-		size_t allocatedMemory; ///< The total allocated memory in bytes of this allocator
+		unsigned int allocations; //!< The number of allocations of this allocator
+		size_t allocatedMemory; //!< The total allocated memory in bytes of this allocator
 
 		/// Constructs a shared pointer
 		template<typename T, typename... Args>

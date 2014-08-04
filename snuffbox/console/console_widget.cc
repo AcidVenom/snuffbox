@@ -38,22 +38,22 @@ namespace snuffbox
 			<< "\\bcatch\\b" << "\\btypeof\\b" << "\\bvar\\b"
 			<< "\\bwith\\b" << "\\byield\\b" << "\\bassert\\b"
 			<< "\\bLog\\b" << "\\bGame\\b" << "\\bfunction\\b" << "\\bnull\\b"
-      << "\\bundefined\\b" << "\\btrue\\b" << "\\bfalse\\b" << "\\bdefault\\b"
-      << "\\bcase\\b" << "\\bif\\b" << "\\belse\\b";
+			<< "\\bundefined\\b" << "\\btrue\\b" << "\\bfalse\\b" << "\\bdefault\\b"
+			<< "\\bcase\\b" << "\\bif\\b" << "\\belse\\b";
 		foreach(const QString &pattern, keywordPatterns) {
 			rule.pattern = QRegExp(pattern);
 			rule.format = keywordFormat;
 			highlightingRules.append(rule);
 		}
 
-		quotationFormat.setForeground(QColor(240,165,110));
+		quotationFormat.setForeground(QColor(240, 165, 110));
 		rule.pattern = QRegExp("\".*\"");
 		rule.format = quotationFormat;
 		highlightingRules.append(rule);
 
 		functionFormat.setFontWeight(QFont::Bold);
 		functionFormat.setFontItalic(true);
-		functionFormat.setForeground(QColor(225,210,140));
+		functionFormat.setForeground(QColor(225, 210, 140));
 		rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
 		rule.format = functionFormat;
 		highlightingRules.append(rule);
@@ -110,14 +110,14 @@ namespace snuffbox
 	ConsoleWidget::ConsoleWidget(QWidget& parent) :
 		window_(&parent),
 		ui_(new Ui::ConsoleUI()),
-		shiftPressed_(false),
-    historyIndex_(0),
-		lastLine_(""),
-		repeatCount_(0),
-		lastSev_(LogSeverity::kDebug)
+		shift_pressed_(false),
+		history_index_(0),
+		last_line_(""),
+		repeat_count_(0),
+		last_sev_(LogSeverity::kDebug)
 	{
 		window_->setMinimumSize(QSize(400, 480));
-		
+
 		ui_->setupUi(window_);
 		highlighter_ = new JavaScriptSyntaxHighlighter(ui_->commandLine->document());
 
@@ -134,18 +134,18 @@ namespace snuffbox
 		QFontMetrics metrics(monospace);
 		ui_->terminal->setTabStopWidth(2 * metrics.width(" "));
 		ui_->variableTree->header()->setVisible(true);
-		
+
 		ui_->commandLine->installEventFilter(this);
 	}
 
 	bool ConsoleWidget::eventFilter(QObject *obj, QEvent *event)
 	{
-		if (obj == ui_->commandLine)  
+		if (obj == ui_->commandLine)
 		{
-			if (event->type() == QEvent::KeyPress)  
+			if (event->type() == QEvent::KeyPress)
 			{
 				QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-				if (keyEvent->key() == Qt::Key_Return && !shiftPressed_)
+				if (keyEvent->key() == Qt::Key_Return && !shift_pressed_)
 				{
 					HandleCommand();
 					return true;
@@ -153,7 +153,7 @@ namespace snuffbox
 
 				if (keyEvent->key() == Qt::Key_Shift)
 				{
-					shiftPressed_ = true;
+					shift_pressed_ = true;
 				}
 			}
 
@@ -162,35 +162,35 @@ namespace snuffbox
 				QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 				if (keyEvent->key() == Qt::Key_Shift)
 				{
-					shiftPressed_ = false;
+					shift_pressed_ = false;
 				}
 
-        if (shiftPressed_)
-        {
-          if (keyEvent->key() == Qt::Key_Up)
-          {
-            if (historyIndex_ > 0)
-            {
-              --historyIndex_;
-              ui_->commandLine->setText(history_[historyIndex_]);
-              return true;
-            }
-          }
+				if (shift_pressed_)
+				{
+					if (keyEvent->key() == Qt::Key_Up)
+					{
+						if (history_index_ > 0)
+						{
+							--history_index_;
+							ui_->commandLine->setText(history_[history_index_]);
+							return true;
+						}
+					}
 
-          if (keyEvent->key() == Qt::Key_Down)
-          {
-            if (historyIndex_ < static_cast<unsigned int>(history_.size()))
-            {
-              ++historyIndex_;
-              ui_->commandLine->setText(history_[historyIndex_-1]);
-              return true;
-            }
-            else
-            {
-              ui_->commandLine->setText("");
-            }
-          }
-        }
+					if (keyEvent->key() == Qt::Key_Down)
+					{
+						if (history_index_ < static_cast<unsigned int>(history_.size()))
+						{
+							++history_index_;
+							ui_->commandLine->setText(history_[history_index_ - 1]);
+							return true;
+						}
+						else
+						{
+							ui_->commandLine->setText("");
+						}
+					}
+				}
 			}
 		}
 
@@ -212,12 +212,12 @@ namespace snuffbox
 	//---------------------------------------------------------------
 	void ConsoleWidget::HandleCommand()
 	{
-    if ((environment::has_game() && !environment::game().started()) || !environment::has_game())
-    {
-      AddLine(LogSeverity::kFatal, "Cannot execute JavaScript commands when the game is shut down!");
-      ui_->commandLine->clear();
-      return;
-    }
+		if ((environment::has_game() && !environment::game().started()) || !environment::has_game())
+		{
+			AddLine(LogSeverity::kFatal, "Cannot execute JavaScript commands when the game is shut down!");
+			ui_->commandLine->clear();
+			return;
+		}
 
 		JS_CREATE_SCOPE;
 		std::string txt = ui_->commandLine->toPlainText().toStdString();
@@ -231,19 +231,19 @@ namespace snuffbox
 		{
 			bool failed = false;
 			std::string exception(environment::js_state_wrapper().GetException(&try_catch, &failed));
-			AddLine(LogSeverity::kError,exception.c_str());
+			AddLine(LogSeverity::kError, exception.c_str());
 		}
 		else
 		{
-      AddLine(LogSeverity::kDebug, *String::Utf8Value(res->ToString()));
+			AddLine(LogSeverity::kDebug, *String::Utf8Value(res->ToString()));
 			if (ui_->toggleWatch->isChecked() && !res->IsUndefined())
 			{
-				AddToWatch(txt.c_str(),res);
+				AddToWatch(txt.c_str(), res);
 			}
 		}
 
-    history_.push_back(ui_->commandLine->toPlainText());
-    historyIndex_ = static_cast<unsigned int>(history_.size());
+		history_.push_back(ui_->commandLine->toPlainText());
+		history_index_ = static_cast<unsigned int>(history_.size());
 		ui_->commandLine->clear();
 	}
 
@@ -252,8 +252,8 @@ namespace snuffbox
 	{
 		QTreeWidgetItem* item = nullptr;
 		bool found = false;
-		auto it = watchedVariables_.find(name);
-		if (it != watchedVariables_.end())
+		auto it = watched_variables_.find(name);
+		if (it != watched_variables_.end())
 		{
 			QList<QTreeWidgetItem*> list = it->second->takeChildren();
 			for (auto child : list)
@@ -294,7 +294,7 @@ namespace snuffbox
 		if (!found)
 		{
 			ui_->variableTree->addTopLevelItem(item);
-			watchedVariables_.emplace(name,item);
+			watched_variables_.emplace(name, item);
 		}
 	}
 
@@ -349,17 +349,17 @@ namespace snuffbox
 	//---------------------------------------------------------------
 	void ConsoleWidget::AddLine(LogSeverity sev, const char* msg)
 	{
-    if (msg == nullptr) return;
+		if (msg == nullptr) return;
 
-		if (strcmp(lastLine_.c_str(), msg) == 0 && lastSev_ == sev)
+		if (strcmp(last_line_.c_str(), msg) == 0 && last_sev_ == sev)
 		{
-			++repeatCount_;
+			++repeat_count_;
 			QTextCursor cursor = ui_->terminal->textCursor();
 			cursor.movePosition(QTextCursor::End);
-			if (repeatCount_ > 1)
+			if (repeat_count_ > 1)
 			{
-				unsigned int width = static_cast<unsigned int>(std::strlen(std::to_string(repeatCount_-1).c_str()));
-				for (unsigned int i = 0; i < width+5; ++i)
+				unsigned int width = static_cast<unsigned int>(std::strlen(std::to_string(repeat_count_ - 1).c_str()));
+				for (unsigned int i = 0; i < width + 5; ++i)
 				{
 					cursor.deletePreviousChar();
 					cursor.movePosition(QTextCursor::End);
@@ -374,14 +374,14 @@ namespace snuffbox
 
 			cursor.setCharFormat(format);
 
-			cursor.insertText((std::string(" [") + std::to_string(repeatCount_) + std::string("] ")).c_str());
+			cursor.insertText((std::string(" [") + std::to_string(repeat_count_) + std::string("] ")).c_str());
 			return;
 		}
 
-		repeatCount_ = 0;
+		repeat_count_ = 0;
 
-		lastSev_ = sev;
-		lastLine_ = std::string(msg);
+		last_sev_ = sev;
+		last_line_ = std::string(msg);
 		time_t t = time(0);
 		struct tm now;
 		localtime_s(&now, &t);
@@ -463,7 +463,7 @@ namespace snuffbox
 	{
 		SNUFF_SAFE_DELETE(highlighter_);
 
-		for (auto it = watchedVariables_.begin(); it != watchedVariables_.end(); ++it)
+		for (auto it = watched_variables_.begin(); it != watched_variables_.end(); ++it)
 		{
 			QList<QTreeWidgetItem*> list = it->second->takeChildren();
 			for (auto child : list)
@@ -475,7 +475,7 @@ namespace snuffbox
 			SNUFF_SAFE_DELETE(it->second);
 		}
 
-		watchedVariables_.clear();
+		watched_variables_.clear();
 
 		SNUFF_SAFE_DELETE(ui_);
 	}

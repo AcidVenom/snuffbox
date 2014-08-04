@@ -182,6 +182,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClCompile Include="d3d11\elements\billboard_element.cc" />
     <ClCompile Include="d3d11\elements\mesh_element.cc" />
     <ClCompile Include="d3d11\elements\quad_element.cc" />
+    <ClCompile Include="d3d11\elements\render_element.cc" />
     <ClCompile Include="d3d11\elements\terrain_element.cc" />
     <ClCompile Include="d3d11\elements\widget_element.cc" />
     <ClCompile Include="fbx\fbx_loader.cc" />

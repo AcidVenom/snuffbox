@@ -25,13 +25,13 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Mesh::Create()
 	{
-		vertexBuffer_ = model_->vertices();
+		vertex_buffer_ = model_->vertices();
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void Mesh::SetBuffers()
 	{
-		if (vertexBuffer_ == model_->vertices() && model_->shouldReload())
+		if (vertex_buffer_ == model_->vertices() && model_->shouldReload())
 		{
 			model_->disableReload();
 		}
@@ -40,7 +40,7 @@ namespace snuffbox
 		{
 			Create();
 		}
-		environment::render_device().SetVertexBuffer(vertexBuffer_);
+		environment::render_device().SetVertexBuffer(vertex_buffer_);
 		environment::render_device().SetIndexBuffer(nullptr);
 	}
 }

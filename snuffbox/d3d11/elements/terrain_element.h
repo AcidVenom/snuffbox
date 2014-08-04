@@ -27,13 +27,16 @@ namespace snuffbox
 		/// Sets the buffers of the terrain
 		void SetBuffers();
 
-    /// Returns the vertex buffer type
+		/**
+		* @return (snuffbox::VertexBufferType) The vertex buffer type
+		*/
     VertexBufferType type(){ return VertexBufferType::kTerrain; }
 
 	private:
-		unsigned int w_, h_; ///< The width and the height of the terrain
-		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer
-		ID3D11Buffer* indexBuffer_; ///< The index buffer
+		unsigned int w_; //!< The height of the terrain
+		unsigned int h_; //!< The width of the terrain
+		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer
+		ID3D11Buffer* index_buffer_; //!< The index buffer
 
 	public:
 		JS_NAME(Terrain);

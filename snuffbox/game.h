@@ -93,31 +93,31 @@ namespace snuffbox
 		QApplication& app(){ return qtApp_; }
 
 	private:
-		SharedPtr<Win32Window> window_; ///< The Win32 window hooked to the game
-		SharedPtr<Mouse> mouse_; ///< The mouse object
-		SharedPtr<Keyboard> keyboard_; ///< The keyboard object
-		SharedPtr<D3D11DisplayDevice> device_; ///< The D3D11 device
-		bool started_;	///< Is the game started yet?
-		JSCallback initialise_; ///< The JavaScript update callback
-		JSCallback update_; ///< The JavaScript update callback
-		JSCallback draw_; ///< The JavaScript update callback
-		JSCallback shutdown_; ///< The JavaScript update callback
-		JSCallback onReload_; ///< The JavaScript onReload callback
-		double deltaTime_;	///< The current delta time
-		bool consoleEnabled_; ///< Is the console enabled?
-		std::string path_; ///< The path the game is running in
-		int gameTime_; ///< The game time
-		high_resolution_clock::time_point lastTime_;	///< The last clock time for delta timing
-		QApplication& qtApp_; ///< The qt application
-		bool shouldQuit_; ///< If the application should quit
-		bool shouldReload_; ///< If the application should reload
-		bool doReload_; ///< Should all content be reloaded?
+		SharedPtr<Win32Window> window_; //!< The Win32 window hooked to the game
+		SharedPtr<Mouse> mouse_; //!< The mouse object
+		SharedPtr<Keyboard> keyboard_; //!< The keyboard object
+		SharedPtr<D3D11DisplayDevice> device_; //!< The D3D11 device
+		bool started_;	//!< Is the game started yet?
+		JSCallback initialise_; //!< The JavaScript update callback
+		JSCallback update_; //!< The JavaScript update callback
+		JSCallback draw_; //!< The JavaScript update callback
+		JSCallback shutdown_; //!< The JavaScript update callback
+		JSCallback onReload_; //!< The JavaScript onReload callback
+		double deltaTime_;	//!< The current delta time
+		bool consoleEnabled_; //!< Is the console enabled?
+		std::string path_; //!< The path the game is running in
+		int gameTime_; //!< The game time
+		high_resolution_clock::time_point lastTime_;	//!< The last clock time for delta timing
+		QApplication& qtApp_; //!< The qt application
+		bool shouldQuit_; //!< If the application should quit
+		bool shouldReload_; //!< If the application should reload
+		bool doReload_; //!< Should all content be reloaded?
 	public:
 		JS_NAME(Game);
-		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions
-		static void JSRender(JS_ARGS); ///< Renders the scene
-    static void JSCleanUp(JS_ARGS); ///< Forces a garabage collection
-		static void JSSetName(JS_ARGS); ///< Sets the window name
-		static void JSShowConsole(JS_ARGS); ///< Shows the console
+		static void RegisterJS(JS_TEMPLATE); //!< Registers all JavaScript functions
+		static void JSRender(JS_ARGS); //!< Renders the scene
+    static void JSCleanUp(JS_ARGS); //!< Forces a garabage collection
+		static void JSSetName(JS_ARGS); //!< Sets the window name
+		static void JSShowConsole(JS_ARGS); //!< Shows the console
 	};
 }

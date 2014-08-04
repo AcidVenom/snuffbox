@@ -13,7 +13,7 @@ namespace snuffbox
 
 		bool has_console(){ return globalInstance != nullptr; }
 		Console& console()
-		{ 
+		{
 			SNUFF_ASSERT_NOTNULL(globalInstance);
 			return *globalInstance;
 		}

@@ -48,10 +48,10 @@ namespace snuffbox
 		CameraType type(){ return type_; }
 
 	private:
-		XMVECTOR up_; ///< Up vector
-		XMVECTOR target_; ///< Orientation vector
-		XMVECTOR translation_; ///< Translation vector
-		XMMATRIX viewMatrix_; ///< The resulting view matrix
+		XMVECTOR up_; //!< Up vector
+		XMVECTOR target_; //!< Orientation vector
+		XMVECTOR translation_; //!< Translation vector
+		XMMATRIX viewMatrix_; //!< The resulting view matrix
 
 		XMMATRIX rotation_;
 		const XMVECTOR forward_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);

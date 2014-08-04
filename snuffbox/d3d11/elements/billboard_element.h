@@ -27,16 +27,22 @@ namespace snuffbox
 		/// Sets the buffers of the quad
 		void SetBuffers();
 
-		/// Override the world function, to use our own billboard matrix
+		/**
+		* @brief Override the world function, to use our own billboard matrix
+		* @param[in] camera (snuffbox::Camera*) The camera to use and to billboard to
+		* @return (XMMATRIX&) The ouput world matrix
+		*/
 		XMMATRIX& World(Camera* camera);
 
-		/// Returns the vertex buffer type
+		/**
+		* @return (snuffbox::VertexBufferType) The vertex buffer type
+		*/
 		VertexBufferType type(){ return VertexBufferType::kQuad; }
 
 	private:
-		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer
-		ID3D11Buffer* indexBuffer_; ///< The index buffer
-		XMMATRIX world_; ///< The previous transformation
+		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer
+		ID3D11Buffer* index_buffer_; //!< The index buffer
+		XMMATRIX world_; //!< The previous transformation
 	public:
 		JS_NAME(Billboard);
 	};

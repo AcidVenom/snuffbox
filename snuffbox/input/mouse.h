@@ -103,24 +103,24 @@ namespace snuffbox
 		std::tuple<double, double> movement(){ return std::tuple<double, double>(dx_, dy_); }
 
 	private:
-		MouseButtonState buttonStates_[5]; ///< The button states of every button
-		float x_, y_;											 ///< X and Y position of the mouse
-		float dx_, dy_;										 ///< The movement of the mouse
-		float prevX_, prevY_;							 ///< The previous mouse position
-		std::queue<MouseData> queue_;			 ///< The queue to handle messages from
+		MouseButtonState buttonStates_[5]; //!< The button states of every button
+		float x_, y_;											 //!< X and Y position of the mouse
+		float dx_, dy_;										 //!< The movement of the mouse
+		float prevX_, prevY_;							 //!< The previous mouse position
+		std::queue<MouseData> queue_;			 //!< The queue to handle messages from
 
 	public:
 		JS_NAME(Mouse);
-		static void RegisterJS(JS_TEMPLATE); ///< Registers all JavaScript functions
+		static void RegisterJS(JS_TEMPLATE); //!< Registers all JavaScript functions
 
 	private:
-		static void JSGetMovement(JS_ARGS); ///< Returns the movement of the mouse this frame
-		static void JSGetPosition(JS_ARGS);	///< Retrieves the position of the mouse
-		static void JSIsPressed(JS_ARGS);	///< Returns if a mouse button was pressed this frame
-		static void JSIsDown(JS_ARGS);	///< Returns if a mouse button is down this frame
-		static void JSIsReleased(JS_ARGS);	///< Returns if a mouse button is released this frame
-		static void JSIsDoubleClicked(JS_ARGS);	///< Returns if a mouse button is double clicked this frame
-		static void JSWheelUp(JS_ARGS);	///< Returns if the mouse was scrolled up this frame
-		static void JSWheelDown(JS_ARGS); ///< Returns if the mouse was scrolled down this frame
+		static void JSGetMovement(JS_ARGS); //!< Returns the movement of the mouse this frame
+		static void JSGetPosition(JS_ARGS);	//!< Retrieves the position of the mouse
+		static void JSIsPressed(JS_ARGS);	//!< Returns if a mouse button was pressed this frame
+		static void JSIsDown(JS_ARGS);	//!< Returns if a mouse button is down this frame
+		static void JSIsReleased(JS_ARGS);	//!< Returns if a mouse button is released this frame
+		static void JSIsDoubleClicked(JS_ARGS);	//!< Returns if a mouse button is double clicked this frame
+		static void JSWheelUp(JS_ARGS);	//!< Returns if the mouse was scrolled up this frame
+		static void JSWheelDown(JS_ARGS); //!< Returns if the mouse was scrolled down this frame
 	};
 }

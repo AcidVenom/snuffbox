@@ -303,11 +303,11 @@ namespace snuffbox
 	void D3D11DisplayDevice::CreateConstantBuffer()
 	{
 		HRESULT result = S_OK;
-		VS_CONSTANT_BUFFER vsConstantBuffer;
+		ShaderConstantBuffer vsConstantBuffer;
 		float uniforms[4096];
 
 		D3D11_BUFFER_DESC constantBufferDesc;
-		constantBufferDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER)* 4;
+		constantBufferDesc.ByteWidth = sizeof(ShaderConstantBuffer)* 4;
 		constantBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		constantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -645,7 +645,7 @@ namespace snuffbox
 		{
 			inline bool operator()(RenderElement* a, RenderElement* b)
 			{
-				return (a->distanceFromCamera() < b->distanceFromCamera());
+				return (a->distance_from_camera() < b->distance_from_camera());
 			}
 		} RenderSorterDistance;
 
@@ -689,10 +689,10 @@ namespace snuffbox
 				vbType_ = type;
 			}
 
-			worldMatrix_ = it->World(camera_);
+			worldMatrix_ = it->world_matrix(camera_);
 
 			D3D11_MAPPED_SUBRESOURCE cbData;
-			VS_CONSTANT_BUFFER* mappedData;
+			ShaderConstantBuffer* mappedData;
 			float* uniforms;
 
 			context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
@@ -700,7 +700,7 @@ namespace snuffbox
 
 			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
       XMVECTOR deter;
-			mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
+			mappedData = static_cast<ShaderConstantBuffer*>(cbData.pData);
 			mappedData->Time = time_;
 			mappedData->World = worldMatrix_;
 			mappedData->View = viewMatrix_;
@@ -730,9 +730,9 @@ namespace snuffbox
 			textures[0] = defaultResource_;
 			textures[1] = defaultNormal_;
 
-			if (it->normalMap())
+			if (it->normal_map())
 			{
-				textures[1] = it->normalMap()->resource();
+				textures[1] = it->normal_map()->resource();
 			}
 
 			if (it->texture())
@@ -818,7 +818,7 @@ namespace snuffbox
 				delta = translation - camTranslation;
 				distance = sqrt(XMVectorGetX(delta)*XMVectorGetX(delta) + XMVectorGetY(delta)*XMVectorGetY(delta) + XMVectorGetZ(delta)*XMVectorGetZ(delta));
 
-				it->SetDistanceFromCamera(distance);
+				it->set_distance_from_camera(distance);
 			}
 			DrawRenderElement(it);
 
@@ -847,14 +847,14 @@ namespace snuffbox
 			worldMatrix_ = XMMatrixIdentity();
 
 			D3D11_MAPPED_SUBRESOURCE cbData;
-			VS_CONSTANT_BUFFER* mappedData;
+			ShaderConstantBuffer* mappedData;
 
 			context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 			context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
 
 			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
 			XMVECTOR deter;
-			mappedData = static_cast<VS_CONSTANT_BUFFER*>(cbData.pData);
+			mappedData = static_cast<ShaderConstantBuffer*>(cbData.pData);
 			mappedData->Time = time_;
 			mappedData->World = worldMatrix_;
 			mappedData->View = viewMatrix_;

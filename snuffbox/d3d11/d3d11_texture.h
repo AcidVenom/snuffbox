@@ -28,6 +28,6 @@ namespace snuffbox
 		ID3D11ShaderResourceView* resource(){ return texture_; }
 
 	private:
-		ID3D11ShaderResourceView* texture_; ///< The actual texture
+		ID3D11ShaderResourceView* texture_; //!< The actual texture
 	};
 }

@@ -78,14 +78,14 @@ namespace snuffbox
 		void Update();
 
 	private:
-		KeyState keyStates_[255]; ///< All the states of every key
-		std::queue<KeyData> queue_; ///< The queue with key events
+		KeyState keyStates_[255]; //!< All the states of every key
+		std::queue<KeyData> queue_; //!< The queue with key events
 
 	public:
 		JS_NAME(Keyboard);
-		static void RegisterJS(JS_TEMPLATE); ///< Register all JS functions
-		static void JSIsPressed(JS_ARGS); ///< Checks if a key is pressed
-		static void JSIsDown(JS_ARGS); ///< Checks if a key is down
-		static void JSIsReleased(JS_ARGS); ///< Checks if a key is released
+		static void RegisterJS(JS_TEMPLATE); //!< Register all JS functions
+		static void JSIsPressed(JS_ARGS); //!< Checks if a key is pressed
+		static void JSIsDown(JS_ARGS); //!< Checks if a key is down
+		static void JSIsReleased(JS_ARGS); //!< Checks if a key is released
 	};
 }

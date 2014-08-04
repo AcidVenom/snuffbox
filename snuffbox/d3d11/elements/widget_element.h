@@ -41,27 +41,41 @@ namespace snuffbox
 		/// Sets the buffers for the render device to use
 		void SetBuffers();
 
-		/// The vertex buffer type
+		/**
+		* @return (snuffbox::VertexBufferType) The vertex buffer type
+		*/
 		VertexBufferType type(){ return VertexBufferType::kQuad; }
 
-		/// Sets one or multiple anchor types
+		/**
+		* @brief Sets one or multiple anchor types
+		* @param[in] anchor (snuffbox::WidgetAnchor) The position to anchor to
+		*/
 		void SetAnchor(WidgetAnchor anchor);
 
-		/// Removes an anchor
+		/**
+		* @brief Removes an anchor
+		* @param[in] anchor (snuffbox::WidgetAnchor) The anchor to remove
+		*/
 		void RemoveAnchor(WidgetAnchor anchor);
 
-		/// Returns a matrix for anchoring
+		/**
+		* @return (XMMATRIX) Returns a calculated matrix for anchoring
+		*/
 		XMMATRIX anchor();
 
-		/// Override the world matrix to use our own ui world matrix
+		/**
+		* @brief Override the world matrix to use our own ui world matrix
+		* @param[in] camera (snuffbox::Camera*) The currently in-use camera
+		* @return (XMMATRIX&) The calculated world matrix
+		*/
 		XMMATRIX& World(Camera* camera);
 
 	private:
-		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer of this element
-		ID3D11Buffer* indexBuffer_; ///< The index buffer of this element
-		int						anchors_[4]; ///< Booleans to check if a widget should be anchored
-		XMMATRIX			world_; ///< The world matrix
-		Widget*				parent_; ///< The widget's parent
+		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer of this element
+		ID3D11Buffer* index_buffer_; //!< The index buffer of this element
+		int						anchors_[4]; //!< Booleans to check if a widget should be anchored
+		XMMATRIX			world_; //!< The world matrix
+		Widget*				parent_; //!< The widget's parent
 	public:
 		JS_NAME(Widget);
 

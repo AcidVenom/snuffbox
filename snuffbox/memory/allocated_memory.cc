@@ -32,7 +32,7 @@ namespace snuffbox
 		SNUFF_XASSERT(allocations == 0 && allocatedMemory == 0, "Detected a memory leak on the heap!");
 		SNUFF_LOG_INFO("No memory leaks detected");
 		SNUFF_LOG_SUCCESS("Shutdown succesful");
-		if (environment::console().isLoaded() && environment::console().isVisible())
+		if (environment::console().is_loaded() && environment::console().is_visible())
 		{
 			environment::console().Show();
 			qApp->exec();

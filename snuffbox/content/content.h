@@ -13,25 +13,35 @@ namespace snuffbox
 	class Content
 	{
 	public:
-		/// Default constructor
+		/**
+		* @brief Construct content through a type and a pointer to the actual content
+		* @param[in] type (snuffbox::ContentManager::ContentTypes) The content type
+		* @param[in] ptr (snuffbox::SharedPtr<T>&) The shared pointer to the actual content
+		*/
 		Content(ContentManager::ContentTypes type, SharedPtr<T>& ptr);
+
 		/// Default destructor
-		~Content(){} 
+		~Content(){}
 
-		/// Returns the content type
-		ContentManager::ContentTypes type(){ return contentType_; }
+		/*
+		* @return (snuffbox::ContentManager::ContentTypes) The content type of this content
+		*/
+		ContentManager::ContentTypes type(){ return content_type_; }
 
-		/// Returns the content
+		/*
+		* @return (snuffbox::SharedPtr<T>&) The content pointer
+		*/
 		SharedPtr<T>& Get(){ return ptr_; }
 
 	private:
-		ContentManager::ContentTypes contentType_; ///< The type of this content
-		SharedPtr<T> ptr_;	///< The pointer to the actual content
+		ContentManager::ContentTypes content_type_; //!< The type of this content
+		SharedPtr<T> ptr_;	//!< The pointer to the actual content
 	};
 
+	//-----------------------------------------------------------------------------------------------------------------
 	template<typename T>
 	inline Content<T>::Content(ContentManager::ContentTypes type, SharedPtr<T>& ptr) :
-		contentType_(type),
+		content_type_(type),
 		ptr_(ptr)
 	{
 

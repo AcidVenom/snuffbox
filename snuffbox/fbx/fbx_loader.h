@@ -29,7 +29,7 @@ namespace snuffbox
 		void GetMeshData(std::vector<Vertex>* vertsOut, FbxMesh* mesh);
 
 	private:
-		FbxManager*			fbxManager_; ///< The FBX manager from the SDK
-		FbxScene*				fbxScene_; ///< The FBX scene to use
+		FbxManager*			fbxManager_; //!< The FBX manager from the SDK
+		FbxScene*				fbxScene_; //!< The FBX scene to use
 	};
 }

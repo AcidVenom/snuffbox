@@ -44,13 +44,13 @@ namespace snuffbox
 	template<>
 	bool ContentManager::Load<Texture>(std::string path)
 	{
-		if (loadedTextures_.find(path) != loadedTextures_.end())
+		if (loaded_textures_.find(path) != loaded_textures_.end())
 			return false;
 		SNUFF_LOG_INFO(std::string("Loading texture " + path).c_str());
 		SharedPtr<Texture> texture = environment::memory().ConstructShared<Texture>(std::string(path));
 		SharedPtr<Content<Texture>> content = environment::memory().ConstructShared<Content<Texture>>(ContentTypes::kTexture, texture);
 
-		loadedTextures_.emplace(path, content);
+		loaded_textures_.emplace(path, content);
 		return true;
 	}
 
@@ -58,13 +58,13 @@ namespace snuffbox
 	template<>
 	bool ContentManager::Load<Shader>(std::string path)
 	{
-		if (loadedShaders_.find(path) != loadedShaders_.end())
+		if (loaded_shaders_.find(path) != loaded_shaders_.end())
 			return false;
 		SNUFF_LOG_INFO(std::string("Loading shader " + path).c_str());
 		SharedPtr<Shader> shader = environment::memory().ConstructShared<Shader>(std::string(path));
 		SharedPtr<Content<Shader>> content = environment::memory().ConstructShared<Content<Shader>>(ContentTypes::kShader, shader);
 
-		loadedShaders_.emplace(path, content);
+		loaded_shaders_.emplace(path, content);
 		return true;
 	}
 
@@ -72,14 +72,14 @@ namespace snuffbox
 	template<>
 	bool ContentManager::Load<FBXModel>(std::string path)
 	{
-		if (loadedModels_.find(path) != loadedModels_.end())
+		if (loaded_models_.find(path) != loaded_models_.end())
 			return false;
 
 		SNUFF_LOG_INFO(std::string("Loading model " + path).c_str());
 		SharedPtr<FBXModel> model = environment::memory().ConstructShared<FBXModel>(environment::fbx_loader().Load(path), path);
 		SharedPtr<Content<FBXModel>> content = environment::memory().ConstructShared<Content<FBXModel>>(ContentTypes::kModel, model);
 
-		loadedModels_.emplace(path, content);
+		loaded_models_.emplace(path, content);
 		return true;
 	}
 
@@ -87,9 +87,9 @@ namespace snuffbox
 	template<>
 	void ContentManager::Unload<Texture>(std::string path)
 	{
-		SNUFF_XASSERT(loadedTextures_.find(path) != loadedTextures_.end(), "The texture '" + path + "' was never loaded!");
+		SNUFF_XASSERT(loaded_textures_.find(path) != loaded_textures_.end(), "The texture '" + path + "' was never loaded!");
 
-		loadedTextures_.erase(loadedTextures_.find(path));
+		loaded_textures_.erase(loaded_textures_.find(path));
 		environment::file_watcher().RemoveWatchedFile(path);
 		SNUFF_LOG_INFO(std::string("Unloaded texture " + path).c_str());
 	}
@@ -98,9 +98,9 @@ namespace snuffbox
 	template<>
 	void ContentManager::Unload<Shader>(std::string path)
 	{
-		SNUFF_XASSERT(loadedShaders_.find(path) != loadedShaders_.end(), "The shader '" + path + "' was never loaded!");
+		SNUFF_XASSERT(loaded_shaders_.find(path) != loaded_shaders_.end(), "The shader '" + path + "' was never loaded!");
 
-		loadedShaders_.erase(loadedShaders_.find(path));
+		loaded_shaders_.erase(loaded_shaders_.find(path));
 		environment::file_watcher().RemoveWatchedFile(path);
 		SNUFF_LOG_INFO(std::string("Unloaded shader " + path).c_str());
 	}
@@ -109,9 +109,9 @@ namespace snuffbox
 	template<>
 	void ContentManager::Unload<FBXModel>(std::string path)
 	{
-		SNUFF_XASSERT(loadedModels_.find(path) != loadedModels_.end(), "The model '" + path + "' was never loaded!");
+		SNUFF_XASSERT(loaded_models_.find(path) != loaded_models_.end(), "The model '" + path + "' was never loaded!");
 
-		loadedModels_.erase(loadedModels_.find(path));
+		loaded_models_.erase(loaded_models_.find(path));
 		environment::file_watcher().RemoveWatchedFile(path);
 		SNUFF_LOG_INFO(std::string("Unloaded model " + path).c_str());
 	}
@@ -121,11 +121,11 @@ namespace snuffbox
 	SharedPtr<Texture>& ContentManager::Get<Texture>(std::string path)
 	{
 		Content<Texture>* contentPtr = nullptr;
-		 
-		SNUFF_XASSERT(loadedTextures_.find(path) != loadedTextures_.end(), std::string("Texture not loaded '" + path + "'!"));
 
-		contentPtr = loadedTextures_.find(path)->second.get();
-		
+		SNUFF_XASSERT(loaded_textures_.find(path) != loaded_textures_.end(), std::string("Texture not loaded '" + path + "'!"));
+
+		contentPtr = loaded_textures_.find(path)->second.get();
+
 		return contentPtr->Get();
 	}
 
@@ -135,9 +135,9 @@ namespace snuffbox
 	{
 		Content<Shader>* contentPtr = nullptr;
 
-		SNUFF_XASSERT(loadedShaders_.find(path) != loadedShaders_.end(), std::string("Shader not loaded '" + path + "'!"));
+		SNUFF_XASSERT(loaded_shaders_.find(path) != loaded_shaders_.end(), std::string("Shader not loaded '" + path + "'!"));
 
-		contentPtr = loadedShaders_.find(path)->second.get();
+		contentPtr = loaded_shaders_.find(path)->second.get();
 
 		return contentPtr->Get();
 	}
@@ -148,9 +148,9 @@ namespace snuffbox
 	{
 		Content<FBXModel>* contentPtr = nullptr;
 
-		SNUFF_XASSERT(loadedModels_.find(path) != loadedModels_.end(), std::string("Model not loaded '" + path + "'!"));
+		SNUFF_XASSERT(loaded_models_.find(path) != loaded_models_.end(), std::string("Model not loaded '" + path + "'!"));
 
-		contentPtr = loadedModels_.find(path)->second.get();
+		contentPtr = loaded_models_.find(path)->second.get();
 
 		return contentPtr->Get();
 	}
@@ -172,23 +172,23 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void ContentManager::UnloadAll()
 	{
-		for (auto it = loadedTextures_.begin(); it != loadedTextures_.end(); ++it)
+		for (auto it = loaded_textures_.begin(); it != loaded_textures_.end(); ++it)
 		{
 			environment::file_watcher().RemoveWatchedFile(it->first);
 		}
-		loadedTextures_.clear();
+		loaded_textures_.clear();
 
-		for (auto it = loadedShaders_.begin(); it != loadedShaders_.end(); ++it)
+		for (auto it = loaded_shaders_.begin(); it != loaded_shaders_.end(); ++it)
 		{
 			environment::file_watcher().RemoveWatchedFile(it->first);
 		}
-		loadedShaders_.clear();
+		loaded_shaders_.clear();
 
-		for (auto it = loadedModels_.begin(); it != loadedModels_.end(); ++it)
+		for (auto it = loaded_models_.begin(); it != loaded_models_.end(); ++it)
 		{
 			environment::file_watcher().RemoveWatchedFile(it->first);
 		}
-		loadedModels_.clear();
+		loaded_models_.clear();
 	}
 
 	//-------------------------------------------------------------------------------------------

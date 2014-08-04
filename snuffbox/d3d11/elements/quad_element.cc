@@ -17,8 +17,8 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	Quad::~Quad()
 	{
-		vertexBuffer_->Release();
-		indexBuffer_->Release();
+		vertex_buffer_->Release();
+		index_buffer_->Release();
 	}
 	
 	//-------------------------------------------------------------------------------------------
@@ -34,14 +34,14 @@ namespace snuffbox
 		indices().push_back(1);
     indices().push_back(3);
 
-		vertexBuffer_ = environment::render_device().CreateVertexBuffer(vertices());
-		indexBuffer_ = environment::render_device().CreateIndexBuffer(indices());
+		vertex_buffer_ = environment::render_device().CreateVertexBuffer(vertices());
+		index_buffer_ = environment::render_device().CreateIndexBuffer(indices());
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void Quad::SetBuffers()
 	{
-		environment::render_device().SetVertexBuffer(vertexBuffer_);
-		environment::render_device().SetIndexBuffer(indexBuffer_);
+		environment::render_device().SetVertexBuffer(vertex_buffer_);
+		environment::render_device().SetIndexBuffer(index_buffer_);
 	}
 }

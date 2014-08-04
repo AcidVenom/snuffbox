@@ -56,6 +56,6 @@ namespace snuffbox
 			}
 		}
 	private:
-		Persistent<Function> func_; ///< The actual function of this callback
+		Persistent<Function> func_; //!< The actual function of this callback
 	};
 }

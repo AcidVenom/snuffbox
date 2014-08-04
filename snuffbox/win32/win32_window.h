@@ -78,12 +78,12 @@ namespace snuffbox
 		HWND& handle(){ return handle_; }
 
 	private:
-		HWND handle_; ///< The reference to the window handle used by this window
-    HINSTANCE instance_; ///< The reference to the hInstance
-		bool focussed_; ///< Check to see if the window is focussed or not
-		WindowParameters params_; ///< The parameters of this window
+		HWND handle_; //!< The reference to the window handle used by this window
+    HINSTANCE instance_; //!< The reference to the hInstance
+		bool focussed_; //!< Check to see if the window is focussed or not
+		WindowParameters params_; //!< The parameters of this window
 	};
 
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam); ///< The windows message loop
+	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam); //!< The windows message loop
 
 }

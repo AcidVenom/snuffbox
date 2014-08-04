@@ -70,7 +70,7 @@ namespace snuffbox
 		bool CheckParams(std::string format);
 
 	private:
-		const FunctionCallbackInfo<Value>& args_; ///< The JavaScript arguments passed by a function
+		const FunctionCallbackInfo<Value>& args_; //!< The JavaScript arguments passed by a function
 	};
 
 	//------------------------------------------------------------------------------

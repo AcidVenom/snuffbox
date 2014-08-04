@@ -50,7 +50,7 @@ namespace snuffbox
 		}
 
 	private:
-		unsigned int refCount_;	///< The amount of references of this object
+		unsigned int refCount_;	//!< The amount of references of this object
 		T* ptr_;
 	};
 
@@ -107,8 +107,8 @@ namespace snuffbox
 		T* get();
 
 	private:
-		T* ptr_; ///< The pointer held by this shared pointer
-		RefCount<T>* ref_; ///< The references held by this pointer
+		T* ptr_; //!< The pointer held by this shared pointer
+		RefCount<T>* ref_; //!< The references held by this pointer
 	};
 
 	//------------------------------------------------------------------------------------------------------

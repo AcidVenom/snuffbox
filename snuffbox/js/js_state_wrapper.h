@@ -140,11 +140,11 @@ namespace snuffbox
     void Destroy();
 
   private:
-    Isolate* isolate_; ///< The JavaScript isolate created at startup
-    std::string path_; ///< The source directory path
-		Persistent<ObjectTemplate, CopyablePersistentTraits<ObjectTemplate>> global_; ///< The function registry
-		Persistent<Context, CopyablePersistentTraits<Context>> context_;	///< The JavaScript context
-		std::map<std::string, bool> loadedFiles_; ///< Check to see if a file is already loaded
+    Isolate* isolate_; //!< The JavaScript isolate created at startup
+    std::string path_; //!< The source directory path
+		Persistent<ObjectTemplate, CopyablePersistentTraits<ObjectTemplate>> global_; //!< The function registry
+		Persistent<Context, CopyablePersistentTraits<Context>> context_;	//!< The JavaScript context
+		std::map<std::string, bool> loadedFiles_; //!< Check to see if a file is already loaded
 
   private:
     /// JavaScript log debug

@@ -25,12 +25,14 @@ namespace snuffbox
 		/// Sets the buffers of the quad
 		void SetBuffers();
 
-    /// Returns the vertex buffer type
+		/**
+		* @return (snuffbox::VertexBufferType) The vertex buffer type
+		*/
     VertexBufferType type(){ return VertexBufferType::kQuad; }
 
 	private:
-		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer
-		ID3D11Buffer* indexBuffer_; ///< The index buffer
+		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer
+		ID3D11Buffer* index_buffer_; //!< The index buffer
 	public:
 		JS_NAME(Quad);
 	};

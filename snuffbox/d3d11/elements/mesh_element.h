@@ -25,15 +25,19 @@ namespace snuffbox
 		/// Sets the buffers of the mesh
 		void SetBuffers();
 
-		/// Returns the vertex buffer type
+		/**
+		* @return (snuffbox::VertexBufferType) The vertex buffer type
+		*/
 		VertexBufferType type(){ return VertexBufferType::kMesh; }
 
-		/// Returns the 3D model
+		/** 
+		* @return (snuffbox::FBXModel*) The 3D model
+		*/
 		FBXModel* model(){ return model_; }
 
 	private:
-		ID3D11Buffer* vertexBuffer_; ///< The vertex buffer
-		FBXModel* model_;	 ///< The model to use
+		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer
+		FBXModel* model_;	 //!< The model to use
 	public:
 		JS_NAME(Mesh);
 	};

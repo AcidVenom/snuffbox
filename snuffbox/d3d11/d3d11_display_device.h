@@ -65,11 +65,11 @@ namespace snuffbox
 	};
 
 	/**
-	* @struct snuffbox::VS_CONSTANT_BUFFER
+	* @struct snuffbox::ShaderConstantBuffer
 	* @brief The constant buffer used to pass variables to the shader
 	* @author Daniël Konings
 	*/
-	struct VS_CONSTANT_BUFFER
+	struct ShaderConstantBuffer
 	{
 		float Time;
 		XMMATRIX Projection;
@@ -216,45 +216,45 @@ namespace snuffbox
 		D3D11_VIEWPORT& viewport();
 
 	private:
-		SwapChainDescription					swapDesc_;					///< The swap chain description to create the chain
-		SwapChain*										swapChain_;					///< The swap chain for this device
-		D3DDevice*										device_;						///< The actual device
-		D3DContext*										context_;						///< The immediate context
-		std::vector<DisplayAdapter*>	displayAdapters_;		///< The display adapters this device can use
-		DisplayAdapter*								primaryAdapter_;		///< The primary display adapter
-		D3DTexture2D*									backBuffer_;				///< The backbuffer of this device
-		D3DRenderTargetView*					renderTargetView_;	///< The render target view of this device
-		ID3D11Buffer*									vsConstantBuffer_;	///< The constant buffer
-		ID3D11Buffer*									uniformBuffer_;			///< The constant buffer for uniforms
-		ID3D11InputLayout*						inputLayout_;				///< The vertex input layout
-		ID3D10Blob*										vsBuffer_;					///< Vertex shader buffer
-		ID3D10Blob*										psBuffer_;					///< Pixel shader buffer
-		float													time_;							///< The game time
-		XMMATRIX											worldMatrix_;				///< The world matrix
-		XMMATRIX											viewMatrix_;				///< The view matrix
-		XMMATRIX											projectionMatrix_;	///< The projection matrix
-		ID3D11RasterizerState*				rasterizerState_;	  ///< The rasterizer state
-		std::vector<RenderElement*>		renderElements_;		///< The list of render elements
-		std::vector<RenderElement*>		opaqueElements_;		///< The list of opaque render elements
-		std::vector<RenderElement*>		uiElements_;				///< The list of ui render elements
-    VertexBufferType              vbType_;            ///< The vertex buffer type
-		ID3D11DepthStencilView*				depthStencilView_;	///< The depth stencil view
-		ID3D11Texture2D*							depthStencilBuffer_;///< The buffer of the depth stencil
-		ID3D11DepthStencilState*			depthState_;				///< The depth stencil state
-		ID3D11Texture2D*							noTexture_;					///< A white rectangular texture as default
-		ID3D11Texture2D*							noNormal_;					///< A green rectangular texture as default normal
-		ID3D11ShaderResourceView*			defaultResource_;		///< The default shader resource
-		ID3D11ShaderResourceView*     defaultNormal_;			///< The default shader normal map
-		ID3D11SamplerState*						samplerState_;			///< The texture sampler state
-		ID3D11ShaderResourceView*			currentTexture_;		///< The current texture being used
-		ID3D11ShaderResourceView*			currentNormal_;			///< The current normal map being used
-		Shader*												currentShader_;			///< The current shader being used
-		Camera*												camera_;						///< The current camera being used
-		ID3D11BlendState*							blendState_;				///< The blend state being used
-    FBXModel*                     currentModel_;      ///< The current model being used
-    D3D11_PRIMITIVE_TOPOLOGY      topology_;          ///< The current primitive topology
-		std::vector<Vertex>						lines_;							///< The vector for lines to draw
-		ID3D11Buffer*									lineBuffer_;				///< The line vertex buffer
-		D3D11_VIEWPORT								viewport_;					///< The viewport of the device
+		SwapChainDescription					swapDesc_;					//!< The swap chain description to create the chain
+		SwapChain*										swapChain_;					//!< The swap chain for this device
+		D3DDevice*										device_;						//!< The actual device
+		D3DContext*										context_;						//!< The immediate context
+		std::vector<DisplayAdapter*>	displayAdapters_;		//!< The display adapters this device can use
+		DisplayAdapter*								primaryAdapter_;		//!< The primary display adapter
+		D3DTexture2D*									backBuffer_;				//!< The backbuffer of this device
+		D3DRenderTargetView*					renderTargetView_;	//!< The render target view of this device
+		ID3D11Buffer*									vsConstantBuffer_;	//!< The constant buffer
+		ID3D11Buffer*									uniformBuffer_;			//!< The constant buffer for uniforms
+		ID3D11InputLayout*						inputLayout_;				//!< The vertex input layout
+		ID3D10Blob*										vsBuffer_;					//!< Vertex shader buffer
+		ID3D10Blob*										psBuffer_;					//!< Pixel shader buffer
+		float													time_;							//!< The game time
+		XMMATRIX											worldMatrix_;				//!< The world matrix
+		XMMATRIX											viewMatrix_;				//!< The view matrix
+		XMMATRIX											projectionMatrix_;	//!< The projection matrix
+		ID3D11RasterizerState*				rasterizerState_;	  //!< The rasterizer state
+		std::vector<RenderElement*>		renderElements_;		//!< The list of render elements
+		std::vector<RenderElement*>		opaqueElements_;		//!< The list of opaque render elements
+		std::vector<RenderElement*>		uiElements_;				//!< The list of ui render elements
+    VertexBufferType              vbType_;            //!< The vertex buffer type
+		ID3D11DepthStencilView*				depthStencilView_;	//!< The depth stencil view
+		ID3D11Texture2D*							depthStencilBuffer_;//!< The buffer of the depth stencil
+		ID3D11DepthStencilState*			depthState_;				//!< The depth stencil state
+		ID3D11Texture2D*							noTexture_;					//!< A white rectangular texture as default
+		ID3D11Texture2D*							noNormal_;					//!< A green rectangular texture as default normal
+		ID3D11ShaderResourceView*			defaultResource_;		//!< The default shader resource
+		ID3D11ShaderResourceView*     defaultNormal_;			//!< The default shader normal map
+		ID3D11SamplerState*						samplerState_;			//!< The texture sampler state
+		ID3D11ShaderResourceView*			currentTexture_;		//!< The current texture being used
+		ID3D11ShaderResourceView*			currentNormal_;			//!< The current normal map being used
+		Shader*												currentShader_;			//!< The current shader being used
+		Camera*												camera_;						//!< The current camera being used
+		ID3D11BlendState*							blendState_;				//!< The blend state being used
+    FBXModel*                     currentModel_;      //!< The current model being used
+    D3D11_PRIMITIVE_TOPOLOGY      topology_;          //!< The current primitive topology
+		std::vector<Vertex>						lines_;							//!< The vector for lines to draw
+		ID3D11Buffer*									lineBuffer_;				//!< The line vertex buffer
+		D3D11_VIEWPORT								viewport_;					//!< The viewport of the device
 	};
 }
