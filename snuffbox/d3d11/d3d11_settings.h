@@ -12,8 +12,15 @@ namespace snuffbox
 	*/
 	struct Resolution
 	{
+		/**
+		* @brief Creates the resolution structure with a width and height
+		* @param[in] width (unsigned int) The width
+		* @param[in] height (unsigned int) The height
+		*/
 		Resolution(unsigned int width, unsigned int height) : w(width), h(height){}
-		unsigned int w, h;
+
+		unsigned int w; //!< The width of the resolution
+		unsigned int h; //!< The height of the resolution
 	};
 
 	/**
@@ -23,12 +30,22 @@ namespace snuffbox
 	*/
 	struct RenderSettings
 	{
-		RenderSettings() : vsync(1), fullscreen(false), cullMode(D3D11_CULL_FRONT), resolution(1280,720){}
-		Resolution resolution;
-		unsigned int vsync;
-		bool fullscreen;
-		D3D11_CULL_MODE cullMode;
-		D3DXCOLOR bufferColor;
+		/**
+		* @brief Creates the render settings with default settings
+		*/
+		RenderSettings() :
+			vsync(1),
+			fullscreen(false),
+			cull_mode(D3D11_CULL_FRONT),
+			resolution(640, 480),
+			buffer_colour(0.0f, 0.0f, 0.0f, 1.0f)
+		{}
+
+		Resolution resolution; //!< The resolution
+		unsigned int vsync; //!< Is vsync on or off
+		bool fullscreen; //!< Is the application running fullscreen?
+		D3D11_CULL_MODE cull_mode; //!< The cull mode
+		D3DXCOLOR buffer_colour; //!< The buffer colour
 	};
 	/**
 	* @class snuffbox::D3D11Settings
@@ -44,14 +61,21 @@ namespace snuffbox
 		/// Default destructor
 		~D3D11Settings();
 		
-		/// Returns the render settings
+		/**
+		* @return (snuffbox::RenderSettings&) The actual settings
+		*/
 		RenderSettings& settings(){ return settings_; }
 
-		/// Converts a cull mode enum to a string
+		/**
+		* @brief Converts a cull mode enum to a string
+		* @param[in] mode (D3D11_CULL_MODE) The cull mode to use
+		* @return (const char*) The final string
+		*/
 		static const char* CullModeToString(D3D11_CULL_MODE mode);
 
 	private:
-		RenderSettings settings_;
+		RenderSettings settings_; //!< The actual settings
+
 	public:
 		JS_NAME(RenderSettings);
 		static void RegisterJS(JS_TEMPLATE);
@@ -59,7 +83,7 @@ namespace snuffbox
 		static void JSSetResolution(JS_ARGS);
 		static void JSSetFullscreen(JS_ARGS);
 		static void JSSetVsync(JS_ARGS);
-		static void JSSetBackBufferColor(JS_ARGS);
+		static void JSSetBackBufferColour(JS_ARGS);
 		static void JSResolution(JS_ARGS);
 		static void JSSetWindowSize(JS_ARGS);
 	};

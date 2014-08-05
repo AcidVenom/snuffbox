@@ -13,18 +13,27 @@ namespace snuffbox
 	class Texture
 	{
 	public:
-		/// Default constructor
+		/**
+		* @brief Construct through a path
+		* @param[in] path (std::string) The path
+		*/
 		Texture(std::string path);
+
 		/// Default destructor
 		~Texture();
 
 		/// Destroy the texture object
 		void Destroy();
 
-		/// Reloads the texture
+		/**
+		* @brief Reload through a path
+		* @param[in] path (std::string) The path
+		*/
 		void Reload(std::string path);
 
-		/// Returns the shader resource
+		/**
+		* @return (ID3D11ShaderResourceView*) The shader resource
+		*/
 		ID3D11ShaderResourceView* resource(){ return texture_; }
 
 	private:

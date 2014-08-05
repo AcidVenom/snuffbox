@@ -11,7 +11,59 @@
 #include "../../snuffbox/memory/allocated_memory.h"
 #include "../../snuffbox/content/content_manager.h"
 #include "../../snuffbox/win32/win32_window.h"
+
+#include <fstream>
 #include <comdef.h>
+
+#define SNUFF_BASE_SHADER "cbuffer ConstantBuffer : register(b0)\n\
+{\n\
+\tfloat Time;\n\
+\tfloat4x4 World;\n\
+\tfloat4x4 View;\n\
+\tfloat4x4 Projection;\n\
+\tfloat4x4 WorldViewProjection;\n\
+\tfloat Alpha;\n\
+\tfloat3 Blend;\n\
+\tfloat4x4 InvWorld;\n\
+}\n\
+\n\
+cbuffer Uniforms : register(b1)\n\
+{\n\
+\n\
+}\n\
+\n\
+struct VOut\n\
+{\n\
+\tfloat4 position : SV_POSITION;\n\
+\tfloat4 colour : COLOUR;\n\
+\tfloat3 normal : NORMAL;\n\
+\tfloat2 texcoord : TEXCOORD0;\n\
+\tfloat3 tangent : TANGENT;\n\
+\tfloat3 binormal : BINORMAL;\n\
+};\n\
+\n\
+VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 colour : COLOUR, float3 tangent : TANGENT, float3 binormal : BINORMAL)\n\
+{\n\
+\tVOut output;\n\
+\toutput.position = mul(position, WorldViewProjection);\n\
+\toutput.normal = normalize(mul(float4(normal, 0), InvWorld).xyz);\n\
+\toutput.tangent = normalize(mul(float4(normal, 0), InvWorld).xyz);\n\
+\toutput.binormal = normalize(mul(float4(normal, 0), InvWorld).xyz);\n\
+\toutput.texcoord = texcoord;\n\
+\toutput.colour = colour;\n\
+\treturn output;\n\
+}\n\
+\n\
+Texture2D textures[2];\n\
+SamplerState SampleType;\n\
+\n\
+float4 PS(VOut input) : SV_TARGET\n\
+{\n\
+\tfloat4 textureColour = textures[0].Sample(SampleType, input.texcoord);\n\
+\tfloat4 colour = float4(textureColour.rgb * Blend * input.colour.rgb, textureColour.a);\n\
+\tcolour.a *= Alpha;\n\
+\treturn colour;\n\
+}"
 
 namespace snuffbox
 {
@@ -37,9 +89,9 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	D3D11DisplayDevice::D3D11DisplayDevice() : 
 		time_(0.0f), 
-		vbType_(VertexBufferType::kNone), 
+		vb_type_(VertexBufferType::kNone), 
 		camera_(nullptr),
-    currentModel_(nullptr),
+    current_model_(nullptr),
     topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
 	{
 		environment::globalInstance = this;
@@ -60,7 +112,7 @@ namespace snuffbox
 		GetAdapters();
 		CreateBackBuffer();
 		CreateViewport();
-		environment::content_manager().Load<Shader>("shaders/base.fx");
+		CreateBaseShader();
 		CreateConstantBuffer();
 		CreateLayout();
 		CreateDepthStencil();
@@ -74,24 +126,24 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::CreateDevice()
 	{
-		ZeroMemory(&swapChain_, sizeof(SwapChain));
-		ZeroMemory(&swapDesc_, sizeof(SwapChainDescription));
+		ZeroMemory(&swap_chain_, sizeof(SwapChain));
+		ZeroMemory(&swap_desc_, sizeof(SwapChainDescription));
 
-		swapDesc_.BufferCount = 1;
-		swapDesc_.BufferDesc.Width = environment::game().window()->params().w;
-		swapDesc_.BufferDesc.Height = environment::game().window()->params().h;
-		swapDesc_.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		swapDesc_.BufferDesc.RefreshRate.Numerator = 60;
-		swapDesc_.BufferDesc.RefreshRate.Denominator = 1;
-		swapDesc_.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapDesc_.OutputWindow = environment::game().window()->handle();
-		swapDesc_.SampleDesc.Count = 1;
-		swapDesc_.SampleDesc.Quality = 0;
-		swapDesc_.Windowed = !environment::render_settings().settings().fullscreen;
-		swapDesc_.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-		swapDesc_.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		swapDesc_.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		swapDesc_.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		swap_desc_.BufferCount = 1;
+		swap_desc_.BufferDesc.Width = environment::game().window()->params().w;
+		swap_desc_.BufferDesc.Height = environment::game().window()->params().h;
+		swap_desc_.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swap_desc_.BufferDesc.RefreshRate.Numerator = 60;
+		swap_desc_.BufferDesc.RefreshRate.Denominator = 1;
+		swap_desc_.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swap_desc_.OutputWindow = environment::game().window()->handle();
+		swap_desc_.SampleDesc.Count = 1;
+		swap_desc_.SampleDesc.Quality = 0;
+		swap_desc_.Windowed = !environment::render_settings().settings().fullscreen;
+		swap_desc_.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+		swap_desc_.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swap_desc_.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swap_desc_.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 		HRESULT result = S_OK;
 
@@ -112,8 +164,8 @@ namespace snuffbox
 			&featureLevelsRequested,
 			1,
 			D3D11_SDK_VERSION,
-			&swapDesc_,
-			&swapChain_,
+			&swap_desc_,
+			&swap_chain_,
 			&device_,
 			&featureLevelsSupported,
 			&context_
@@ -143,7 +195,7 @@ namespace snuffbox
 
 		for (UINT it = 0; factory->EnumAdapters(it, &adapter) != DXGI_ERROR_NOT_FOUND; ++it)
 		{
-			displayAdapters_.push_back(adapter);
+			display_adapters_.push_back(adapter);
 			DXGI_ADAPTER_DESC description;
 			if (FAILED(hr = adapter->GetDesc(&description)))
 			{
@@ -156,7 +208,7 @@ namespace snuffbox
 			{
 				highestVram = vram;
 				bestAdapter = description;
-				primaryAdapter_ = adapter;
+				primary_adapter_ = adapter;
 			}
 		}
 
@@ -185,13 +237,13 @@ namespace snuffbox
 	{
 		HRESULT result = S_OK;
 
-		result = swapChain_->GetBuffer(0, __uuidof(D3DTexture2D),
-			(LPVOID*)&backBuffer_);
+		result = swap_chain_->GetBuffer(0, __uuidof(D3DTexture2D),
+			(LPVOID*)&back_buffer_);
 
 		SNUFF_XASSERT(result == S_OK, HRToString(result));
 
-		result = device_->CreateRenderTargetView(backBuffer_, NULL,
-			&renderTargetView_);
+		result = device_->CreateRenderTargetView(back_buffer_, NULL,
+			&render_target_view_);
 
 		SNUFF_XASSERT(result == S_OK, HRToString(result))
 	}
@@ -206,15 +258,15 @@ namespace snuffbox
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		result = device_->CreateInputLayout(layout, 6, vsBuffer_->GetBufferPointer(),vsBuffer_->GetBufferSize(), &inputLayout_);
+		result = device_->CreateInputLayout(layout, 6, vs_buffer_->GetBufferPointer(),vs_buffer_->GetBufferSize(), &input_layout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "Input Layout").c_str());
 
-		context_->IASetInputLayout(inputLayout_);
+		context_->IASetInputLayout(input_layout_);
 		context_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 		D3D11_RASTERIZER_DESC rasterizer;
@@ -222,10 +274,10 @@ namespace snuffbox
 		rasterizer.CullMode = D3D11_CULL_FRONT;
 		rasterizer.FillMode = D3D11_FILL_SOLID;
 
-		result = device_->CreateRasterizerState(&rasterizer, &rasterizerState_);
+		result = device_->CreateRasterizerState(&rasterizer, &rasterizer_state_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
-    context_->RSSetState(rasterizerState_);
+    context_->RSSetState(rasterizer_state_);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -239,15 +291,44 @@ namespace snuffbox
 		rasterizer.CullMode = mode;
 		rasterizer.FillMode = D3D11_FILL_SOLID;
 
-		SNUFF_SAFE_RELEASE(rasterizerState_);
-		result = device_->CreateRasterizerState(&rasterizer, &rasterizerState_);
-		context_->RSSetState(rasterizerState_);
+		SNUFF_SAFE_RELEASE(rasterizer_state_);
+		result = device_->CreateRasterizerState(&rasterizer, &rasterizer_state_);
+		context_->RSSetState(rasterizer_state_);
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::SetFullscreen(bool mode)
 	{
-		swapChain_->SetFullscreenState(mode, NULL);
+		swap_chain_->SetFullscreenState(mode, NULL);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateBaseShader()
+	{
+		std::fstream fin;
+
+		fin.open(environment::game().path() + "/shaders/base.fx");
+
+		if (!fin)
+		{
+			std::ofstream out;
+			out.open(environment::game().path() + "/shaders/base.fx");
+
+			if (!out)
+			{
+				CreateDirectoryA(std::string(environment::game().path() + "/shaders").c_str(), 0);
+				out.open(environment::game().path() + "/shaders/base.fx");
+
+				SNUFF_XASSERT(out, "Unknown error in creating of the base shader");
+			}
+
+			out << SNUFF_BASE_SHADER;
+			out.close();
+		}
+		
+		fin.close();
+
+		environment::content_manager().Load<Shader>("shaders/base.fx");
 	}
 
 	//---------------------------------------------------------------------------------
@@ -256,30 +337,30 @@ namespace snuffbox
 		VertexShader* vs;
 		PixelShader* ps;
 
-		if (vsBuffer_ != NULL)
+		if (vs_buffer_ != NULL)
 		{
-			vsBuffer_->Release();
-			vsBuffer_ = NULL;
+			vs_buffer_->Release();
+			vs_buffer_ = NULL;
 		}
 
-		if (psBuffer_ != NULL)
+		if (ps_buffer_ != NULL)
 		{
-			psBuffer_->Release();
-			psBuffer_ = NULL;
+			ps_buffer_->Release();
+			ps_buffer_ = NULL;
 		}
 
 		ID3D10Blob* errors = nullptr;
 		HRESULT result = S_OK;
 		std::string file_path = environment::game().path() + "/" + path;
 		
-		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "VS", "vs_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &vsBuffer_, &errors, 0);
+		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "VS", "vs_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &vs_buffer_, &errors, 0);
 		if (errors != nullptr)
 		{
 			SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
 			return Shaders{ nullptr, nullptr };
 		}
 		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + file_path).c_str()).c_str());
-		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "PS", "ps_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &psBuffer_, &errors, 0);
+		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "PS", "ps_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &ps_buffer_, &errors, 0);
 		if (errors != nullptr)
 		{
 			SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
@@ -287,9 +368,9 @@ namespace snuffbox
 		}
 		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + file_path).c_str()).c_str());
 
-		result = device_->CreateVertexShader(vsBuffer_->GetBufferPointer(), vsBuffer_->GetBufferSize(), NULL, &vs);
+		result = device_->CreateVertexShader(vs_buffer_->GetBufferPointer(), vs_buffer_->GetBufferSize(), NULL, &vs);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-		result = device_->CreatePixelShader(psBuffer_->GetBufferPointer(), psBuffer_->GetBufferSize(), NULL, &ps);
+		result = device_->CreatePixelShader(ps_buffer_->GetBufferPointer(), ps_buffer_->GetBufferSize(), NULL, &ps);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		if (errors != nullptr)
@@ -319,13 +400,13 @@ namespace snuffbox
 		initData.SysMemPitch = 0;
 		initData.SysMemSlicePitch = 0;
 
-		result = device_->CreateBuffer(&constantBufferDesc, &initData, &vsConstantBuffer_);
+		result = device_->CreateBuffer(&constantBufferDesc, &initData, &constant_buffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		constantBufferDesc.ByteWidth = sizeof(float)* 4096;
 		initData.pSysMem = &uniforms;
 
-		result = device_->CreateBuffer(&constantBufferDesc, &initData, &uniformBuffer_);
+		result = device_->CreateBuffer(&constantBufferDesc, &initData, &uniform_buffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 	}
 
@@ -334,7 +415,7 @@ namespace snuffbox
 		D3D11_VIEWPORT viewport;
 		DXGI_SWAP_CHAIN_DESC scDesc;
 
-		swapChain_->GetDesc(&scDesc);
+		swap_chain_->GetDesc(&scDesc);
 
 		float windowWidth = environment::game().window()->params().w;
 		float windowHeight = environment::game().window()->params().h;
@@ -429,7 +510,7 @@ namespace snuffbox
 
 		D3D11_TEXTURE2D_DESC dsvDesc;
 		DXGI_SWAP_CHAIN_DESC scDesc;
-		swapChain_->GetDesc(&scDesc);
+		swap_chain_->GetDesc(&scDesc);
 
 		dsvDesc.Width = scDesc.BufferDesc.Width;
 		dsvDesc.Height = scDesc.BufferDesc.Height;
@@ -443,9 +524,9 @@ namespace snuffbox
 		dsvDesc.CPUAccessFlags = 0;
 		dsvDesc.MiscFlags = 0;
 
-		result = device_->CreateTexture2D(&dsvDesc, NULL, &depthStencilBuffer_);
+		result = device_->CreateTexture2D(&dsvDesc, NULL, &depth_stencil_buffer_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-		result = device_->CreateDepthStencilView(depthStencilBuffer_, NULL, &depthStencilView_);
+		result = device_->CreateDepthStencilView(depth_stencil_buffer_, NULL, &depth_stencil_view_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		D3D11_DEPTH_STENCIL_DESC dsDesc;
@@ -469,10 +550,10 @@ namespace snuffbox
 		dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 		dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-		result = device_->CreateDepthStencilState(&dsDesc, &depthState_);
+		result = device_->CreateDepthStencilState(&dsDesc, &depth_state_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
-		context_->OMSetDepthStencilState(depthState_,1);
+		context_->OMSetDepthStencilState(depth_state_,1);
 	}
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::CreateSamplerState()
@@ -495,10 +576,10 @@ namespace snuffbox
 		sDesc.MinLOD = 0;
 		sDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-		result = device_->CreateSamplerState(&sDesc, &samplerState_);
+		result = device_->CreateSamplerState(&sDesc, &sampler_state_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
-		context_->PSSetSamplers(0, 1, &samplerState_);
+		context_->PSSetSamplers(0, 1, &sampler_state_);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -527,9 +608,9 @@ namespace snuffbox
 		initData.SysMemPitch = sizeof(color);
 		initData.SysMemSlicePitch = sizeof(color);
 
-		result = device_->CreateTexture2D(&whiteTexture, &initData, &noTexture_);
+		result = device_->CreateTexture2D(&whiteTexture, &initData, &no_texture_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-		result = device_->CreateShaderResourceView(noTexture_, NULL, &defaultResource_);
+		result = device_->CreateShaderResourceView(no_texture_, NULL, &default_resource_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		D3DXCOLOR col(0.51f, 0.54f, 0.98f, 1.0f);
@@ -554,9 +635,9 @@ namespace snuffbox
 		iData.SysMemPitch = sizeof(col);
 		iData.SysMemSlicePitch = sizeof(col);
 
-		result = device_->CreateTexture2D(&normalTexture, &iData, &noNormal_);
+		result = device_->CreateTexture2D(&normalTexture, &iData, &no_normal_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-		result = device_->CreateShaderResourceView(noNormal_, NULL, &defaultNormal_);
+		result = device_->CreateShaderResourceView(no_normal_, NULL, &default_normal_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 	}
 
@@ -579,11 +660,11 @@ namespace snuffbox
 		bDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		bDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-		result = device_->CreateBlendState(&bDesc, &blendState_);
+		result = device_->CreateBlendState(&bDesc, &blend_state_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		float factor[4] = { 1, 1, 1, 1 };
-		context_->OMSetBlendState(blendState_,factor,0xFFFFFFFF);
+		context_->OMSetBlendState(blend_state_,factor,0xFFFFFFFF);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -594,13 +675,13 @@ namespace snuffbox
 		vert.y = y1;
 		vert.z = z1;
 		vert.w = 1.0f;
-		vert.texCoord.x = 0;
-		vert.texCoord.y = 0;
+		vert.tex_coord.x = 0;
+		vert.tex_coord.y = 0;
 		vert.normal = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		vert.color.x = r1;
-		vert.color.y = g1;
-		vert.color.z = b1;
-		vert.color.w = 1.0f;
+		vert.colour.x = r1;
+		vert.colour.y = g1;
+		vert.colour.z = b1;
+		vert.colour.w = 1.0f;
 
 		lines_.push_back(vert);
 
@@ -608,13 +689,13 @@ namespace snuffbox
 		vert.y = y2;
 		vert.z = z2;
 		vert.w = 1.0f;
-		vert.texCoord.x = 0;
-		vert.texCoord.y = 0;
+		vert.tex_coord.x = 0;
+		vert.tex_coord.y = 0;
 		vert.normal = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		vert.color.x = r2;
-		vert.color.y = g2;
-		vert.color.z = b2;
-		vert.color.w = 1.0f;
+		vert.colour.x = r2;
+		vert.colour.y = g2;
+		vert.colour.z = b2;
+		vert.colour.w = 1.0f;
 
 		lines_.push_back(vert);
 	}
@@ -624,14 +705,14 @@ namespace snuffbox
 	{
 		if (camera_ && camera_->type() == Camera::CameraType::kPerspective)
 		{
-			context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
+			context_->OMSetRenderTargets(1, &render_target_view_, depth_stencil_view_);
 		}
 		else
 		{
-			context_->OMSetRenderTargets(1, &renderTargetView_, NULL);
+			context_->OMSetRenderTargets(1, &render_target_view_, NULL);
 		}
-		context_->ClearRenderTargetView(renderTargetView_, environment::render_settings().settings().bufferColor);
-		context_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		context_->ClearRenderTargetView(render_target_view_, environment::render_settings().settings().buffer_colour);
+		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		struct RenderSorterByZ
 		{
@@ -653,11 +734,11 @@ namespace snuffbox
 		{
 			if (camera_->type() == Camera::CameraType::kOrthographic)
 			{
-				std::sort(renderElements_.begin(), renderElements_.end(), RenderSorterByZ);
+				std::sort(render_elements_.begin(), render_elements_.end(), RenderSorterByZ);
 			}
 			else
 			{
-				std::sort(renderElements_.begin(), renderElements_.end(), RenderSorterDistance);
+				std::sort(render_elements_.begin(), render_elements_.end(), RenderSorterDistance);
 			}
 		}
 		camera_ = nullptr;
@@ -670,52 +751,52 @@ namespace snuffbox
 		{
 			RenderElement::ElementTypes elementType = it->element_type();
 			VertexBufferType type = it->type();
-			if (type != vbType_ || type == VertexBufferType::kMesh)
+			if (type != vb_type_ || type == VertexBufferType::kMesh)
 			{
         if (type == VertexBufferType::kMesh)
         {
           Mesh* mesh = static_cast<Mesh*>(it);
           FBXModel* model = mesh->model();
-          if (model != currentModel_ || type != vbType_)
+          if (model != current_model_ || type != vb_type_)
           {
             it->SetBuffers();
-            currentModel_ = model;
+            current_model_ = model;
           }
         }
         else
         {
           it->SetBuffers();
         }
-				vbType_ = type;
+				vb_type_ = type;
 			}
 
-			worldMatrix_ = it->world_matrix(camera_);
+			world_matrix_ = it->world_matrix(camera_);
 
 			D3D11_MAPPED_SUBRESOURCE cbData;
 			ShaderConstantBuffer* mappedData;
 			float* uniforms;
 
-			context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-			context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+			context_->VSSetConstantBuffers(0, 1, &constant_buffer_);
+			context_->PSSetConstantBuffers(0, 1, &constant_buffer_);
 
-			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+			context_->Map(constant_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
       XMVECTOR deter;
 			mappedData = static_cast<ShaderConstantBuffer*>(cbData.pData);
 			mappedData->Time = time_;
-			mappedData->World = worldMatrix_;
-			mappedData->View = viewMatrix_;
-			mappedData->Projection = projectionMatrix_;
-			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
-      mappedData->InvWorld = XMMatrixTranspose(XMMatrixInverse(&deter, worldMatrix_));
+			mappedData->World = world_matrix_;
+			mappedData->View = view_matrix_;
+			mappedData->Projection = projection_matrix_;
+			mappedData->WorldViewProjection = world_matrix_ * view_matrix_ * projection_matrix_;
+      mappedData->InvWorld = XMMatrixTranspose(XMMatrixInverse(&deter, world_matrix_));
 			mappedData->Alpha = it->alpha();
 			mappedData->Blend = it->blend();
 
-			context_->Unmap(vsConstantBuffer_, 0);
+			context_->Unmap(constant_buffer_, 0);
 
-			context_->VSSetConstantBuffers(1, 1, &uniformBuffer_);
-			context_->PSSetConstantBuffers(1, 1, &uniformBuffer_);
+			context_->VSSetConstantBuffers(1, 1, &uniform_buffer_);
+			context_->PSSetConstantBuffers(1, 1, &uniform_buffer_);
 
-			context_->Map(uniformBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+			context_->Map(uniform_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
 
 			uniforms = static_cast<float*>(cbData.pData);
 			auto vec = it->uniforms();
@@ -724,11 +805,11 @@ namespace snuffbox
 				uniforms[i] = vec[i];
 			}
 
-			context_->Unmap(uniformBuffer_, 0);
+			context_->Unmap(uniform_buffer_, 0);
 
 			ID3D11ShaderResourceView* textures[2];
-			textures[0] = defaultResource_;
-			textures[1] = defaultNormal_;
+			textures[0] = default_resource_;
+			textures[1] = default_normal_;
 
 			if (it->normal_map())
 			{
@@ -740,22 +821,22 @@ namespace snuffbox
 				textures[0] = it->texture()->resource();
 			}
 
-			if (currentTexture_ != textures[0] || currentNormal_ != textures[1])
+			if (current_texture_ != textures[0] || current_normal_ != textures[1])
 			{
 				context_->PSSetShaderResources(0, 2, textures);
 			}
 
-			currentTexture_ = textures[0];
-			currentNormal_ = textures[1];
+			current_texture_ = textures[0];
+			current_normal_ = textures[1];
 
 			if (it->shader())
 			{
-				if (currentShader_ != it->shader())
+				if (current_shader_ != it->shader())
 				{
 					auto shaders = it->shader()->shaders();
 					context_->PSSetShader(shaders.ps, 0, 0);
 					context_->VSSetShader(shaders.vs, 0, 0);
-					currentShader_ = it->shader();
+					current_shader_ = it->shader();
 				}
 			}
 
@@ -779,7 +860,7 @@ namespace snuffbox
 				}
 
 				Mesh* mesh = static_cast<Mesh*>(it);
-        context_->Draw(mesh->model()->vertexCount(), 0);
+        context_->Draw(mesh->model()->vertex_count(), 0);
         topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 			}
 		}
@@ -792,14 +873,14 @@ namespace snuffbox
 
 		RenderElement* it = nullptr;
 
-		for (int idx = static_cast<int>(opaqueElements_.size()-1); idx >= 0; --idx)
+		for (int idx = static_cast<int>(opaque_elements_.size()-1); idx >= 0; --idx)
 		{
-			it = opaqueElements_[idx];
+			it = opaque_elements_[idx];
 			DrawRenderElement(it);
 
 			if (it->destroyed())
 			{
-				opaqueElements_.erase(opaqueElements_.begin() + idx);
+				opaque_elements_.erase(opaque_elements_.begin() + idx);
 			}
 		}
 
@@ -808,9 +889,9 @@ namespace snuffbox
 		XMVECTOR delta;
 		float distance;
 
-		for (int idx = static_cast<int>(renderElements_.size() - 1); idx >= 0; --idx)
+		for (int idx = static_cast<int>(render_elements_.size() - 1); idx >= 0; --idx)
 		{
-			it = renderElements_[idx];
+			it = render_elements_[idx];
 
 			if (camera_->type() == Camera::CameraType::kPerspective)
 			{
@@ -824,57 +905,57 @@ namespace snuffbox
 
 			if (it->destroyed())
 			{
-				renderElements_.erase(renderElements_.begin() + idx);
+				render_elements_.erase(render_elements_.begin() + idx);
 			}
 		}
 
 		if (lines_.size() > 0)
 		{
-			if (lineBuffer_)
+			if (line_buffer_)
 			{
-				lineBuffer_->Release();
-				lineBuffer_ = nullptr;
+				line_buffer_->Release();
+				line_buffer_ = nullptr;
 			}
-			lineBuffer_ = CreateVertexBuffer(lines_);
+			line_buffer_ = CreateVertexBuffer(lines_);
 			if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST)
 			{
 				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
 			}
-			SetVertexBuffer(lineBuffer_);
+			SetVertexBuffer(line_buffer_);
 
-			vbType_ = VertexBufferType::kLine;
+			vb_type_ = VertexBufferType::kLine;
 
-			worldMatrix_ = XMMatrixIdentity();
+			world_matrix_ = XMMatrixIdentity();
 
 			D3D11_MAPPED_SUBRESOURCE cbData;
 			ShaderConstantBuffer* mappedData;
 
-			context_->VSSetConstantBuffers(0, 1, &vsConstantBuffer_);
-			context_->PSSetConstantBuffers(0, 1, &vsConstantBuffer_);
+			context_->VSSetConstantBuffers(0, 1, &constant_buffer_);
+			context_->PSSetConstantBuffers(0, 1, &constant_buffer_);
 
-			context_->Map(vsConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+			context_->Map(constant_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
 			XMVECTOR deter;
 			mappedData = static_cast<ShaderConstantBuffer*>(cbData.pData);
 			mappedData->Time = time_;
-			mappedData->World = worldMatrix_;
-			mappedData->View = viewMatrix_;
-			mappedData->Projection = projectionMatrix_;
-			mappedData->WorldViewProjection = worldMatrix_ * viewMatrix_ * projectionMatrix_;
-			mappedData->InvWorld = XMMatrixTranspose(XMMatrixInverse(&deter, worldMatrix_));
+			mappedData->World = world_matrix_;
+			mappedData->View = view_matrix_;
+			mappedData->Projection = projection_matrix_;
+			mappedData->WorldViewProjection = world_matrix_ * view_matrix_ * projection_matrix_;
+			mappedData->InvWorld = XMMatrixTranspose(XMMatrixInverse(&deter, world_matrix_));
 			mappedData->Alpha = 1;
 			mappedData->Blend = XMFLOAT3(1, 1, 1);
 
-			context_->Unmap(vsConstantBuffer_, 0);
+			context_->Unmap(constant_buffer_, 0);
 			Shaders shaders = environment::content_manager().Get<Shader>("shaders/base.fx").get()->shaders();
 
 			ID3D11ShaderResourceView* textures[2];
-			textures[0] = defaultResource_;
-			textures[1] = defaultNormal_;
+			textures[0] = default_resource_;
+			textures[1] = default_normal_;
 
 			context_->PSSetShaderResources(0, 2, textures);
 
-			currentTexture_ = nullptr;
-			currentNormal_ = nullptr;
+			current_texture_ = nullptr;
+			current_normal_ = nullptr;
 
 			context_->PSSetShader(shaders.ps, 0, 0);
 			context_->VSSetShader(shaders.vs, 0, 0);
@@ -883,22 +964,22 @@ namespace snuffbox
 			context_->Draw(static_cast<UINT>(lines_.size()), static_cast<UINT>(0));
 		}
 
-		context_->OMSetRenderTargets(1, &renderTargetView_, NULL);
+		context_->OMSetRenderTargets(1, &render_target_view_, NULL);
 
 		SwapChainDescription swapDesc;
-		swapChain_->GetDesc(&swapDesc);
+		swap_chain_->GetDesc(&swapDesc);
 
-		projectionMatrix_ = XMMatrixOrthographicRH(swapDesc.BufferDesc.Width, swapDesc.BufferDesc.Height, 1.0f, 1000.0f);
-		viewMatrix_ = XMMatrixIdentity();
+		projection_matrix_ = XMMatrixOrthographicRH(swapDesc.BufferDesc.Width, swapDesc.BufferDesc.Height, 1.0f, 1000.0f);
+		view_matrix_ = XMMatrixIdentity();
 
-		for (int idx = static_cast<int>(uiElements_.size() - 1); idx >= 0; --idx)
+		for (int idx = static_cast<int>(ui_elements_.size() - 1); idx >= 0; --idx)
 		{
-			it = uiElements_[idx];
+			it = ui_elements_[idx];
 			DrawRenderElement(it);
 
 			if (it->destroyed())
 			{
-				uiElements_.erase(uiElements_.begin() + idx);
+				ui_elements_.erase(ui_elements_.begin() + idx);
 			}
 		}
 	}
@@ -912,31 +993,31 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::UpdateCamera(Camera* camera)
 	{
-		worldMatrix_ = XMMatrixIdentity();
-		viewMatrix_ = camera->view();
+		world_matrix_ = XMMatrixIdentity();
+		view_matrix_ = camera->view_matrix();
 		camera_ = camera;
 
 		SwapChainDescription swapDesc;
-		swapChain_->GetDesc(&swapDesc);
+		swap_chain_->GetDesc(&swapDesc);
 		if (camera->type() == Camera::CameraType::kOrthographic)
 		{
-			projectionMatrix_ = XMMatrixOrthographicRH(environment::render_settings().settings().resolution.w, environment::render_settings().settings().resolution.h, 1.0f, 1000.0f);
+			projection_matrix_ = XMMatrixOrthographicRH(environment::render_settings().settings().resolution.w, environment::render_settings().settings().resolution.h, 1.0f, 1000.0f);
 		}
 		else
 		{
-			projectionMatrix_ = XMMatrixPerspectiveFovRH(camera->fov(), static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
+			projection_matrix_ = XMMatrixPerspectiveFovRH(camera->fov(), static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
 		}
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::EndDraw()
 	{
-		swapChain_->Present(environment::render_settings().settings().vsync, 0);
+		swap_chain_->Present(environment::render_settings().settings().vsync, 0);
 		lines_.clear();
-		if (lineBuffer_)
+		if (line_buffer_)
 		{
-			lineBuffer_->Release();
-			lineBuffer_ = nullptr;
+			line_buffer_->Release();
+			line_buffer_ = nullptr;
 		}
 	}
 
@@ -946,20 +1027,20 @@ namespace snuffbox
 		HRESULT result = S_OK;
 
 		context_->OMSetRenderTargets(0, 0, 0);
-		SNUFF_SAFE_RELEASE(depthStencilBuffer_);
-		SNUFF_SAFE_RELEASE(renderTargetView_);
-		SNUFF_SAFE_RELEASE(depthStencilView_);
-		SNUFF_SAFE_RELEASE(depthState_);
-		SNUFF_SAFE_RELEASE(samplerState_);
-		SNUFF_SAFE_RELEASE(blendState_);
-		SNUFF_SAFE_RELEASE(rasterizerState_);
-		SNUFF_SAFE_RELEASE(backBuffer_);
-		SNUFF_SAFE_RELEASE(inputLayout_);
+		SNUFF_SAFE_RELEASE(depth_stencil_buffer_);
+		SNUFF_SAFE_RELEASE(render_target_view_);
+		SNUFF_SAFE_RELEASE(depth_stencil_view_);
+		SNUFF_SAFE_RELEASE(depth_state_);
+		SNUFF_SAFE_RELEASE(sampler_state_);
+		SNUFF_SAFE_RELEASE(blend_state_);
+		SNUFF_SAFE_RELEASE(rasterizer_state_);
+		SNUFF_SAFE_RELEASE(back_buffer_);
+		SNUFF_SAFE_RELEASE(input_layout_);
 
 		unsigned int w = environment::game().window()->params().w;
 		unsigned int h = environment::game().window()->params().h;
 
-		result = swapChain_->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0);
+		result = swap_chain_->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		CreateBackBuffer();
@@ -968,45 +1049,45 @@ namespace snuffbox
 		CreateDepthStencil();
 		CreateSamplerState();
 		CreateBlendState();
-    SetCullMode(environment::render_settings().settings().cullMode);
+    SetCullMode(environment::render_settings().settings().cull_mode);
 
-		context_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
+		context_->OMSetRenderTargets(1, &render_target_view_, depth_stencil_view_);
 	}
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::Destroy()
 	{
-		swapChain_->SetFullscreenState(FALSE, NULL);
+		swap_chain_->SetFullscreenState(FALSE, NULL);
 
 		SNUFF_SAFE_RELEASE(device_);
 		SNUFF_SAFE_RELEASE(context_);
-		SNUFF_SAFE_RELEASE(swapChain_);
-		for (auto it : displayAdapters_)
+		SNUFF_SAFE_RELEASE(swap_chain_);
+		for (auto it : display_adapters_)
 		{
 			SNUFF_SAFE_RELEASE(it);
 		}
-		SNUFF_SAFE_RELEASE(renderTargetView_);
-		SNUFF_SAFE_RELEASE(backBuffer_);
-		SNUFF_SAFE_RELEASE(inputLayout_);
-		SNUFF_SAFE_RELEASE(vsBuffer_);
-		SNUFF_SAFE_RELEASE(psBuffer_);
-		SNUFF_SAFE_RELEASE(vsConstantBuffer_);
-		SNUFF_SAFE_RELEASE(uniformBuffer_);
-		SNUFF_SAFE_RELEASE(rasterizerState_);
-		SNUFF_SAFE_RELEASE(depthStencilBuffer_);
-		SNUFF_SAFE_RELEASE(depthStencilView_);
-		SNUFF_SAFE_RELEASE(depthState_);
-		SNUFF_SAFE_RELEASE(samplerState_);
-		SNUFF_SAFE_RELEASE(noTexture_);
-		SNUFF_SAFE_RELEASE(defaultResource_);
-		SNUFF_SAFE_RELEASE(noNormal_);
-		SNUFF_SAFE_RELEASE(defaultNormal_);
-		SNUFF_SAFE_RELEASE(blendState_);
+		SNUFF_SAFE_RELEASE(render_target_view_);
+		SNUFF_SAFE_RELEASE(back_buffer_);
+		SNUFF_SAFE_RELEASE(input_layout_);
+		SNUFF_SAFE_RELEASE(vs_buffer_);
+		SNUFF_SAFE_RELEASE(ps_buffer_);
+		SNUFF_SAFE_RELEASE(constant_buffer_);
+		SNUFF_SAFE_RELEASE(uniform_buffer_);
+		SNUFF_SAFE_RELEASE(rasterizer_state_);
+		SNUFF_SAFE_RELEASE(depth_stencil_buffer_);
+		SNUFF_SAFE_RELEASE(depth_stencil_view_);
+		SNUFF_SAFE_RELEASE(depth_state_);
+		SNUFF_SAFE_RELEASE(sampler_state_);
+		SNUFF_SAFE_RELEASE(no_texture_);
+		SNUFF_SAFE_RELEASE(default_resource_);
+		SNUFF_SAFE_RELEASE(no_normal_);
+		SNUFF_SAFE_RELEASE(default_normal_);
+		SNUFF_SAFE_RELEASE(blend_state_);
 
-		if (lineBuffer_)
+		if (line_buffer_)
 		{
-			lineBuffer_->Release();
-			lineBuffer_ = nullptr;
+			line_buffer_->Release();
+			line_buffer_ = nullptr;
 		}
 
 		SNUFF_LOG_INFO("Destroyed the D3D11 display device");

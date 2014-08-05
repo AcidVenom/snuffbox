@@ -50,7 +50,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	XMMATRIX& Billboard::World(Camera* camera)
 	{
-		XMMATRIX baseMatrix(XMMatrixTranspose(camera->view()));
+		XMMATRIX baseMatrix(XMMatrixTranspose(camera->view_matrix()));
 
 		baseMatrix._14 = baseMatrix._24 = baseMatrix._34 = baseMatrix._41 = baseMatrix._42 = baseMatrix._43 = 0;
 		baseMatrix._44 = 1;

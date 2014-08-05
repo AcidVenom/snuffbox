@@ -45,7 +45,10 @@ namespace snuffbox
 	*/
 	struct MouseButtonState
 	{
-		bool down, pressed, released, dblclk;
+		bool down; //!< Is a mouse button down?
+		bool pressed; //!< Was a mouse button pressed?
+		bool released; //!< Was a mouse button released?
+		bool dblclk; //!< Was a mouse button double clicked?
 	};
 
 	/**
@@ -55,9 +58,10 @@ namespace snuffbox
 	*/
 	struct MouseData
 	{
-		MouseEnums::MouseEvent type;
-		MouseEnums::MouseButton button;
-		float x, y;
+		MouseEnums::MouseEvent type; //!< The type of the mouse event
+		MouseEnums::MouseButton button; //!< The button in question
+		float x; //!< The x position of the mouse
+		float y; //!< The y position of the mouse
 	};
 
 	/**
@@ -77,37 +81,60 @@ namespace snuffbox
 		/// Resets all buttonstates
 		void ResetStates();
 
-		/// Receive events
+		/**
+		* @brief Receive an event and push it to the queue
+		* @param[in] evt (snuffbox::MouseData&) The mouse data to evaluate
+		*/
 		void ReceiveEvent(MouseData& evt);
 
 		/// Process events
 		void Update();
 
-		/// Checks if a certain button is down
+		/**
+		* @brief Checks if a button is currently down
+		* @param[in] button (snuffbox::MouseEnums::MouseButton) The button in question
+		* @return (bool) The result
+		*/
 		bool IsDown(MouseEnums::MouseButton button);
 
-		/// Checks if a certain button is pressed
+		/**
+		* @brief Checks if a button is currently pressed
+		* @param[in] button (snuffbox::MouseEnums::MouseButton) The button in question
+		* @return (bool) The result
+		*/
 		bool IsPressed(MouseEnums::MouseButton button);
 
-		/// Checks if a certain button is released
+		/**
+		* @brief Checks if a button is currently released
+		* @param[in] button (snuffbox::MouseEnums::MouseButton) The button in question
+		* @return (bool) The result
+		*/
 		bool IsReleased(MouseEnums::MouseButton button);
 
-		/// Checks if a certain button is double clicked
+		/**
+		* @brief Checks if a button is currently double clicked
+		* @param[in] button (snuffbox::MouseEnums::MouseButton) The button in question
+		* @return (bool) The result
+		*/
 		bool IsDoubleClicked(MouseEnums::MouseButton button);
 
 
-		/// Returns the position of the mouse
+		/**
+		* @return (std::tuple<double, double>) The position of the mouse
+		*/
 		std::tuple<double, double> position(){ return std::tuple<double, double>(x_,y_); }
 
-		/// Returns the movement of the mouse
+		/**
+		* @return (std::tuple<double, double>) The movement of the mouse
+		*/
 		std::tuple<double, double> movement(){ return std::tuple<double, double>(dx_, dy_); }
 
 	private:
-		MouseButtonState buttonStates_[5]; //!< The button states of every button
-		float x_, y_;											 //!< X and Y position of the mouse
-		float dx_, dy_;										 //!< The movement of the mouse
-		float prevX_, prevY_;							 //!< The previous mouse position
-		std::queue<MouseData> queue_;			 //!< The queue to handle messages from
+		MouseButtonState button_states_[5]; //!< The button states of every button
+		float x_, y_;											  //!< X and Y position of the mouse
+		float dx_, dy_;										  //!< The movement of the mouse
+		float prev_x_, prev_y_;							//!< The previous mouse position
+		std::queue<MouseData> queue_;			  //!< The queue to handle messages from
 
 	public:
 		JS_NAME(Mouse);

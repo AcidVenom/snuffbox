@@ -11,8 +11,8 @@ namespace snuffbox
 	*/
 	struct Shaders
 	{
-		VertexShader* vs;
-		PixelShader* ps;
+		VertexShader* vs; //!< The vertex shader
+		PixelShader* ps; //!< The pixel shader
 	};
 
 	/**
@@ -23,7 +23,10 @@ namespace snuffbox
 	class Shader
 	{
 	public:
-		/// Default constructor with a path
+		/**
+		* @brief Construct through a path
+		* @param[in] path (std::string) The path
+		*/
 		Shader(std::string path);
 
 		/// Default destructor
@@ -32,14 +35,19 @@ namespace snuffbox
 		/// Destroys the loaded shader
 		void Destroy();
 
-		/// Reloads the loaded shader
+		/**
+		* @brief Reloads the loaded shader
+		* @param[in] path (std::string) The path to reload from
+		*/
 		void Reload(std::string path);
 
-		/// Returns both shaders
+		/**
+		* @return (snuffbox::Shaders) Both the vertex and the pixel shader in a structure
+		*/
 		Shaders shaders(){ return Shaders{ vs_, ps_ }; }
 		
 	private:
-		VertexShader* vs_;
-		PixelShader* ps_;
+		VertexShader* vs_; //!< The vertex shader
+		PixelShader* ps_; //!< The pixel shader
 	};
 }

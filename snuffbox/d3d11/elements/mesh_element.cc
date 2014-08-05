@@ -31,12 +31,12 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Mesh::SetBuffers()
 	{
-		if (vertex_buffer_ == model_->vertices() && model_->shouldReload())
+		if (vertex_buffer_ == model_->vertices() && model_->should_reload())
 		{
-			model_->disableReload();
+			model_->DisableReload();
 		}
 
-		if (model_->shouldReload())
+		if (model_->should_reload())
 		{
 			Create();
 		}

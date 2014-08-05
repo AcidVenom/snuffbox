@@ -29,9 +29,9 @@ namespace snuffbox
 	{
 		for (unsigned int i = 0; i < 255; ++i)
 		{
-			keyStates_[i].pressed = false;
-			keyStates_[i].down = false;
-			keyStates_[i].released = false;
+			key_states_[i].pressed = false;
+			key_states_[i].down = false;
+			key_states_[i].released = false;
 		}
 
 		environment::globalInstance = this;
@@ -42,27 +42,27 @@ namespace snuffbox
 	{
 		for (unsigned int i = 0; i < 255; ++i)
 		{
-			keyStates_[i].pressed = false;
-			keyStates_[i].released = false;
+			key_states_[i].pressed = false;
+			key_states_[i].released = false;
 		}
 	}
 
 	//--------------------------------------------------------------------------------------
 	bool Keyboard::IsPressed(Key key)
 	{
-		return keyStates_[key].pressed;
+		return key_states_[key].pressed;
 	}
 
 	//--------------------------------------------------------------------------------------
 	bool Keyboard::IsDown(Key key)
 	{
-		return keyStates_[key].down;
+		return key_states_[key].down;
 	}
 
 	//--------------------------------------------------------------------------------------
 	bool Keyboard::IsReleased(Key key)
 	{
-		return keyStates_[key].released;
+		return key_states_[key].released;
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -83,15 +83,15 @@ namespace snuffbox
 			switch (evt.type)
 			{
 			case KeyboardEnums::KeyEvent::kPressed:
-				if (!keyStates_[evt.key].down)
-					keyStates_[evt.key].pressed = true;
+				if (!key_states_[evt.key].down)
+					key_states_[evt.key].pressed = true;
 				
-				keyStates_[evt.key].down = true;
+				key_states_[evt.key].down = true;
 				break;
 
 			case KeyboardEnums::KeyEvent::kReleased:
-				keyStates_[evt.key].down = false;
-				keyStates_[evt.key].released = true;
+				key_states_[evt.key].down = false;
+				key_states_[evt.key].released = true;
 				break;
 			}
 

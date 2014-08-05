@@ -19,9 +19,9 @@ namespace snuffbox
 		yaw_ = 0.0f;
 		pitch_ = 0.0f;
 		roll_ = 0.0f;
-		camForward_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-		camRight_ = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-		viewMatrix_ = XMMatrixIdentity();
+		cam_forward_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		cam_right_ = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+		view_matrix_ = XMMatrixIdentity();
 
 		if (strcmp(wrapper.GetString(0).c_str(), "orthographic") == 0)
 		{
@@ -45,9 +45,9 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	void Camera::TranslateBy(float x, float y, float z)
 	{
-		moveLeftRight_ = x;
-		moveUpDown_ = y;
-		moveBackForward_ = z;
+		move_left_right_ = x;
+		move_up_down_ = y;
+		move_back_forward_ = z;
 	}
 
 	//------------------------------------------------------------------------------
@@ -90,27 +90,27 @@ namespace snuffbox
 	}
 
 	//------------------------------------------------------------------------------
-	XMMATRIX& Camera::view()
+	XMMATRIX& Camera::view_matrix()
 	{
 		rotation_ = XMMatrixRotationRollPitchYaw(yaw_, pitch_, roll_);
 		target_ = XMVector3TransformCoord(forward_, rotation_);
 		target_ = XMVector3Normalize(target_);
 
-		camRight_ = XMVector3TransformCoord(right_, rotation_);
-		camForward_ = XMVector3TransformCoord(forward_, rotation_);
-		up_ = XMVector3Cross(camForward_, camRight_);
+		cam_right_ = XMVector3TransformCoord(right_, rotation_);
+		cam_forward_ = XMVector3TransformCoord(forward_, rotation_);
+		up_ = XMVector3Cross(cam_forward_, cam_right_);
 
-		translation_ += moveLeftRight_ * camRight_;
-		translation_ += moveBackForward_ * camForward_;
-		translation_ += moveUpDown_ * up_;
+		translation_ += move_left_right_ * cam_right_;
+		translation_ += move_back_forward_ * cam_forward_;
+		translation_ += move_up_down_ * up_;
 
 		target_ = translation_ + target_;
 
-		viewMatrix_ = XMMatrixLookAtLH(translation_, target_, up_);
-		moveLeftRight_ = 0.0f;
-		moveBackForward_ = 0.0f;
-		moveUpDown_ = 0.0f;
-		return viewMatrix_;
+		view_matrix_ = XMMatrixLookAtLH(translation_, target_, up_);
+		move_left_right_ = 0.0f;
+		move_back_forward_ = 0.0f;
+		move_up_down_ = 0.0f;
+		return view_matrix_;
 	}
 
 	//------------------------------------------------------------------------------

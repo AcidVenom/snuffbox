@@ -39,8 +39,8 @@ namespace snuffbox
 				vertex.normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 				vertex.binormal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 				vertex.tangent = XMFLOAT3(0.0f, 1.0f, 0.0f);
-				vertex.texCoord = XMFLOAT2(static_cast<float>(x) / w_, 1.0f-(static_cast<float>(y) / h_));
-				vertex.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+				vertex.tex_coord = XMFLOAT2(static_cast<float>(x) / w_, 1.0f-(static_cast<float>(y) / h_));
+				vertex.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 				vertices().push_back(vertex);
 			}

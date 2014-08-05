@@ -8,10 +8,10 @@ namespace snuffbox
 {
 	//----------------------------------------------------------------------------------------
 	FBXModel::FBXModel(const std::vector<Vertex>& verts, std::string relativePath) :
-		shouldReload_(false)
+		should_reload_(false)
 	{
 		vertices_ = environment::render_device().CreateVertexBuffer(verts);
-		vertexCount_ = static_cast<unsigned int>(verts.size());
+		vertex_count_ = static_cast<unsigned int>(verts.size());
 
 		std::string path = environment::game().path() + "/" + relativePath;
 		environment::file_watcher().AddFile(path, relativePath, FileType::kModel);
@@ -25,9 +25,9 @@ namespace snuffbox
 
 		std::vector<Vertex> verts = environment::fbx_loader().Load(relativePath);
 		vertices_ = environment::render_device().CreateVertexBuffer(verts);
-		vertexCount_ = static_cast<unsigned int>(verts.size());
+		vertex_count_ = static_cast<unsigned int>(verts.size());
 
-		shouldReload_ = true;
+		should_reload_ = true;
 	}
 
 	//----------------------------------------------------------------------------------------

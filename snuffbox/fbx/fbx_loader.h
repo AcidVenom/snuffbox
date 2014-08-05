@@ -19,17 +19,28 @@ namespace snuffbox
 		/// Default destructor
 		~FBXLoader();
 
-		/// Loads a model from a given path, returning the list of vertices
+		/**
+		* @brief Loads a model from a given path, returning the list of vertices
+		* @param[in] path (std::string) The path to load from
+		* @return (std::vector<Vertex>) The list of vertices of the model
+		*/
 		std::vector<Vertex> Load(std::string path);
 
-		/// Loads an FBX scene from a file path
+		/**
+		* @brief Loads an FBX scene from a file path
+		* @param[in] path (std::string) The path to load from
+		*/
 		void LoadScene(std::string path);
 
-		/// Retrieves mesh data
+		/**
+		* @brief Retrieves all mesh data necessary
+		* @param[out] vertsOut (std::vector<Vertex>*) The vertex vector to fill with vertex information
+		* @param[in] mesh (FbxMesh*) The mesh to load the information from
+		*/
 		void GetMeshData(std::vector<Vertex>* vertsOut, FbxMesh* mesh);
 
 	private:
-		FbxManager*			fbxManager_; //!< The FBX manager from the SDK
-		FbxScene*				fbxScene_; //!< The FBX scene to use
+		FbxManager*			fbx_manager_; //!< The FBX manager from the SDK
+		FbxScene*				fbx_scene_; //!< The FBX scene to use
 	};
 }

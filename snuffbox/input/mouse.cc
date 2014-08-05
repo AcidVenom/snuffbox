@@ -44,25 +44,25 @@ namespace snuffbox
 	//--------------------------------------------------------------------------------------
 	bool Mouse::IsDown(MouseEnums::MouseButton button)
 	{
-		return buttonStates_[button].down;
+		return button_states_[button].down;
 	}
 
 	//--------------------------------------------------------------------------------------
 	bool Mouse::IsPressed(MouseEnums::MouseButton button)
 	{
-		return buttonStates_[button].pressed;
+		return button_states_[button].pressed;
 	}
 
   //--------------------------------------------------------------------------------------
 	bool Mouse::IsReleased(MouseEnums::MouseButton button)
   {
-    return buttonStates_[button].released;
+    return button_states_[button].released;
   }
 
 	//--------------------------------------------------------------------------------------
 	bool Mouse::IsDoubleClicked(MouseEnums::MouseButton button)
 	{
-		return buttonStates_[button].dblclk;
+		return button_states_[button].dblclk;
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -227,9 +227,9 @@ namespace snuffbox
 	{
 		for (unsigned int i = 0; i < 5; ++i)
 		{
-			buttonStates_[i].pressed = false;
-			buttonStates_[i].released = false;
-			buttonStates_[i].dblclk = false;
+			button_states_[i].pressed = false;
+			button_states_[i].released = false;
+			button_states_[i].dblclk = false;
 		}
 	}
 
@@ -253,12 +253,12 @@ namespace snuffbox
 			switch (evt.type)
 			{
 			case MouseEnums::MouseEvent::kWheel:
-				buttonStates_[evt.button].pressed = true;
+				button_states_[evt.button].pressed = true;
 				break;
 
 			case MouseEnums::MouseEvent::kDblClk:
-				buttonStates_[evt.button].down = true;
-				buttonStates_[evt.button].dblclk = true;
+				button_states_[evt.button].down = true;
+				button_states_[evt.button].dblclk = true;
 				x_ = evt.x;
 				y_ = evt.y;
 				break;
@@ -269,30 +269,30 @@ namespace snuffbox
 				break;
 
 			case MouseEnums::MouseEvent::kPressed:
-        buttonStates_[evt.button].down = true;
-        buttonStates_[evt.button].pressed = true;
+        button_states_[evt.button].down = true;
+        button_states_[evt.button].pressed = true;
         x_ = evt.x;
         y_ = evt.y;
         break;
 
 			case MouseEnums::MouseEvent::kDown:
-				buttonStates_[evt.button].down = true;
+				button_states_[evt.button].down = true;
 				x_ = evt.x;
 				y_ = evt.y;
 				break;
 
 			case MouseEnums::MouseEvent::kUp:
-				buttonStates_[evt.button].down = false;
-				buttonStates_[evt.button].released = true;
+				button_states_[evt.button].down = false;
+				button_states_[evt.button].released = true;
 				break;
 			}
 			queue_.pop();
 		}
 
-		dx_ = x_ - prevX_;
-		dy_ = y_ - prevY_;
+		dx_ = x_ - prev_x_;
+		dy_ = y_ - prev_y_;
 
-		prevX_ = x_;
-		prevY_ = y_;
+		prev_x_ = x_;
+		prev_y_ = y_;
 	}
 }

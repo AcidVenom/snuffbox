@@ -27,18 +27,18 @@ namespace snuffbox
 {
 	//----------------------------------------------------------------------------------------
 	FBXLoader::FBXLoader() : 
-		fbxManager_(nullptr),
-		fbxScene_(nullptr)
+		fbx_manager_(nullptr),
+		fbx_scene_(nullptr)
 	{
-		fbxManager_ = FbxManager::Create();
-		SNUFF_ASSERT_NOTNULL(fbxManager_);
-		SNUFF_LOG_INFO(std::string("FBX SDK version " + std::string(fbxManager_->GetVersion())).c_str());
+		fbx_manager_ = FbxManager::Create();
+		SNUFF_ASSERT_NOTNULL(fbx_manager_);
+		SNUFF_LOG_INFO(std::string("FBX SDK version " + std::string(fbx_manager_->GetVersion())).c_str());
 
-		FbxIOSettings* ioSettings = FbxIOSettings::Create(fbxManager_, IOSROOT);
-		fbxManager_->SetIOSettings(ioSettings);
+		FbxIOSettings* ioSettings = FbxIOSettings::Create(fbx_manager_, IOSROOT);
+		fbx_manager_->SetIOSettings(ioSettings);
 
-		fbxScene_ = FbxScene::Create(fbxManager_, "FBX_Scene");
-		SNUFF_ASSERT_NOTNULL(fbxScene_);
+		fbx_scene_ = FbxScene::Create(fbx_manager_, "FBX_Scene");
+		SNUFF_ASSERT_NOTNULL(fbx_scene_);
 
 		environment::globalInstance = this;
 	}
@@ -46,15 +46,15 @@ namespace snuffbox
 	//----------------------------------------------------------------------------------------
 	std::vector<Vertex> FBXLoader::Load(std::string path)
 	{
-		SNUFF_ASSERT_NOTNULL(fbxManager_);
+		SNUFF_ASSERT_NOTNULL(fbx_manager_);
 		bool result = true;
 		std::string full_path = environment::game().path() + "/" + path;
 		LoadScene(full_path);
 		
-		SNUFF_ASSERT_NOTNULL(fbxScene_);
+		SNUFF_ASSERT_NOTNULL(fbx_scene_);
 		std::vector<Vertex> temp;
 
-		FbxNode* node = fbxScene_->GetRootNode()->GetChild(0);
+		FbxNode* node = fbx_scene_->GetRootNode()->GetChild(0);
 		if (node)
 		{
 			FbxMesh* mesh = node->GetMesh();
@@ -70,29 +70,29 @@ namespace snuffbox
 	//----------------------------------------------------------------------------------------
 	void FBXLoader::LoadScene(std::string path)
 	{
-		SNUFF_ASSERT_NOTNULL(fbxManager_);
+		SNUFF_ASSERT_NOTNULL(fbx_manager_);
 		int fileMajorVersion, fileMinorVersion, fileRevision;
 		bool result = true;
 
-		FbxImporter* fbxImporter = FbxImporter::Create(fbxManager_, "");
+		FbxImporter* fbxImporter = FbxImporter::Create(fbx_manager_, "");
 
-		result = fbxImporter->Initialize(path.c_str(), -1, fbxManager_->GetIOSettings());
+		result = fbxImporter->Initialize(path.c_str(), -1, fbx_manager_->GetIOSettings());
 		SNUFF_XASSERT(result == true, std::string("Failed importing " + path + " into the FBX manager!\n" + std::string(fbxImporter->GetStatus().GetErrorString())).c_str());
 		fbxImporter->GetFileVersion(fileMajorVersion, fileMinorVersion, fileRevision);
 
 		if (fbxImporter->IsFBX())
 		{
 			SNUFF_LOG_DEBUG(std::string("FBX file version " + std::to_string(fileMajorVersion) + "." + std::to_string(fileMinorVersion) + "." + std::to_string(fileRevision)).c_str());
-			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_MATERIAL, false);
-			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_TEXTURE, true);
-			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_LINK, false);
-			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_SHAPE, true);
-			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_GOBO, false);
-			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_ANIMATION, false);
-			fbxManager_->GetIOSettings()->SetBoolProp(IMP_FBX_GLOBAL_SETTINGS, true);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_MATERIAL, false);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_TEXTURE, true);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_LINK, false);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_SHAPE, true);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_GOBO, false);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_ANIMATION, false);
+			fbx_manager_->GetIOSettings()->SetBoolProp(IMP_FBX_GLOBAL_SETTINGS, true);
 		}
 
-		result = fbxImporter->Import(fbxScene_);
+		result = fbxImporter->Import(fbx_scene_);
 		SNUFF_XASSERT(result == true, "Failed importing the file to the FBX scene!");
 
 		fbxImporter->Destroy();
@@ -162,7 +162,7 @@ namespace snuffbox
 					vert.binormal.x = binormal.mData[0];
 					vert.binormal.z = -binormal.mData[1];
 					vert.binormal.y = binormal.mData[2];
-					vert.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+					vert.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 					vertsOut->push_back(vert);
 				}
@@ -184,8 +184,8 @@ namespace snuffbox
 				
 						FbxVector2 uv = uvElement->GetDirectArray().GetAt(uvIndex);
 						
-						vertsOut->at(count).texCoord.x = uv.mData[0];
-						vertsOut->at(count).texCoord.y = -uv.mData[1];
+						vertsOut->at(count).tex_coord.x = uv.mData[0];
+						vertsOut->at(count).tex_coord.y = -uv.mData[1];
 
 						++count;
 					}
@@ -207,8 +207,8 @@ namespace snuffbox
 
 							FbxVector2 uv = uvElement->GetDirectArray().GetAt(uvIndex);
 
-							vertsOut->at(count).texCoord.x = uv.mData[0];
-							vertsOut->at(count).texCoord.y = -uv.mData[1];
+							vertsOut->at(count).tex_coord.x = uv.mData[0];
+							vertsOut->at(count).tex_coord.y = -uv.mData[1];
 
 							++count;
 							++polyCounter;
@@ -224,7 +224,7 @@ namespace snuffbox
 	//----------------------------------------------------------------------------------------
 	FBXLoader::~FBXLoader()
 	{
-		fbxManager_->Destroy();
+		fbx_manager_->Destroy();
 		environment::globalInstance = nullptr;
 	}
 }

@@ -31,8 +31,8 @@ namespace snuffbox
 	*/
 	struct KeyData
 	{
-		KeyboardEnums::KeyEvent type;
-		Key key;
+		KeyboardEnums::KeyEvent type; //!< The key event type
+		Key key; //!< The key in question
 	};
 
 	/**
@@ -42,7 +42,9 @@ namespace snuffbox
 	*/
 	struct KeyState
 	{
-		bool pressed, down, released;
+		bool pressed; //!< Was the key pressed?
+		bool down; //!< Is the key down?
+		bool released; //!< Was the key released?
 	};
 
 	/**
@@ -59,26 +61,41 @@ namespace snuffbox
 		/// Default destructor
 		~Keyboard();
 
-		/// Checks if a key is currently pressed
+		/**
+		* @brief Checks if a key is currently pressed
+		* @param[in] key (snuffbox::Key) The key in question
+		* @return (bool) The result
+		*/
 		bool IsPressed(Key key);
 
-		/// Checks if a key is currently down
+		/**
+		* @brief Checks if a key is currently down
+		* @param[in] key (snuffbox::Key) The key in question
+		* @return (bool) The result
+		*/
 		bool IsDown(Key key);
 
-		/// Checks if a key is currently released
+		/**
+		* @brief Checks if a key is currently released
+		* @param[in] key (snuffbox::Key) The key in question
+		* @return (bool) The result
+		*/
 		bool IsReleased(Key key);
 
 		/// Resets all keystates to their default value
 		void ResetStates();
 
-		/// Pushes an event into the queue
+		/**
+		* @brief Pushes an event into the queue
+		* @param[in] evt (snuffbox::KeyData) The key data to evaluate
+		*/
 		void ReceiveEvent(KeyData evt);
 
 		/// Updates the entire keyboard
 		void Update();
 
 	private:
-		KeyState keyStates_[255]; //!< All the states of every key
+		KeyState key_states_[255]; //!< All the states of every key
 		std::queue<KeyData> queue_; //!< The queue with key events
 
 	public:

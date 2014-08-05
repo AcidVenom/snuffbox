@@ -29,7 +29,7 @@ namespace snuffbox
 		{
 			return;
 		}
-		std::vector<RenderElement*>* vec = &environment::render_device().opaqueElements();
+		std::vector<RenderElement*>* vec = &environment::render_device().opaque_elements();
 		Destroy();
 		if (element_type() == ElementTypes::kTerrain)
 		{
@@ -46,7 +46,7 @@ namespace snuffbox
 		}
 		else if (element_type() == ElementTypes::kWidget)
 		{
-			vec = &environment::render_device().uiElements();
+			vec = &environment::render_device().ui_elements();
 
 			for (unsigned int i = 0; i < vec->size(); ++i)
 			{
@@ -61,7 +61,7 @@ namespace snuffbox
 		}
 		else
 		{
-			vec = &environment::render_device().renderElements();
+			vec = &environment::render_device().render_elements();
 
 			for (unsigned int i = 0; i < vec->size(); ++i)
 			{
@@ -94,15 +94,15 @@ namespace snuffbox
 		{
 			if (element_type() == ElementTypes::kTerrain)
 			{
-				environment::render_device().opaqueElements().push_back(this);
+				environment::render_device().opaque_elements().push_back(this);
 			}
 			else if (element_type() == ElementTypes::kWidget)
 			{
-				environment::render_device().uiElements().push_back(this);
+				environment::render_device().ui_elements().push_back(this);
 			}
 			else
 			{
-				environment::render_device().renderElements().push_back(this);
+				environment::render_device().render_elements().push_back(this);
 			}
 
 			destroyed_ = false;

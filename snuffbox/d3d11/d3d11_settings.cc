@@ -42,7 +42,7 @@ namespace snuffbox
 	D3D11Settings::D3D11Settings()
 	{
 		environment::globalInstance = this;
-		settings_.bufferColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+		settings_.buffer_colour = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	//-------------------------------------------------------------------------------
@@ -56,9 +56,9 @@ namespace snuffbox
 	{
 		JS_CHECK_PARAMS("N");
 		unsigned int mode = wrapper.GetNumber<unsigned int>(0);
-		environment::render_settings().settings().cullMode = static_cast<D3D11_CULL_MODE>(mode);
-		environment::render_device().SetCullMode(environment::render_settings().settings().cullMode);
-		SNUFF_LOG_INFO(std::string("[Settings] Cull mode: " + std::string(CullModeToString(environment::render_settings().settings().cullMode))).c_str());
+		environment::render_settings().settings().cull_mode = static_cast<D3D11_CULL_MODE>(mode);
+		environment::render_device().SetCullMode(environment::render_settings().settings().cull_mode);
+		SNUFF_LOG_INFO(std::string("[Settings] Cull mode: " + std::string(CullModeToString(environment::render_settings().settings().cull_mode))).c_str());
 	}
 
 	//-------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------
-	void D3D11Settings::JSSetBackBufferColor(JS_ARGS)
+	void D3D11Settings::JSSetBackBufferColour(JS_ARGS)
 	{
 		JS_CHECK_PARAMS("NNNN");
 		float rgb[4] = { 
@@ -107,9 +107,9 @@ namespace snuffbox
 			wrapper.GetNumber<float>(2), 
 			wrapper.GetNumber<float>(3) 
 		};
-		environment::render_settings().settings().bufferColor = D3DXCOLOR(rgb);
+		environment::render_settings().settings().buffer_colour = D3DXCOLOR(rgb);
 		
-		SNUFF_LOG_INFO(std::string("[Settings] Changed back buffer color to: (" + std::to_string(rgb[0]) + "," + std::to_string(rgb[1]) + "," + std::to_string(rgb[2]) + "," + std::to_string(rgb[3]) + ")").c_str());
+		SNUFF_LOG_INFO(std::string("[Settings] Changed back buffer colour to: (" + std::to_string(rgb[0]) + "," + std::to_string(rgb[1]) + "," + std::to_string(rgb[2]) + "," + std::to_string(rgb[3]) + ")").c_str());
 	}
 
 	//-------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ namespace snuffbox
 			JSFunctionRegister("setFullscreen", JSSetFullscreen),
 			JSFunctionRegister("setResolution", JSSetResolution),
 			JSFunctionRegister("setVsync", JSSetVsync),
-			JSFunctionRegister("setBackBufferColor", JSSetBackBufferColor),
+			JSFunctionRegister("setBackBufferColour", JSSetBackBufferColour),
 			JSFunctionRegister("resolution", JSResolution),
 			JSFunctionRegister("setWindowSize", JSSetWindowSize)
 		};

@@ -177,6 +177,10 @@ namespace snuffbox
 
 	// Oh God I don't like this at all
 
-	/// Converts a string to a key
+	/**
+	* @brief Converts a string to a key
+	* @param[in] name (const char*) The key name
+	* @return (snuffbox::Key) The actual converted key
+	*/
 	Key StringToKey(const char* name);
 }
