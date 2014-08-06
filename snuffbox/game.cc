@@ -66,7 +66,8 @@ device_(environment::memory().ConstructShared<D3D11DisplayDevice>()),
 path_(""),
 gameTime_(0),
 qtApp_(app),
-shouldQuit_(false)
+shouldQuit_(false),
+deltaTime_(0.0)
 {
 	environment::globalInstance = this;
 	ParseCommandLine();
@@ -381,8 +382,8 @@ void Game::CreateCallbacks()
 //------------------------------------------------------------------------------------------------------
 void Game::Run()
 {
+  Update();
 	Draw();
-	Update();
 }
 
 //------------------------------------------------------------------------------------------------------

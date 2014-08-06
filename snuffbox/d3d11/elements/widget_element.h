@@ -68,7 +68,7 @@ namespace snuffbox
 		* @param[in] camera (snuffbox::Camera*) The currently in-use camera
 		* @return (XMMATRIX&) The calculated world matrix
 		*/
-		XMMATRIX& World(Camera* camera);
+    XMMATRIX& world_matrix(Camera* camera);
 
 	private:
 		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer of this element

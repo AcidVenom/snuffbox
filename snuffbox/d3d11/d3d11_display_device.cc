@@ -969,7 +969,7 @@ namespace snuffbox
 		SwapChainDescription swapDesc;
 		swap_chain_->GetDesc(&swapDesc);
 
-		projection_matrix_ = XMMatrixOrthographicRH(swapDesc.BufferDesc.Width, swapDesc.BufferDesc.Height, 1.0f, 1000.0f);
+    projection_matrix_ = XMMatrixOrthographicRH(environment::render_settings().settings().resolution.w, environment::render_settings().settings().resolution.h, 1.0f, 1000.0f);
 		view_matrix_ = XMMatrixIdentity();
 
 		for (int idx = static_cast<int>(ui_elements_.size() - 1); idx >= 0; --idx)
@@ -999,13 +999,16 @@ namespace snuffbox
 
 		SwapChainDescription swapDesc;
 		swap_chain_->GetDesc(&swapDesc);
+    unsigned int w = environment::render_settings().settings().resolution.w;
+    unsigned int h = environment::render_settings().settings().resolution.h;
+
 		if (camera->type() == Camera::CameraType::kOrthographic)
 		{
-			projection_matrix_ = XMMatrixOrthographicRH(environment::render_settings().settings().resolution.w, environment::render_settings().settings().resolution.h, 1.0f, 1000.0f);
+      projection_matrix_ = XMMatrixOrthographicRH(w, h, 1.0f, 1000.0f);
 		}
 		else
 		{
-			projection_matrix_ = XMMatrixPerspectiveFovRH(camera->fov(), static_cast<float>(swapDesc.BufferDesc.Width / swapDesc.BufferDesc.Height), 1.0f, 1000.0f);
+      projection_matrix_ = XMMatrixPerspectiveFovRH(camera->fov(), static_cast<float>(w / h), 1.0f, 1000.0f);
 		}
 	}
 

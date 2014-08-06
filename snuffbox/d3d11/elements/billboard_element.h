@@ -32,7 +32,7 @@ namespace snuffbox
 		* @param[in] camera (snuffbox::Camera*) The camera to use and to billboard to
 		* @return (XMMATRIX&) The ouput world matrix
 		*/
-		XMMATRIX& World(Camera* camera);
+    XMMATRIX& world_matrix(Camera* camera);
 
 		/**
 		* @return (snuffbox::VertexBufferType) The vertex buffer type
