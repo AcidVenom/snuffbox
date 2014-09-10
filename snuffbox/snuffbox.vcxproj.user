@@ -9,7 +9,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-source-directory=C:/Users/Administrator/Desktop/tiny-quest -console -reload</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-source-directory=C:/Programming/tiny-quest -console -reload</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

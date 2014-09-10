@@ -317,6 +317,16 @@ namespace snuffbox
 			renderPtr->RemoveFromRenderer();
 		}
 
+		Camera* cameraPtr = dynamic_cast<Camera*>(ptr);
+
+		if (cameraPtr)
+		{
+			if (environment::has_render_device())
+			{
+				environment::render_device().SetCamera(nullptr);
+			}
+		}
+
 		int64_t size = -static_cast<int64_t>(sizeof(ptr));
 		ptr->persistent().Reset();
 		environment::memory().Destruct<JSObject>(ptr);

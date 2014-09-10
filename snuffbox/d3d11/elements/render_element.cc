@@ -92,21 +92,14 @@ namespace snuffbox
 	{
 		if (destroyed_ == true)
 		{
-			if (element_type() == ElementTypes::kTerrain)
-			{
-				environment::render_device().opaque_elements().push_back(this);
-			}
-			else if (element_type() == ElementTypes::kWidget)
-			{
-				environment::render_device().ui_elements().push_back(this);
-			}
-			else
-			{
-				environment::render_device().render_elements().push_back(this);
-			}
-
-			destroyed_ = false;
+			environment::render_device().render_queue().push(this);
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::set_destroyed(bool value)
+	{
+		destroyed_ = value;
 	}
 
 	//-------------------------------------------------------------------------------------------

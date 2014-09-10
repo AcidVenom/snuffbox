@@ -275,6 +275,12 @@ namespace snuffbox
 		*/
 		float z(){ return z_; }
 
+		/**
+		* @brief Sets if this element is destroyed or not
+		* @param[in] value (bool) The destroyed state to set
+		*/
+		void set_destroyed(bool value);
+
 	private:
 		std::vector<Vertex>										vertices_; //!< The vertices
 		std::vector<unsigned int>							indices_; //!< The indices
@@ -304,6 +310,7 @@ namespace snuffbox
 		XMFLOAT3															blend_;	//!< The blend color of this render element
 		bool																	visible_; //!< Is this element visible?
 		std::string														name_;	 //!< The render element name
+		bool																	spawned_; //!< Has this element already been spawned?
 
 	public:
 		static void RegisterJS(JS_TEMPLATE);

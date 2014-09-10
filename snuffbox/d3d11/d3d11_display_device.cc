@@ -972,9 +972,20 @@ namespace snuffbox
     projection_matrix_ = XMMatrixOrthographicRH(environment::render_settings().settings().resolution.w, environment::render_settings().settings().resolution.h, 1.0f, 1000.0f);
 		view_matrix_ = XMMatrixIdentity();
 
+		struct RenderSorterByZ
+		{
+			inline bool operator()(RenderElement* a, RenderElement* b)
+			{
+				return (a->z() > b->z());
+			}
+		} RenderSorterByZ;
+
+		std::sort(ui_elements_.begin(), ui_elements_.end(), RenderSorterByZ);
+
 		for (int idx = static_cast<int>(ui_elements_.size() - 1); idx >= 0; --idx)
 		{
 			it = ui_elements_[idx];
+
 			DrawRenderElement(it);
 
 			if (it->destroyed())
@@ -1016,12 +1027,46 @@ namespace snuffbox
 	void D3D11DisplayDevice::EndDraw()
 	{
 		swap_chain_->Present(environment::render_settings().settings().vsync, 0);
+		std::map<RenderElement*, bool> exists;
+		while (!render_queue_.empty())
+		{
+			RenderElement* it = render_queue_.front();
+			render_queue_.pop();
+
+			if (exists.find(it) != exists.end())
+			{
+				continue;
+			}
+
+			exists.emplace(it, true);
+
+			if (it->element_type() == RenderElement::ElementTypes::kTerrain)
+			{
+				environment::render_device().opaque_elements().push_back(it);
+			}
+			else if (it->element_type() == RenderElement::ElementTypes::kWidget)
+			{
+				environment::render_device().ui_elements().push_back(it);
+			}
+			else
+			{
+				environment::render_device().render_elements().push_back(it);
+			}
+
+			it->set_destroyed(false);
+		}
 		lines_.clear();
 		if (line_buffer_)
 		{
 			line_buffer_->Release();
 			line_buffer_ = nullptr;
 		}
+	}
+
+	//---------------------------------------------------------------------------------
+	std::queue<RenderElement*>& D3D11DisplayDevice::render_queue()
+	{
+		return render_queue_;
 	}
 
 	//---------------------------------------------------------------------------------
