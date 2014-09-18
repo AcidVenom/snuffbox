@@ -14,7 +14,7 @@ namespace snuffbox
 	{
 		JS_CHECK_PARAMS("S");
 		up_ = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-		translation_ = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		translation_ = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 		target_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		yaw_ = 0.0f;
 		pitch_ = 0.0f;

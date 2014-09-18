@@ -22,7 +22,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 1
-#define SNUFF_VERSION_MINOR 9
+#define SNUFF_VERSION_MINOR 91
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -145,9 +145,9 @@ void Game::Draw()
 	};
 
 	environment::render_device().StartDraw();
-	draw_.Call(1, argv);
 	environment::render_device().Draw();
 	environment::render_device().EndDraw();
+	draw_.Call(1, argv);
 
 	high_resolution_clock::time_point now = high_resolution_clock::now();
 	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime_);

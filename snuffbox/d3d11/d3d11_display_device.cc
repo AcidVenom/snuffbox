@@ -741,7 +741,6 @@ namespace snuffbox
 				std::sort(render_elements_.begin(), render_elements_.end(), RenderSorterDistance);
 			}
 		}
-		camera_ = nullptr;
 	}
 
 	//---------------------------------------------------------------------------------
@@ -993,6 +992,8 @@ namespace snuffbox
 				ui_elements_.erase(ui_elements_.begin() + idx);
 			}
 		}
+
+		camera_ = nullptr;
 	}
 
 	//---------------------------------------------------------------------------------
