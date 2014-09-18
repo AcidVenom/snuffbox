@@ -14,6 +14,7 @@ namespace snuffbox
 		element_type_(type),
 		shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get()),
 		destroyed_(true),
+		spawned_(false),
 		distance_from_camera_(0.0f),
 		alpha_(1.0f),
 		blend_(1.0f, 1.0f, 1.0f),
@@ -86,6 +87,11 @@ namespace snuffbox
 		return world_matrix_;
 	}
 
+	//-------------------------------------------------------------------------------------------
+	bool RenderElement::spawned()
+	{
+		return spawned_;
+	}
 
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::Spawn()
@@ -93,6 +99,7 @@ namespace snuffbox
 		if (destroyed_ == true)
 		{
 			environment::render_device().render_queue().push(this);
+			spawned_ = true;
 		}
 	}
 
@@ -112,6 +119,7 @@ namespace snuffbox
 	void RenderElement::Destroy()
 	{
 		destroyed_ = true;
+		spawned_ = false;
 	}
 
 	//-------------------------------------------------------------------------------------------

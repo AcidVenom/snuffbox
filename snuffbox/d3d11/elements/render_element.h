@@ -281,6 +281,11 @@ namespace snuffbox
 		*/
 		void set_destroyed(bool value);
 
+		/**
+		* @return (bool) Is this element spawned, but not drawn yet?
+		*/
+		bool spawned();
+
 	private:
 		std::vector<Vertex>										vertices_; //!< The vertices
 		std::vector<unsigned int>							indices_; //!< The indices

@@ -1034,7 +1034,7 @@ namespace snuffbox
 			RenderElement* it = render_queue_.front();
 			render_queue_.pop();
 
-			if (exists.find(it) != exists.end())
+			if (exists.find(it) != exists.end() || !it->spawned())
 			{
 				continue;
 			}
