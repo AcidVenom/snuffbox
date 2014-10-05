@@ -423,7 +423,7 @@ namespace snuffbox
 			break;
 		case LogSeverity::kWarning:
 			fg = QColor(255, 185, 0);
-			bg = QColor(140, 110, 30);
+			bg = QColor(70, 65, 15);
 			break;
 		case LogSeverity::kError:
 			fg = QColor(255, 0, 0);

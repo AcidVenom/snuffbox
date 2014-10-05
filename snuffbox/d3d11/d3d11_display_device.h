@@ -249,6 +249,9 @@ namespace snuffbox
 		/// Creates the context blend state
 		void CreateBlendState();
 
+		/// Clears the renderer for new use
+		void Clear(){ render_elements_.clear(); opaque_elements_.clear(); ui_elements_.clear(); }
+
 		/**
 		* @brief Draws a given render element
 		* @param[in] it (snuffbox::RenderElement*) The render element to draw

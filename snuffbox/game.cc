@@ -22,7 +22,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 1
-#define SNUFF_VERSION_MINOR 92
+#define SNUFF_VERSION_MINOR 93
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -319,13 +319,20 @@ void Game::RegisterJS(JS_TEMPLATE)
 	JS_CREATE_SCOPE;
 
 	JSFunctionRegister funcs[] = {
-    JSFunctionRegister("render", JSRender),
+		JSFunctionRegister("render", JSRender),
+		JSFunctionRegister("clearRenderer", JSClearRenderer),
     JSFunctionRegister("cleanUp", JSCleanUp),
 		JSFunctionRegister("setName", JSSetName),
 		JSFunctionRegister("showConsole", JSShowConsole)
 	};
 
 	JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
+}
+
+//------------------------------------------------------------------------------------------------------
+void Game::JSClearRenderer(JS_ARGS)
+{
+	environment::render_device().Clear();
 }
 
 //------------------------------------------------------------------------------------------------------
