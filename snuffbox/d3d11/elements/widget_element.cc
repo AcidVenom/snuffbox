@@ -17,7 +17,6 @@ namespace snuffbox
 	{
 		JSWrapper wrapper(args);
 		Create();
-		SetScale(64, 0, 64);
 
 		if (args.Length() > 0)
 		{
@@ -85,6 +84,10 @@ namespace snuffbox
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "setAnchorRight"), Function::New(JS_ISOLATE, JSSetAnchorRight));
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "setAnchorTop"), Function::New(JS_ISOLATE, JSSetAnchorTop));
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "setAnchorBottom"), Function::New(JS_ISOLATE, JSSetAnchorBottom));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "removeAnchorTop"), Function::New(JS_ISOLATE, JSRemoveAnchorTop));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "removeAnchorBottom"), Function::New(JS_ISOLATE, JSRemoveAnchorBottom));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "removeAnchorLeft"), Function::New(JS_ISOLATE, JSRemoveAnchorLeft));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "removeAnchorRight"), Function::New(JS_ISOLATE, JSRemoveAnchorRight));
 	}
 
 	//-------------------------------------------------------------------------------
@@ -123,38 +126,78 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------
+	void Widget::JSRemoveAnchorTop(JS_ARGS)
+	{
+		JS_SETUP(Widget, "V");
+		self->RemoveAnchor(Widget::WidgetAnchor::kTop);
+	}
+
+	//-------------------------------------------------------------------------------
+	void Widget::JSRemoveAnchorBottom(JS_ARGS)
+	{
+		JS_SETUP(Widget, "V");
+		self->RemoveAnchor(Widget::WidgetAnchor::kBottom);
+	}
+
+	//-------------------------------------------------------------------------------
+	void Widget::JSRemoveAnchorLeft(JS_ARGS)
+	{
+		JS_SETUP(Widget, "V");
+		self->RemoveAnchor(Widget::WidgetAnchor::kLeft);
+	}
+
+	//-------------------------------------------------------------------------------
+	void Widget::JSRemoveAnchorRight(JS_ARGS)
+	{
+		JS_SETUP(Widget, "V");
+		self->RemoveAnchor(Widget::WidgetAnchor::kRight);
+	}
+
+	//-------------------------------------------------------------------------------
 	XMMATRIX Widget::anchor()
 	{
 		float w = static_cast<float>(environment::render_settings().settings().resolution.w);
 		float h = static_cast<float>(environment::render_settings().settings().resolution.h);
 
-		if (parent_)
+		float anchorLeftRight = 0, anchorTopBottom = 0;
+
+		if (parent_ != nullptr)
 		{
-			w = XMVectorGetX(parent_->scale());
-			h = XMVectorGetZ(parent_->scale());
+			XMVECTOR size = parent_->scale() * parent_->size();
+			w = XMVectorGetX(size);
+			h = XMVectorGetZ(size);
+
+			anchorLeftRight = w / 2;
+			anchorTopBottom = h / 2;
 		}
 
-		float offsetX, offsetZ;
-
-		if (!parent_)
+		if (anchors_[WidgetAnchor::kLeft] == 1)
 		{
-			offsetX = anchors_[WidgetAnchor::kLeft] == 0 ? -XMVectorGetX(scale()) : 0;
-			offsetZ = anchors_[WidgetAnchor::kBottom] == 0 ? -XMVectorGetZ(scale()) : 0;
+			anchorLeftRight = parent_ == nullptr ? -(w / 2) : 0;
 		}
-		else
-		{
-			offsetX = anchors_[WidgetAnchor::kLeft] == 1 ? XMVectorGetX(scale()) : 0;
-			offsetZ = anchors_[WidgetAnchor::kBottom] == 1 ? XMVectorGetZ(scale()) : 0;
-		}
-		
-		float anchorLeftRight = static_cast<float>(anchors_[WidgetAnchor::kRight] - anchors_[WidgetAnchor::kLeft]) * w / 2 + offsetX;
-		float anchorTopBottom = static_cast<float>(anchors_[WidgetAnchor::kTop] - anchors_[WidgetAnchor::kBottom]) * h / 2 + offsetZ;
 
-		if (parent_)
+		if (anchors_[WidgetAnchor::kRight] == 1)
 		{
-      XMVECTOR trans = XMVectorSet(parent_->world_matrix(nullptr)._41, parent_->world_matrix(nullptr)._42, parent_->world_matrix(nullptr)._43, parent_->world_matrix(nullptr)._44);
-			anchorLeftRight += XMVectorGetX(trans);
-			anchorTopBottom += XMVectorGetY(trans);
+			XMVECTOR vec = parent_ == nullptr ? scale() * size() : scale() * -size();
+			anchorLeftRight = w / 2 - XMVectorGetX(vec);
+		}
+
+		if (anchors_[WidgetAnchor::kTop] == 1)
+		{
+			XMVECTOR vec = parent_ == nullptr ? scale() * size() : scale() * -size();
+			anchorTopBottom = (h / 2) - XMVectorGetZ(vec);
+		}
+
+		if (anchors_[WidgetAnchor::kBottom] == 1)
+		{
+			anchorTopBottom = parent_ == nullptr ? -(h / 2) : 0;
+		}
+
+		if (parent_ != nullptr)
+		{
+			XMMATRIX& m = parent_->offset();
+			anchorLeftRight += m._41;
+			anchorTopBottom += m._43;
 		}
 
 		return XMMatrixTranslation(anchorLeftRight, anchorTopBottom, 0);
@@ -163,7 +206,10 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------
 	XMMATRIX& Widget::world_matrix(Camera* camera)
 	{
-		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * rotation() * XMMatrixTranslationFromVector(translation()) * anchor();
+		XMMATRIX trans = XMMatrixTranslationFromVector(translation());
+		trans._42 = -trans._42;
+
+		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * rotation() * trans * anchor();
 		return world_;
 	}
 }

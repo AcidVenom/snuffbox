@@ -1,73 +1,37 @@
-ContentManager.load("shader","shaders/custom.fx");
-ContentManager.load("shader","shaders/lighting.fx");
-ContentManager.load("texture","textures/snuffbox.png");
-ContentManager.load("model","models/axew.fbx");
-ContentManager.load("texture","textures/axew.png");
-ContentManager.load("model","models/totodile.fbx");
-ContentManager.load("texture","textures/totodile.png");
-ContentManager.load("model","models/gible.fbx");
-ContentManager.load("texture","textures/gible.png");
-ContentManager.load("model","models/scraggy.fbx");
-ContentManager.load("texture","textures/scraggy.png");
-ContentManager.load("texture","textures/normal.png");
-ContentManager.load("texture","textures/bricks.png");
+Game.viewport = Game.viewport || Widget.new();
+Game.viewport.setBlend(0,0,0.2);
+Game.viewport.setSize(640,480);
+Game.viewport.spawn();
+Game.viewport.setTranslation(0,0,10);
+Game.viewport.setOffset(0.5,0,0.5);
 
-var terrain = terrain || undefined;
-var widget = widget || undefined; 
-var widget2 = widget2 || undefined;
-var mesh = mesh || Mesh.new("models/axew.fbx");
-var mesh2 = mesh2 || Mesh.new("models/totodile.fbx");
-var mesh3 = mesh3 || Mesh.new("models/gible.fbx");
-var mesh4 = mesh4 || Mesh.new("models/scraggy.fbx");
+Game.widget = Game.widget || Widget.new();
+Game.widget.setBlend(1,0,0);
+Game.widget.setSize(64,64);
+Game.widget.setTranslation(0,0,50);
+Game.widget.setOffset(0.5,0,0.5);
+Game.widget.spawn();
 
-mesh.spawn();
-mesh.setTexture("textures/axew.png");
-mesh.setScale(10,10,10);
-mesh.setTranslation(30,0,-30);
-mesh.setRotation(0,0,0);
+Game.widget2 = Game.widget2 || Widget.new(Game.widget);
+Game.widget2.setBlend(0,1,1);
+Game.widget2.setSize(16,16);
+Game.widget2.spawn();
+Game.widget2.setTranslation(0,0,100);
+Game.widget2.setOffset(0.5,0,0.5);
 
-mesh2.spawn();
-mesh2.setTexture("textures/totodile.png");
-mesh2.setScale(10,10,10);
-mesh2.setTranslation(90,0,-30);
-
-mesh3.spawn();
-mesh3.setTexture("textures/gible.png");
-mesh3.setScale(10,10,10);
-mesh3.setTranslation(150,0,-30);
-
-mesh4.spawn();
-mesh4.setTexture("textures/scraggy.png");
-mesh4.setScale(10,10,10);
-mesh4.setTranslation(210,0,-30);
-
-var timer = timer || 0;
+Game.mouseArea = MouseArea.new(Game.widget2);
 
 Game.Initialise = function()
 {
 	Game.setName("Snuffbox Test Project");
-	RenderSettings.setResolution(1280,720);
+	RenderSettings.setResolution(640,480);
 	RenderSettings.setVsync(false);
 	RenderSettings.setFullscreen(false);
 	RenderSettings.setCullMode(RenderSettings.CullNone);
-	RenderSettings.setBackBufferColour(0,0,0.5,1);
-	RenderSettings.setWindowSize(1280,720);
+	RenderSettings.setBackBufferColour(0,0,0,1);
+	RenderSettings.setWindowSize(640,480);
 	Game.camera = Camera.new("perspective");
 	Game.camera.setTranslation(0,0,0);
-	terrain = Terrain.new(256,256);
-	terrain.spawn();
-	terrain.setTranslation(30,0,0);
-
-	widget = Widget.new();
-	widget.setScale(256,0,256);
-	widget.setTexture("textures/snuffbox.png");
-	widget.spawn();
-
-	widget2 = Widget.new(widget);
-	widget2.setScale(64,0,64);
-	widget2.setBlend(1,0,0);
-	widget2.spawn();
-	widget2.setOffset(0.5,0,0.5);
 }
 Game.Update = function(dt)
 {	
@@ -96,16 +60,6 @@ Game.Update = function(dt)
 	if (Mouse.isDown(0)) Game.camera.rotateBy(rx/100,ry/100,0);
 	
 	Game.camera.translateBy(mx,0,mz);
-
-	timer += dt;
-
-	widget2.rotateBy(dt*2,dt*6,dt*4);
-	widget2.setScale(64+Math.sin(timer)*40,64+Math.sin(timer)*40,64+Math.sin(timer)*40);
-	widget2.setAlpha(0.5);
-	//widget2.setTranslation(66,71,0);
-
-	//RenderSettings.setBackBufferColour(Math.random(),Math.random(),Math.random(),Math.random());
-	
 }
 
 Game.Draw = function(dt)
@@ -120,5 +74,5 @@ Game.Shutdown = function()
 
 Game.OnReload = function()
 {
-	
+
 }

@@ -20,6 +20,8 @@ namespace snuffbox
 		blend_(1.0f, 1.0f, 1.0f),
 		visible_(true)
 	{
+		size_[0] = 1.0f;
+		size_[1] = 1.0f;
 		name_ = "RenderElement_" + std::to_string(++element_uuid);
 	}
 
@@ -80,8 +82,11 @@ namespace snuffbox
 	//--------------------------------------------------------------------------------------------------
 	XMMATRIX& RenderElement::world_matrix(Camera* camera)
 	{
-		world_matrix_ = XMMatrixScaling(sx_, sy_, sz_) *
-			XMMatrixTranslation(ox_*sx_, oy_*sy_, oz_*sz_) *
+		float sx = sx_*size_[0];
+		float sz = sz_*size_[1];
+
+		world_matrix_ = XMMatrixScaling(sx, sy_, sz) *
+			XMMatrixTranslation(ox_*sx, oy_*sy_, oz_*sz) *
 			rotation_ *
 			XMMatrixTranslation(x_, y_, z_);
 		return world_matrix_;
@@ -125,9 +130,9 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::SetOffset(float x, float y, float z)
 	{
-		ox_ = x;
-		oy_ = y;
-		oz_ = z;
+		ox_ = -x;
+		oy_ = -y;
+		oz_ = -z;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -317,9 +322,9 @@ namespace snuffbox
 	{
 		JS_SETUP(RenderElement, "NNN");
 
-		float x = -wrapper.GetNumber<float>(0);
-		float y = -wrapper.GetNumber<float>(1);
-		float z = -wrapper.GetNumber<float>(2);
+		float x = wrapper.GetNumber<float>(0);
+		float y = wrapper.GetNumber<float>(1);
+		float z = wrapper.GetNumber<float>(2);
 
 		self->SetOffset(x, y, z);
 	}
@@ -481,6 +486,28 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSSetSize(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "NN");
+		self->size_[0] = wrapper.GetNumber<float>(0);
+		self->size_[1] = wrapper.GetNumber<float>(1);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSSize(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "V");
+		wrapper.ReturnTuple<float>(self->size_[0], self->size_[1], "w", "h");
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSDestroyed(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "NN");
+		wrapper.ReturnBool(self->destroyed_);
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -507,7 +534,10 @@ namespace snuffbox
 			JSFunctionRegister("setBlend", JSSetBlend),
 			JSFunctionRegister("blend", JSBlend),
 			JSFunctionRegister("setName", JSSetName),
-			JSFunctionRegister("name", JSName)
+			JSFunctionRegister("name", JSName),
+			JSFunctionRegister("setSize", JSSetSize),
+			JSFunctionRegister("size", JSSize),
+			JSFunctionRegister("destroyed", JSDestroyed)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);

@@ -109,6 +109,9 @@
     <ClCompile Include="d3d11\elements\render_element.cc">
       <Filter>d3d11\elements</Filter>
     </ClCompile>
+    <ClCompile Include="input\mouse_area.cc">
+      <Filter>input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -203,6 +206,9 @@
     </ClInclude>
     <ClInclude Include="d3d11\d3d11_line.h">
       <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="input\mouse_area.h">
+      <Filter>input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

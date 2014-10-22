@@ -98,15 +98,19 @@ namespace snuffbox
 		/**
 		* @return (XMMATRIX) The scaling matrix
 		*/
-		XMMATRIX scaling(){ return XMMatrixScaling(sx_, sy_, sz_); }
+		XMMATRIX scaling(){ return XMMatrixScaling(sx_*size_[0], sy_, sz_*size_[1]); }
 		/**
 		* @return (XMMATRIX) The offset matrix
 		*/
-		XMMATRIX offset(){ return XMMatrixTranslation(ox_*sx_, oy_*sy_, oz_*sz_); }
+		XMMATRIX offset(){ return XMMatrixTranslation(ox_*sx_*size_[0], oy_*sy_, oz_*sz_*size_[1]); }
 		/**
 		* @return (XMVECTOR) The scaling vector
 		*/
 		XMVECTOR scale(){ return XMVectorSet(sx_, sy_, sz_, 0); }
+		/**
+		* @return (XMVECTOR) The size vector
+		*/
+		XMVECTOR size(){ return XMVectorSet(size_[0], 0, size_[1], 0); }
 		/**
 		* @return (XMMATRIX) The rotation matrix
 		*/
@@ -304,6 +308,8 @@ namespace snuffbox
 		float																	sy_; //!< The y scale
 		float																	sz_; //!< The z scale
 
+		float																	size_[2]; //!< The widget's size
+
 		Texture*															texture_;	//!< The texture of this render element
 		Texture*															normal_map_; //!< The normal map of this render element
 		Shader*																shader_; //!< The current shader used by this element
@@ -342,5 +348,8 @@ namespace snuffbox
 		static void JSSetVisible(JS_ARGS);
 		static void JSSetName(JS_ARGS);
 		static void JSName(JS_ARGS);
+		static void JSSetSize(JS_ARGS);
+		static void JSSize(JS_ARGS);
+		static void JSDestroyed(JS_ARGS);
 	};
 }

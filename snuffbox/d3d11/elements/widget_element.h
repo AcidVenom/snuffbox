@@ -71,11 +71,12 @@ namespace snuffbox
     XMMATRIX& world_matrix(Camera* camera);
 
 	private:
-		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer of this element
-		ID3D11Buffer* index_buffer_; //!< The index buffer of this element
-		int						anchors_[4]; //!< Booleans to check if a widget should be anchored
-		XMMATRIX			world_; //!< The world matrix
-		Widget*				parent_; //!< The widget's parent
+		ID3D11Buffer*					vertex_buffer_; //!< The vertex buffer of this element
+		ID3D11Buffer*					index_buffer_; //!< The index buffer of this element
+		int										anchors_[4]; //!< Booleans to check if a widget should be anchored
+		XMMATRIX							world_; //!< The world matrix
+		Widget*								parent_; //!< The widget's parent
+
 	public:
 		JS_NAME(Widget);
 
@@ -83,6 +84,10 @@ namespace snuffbox
 		static void JSSetAnchorRight(JS_ARGS);
 		static void JSSetAnchorTop(JS_ARGS);
 		static void JSSetAnchorBottom(JS_ARGS);
+		static void JSRemoveAnchorLeft(JS_ARGS);
+		static void JSRemoveAnchorRight(JS_ARGS);
+		static void JSRemoveAnchorTop(JS_ARGS);
+		static void JSRemoveAnchorBottom(JS_ARGS);
 
     void RegisterExtraFunctions(JS_EXTRA);
 	};

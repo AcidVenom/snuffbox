@@ -1,6 +1,6 @@
 #pragma once
 
-#define JS_CHECK_PARAMS(format) JSWrapper wrapper(args); bool validParams = wrapper.CheckParams(format); if(!validParams){ SNUFF_ASSERT("Invalid parameters!"); }
+#define JS_CHECK_PARAMS(format) JSWrapper wrapper(args); bool validParams = wrapper.CheckParams(format); if(!validParams){ SNUFF_LOG_ERROR("Invalid parameters!"); }
 
 #include "../../snuffbox/js/js_state_wrapper.h"
 
@@ -17,7 +17,7 @@ namespace snuffbox
 	{
 	public:
 		/// Default constructor
-		JSWrapper(const FunctionCallbackInfo<Value>& args) : args_(args){}
+		JSWrapper(const FunctionCallbackInfo<Value>& args) : args_(args), log_errors_(true){}
 
 		/// Default destructor
 		~JSWrapper(){}
@@ -69,8 +69,12 @@ namespace snuffbox
 		/// Checks if the parameters given in the function are of the right type
 		bool CheckParams(std::string format);
 
+		/// Sets the log errors to on or off
+		void SetLogErrors(bool val){log_errors_ = val;}
+
 	private:
 		const FunctionCallbackInfo<Value>& args_; //!< The JavaScript arguments passed by a function
+		bool log_errors_; //!< Log errors or not
 	};
 
 	//------------------------------------------------------------------------------
@@ -184,10 +188,13 @@ namespace snuffbox
 	//------------------------------------------------------------------------------
 	inline void JSWrapper::Error(std::string error)
 	{
-		std::string objName = *String::Utf8Value(args_.This()->ToString());
-		std::string functionName = *String::Utf8Value(args_.Callee()->ToString());
+		if (log_errors_ == true)
+		{
+			std::string objName = *String::Utf8Value(args_.This()->ToString());
+			std::string functionName = *String::Utf8Value(args_.Callee()->ToString());
 
-		SNUFF_LOG_ERROR(std::string("\n" + objName + "\n\t" + functionName + "\n\t\t" + error).c_str());
+			SNUFF_LOG_ERROR(std::string("\n" + objName + "\n\t" + functionName + "\n\t\t" + error).c_str());
+		}
 	}
 
 	//------------------------------------------------------------------------------

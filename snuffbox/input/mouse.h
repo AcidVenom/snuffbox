@@ -129,6 +129,11 @@ namespace snuffbox
 		*/
 		std::tuple<double, double> movement(){ return std::tuple<double, double>(dx_, dy_); }
 
+		/**
+		* @return (std::tuple<double, double>) The relative position of the mouse
+		*/
+		std::tuple<double, double> GetRelativePosition();
+
 	private:
 		MouseButtonState button_states_[5]; //!< The button states of every button
 		float x_, y_;											  //!< X and Y position of the mouse

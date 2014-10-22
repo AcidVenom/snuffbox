@@ -190,6 +190,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClCompile Include="game.cc" />
     <ClCompile Include="input\keyboard.cc" />
     <ClCompile Include="input\mouse.cc" />
+    <ClCompile Include="input\mouse_area.cc" />
     <ClCompile Include="js\js_state_wrapper.cc" />
     <ClCompile Include="js\js_wrapper.cc" />
     <ClCompile Include="memory\allocated_memory.cc" />
@@ -221,6 +222,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClInclude Include="input\key.h" />
     <ClInclude Include="input\keyboard.h" />
     <ClInclude Include="input\mouse.h" />
+    <ClInclude Include="input\mouse_area.h" />
     <ClInclude Include="js\js_callback.h" />
     <ClInclude Include="js\js_object_register.h" />
     <ClInclude Include="js\js_state_wrapper.h" />

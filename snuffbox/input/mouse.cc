@@ -84,6 +84,7 @@ namespace snuffbox
 
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Pixel"), Number::New(JS_ISOLATE, 0));
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Screen"), Number::New(JS_ISOLATE, 1));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Relative"), Number::New(JS_ISOLATE, 2));
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
 	}
@@ -93,61 +94,73 @@ namespace snuffbox
 	{
 		JS_CREATE_ARGUMENT_SCOPE;
 		JS_CHECK_PARAMS("N");
-
-		std::tuple<double, double> pos = environment::mouse().position();
-		double x = std::get<0>(pos);
-		double y = std::get<1>(pos);
 		unsigned int type = wrapper.GetNumber<unsigned int>(0);
+		std::tuple<double, double> p = environment::mouse().position();
 
 		switch (type)
 		{
 		case 0:
-			wrapper.ReturnTuple<double>(x, y);
+			wrapper.ReturnTuple<double>(std::get<0>(p), std::get<1>(p));
 			break;
 		case 1:
-			D3D11_VIEWPORT* vp = &environment::render_device().viewport();
-
-			if (vp)
-			{
-				float x1 = vp->TopLeftX;
-				float y1 = vp->TopLeftY;
-				float x2 = vp->Width;
-				float y2 = vp->Height;
-
-				float xx = (x - x1) / x2;
-				float yy = (y - y1) / y2;
-
-				xx = xx * 2 - 1;
-				yy = yy * 2 - 1;
-
-				if (xx < -1)
-				{
-					xx = -1;
-				}
-
-				if (yy < -1)
-				{
-					yy = -1;
-				}
-
-				if (xx > 1)
-				{
-					xx = 1;
-				}
-
-				if (yy > 1)
-				{
-					yy = 1;
-				}
-
-				wrapper.ReturnTuple<double>(xx, yy);
-			}
-			else
-			{
-				wrapper.ReturnTuple<double>(0, 0);
-			}
-			
+			p = environment::mouse().GetRelativePosition();
+			wrapper.ReturnTuple<double>(std::get<0>(p), std::get<1>(p));
 			break;
+		case 2:
+			p = environment::mouse().GetRelativePosition();
+			Resolution res = environment::render_settings().settings().resolution;
+			wrapper.ReturnTuple<double>(std::get<0>(p)*(res.w / 2), std::get<1>(p)*(res.h / 2));
+		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	std::tuple<double,double> Mouse::GetRelativePosition()
+	{
+		D3D11_VIEWPORT* vp = &environment::render_device().viewport();
+		float x, y;
+
+		std::tuple<double, double> pos = position();
+
+		x = std::get<0>(pos);
+		y = std::get<1>(pos);
+		if (vp)
+		{
+			float x1 = vp->TopLeftX;
+			float y1 = vp->TopLeftY;
+			float x2 = vp->Width;
+			float y2 = vp->Height;
+
+			float xx = (x - x1) / x2;
+			float yy = (y - y1) / y2;
+
+			xx = xx * 2 - 1;
+			yy = yy * 2 - 1;
+
+			if (xx < -1)
+			{
+				xx = -1;
+			}
+
+			if (yy < -1)
+			{
+				yy = -1;
+			}
+
+			if (xx > 1)
+			{
+				xx = 1;
+			}
+
+			if (yy > 1)
+			{
+				yy = 1;
+			}
+
+			return std::tuple<double,double>(xx, yy);
+		}
+		else
+		{
+			return std::tuple<double, double>(0, 0);
 		}
 	}
 
