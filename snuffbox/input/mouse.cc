@@ -6,6 +6,7 @@
 #include "../../snuffbox/win32/win32_window.h"
 #include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/game.h"
+#include "../../snuffbox/input/mouse_area.h"
 
 namespace snuffbox
 {
@@ -110,6 +111,68 @@ namespace snuffbox
 			p = environment::mouse().GetRelativePosition();
 			Resolution res = environment::render_settings().settings().resolution;
 			wrapper.ReturnTuple<double>(std::get<0>(p)*(res.w / 2), std::get<1>(p)*(res.h / 2));
+		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Mouse::RegisterMouseArea(MouseArea* mouseArea)
+	{
+		mouse_areas_.push_back(mouseArea);
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Mouse::NotifyMouseAreas()
+	{
+		std::tuple<double, double> p = environment::mouse().GetRelativePosition();
+		Resolution res = environment::render_settings().settings().resolution;
+		float x = std::get<0>(p)*(res.w / 2);
+		float y = std::get<1>(p)*(res.h / 2);
+
+		std::vector<MouseArea*> enterNotifications;
+
+		for (int i = static_cast<int>(mouse_areas_.size()) - 1; i >= 0; --i)
+		{
+			MouseArea* mouseArea = mouse_areas_[i];
+			
+			if (mouseArea->activated() == true)
+			{
+				MouseAreaMetrics metrics = mouseArea->metrics();
+				
+				if (x >= metrics.x && y <= metrics.y && x <= metrics.x + metrics.w && y >= metrics.y - metrics.h)
+				{
+					if (!mouseArea->hovered())
+					{
+						enterNotifications.push_back(mouseArea);
+					}
+
+					if (IsPressed(MouseEnums::MouseButton::kLeft) || IsDoubleClicked(MouseEnums::MouseButton::kLeft))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kPressed);
+					}
+
+					if (IsDown(MouseEnums::MouseButton::kLeft))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kDown);
+					}
+
+					if (IsReleased(MouseEnums::MouseButton::kLeft))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kReleased);
+					}
+				}
+				else
+				{
+					if (mouseArea->hovered())
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kLeave);
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < enterNotifications.size(); ++i)
+		{
+			enterNotifications[i]->Notify(MouseArea::MouseAreaStates::kEnter);
 		}
 	}
 
@@ -307,5 +370,7 @@ namespace snuffbox
 
 		prev_x_ = x_;
 		prev_y_ = y_;
+
+		NotifyMouseAreas();
 	}
 }

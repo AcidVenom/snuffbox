@@ -6,6 +6,8 @@
 
 namespace snuffbox
 {
+	class MouseArea;
+
 	class MouseEnums
 	{
 	public:
@@ -134,12 +136,22 @@ namespace snuffbox
 		*/
 		std::tuple<double, double> GetRelativePosition();
 
+		/**
+		* @brief Registers a mouse area that needs checking
+		* @param[in] (snuffbox::MouseArea*) The mouse area to register
+		*/
+		void RegisterMouseArea(MouseArea* area);
+
+		/// Notifies all mouse areas
+		void NotifyMouseAreas();
+
 	private:
 		MouseButtonState button_states_[5]; //!< The button states of every button
 		float x_, y_;											  //!< X and Y position of the mouse
 		float dx_, dy_;										  //!< The movement of the mouse
 		float prev_x_, prev_y_;							//!< The previous mouse position
 		std::queue<MouseData> queue_;			  //!< The queue to handle messages from
+		std::vector<MouseArea*> mouse_areas_; //!< The mouse areas to check
 
 	public:
 		JS_NAME(Mouse);

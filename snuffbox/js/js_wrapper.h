@@ -1,6 +1,7 @@
 #pragma once
 
 #define JS_CHECK_PARAMS(format) JSWrapper wrapper(args); bool validParams = wrapper.CheckParams(format); if(!validParams){ SNUFF_LOG_ERROR("Invalid parameters!"); }
+#undef GetObject
 
 #include "../../snuffbox/js/js_state_wrapper.h"
 
@@ -22,8 +23,8 @@ namespace snuffbox
 		/// Default destructor
 		~JSWrapper(){}
 
-		/// Retrieves a function from a given argument index
-		const Handle<Value> GetFunction(int arg);
+		/// Retrieves a value from a given argument index
+		Local<Value> GetValue(int arg);
 
 		/// Retrieves a boolean value from a given argument index
 		bool GetBool(int arg);
@@ -78,18 +79,11 @@ namespace snuffbox
 	};
 
 	//------------------------------------------------------------------------------
-	inline const Handle<Value> JSWrapper::GetFunction(int arg)
+	inline Local<Value> JSWrapper::GetValue(int arg)
 	{
 		JS_CREATE_SCOPE;
-		const Handle<Value>& func = args_[arg];
 
-		if (!func->IsFunction())
-		{
-			Local<Value> funcName = args_.Callee();
-			Local<String> functionName = funcName->ToString();
-			SNUFF_ASSERT(std::string("Tried to insert a non-function as argument in function " + std::string(*String::Utf8Value(functionName))).c_str());
-		}
-		return Handle<Function>::Cast(func);
+		return args_[arg];
 	}
 
 	//------------------------------------------------------------------------------
