@@ -48,10 +48,10 @@ namespace snuffbox
 			metrics_.w = XMVectorGetX(size);
 			metrics_.h = XMVectorGetZ(size);
 
-			XMMATRIX offset = parent_->offset();
-			XMVECTOR trans = parent_->translation();
-			metrics_.x = XMVectorGetX(trans) + offset._41;
-			metrics_.y = XMVectorGetY(trans) - offset._43;
+			XMMATRIX& trans = parent_->world_matrix(nullptr);
+
+			metrics_.x = trans._41;
+			metrics_.y = -trans._42;
 		}
 	}
 
@@ -88,7 +88,7 @@ namespace snuffbox
 	}
 
 	//----------------------------------------------------------------------------------
-	void MouseArea::Notify(MouseAreaStates type)
+	void MouseArea::Notify(MouseAreaStates type, int button)
 	{
 		if (type == MouseAreaStates::kEnter)
 		{
@@ -105,10 +105,13 @@ namespace snuffbox
 		{
 			JS_CREATE_SCOPE;
 			Handle<Value> obj = Local<Value>::New(JS_ISOLATE, cb.callee);
+			Handle<Number> num = Number::New(JS_ISOLATE, button);
+
 			Handle<Value> argv[] = {
-				obj
+				obj,
+				num
 			};
-			cb.callback.Call(1, argv);
+			cb.callback.Call(2, argv);
 		}
 	}
 
@@ -219,5 +222,14 @@ namespace snuffbox
 		Handle<Object> callee = Handle<Object>::Cast(wrapper.GetValue(1));
 
 		self->SetCallback(MouseAreaStates::kDown, func, callee);
+	}
+
+	//----------------------------------------------------------------------------------
+	MouseArea::~MouseArea()
+	{
+		for (unsigned int i = 0; i < 5; ++i)
+		{
+			callbacks_[i].callee.Reset();
+		}
 	}
 }

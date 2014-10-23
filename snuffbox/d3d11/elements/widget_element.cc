@@ -178,14 +178,18 @@ namespace snuffbox
 
 		if (anchors_[WidgetAnchor::kRight] == 1)
 		{
-			XMVECTOR vec = parent_ == nullptr ? scale() * size() : scale() * -size();
-			anchorLeftRight = w / 2 - XMVectorGetX(vec);
+			XMVECTOR vec = scale() * size();
+
+			float offset = parent_ == nullptr ? w / 2 : w;
+			anchorLeftRight = offset - XMVectorGetX(vec);
 		}
 
 		if (anchors_[WidgetAnchor::kTop] == 1)
 		{
-			XMVECTOR vec = parent_ == nullptr ? scale() * size() : scale() * -size();
-			anchorTopBottom = (h / 2) - XMVectorGetZ(vec);
+			XMVECTOR vec = scale() * size();
+
+			float offset = parent_ == nullptr ? h / 2 : h;
+			anchorTopBottom = offset - XMVectorGetZ(vec);
 		}
 
 		if (anchors_[WidgetAnchor::kBottom] == 1)
@@ -198,6 +202,14 @@ namespace snuffbox
 			XMMATRIX& m = parent_->offset();
 			anchorLeftRight += m._41;
 			anchorTopBottom += m._43;
+
+			XMVECTOR translation = parent_->translation();
+			anchorLeftRight += XMVectorGetX(translation);
+			anchorTopBottom += XMVectorGetY(translation);
+
+			XMMATRIX& anchor = parent_->anchor();
+			anchorLeftRight += anchor._41;
+			anchorTopBottom += anchor._42;
 		}
 
 		return XMMatrixTranslation(anchorLeftRight, anchorTopBottom, 0);

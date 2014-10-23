@@ -52,6 +52,9 @@ namespace snuffbox
 		/// JavaScript constructor
 		MouseArea(JS_ARGS);
 
+		/// Default destructor
+		~MouseArea();
+
 		/**
 		* @brief Sets the metrics of the mouse area
 		* @param[in] x (float) The x position of the mouse area
@@ -82,8 +85,9 @@ namespace snuffbox
 		/**
 		* @brief Notifies the mouse area about a state change, trigger a callback for it
 		* @param[in] type (snuffbox::MouseArea::MouseAreaStates) The state type that was triggered
+		* @param[in] button (int) The button id of the mouse that triggered this event
 		*/
-		void Notify(MouseAreaStates type);
+		void Notify(MouseAreaStates type, int button);
 
 		/**
 		* @brief Updates the mouse area to have the metrics of its parent

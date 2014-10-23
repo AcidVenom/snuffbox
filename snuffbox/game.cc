@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <fstream>
 
-#define SNUFF_VERSION_MAJOR 1
-#define SNUFF_VERSION_MINOR 93
+#define SNUFF_VERSION_MAJOR 0
+#define SNUFF_VERSION_MINOR 55
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"

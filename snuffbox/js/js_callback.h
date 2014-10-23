@@ -19,7 +19,7 @@ namespace snuffbox
 			SetFunction(func);
 		}
 		/// Default destructor
-		~JSCallback(){}
+		~JSCallback(){ func_.Reset(); }
 
 		/// Sets the persistent function
 		inline void SetFunction(const Handle<Function>& func)

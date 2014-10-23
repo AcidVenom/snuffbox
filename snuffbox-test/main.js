@@ -17,9 +17,42 @@ Game.widget2.setBlend(0,1,1);
 Game.widget2.setSize(16,16);
 Game.widget2.spawn();
 Game.widget2.setTranslation(0,0,100);
-Game.widget2.setOffset(0.5,0,0.5);
+Game.widget2.setOffset(0,0,0);
 
 Game.mouseArea = MouseArea.new(Game.widget2);
+
+Game.timer = 0;
+Game.onEnter = function(callee)
+{
+	callee.setBlend(1,1,0);
+}
+
+Game.onLeave = function(callee)
+{
+	callee.setBlend(0,1,1);
+}
+
+Game.onPressed = function(callee,button)
+{
+	if (button == 0)
+	{
+		callee.setBlend(1,0,1);
+	}
+	else if (button == 1)
+	{
+		callee.setBlend(0,1,0);
+	}
+}
+
+Game.onReleased = function(callee,button)
+{
+	callee.setBlend(0,1,1);
+}
+
+Game.mouseArea.setOnPressed(Game.onPressed, Game.widget2);
+Game.mouseArea.setOnEnter(Game.onEnter, Game.widget2);
+Game.mouseArea.setOnLeave(Game.onLeave, Game.widget2);
+Game.mouseArea.setOnReleased(Game.onReleased, Game.widget2);
 
 Game.Initialise = function()
 {
@@ -59,7 +92,14 @@ Game.Update = function(dt)
 
 	if (Mouse.isDown(0)) Game.camera.rotateBy(rx/100,ry/100,0);
 	
+	Game.timer += dt*3;
 	Game.camera.translateBy(mx,0,mz);
+	Game.widget2.setAnchorTop();
+	Game.widget2.setAnchorRight();
+	Game.widget2.setSize(24+24*Math.sin(Game.timer),24+24*Math.sin(Game.timer));
+	Game.viewport.setTranslation(0,0,0);
+	Game.widget.setTranslation(Math.sin(Game.timer)*40,0,1);
+	//Mouse.clearAreas();
 }
 
 Game.Draw = function(dt)

@@ -39,7 +39,7 @@ namespace snuffbox
 	//--------------------------------------------------------------------------------------
 	Mouse::~Mouse()
 	{
-
+		mouse_areas_.clear();
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -80,7 +80,8 @@ namespace snuffbox
 			JSFunctionRegister("isReleased", JSIsReleased),
 			JSFunctionRegister("isDoubleClicked", JSIsDoubleClicked),
 			JSFunctionRegister("wheelUp", JSWheelUp),
-			JSFunctionRegister("wheelDown", JSWheelDown)
+			JSFunctionRegister("wheelDown", JSWheelDown),
+			JSFunctionRegister("clearAreas", JSClearAreas)
 		};
 
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Pixel"), Number::New(JS_ISOLATE, 0));
@@ -147,24 +148,54 @@ namespace snuffbox
 
 					if (IsPressed(MouseEnums::MouseButton::kLeft) || IsDoubleClicked(MouseEnums::MouseButton::kLeft))
 					{
-						mouseArea->Notify(MouseArea::MouseAreaStates::kPressed);
+						mouseArea->Notify(MouseArea::MouseAreaStates::kPressed, 0);
+					}
+
+					if (IsPressed(MouseEnums::MouseButton::kRight) || IsDoubleClicked(MouseEnums::MouseButton::kRight))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kPressed, 1);
+					}
+
+					if (IsPressed(MouseEnums::MouseButton::kMiddle) || IsDoubleClicked(MouseEnums::MouseButton::kMiddle))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kPressed, 2);
 					}
 
 					if (IsDown(MouseEnums::MouseButton::kLeft))
 					{
-						mouseArea->Notify(MouseArea::MouseAreaStates::kDown);
+						mouseArea->Notify(MouseArea::MouseAreaStates::kDown, 0);
+					}
+
+					if (IsDown(MouseEnums::MouseButton::kRight))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kDown, 1);
+					}
+
+					if (IsDown(MouseEnums::MouseButton::kMiddle))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kDown, 2);
 					}
 
 					if (IsReleased(MouseEnums::MouseButton::kLeft))
 					{
-						mouseArea->Notify(MouseArea::MouseAreaStates::kReleased);
+						mouseArea->Notify(MouseArea::MouseAreaStates::kReleased, 0);
+					}
+
+					if (IsReleased(MouseEnums::MouseButton::kRight))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kReleased, 1);
+					}
+
+					if (IsReleased(MouseEnums::MouseButton::kMiddle))
+					{
+						mouseArea->Notify(MouseArea::MouseAreaStates::kReleased, 2);
 					}
 				}
 				else
 				{
 					if (mouseArea->hovered())
 					{
-						mouseArea->Notify(MouseArea::MouseAreaStates::kLeave);
+						mouseArea->Notify(MouseArea::MouseAreaStates::kLeave, 0);
 					}
 				}
 			}
@@ -172,7 +203,7 @@ namespace snuffbox
 
 		for (int i = 0; i < enterNotifications.size(); ++i)
 		{
-			enterNotifications[i]->Notify(MouseArea::MouseAreaStates::kEnter);
+			enterNotifications[i]->Notify(MouseArea::MouseAreaStates::kEnter, 0);
 		}
 	}
 
@@ -225,6 +256,20 @@ namespace snuffbox
 		{
 			return std::tuple<double, double>(0, 0);
 		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Mouse::ClearAreas()
+	{
+		mouse_areas_.clear();
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Mouse::JSClearAreas(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		JS_CHECK_PARAMS("V");
+		environment::mouse().ClearAreas();
 	}
 
 	//--------------------------------------------------------------------------------------

@@ -145,6 +145,9 @@ namespace snuffbox
 		/// Notifies all mouse areas
 		void NotifyMouseAreas();
 
+		/// Clears all mouse areas
+		void ClearAreas();
+
 	private:
 		MouseButtonState button_states_[5]; //!< The button states of every button
 		float x_, y_;											  //!< X and Y position of the mouse
@@ -166,5 +169,6 @@ namespace snuffbox
 		static void JSIsDoubleClicked(JS_ARGS);	//!< Returns if a mouse button is double clicked this frame
 		static void JSWheelUp(JS_ARGS);	//!< Returns if the mouse was scrolled up this frame
 		static void JSWheelDown(JS_ARGS); //!< Returns if the mouse was scrolled down this frame
+		static void JSClearAreas(JS_ARGS); //!< Clears all mouse areas
 	};
 }
