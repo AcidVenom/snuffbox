@@ -34,6 +34,12 @@ namespace snuffbox
 		~Camera();
 
 		/**
+		* @brief Sets the zoom of the camera
+		* @param[in] z (float) The actual zoom
+		*/
+		void SetZoom(float z){ zoom_ = z; }
+
+		/**
 		* @brief Translates the camera by given values
 		* @param[in] x (float) Translate by on x
 		* @param[in] y (float) Translate by on y
@@ -95,6 +101,11 @@ namespace snuffbox
 		*/
 		CameraType type(){ return type_; }
 
+		/**
+		*	@return (float) The zoom of the camera
+		*/
+		float zoom(){ return zoom_; }
+
 	private:
 		XMVECTOR up_; //!< Up vector
 		XMVECTOR target_; //!< Orientation vector
@@ -114,6 +125,7 @@ namespace snuffbox
 		float move_back_forward_; //!< The move back/forward modifier
 		float move_up_down_; //!< The move up/down modifier
 		float fov_; //!< The field of view of the camera
+		float zoom_; //!< The zoom of the camera
 		CameraType type_; //!< The camera type
 	public:
 		JS_NAME(Camera);
@@ -126,5 +138,6 @@ namespace snuffbox
 		static void JSRotation(JS_ARGS);
 		static void JSSetFov(JS_ARGS);
 		static void JSSetType(JS_ARGS);
+		static void JSSetZoom(JS_ARGS);
 	};
 }

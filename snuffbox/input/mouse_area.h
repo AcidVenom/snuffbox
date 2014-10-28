@@ -112,6 +112,9 @@ namespace snuffbox
 		*/
 		bool hovered();
 
+		/// Clears all JavaScript handles from the callbacks to prevent leaking
+		void ClearHandles();
+
 	private:
 		Widget* parent_; //!< The widget parent of this mouse area
 		MouseAreaMetrics metrics_; //!< The metrics of this mouse area

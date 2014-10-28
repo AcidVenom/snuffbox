@@ -225,11 +225,17 @@ namespace snuffbox
 	}
 
 	//----------------------------------------------------------------------------------
-	MouseArea::~MouseArea()
+	void MouseArea::ClearHandles()
 	{
 		for (unsigned int i = 0; i < 5; ++i)
 		{
 			callbacks_[i].callee.Reset();
 		}
+	}
+
+	//----------------------------------------------------------------------------------
+	MouseArea::~MouseArea()
+	{
+		ClearHandles();
 	}
 }

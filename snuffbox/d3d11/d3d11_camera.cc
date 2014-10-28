@@ -22,6 +22,7 @@ namespace snuffbox
 		cam_forward_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		cam_right_ = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 		view_matrix_ = XMMatrixIdentity();
+		zoom_ = 1;
 
 		if (strcmp(wrapper.GetString(0).c_str(), "orthographic") == 0)
 		{
@@ -126,7 +127,8 @@ namespace snuffbox
 			JSFunctionRegister("rotation", JSRotation),
 			JSFunctionRegister("translation", JSTranslation),
 			JSFunctionRegister("setFov", JSSetFov),
-			JSFunctionRegister("setType", JSSetType)
+			JSFunctionRegister("setType", JSSetType),
+			JSFunctionRegister("setZoom", JSSetZoom)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);
@@ -230,5 +232,13 @@ namespace snuffbox
 		{
 			SNUFF_LOG_ERROR(std::string("Unknown camera type '" + typing).c_str());
 		}
+	}
+
+	//------------------------------------------------------------------------------
+	void Camera::JSSetZoom(JS_ARGS)
+	{
+		JS_SETUP(Camera, "N");
+
+		self->SetZoom(wrapper.GetNumber<float>(0));
 	}
 }

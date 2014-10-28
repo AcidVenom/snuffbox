@@ -1016,7 +1016,8 @@ namespace snuffbox
 
 		if (camera->type() == Camera::CameraType::kOrthographic)
 		{
-      projection_matrix_ = XMMatrixOrthographicRH(w, h, 1.0f, 1000.0f);
+			projection_matrix_ = XMMatrixOrthographicRH(w*(1/camera->zoom()), h*(1/camera->zoom()), 1.0f, 1000.0f);
+			projection_matrix_ *= XMMatrixScaling(1, -1, 1);
 		}
 		else
 		{
