@@ -36,4 +36,36 @@ namespace snuffbox
 	public:
 		JS_NAME(Quad);
 	};
+
+	class Quad2D : public RenderElement
+	{
+	public:
+		/// Default constructor
+		Quad2D(JS_ARGS);
+
+		/// Default destructor
+		~Quad2D();
+		
+		/// Creates the vertices
+		void Create();
+
+		/// Sets the buffers
+		void SetBuffers();
+
+		/**
+		* @return (snuffbox::VertexBufferType) The vertex buffer type
+		*/
+		VertexBufferType type(){ return VertexBufferType::kQuad; }
+
+		/**
+		* @return (XMMATRIX&) The world matrix of this quad
+		*/
+		XMMATRIX& world_matrix(Camera* camera);
+
+	private:
+		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer
+		ID3D11Buffer* index_buffer_; //!< The index buffer
+	public:
+		JS_NAME(Quad2D);
+	};
 }

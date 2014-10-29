@@ -55,7 +55,14 @@ namespace snuffbox
 		baseMatrix._14 = baseMatrix._24 = baseMatrix._34 = baseMatrix._41 = baseMatrix._42 = baseMatrix._43 = 0;
 		baseMatrix._44 = 1;
 
-		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * baseMatrix * XMMatrixTranslationFromVector(translation());
+		XMMATRIX trans = XMMatrixTranslationFromVector(translation());
+
+		if (environment::render_settings().y_down() == true)
+		{
+			trans._42 = -trans._42;
+		}
+
+		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * baseMatrix * trans;
 
 		return world_;
 	}

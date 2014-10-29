@@ -122,7 +122,8 @@ namespace snuffbox
 			JSFunctionRegister("setVsync", JSSetVsync),
 			JSFunctionRegister("setBackBufferColour", JSSetBackBufferColour),
 			JSFunctionRegister("resolution", JSResolution),
-			JSFunctionRegister("setWindowSize", JSSetWindowSize)
+			JSFunctionRegister("setWindowSize", JSSetWindowSize),
+			JSFunctionRegister("setYDown", JSSetYDown)
 		};
 
 		obj->Set(JS_ISOLATE, "CullNone", Number::New(JS_ISOLATE, 1));
@@ -141,6 +142,14 @@ namespace snuffbox
 		float h = environment::render_settings().settings().resolution.h;
 
 		wrapper.ReturnTuple(w, h, "w", "h");
+	}
+	
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSSetYDown(JS_ARGS)
+	{
+		JS_CHECK_PARAMS("B");
+
+		environment::render_settings().settings().y_down = wrapper.GetBool(0);
 	}
 
 	//-------------------------------------------------------------------------------

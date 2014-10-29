@@ -200,10 +200,20 @@ namespace snuffbox
 		if (parent_ != nullptr)
 		{
 			XMMATRIX& m = parent_->offset();
+
+			if (environment::render_settings().y_down() == true)
+			{
+				m._43 = -m._43;
+			}
 			anchorLeftRight += m._41;
 			anchorTopBottom += m._43;
 
 			XMVECTOR translation = parent_->translation();
+
+			if (environment::render_settings().y_down() == true)
+			{
+				XMVectorSetY(translation, -XMVectorGetY(translation));
+			}
 			anchorLeftRight += XMVectorGetX(translation);
 			anchorTopBottom += XMVectorGetY(translation);
 
@@ -219,9 +229,18 @@ namespace snuffbox
 	XMMATRIX& Widget::world_matrix(Camera* camera)
 	{
 		XMMATRIX trans = XMMatrixTranslationFromVector(translation());
-		trans._42 = -trans._42;
+		XMMATRIX off = offset();
 
-		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * rotation() * trans * anchor();
+		if (environment::render_settings().y_down() == false)
+		{
+			trans._42 = -trans._42;
+		}
+		else
+		{
+			off._43 = -off._43;
+		}
+
+		world_ = scaling() * off * XMMatrixRotationX(-XM_PI / 2) * rotation() * trans * anchor();
 		return world_;
 	}
 }

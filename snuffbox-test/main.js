@@ -1,15 +1,8 @@
-Game.viewport = Game.viewport || Widget.new();
-Game.viewport.setBlend(0,0,0.2);
-Game.viewport.setSize(640,480);
-Game.viewport.spawn();
-Game.viewport.setTranslation(0,0,10);
-Game.viewport.setOffset(0.5,0,0.5);
-
 Game.widget = Game.widget || Widget.new();
 Game.widget.setBlend(1,0,0);
 Game.widget.setSize(64,64);
 Game.widget.setTranslation(0,0,50);
-Game.widget.setOffset(0.5,0,0.5);
+Game.widget.setOffset(0,0,0);
 Game.widget.spawn();
 
 Game.widget2 = Game.widget2 || Widget.new(Game.widget);
@@ -18,6 +11,13 @@ Game.widget2.setSize(16,16);
 Game.widget2.spawn();
 Game.widget2.setTranslation(0,0,100);
 Game.widget2.setOffset(0,0,0);
+
+Game.quad2D = Quad2D.new();
+Game.quad2D.setSize(32,32);
+Game.quad2D.setOffset(0.5,0.5,0);
+Game.quad2D.setBlend(0,1,0);
+Game.quad2D.setTranslation(0,0,0);
+Game.quad2D.spawn();
 
 Game.mouseArea = MouseArea.new(Game.widget2);
 
@@ -63,7 +63,8 @@ Game.Initialise = function()
 	RenderSettings.setCullMode(RenderSettings.CullNone);
 	RenderSettings.setBackBufferColour(0,0,0,1);
 	RenderSettings.setWindowSize(640,480);
-	Game.camera = Camera.new("perspective");
+	RenderSettings.setYDown(true);
+	Game.camera = Camera.new("orthographic");
 	Game.camera.setTranslation(0,0,0);
 }
 Game.Update = function(dt)
@@ -96,10 +97,12 @@ Game.Update = function(dt)
 	Game.camera.translateBy(mx,0,mz);
 	Game.widget2.setAnchorTop();
 	Game.widget2.setAnchorRight();
-	Game.widget2.setSize(24+24*Math.sin(Game.timer),24+24*Math.sin(Game.timer));
-	Game.viewport.setTranslation(0,0,0);
-	Game.widget.setTranslation(Math.sin(Game.timer)*40,0,1);
-	//Mouse.clearAreas();
+	Game.widget.setAnchorTop();
+	Game.widget.setAnchorLeft();
+	Game.quad2D.rotateBy(0,0,dt);
+	Game.quad2D.translateBy(0,dt*10,0);
+	RenderSettings.setYDown(true);
+	//Game.widget.setTranslation(Math.sin(Game.timer)*40,0,1);
 }
 
 Game.Draw = function(dt)

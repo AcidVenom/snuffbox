@@ -229,7 +229,10 @@ namespace snuffbox
 	{
 		for (unsigned int i = 0; i < 5; ++i)
 		{
-			callbacks_[i].callee.Reset();
+			if (callbacks_[i].callback_set == true)
+			{
+				callbacks_[i].callee.Reset();
+			}
 		}
 	}
 

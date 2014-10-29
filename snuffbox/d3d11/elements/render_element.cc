@@ -130,14 +130,22 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::SetOffset(float x, float y, float z)
 	{
+		if (environment::render_settings().y_down() == false)
+		{
+			z = -z;
+		}
 		ox_ = -x;
 		oy_ = -y;
-		oz_ = -z;
+		oz_ = z;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::TranslateBy(float x, float y, float z)
 	{
+		if (environment::render_settings().y_down() == true)
+		{
+			y = -y;
+		}
 		x_ += x;
 		y_ += y;
 		z_ += z;
@@ -146,6 +154,10 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::SetTranslation(float x, float y, float z)
 	{
+		if (environment::render_settings().y_down() == true)
+		{
+			y = -y;
+		}
 		x_ = x;
 		y_ = y;
 		z_ = z;
@@ -334,7 +346,14 @@ namespace snuffbox
 	{
 		JS_SETUP(RenderElement, "V");
 
-		wrapper.ReturnTriple<float>(-self->ox_, -self->oy_, -self->oz_);
+		float z = -self->oz_;
+
+		if (environment::render_settings().y_down() == true)
+		{
+			z = -z;
+		}
+
+		wrapper.ReturnTriple<float>(-self->ox_, -self->oy_, z);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -350,7 +369,13 @@ namespace snuffbox
 	{
 		JS_SETUP(RenderElement, "V");
 
-		wrapper.ReturnTriple<float>(self->x_, self->y_, self->z_);
+		float y = self->y_;
+
+		if (environment::render_settings().y_down() == true)
+		{
+			y = -y;
+		}
+		wrapper.ReturnTriple<float>(self->x_, y, self->z_);
 	}
 
 	//-------------------------------------------------------------------------------------------

@@ -26,6 +26,7 @@ namespace snuffbox
 		JSRegister<Camera, true>::Register();
 		JSRegister<Terrain, true>::Register();
 		JSRegister<Quad, true>::Register();
+		JSRegister<Quad2D, true>::Register();
 		JSRegister<Billboard, true>::Register();
 		JSRegister<Widget, true>::Register();
 		JSRegister<MouseArea, true>::Register();

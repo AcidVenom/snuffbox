@@ -1,5 +1,6 @@
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/js/js_wrapper.h"
+#include "../../snuffbox/d3d11/d3d11_settings.h"
 
 namespace snuffbox
 {
@@ -166,7 +167,10 @@ namespace snuffbox
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
 		float z = wrapper.GetNumber<float>(2);
-
+		if (environment::render_settings().y_down() == true)
+		{
+			y = -y;
+		}
 		self->SetTranslation(x, y, z);
 	}
 
@@ -204,6 +208,10 @@ namespace snuffbox
 		float y = XMVectorGetY(translation);
 		float z = XMVectorGetZ(translation);
 
+		if (environment::render_settings().y_down() == true)
+		{
+			y = -y;
+		}
 		wrapper.ReturnTriple(x, y, z);
 	}
 

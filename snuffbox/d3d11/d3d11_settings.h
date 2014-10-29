@@ -38,12 +38,14 @@ namespace snuffbox
 			fullscreen(false),
 			cull_mode(D3D11_CULL_FRONT),
 			resolution(640, 480),
-			buffer_colour(0.0f, 0.0f, 0.0f, 1.0f)
+			buffer_colour(0.0f, 0.0f, 0.0f, 1.0f),
+			y_down(false)
 		{}
 
 		Resolution resolution; //!< The resolution
 		unsigned int vsync; //!< Is vsync on or off
 		bool fullscreen; //!< Is the application running fullscreen?
+		bool y_down; //!< Is the Y axis flipped?
 		D3D11_CULL_MODE cull_mode; //!< The cull mode
 		D3DXCOLOR buffer_colour; //!< The buffer colour
 	};
@@ -73,6 +75,11 @@ namespace snuffbox
 		*/
 		static const char* CullModeToString(D3D11_CULL_MODE mode);
 
+		/**
+		* @return (bool) Is the Y axis flipped?
+		*/
+		bool y_down(){ return settings_.y_down; }
+
 	private:
 		RenderSettings settings_; //!< The actual settings
 
@@ -86,5 +93,6 @@ namespace snuffbox
 		static void JSSetBackBufferColour(JS_ARGS);
 		static void JSResolution(JS_ARGS);
 		static void JSSetWindowSize(JS_ARGS);
+		static void JSSetYDown(JS_ARGS);
 	};
 }

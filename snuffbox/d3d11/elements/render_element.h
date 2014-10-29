@@ -99,10 +99,22 @@ namespace snuffbox
 		* @return (XMMATRIX) The scaling matrix
 		*/
 		XMMATRIX scaling(){ return XMMatrixScaling(sx_*size_[0], sy_, sz_*size_[1]); }
+
+		/**
+		* @return (XMMATRIX) The 2D scaling matrix
+		*/
+		XMMATRIX scaling_2d(){ return XMMatrixScaling(sx_*size_[0], sy_*size_[1], sz_); }
+
 		/**
 		* @return (XMMATRIX) The offset matrix
 		*/
 		XMMATRIX offset(){ return XMMatrixTranslation(ox_*sx_*size_[0], oy_*sy_, oz_*sz_*size_[1]); }
+
+		/**
+		* @return (XMMATRIX) The 2D offset matrix
+		*/
+		XMMATRIX offset_2d(){ return XMMatrixTranslation(ox_*sx_*size_[0], oy_*sy_*size_[1], oz_*sz_); }
+
 		/**
 		* @return (XMVECTOR) The scaling vector
 		*/
