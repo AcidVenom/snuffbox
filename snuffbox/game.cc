@@ -17,12 +17,14 @@
 
 #include "../snuffbox/fbx/fbx_loader.h"
 
+#include "../snuffbox/freetype/freetype_wrapper.h"
+
 #include <QtCore>
 #include <stdio.h>
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 585
+#define SNUFF_VERSION_MINOR 587
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -244,6 +246,8 @@ void Game::ParseCommandLine()
 		MessageBoxA(GetDesktopWindow(), "Snuffbox cannot be ran from this directory.\nMissing 'main.js'", "Snuffbox Error", MB_ICONERROR);
 		exit(1);
 	}
+
+	fin.close();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -406,9 +410,9 @@ int SNUFF_MAIN
 	JSStateWrapper js_state_wrapper;
 	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
 	SharedPtr<FBXLoader> fbx_loader = environment::memory().ConstructShared<FBXLoader>();
+	SharedPtr<FreeTypeWrapper> free_type_wrapper = environment::memory().ConstructShared<FreeTypeWrapper>();
 	SharedPtr<ContentManager> content_manager = environment::memory().ConstructShared<ContentManager>();
 	SharedPtr<D3D11Settings> render_settings = environment::memory().ConstructShared<D3D11Settings>();
-	
 
 	std::string windowName(
 		"Snuffbox_" + std::string(SNUFF_DEBUG_MODE) + "_V_" +
@@ -425,6 +429,7 @@ int SNUFF_MAIN
 		console_window.show();
 	}
 	
+	free_type_wrapper->Initialise();
 	environment::render_device().Initialise();
 	js_state_wrapper.Initialise();
 

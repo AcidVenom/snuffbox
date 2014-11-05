@@ -13,6 +13,7 @@ namespace snuffbox
 	class ContentManager;
 	class D3D11Settings;
 	class FBXLoader;
+	class FreeTypeWrapper;
 
 	namespace environment
 	{
@@ -49,6 +50,9 @@ namespace snuffbox
 		/// Returns the FBX loader
 		FBXLoader& fbx_loader();
 
+		/// Returns the FreeType wrapper
+		FreeTypeWrapper& free_type_wrapper();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -81,5 +85,8 @@ namespace snuffbox
 
 		/// Returns if there is an FBX loader or not
 		bool has_fbx_loader();
+
+		/// Returns if there is a FreeType wrapper or not
+		bool has_free_type_wrapper();
 	}
 }

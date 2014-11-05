@@ -7,6 +7,7 @@
 #include "../../snuffbox/d3d11/d3d11_texture.h"
 #include "../../snuffbox/d3d11/d3d11_shader.h"
 #include "../../snuffbox/fbx/fbx_model.h"
+#include "../../snuffbox/freetype/freetype_font.h"
 
 namespace snuffbox
 {
@@ -30,7 +31,8 @@ namespace snuffbox
 		{
 			kTexture,
 			kShader,
-			kModel
+			kModel,
+			kFont
 		};
 
 		/**
@@ -89,10 +91,11 @@ namespace snuffbox
 		void UnloadAll();
 
 	private:
-		std::map<std::string, SharedPtr<Content<Texture>>> loaded_textures_; //!< A map by path of all loaded textures
-		std::map<std::string, SharedPtr<Content<Shader>>> loaded_shaders_; //!< A map by path of all loaded shaders
+		std::map<std::string, SharedPtr<Content<Texture>>>	loaded_textures_; //!< A map by path of all loaded textures
+		std::map<std::string, SharedPtr<Content<Shader>>>		loaded_shaders_; //!< A map by path of all loaded shaders
 		std::map<std::string, SharedPtr<Content<FBXModel>>> loaded_models_; //!< A map by path of all loaded models
-		std::queue<PendingContent>												pending_content_; //!< A queue for pending content
+		std::map<std::string, SharedPtr<Content<Font>>>			loaded_fonts_; //!< A map by path of all loaded models
+		std::queue<PendingContent>													pending_content_; //!< A queue for pending content
 	
 	public:
 		JS_NAME(ContentManager);

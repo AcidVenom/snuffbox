@@ -85,6 +85,21 @@ namespace snuffbox
 
 	//-------------------------------------------------------------------------------------------
 	template<>
+	bool ContentManager::Load<Font>(std::string path)
+	{
+		if (loaded_fonts_.find(path) != loaded_fonts_.end())
+			return false;
+
+		SNUFF_LOG_INFO(std::string("Loading font " + path).c_str());
+		SharedPtr<Font> font = environment::memory().ConstructShared<Font>(path);
+		SharedPtr<Content<Font>> content = environment::memory().ConstructShared<Content<Font>>(ContentTypes::kFont, font);
+
+		loaded_fonts_.emplace(path, content);
+		return true;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
 	void ContentManager::Unload<Texture>(std::string path)
 	{
 		SNUFF_XASSERT(loaded_textures_.find(path) != loaded_textures_.end(), "The texture '" + path + "' was never loaded!");
@@ -114,6 +129,16 @@ namespace snuffbox
 		loaded_models_.erase(loaded_models_.find(path));
 		environment::file_watcher().RemoveWatchedFile(path);
 		SNUFF_LOG_INFO(std::string("Unloaded model " + path).c_str());
+	}
+
+	//-------------------------------------------------------------------------------------------
+	template<>
+	void ContentManager::Unload<Font>(std::string path)
+	{
+		SNUFF_XASSERT(loaded_fonts_.find(path) != loaded_fonts_.end(), "The font '" + path + "' was never loaded!");
+
+		loaded_fonts_.erase(loaded_fonts_.find(path));
+		SNUFF_LOG_INFO(std::string("Unloaded font " + path).c_str());
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -156,6 +181,19 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	template<>
+	SharedPtr<Font>& ContentManager::Get<Font>(std::string path)
+	{
+		Content<Font>* contentPtr = nullptr;
+
+		SNUFF_XASSERT(loaded_fonts_.find(path) != loaded_fonts_.end(), std::string("Font not loaded '" + path + "'!"));
+
+		contentPtr = loaded_fonts_.find(path)->second.get();
+
+		return contentPtr->Get();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void ContentManager::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -189,6 +227,8 @@ namespace snuffbox
 			environment::file_watcher().RemoveWatchedFile(it->first);
 		}
 		loaded_models_.clear();
+
+		loaded_fonts_.clear();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -218,6 +258,12 @@ namespace snuffbox
 		{
 			isContent = true;
 			environment::content_manager().Load<FBXModel>(contentPath);
+		}
+
+		if (strcmp(contentType.c_str(), "font") == 0)
+		{
+			isContent = true;
+			environment::content_manager().Load<Font>(contentPath);
 		}
 
 		if (!isContent)
@@ -251,6 +297,12 @@ namespace snuffbox
 		{
 			isContent = true;
 			environment::content_manager().Unload<FBXModel>(contentPath);
+		}
+
+		if (strcmp(contentType.c_str(), "font") == 0)
+		{
+			isContent = true;
+			environment::content_manager().Unload<Font>(contentPath);
 		}
 
 		if (!isContent)

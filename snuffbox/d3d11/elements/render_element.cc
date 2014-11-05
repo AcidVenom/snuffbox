@@ -18,7 +18,10 @@ namespace snuffbox
 		distance_from_camera_(0.0f),
 		alpha_(1.0f),
 		blend_(1.0f, 1.0f, 1.0f),
-		visible_(true)
+		visible_(true),
+		yaw_(0.0f),
+		pitch_(0.0f),
+		roll_(0.0f)
 	{
 		size_[0] = 1.0f;
 		size_[1] = 1.0f;
@@ -166,15 +169,23 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::RotateBy(float x, float y, float z)
 	{
-		rotation_ *= XMMatrixRotationRollPitchYaw(x, y, z);
+		rotation_ *= XMMatrixRotationRollPitchYaw(-x, -y, -z);
+
+		yaw_ += x;
+		pitch_ += y;
+		roll_ += z;
 	}
 
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::SetRotation(float x, float y, float z)
 	{
-		rotation_ = XMMatrixRotationRollPitchYaw(x, 0, 0);
-		rotation_ *= XMMatrixRotationRollPitchYaw(0, y, 0);
-		rotation_ *= XMMatrixRotationRollPitchYaw(0, 0, z);
+		rotation_ = XMMatrixRotationRollPitchYaw(-x, 0, 0);
+		rotation_ *= XMMatrixRotationRollPitchYaw(0, -y, 0);
+		rotation_ *= XMMatrixRotationRollPitchYaw(0, 0, -z);
+
+		yaw_ = x;
+		pitch_ = y;
+		roll_ = z;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -320,11 +331,16 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::JSSetScale(JS_ARGS)
 	{
-		JS_SETUP(RenderElement, "NNN");
+		JS_SETUP(RenderElement, "NN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
-		float z = wrapper.GetNumber<float>(2);
+		float z = y;
+
+		if (wrapper.argLength() > 2)
+		{
+			z = wrapper.GetNumber<float>(2);
+		}
 
 		self->SetScale(x, y, z);
 	}
@@ -332,11 +348,17 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::JSSetOffset(JS_ARGS)
 	{
-		JS_SETUP(RenderElement, "NNN");
+		JS_SETUP(RenderElement, "NN");
 
 		float x = wrapper.GetNumber<float>(0);
 		float y = wrapper.GetNumber<float>(1);
-		float z = wrapper.GetNumber<float>(2);
+
+		float z = y;
+
+		if (wrapper.argLength() > 2)
+		{
+			z = wrapper.GetNumber<float>(2);
+		}
 
 		self->SetOffset(x, y, z);
 	}
@@ -382,10 +404,7 @@ namespace snuffbox
 	void RenderElement::JSRotation(JS_ARGS)
 	{
 		JS_SETUP(RenderElement, "V");
-		float roll = atan2(self->rotation_._31, self->rotation_._32);
-		float pitch = acos(self->rotation_._33);
-		float yaw = -atan2(self->rotation_._13, self->rotation_._23);
-		wrapper.ReturnTriple<float>(yaw, pitch, roll);
+		wrapper.ReturnTriple<float>(self->yaw_, self->pitch_, self->roll_);
 	}
 
 	//-------------------------------------------------------------------------------------------

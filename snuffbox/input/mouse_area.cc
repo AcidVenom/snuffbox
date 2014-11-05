@@ -51,7 +51,14 @@ namespace snuffbox
 			XMMATRIX& trans = parent_->world_matrix(nullptr);
 
 			metrics_.x = trans._41;
-			metrics_.y = -trans._42;
+			if (environment::render_settings().y_down() == false)
+			{
+				metrics_.y = -trans._42;
+			}
+			else
+			{
+				metrics_.y = trans._42;
+			}
 		}
 	}
 

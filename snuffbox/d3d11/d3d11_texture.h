@@ -19,6 +19,8 @@ namespace snuffbox
 		*/
 		Texture(std::string path);
 
+		Texture(ID3D11ShaderResourceView* texture);
+
 		/// Default destructor
 		~Texture();
 

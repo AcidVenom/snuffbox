@@ -28,6 +28,9 @@
     <Filter Include="fbx">
       <UniqueIdentifier>{a4f4d101-3b7a-4ed9-80d8-716b8a93d721}</UniqueIdentifier>
     </Filter>
+    <Filter Include="freetype">
+      <UniqueIdentifier>{69a8b7a0-d7b4-43cc-9f89-f54b9285d0fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -112,6 +115,15 @@
     <ClCompile Include="input\mouse_area.cc">
       <Filter>input</Filter>
     </ClCompile>
+    <ClCompile Include="freetype\freetype_wrapper.cc">
+      <Filter>freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype\freetype_font.cc">
+      <Filter>freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype\freetype_font_atlas.cc">
+      <Filter>freetype</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -189,9 +201,6 @@
     <ClInclude Include="console\console_ui.h">
       <Filter>console</Filter>
     </ClInclude>
-    <ClInclude Include="content\content_manager.h">
-      <Filter>content</Filter>
-    </ClInclude>
     <ClInclude Include="d3d11\elements\widget_element.h">
       <Filter>d3d11\elements</Filter>
     </ClInclude>
@@ -209,6 +218,18 @@
     </ClInclude>
     <ClInclude Include="input\mouse_area.h">
       <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="freetype\freetype_wrapper.h">
+      <Filter>freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="freetype\freetype_font.h">
+      <Filter>freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="freetype\freetype_font_atlas.h">
+      <Filter>freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="content\content_manager.h">
+      <Filter>d3d11\elements</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

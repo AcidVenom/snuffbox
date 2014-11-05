@@ -73,6 +73,9 @@ namespace snuffbox
 		/// Sets the log errors to on or off
 		void SetLogErrors(bool val){log_errors_ = val;}
 
+		/// Returns the argument length
+		int argLength();
+
 	private:
 		const FunctionCallbackInfo<Value>& args_; //!< The JavaScript arguments passed by a function
 		bool log_errors_; //!< Log errors or not
@@ -84,6 +87,12 @@ namespace snuffbox
 		JS_CREATE_SCOPE;
 
 		return args_[arg];
+	}
+
+	//------------------------------------------------------------------------------
+	inline int JSWrapper::argLength()
+	{
+		return args_.Length();
 	}
 
 	//------------------------------------------------------------------------------

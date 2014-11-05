@@ -103,7 +103,12 @@ namespace snuffbox
 		/**
 		* @return (XMMATRIX) The 2D scaling matrix
 		*/
-		XMMATRIX scaling_2d(){ return XMMatrixScaling(sx_*size_[0], sy_*size_[1], sz_); }
+		XMMATRIX scaling_2d(){ return XMMatrixScaling(sx_*size_[0], sy_*size_[1], sy_); }
+
+		/**
+		* @return (XMMATRIX) The 2D scaling matrix without size
+		*/
+		XMMATRIX scaling_2d_no_size(){ return XMMatrixScaling(sx_, sy_, sy_); }
 
 		/**
 		* @return (XMMATRIX) The offset matrix
@@ -113,7 +118,7 @@ namespace snuffbox
 		/**
 		* @return (XMMATRIX) The 2D offset matrix
 		*/
-		XMMATRIX offset_2d(){ return XMMatrixTranslation(ox_*sx_*size_[0], oy_*sy_*size_[1], oz_*sz_); }
+		XMMATRIX offset_2d(){ return XMMatrixTranslation(ox_*sx_*size_[0], oy_*sy_*size_[1], oy_*sz_); }
 
 		/**
 		* @return (XMVECTOR) The scaling vector
@@ -302,6 +307,9 @@ namespace snuffbox
 		*/
 		bool spawned();
 
+		/// Sets the render texture
+		void set_texture(Texture* texture){ texture_ = texture; }
+
 	private:
 		std::vector<Vertex>										vertices_; //!< The vertices
 		std::vector<unsigned int>							indices_; //!< The indices
@@ -319,6 +327,10 @@ namespace snuffbox
 		float																	sx_; //!< The x scale
 		float																	sy_; //!< The y scale
 		float																	sz_; //!< The z scale
+
+		float																	yaw_; //!< The yaw rotation
+		float																	pitch_; //!< The pitch rotation
+		float																	roll_; //!< The roll rotation
 
 		float																	size_[2]; //!< The widget's size
 

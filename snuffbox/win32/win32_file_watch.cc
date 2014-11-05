@@ -90,6 +90,7 @@ namespace snuffbox
 		for (auto& pair = files_.begin(); pair != files_.end(); ++pair)
 		{
 			auto& it = pair->second;
+
 			bool failed = false;
 			FILETIME lastTime = GetTimeForFile(it.path, &failed);
 			if (!failed)
