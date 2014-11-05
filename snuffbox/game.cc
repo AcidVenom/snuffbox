@@ -18,13 +18,15 @@
 #include "../snuffbox/fbx/fbx_loader.h"
 
 #include "../snuffbox/freetype/freetype_wrapper.h"
+#include "../snuffbox/io/io_manager.h"
+
 
 #include <QtCore>
 #include <stdio.h>
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 587
+#define SNUFF_VERSION_MINOR 589
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -411,6 +413,7 @@ int SNUFF_MAIN
 	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
 	SharedPtr<FBXLoader> fbx_loader = environment::memory().ConstructShared<FBXLoader>();
 	SharedPtr<FreeTypeWrapper> free_type_wrapper = environment::memory().ConstructShared<FreeTypeWrapper>();
+	SharedPtr<IOManager> io_manager = environment::memory().ConstructShared<IOManager>();
 	SharedPtr<ContentManager> content_manager = environment::memory().ConstructShared<ContentManager>();
 	SharedPtr<D3D11Settings> render_settings = environment::memory().ConstructShared<D3D11Settings>();
 

@@ -14,6 +14,7 @@ namespace snuffbox
 	class D3D11Settings;
 	class FBXLoader;
 	class FreeTypeWrapper;
+	class IOManager;
 
 	namespace environment
 	{
@@ -53,6 +54,9 @@ namespace snuffbox
 		/// Returns the FreeType wrapper
 		FreeTypeWrapper& free_type_wrapper();
 
+		/// Returns the IO manager
+		IOManager& io_manager();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -88,5 +92,8 @@ namespace snuffbox
 
 		/// Returns if there is a FreeType wrapper or not
 		bool has_free_type_wrapper();
+
+		/// Returns if there is an IO manager or not
+		bool has_io_manager();
 	}
 }

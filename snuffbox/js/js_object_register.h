@@ -14,6 +14,7 @@
 #include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/d3d11/d3d11_line.h"
 #include "../../snuffbox/content/content_manager.h"
+#include "../../snuffbox/io/io_manager.h"
 
 namespace snuffbox
 {
@@ -34,5 +35,6 @@ namespace snuffbox
 		JSRegister<ContentManager, false>::Register();
 		JSRegister<D3D11Settings, false>::Register();		
 		JSRegister<D3D11Line, false>::Register();
+		JSRegister<IOManager, false>::Register();
 	}
 }

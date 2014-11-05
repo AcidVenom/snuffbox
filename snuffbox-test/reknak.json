@@ -1,0 +1,11 @@
+{
+	"testKey" : {
+		"testProperty" : "testValue",
+		"testArray" : [
+			0,
+			1,
+			2
+		] 
+	}
+
+}

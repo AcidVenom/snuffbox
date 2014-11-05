@@ -31,6 +31,9 @@
     <Filter Include="freetype">
       <UniqueIdentifier>{69a8b7a0-d7b4-43cc-9f89-f54b9285d0fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="io">
+      <UniqueIdentifier>{fec9ed50-21bb-4b62-8316-71ec0bb42946}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -123,6 +126,9 @@
     </ClCompile>
     <ClCompile Include="freetype\freetype_font_atlas.cc">
       <Filter>freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="io\io_manager.cc">
+      <Filter>io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +236,9 @@
     </ClInclude>
     <ClInclude Include="content\content_manager.h">
       <Filter>d3d11\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="io\io_manager.h">
+      <Filter>io</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
