@@ -1,0 +1,13 @@
+icudt51.dll
+icuin51.dll
+icuuc51.dll
+libEGL.dll
+libfbxsdk.dll
+libGLESv2.dll
+Qt5Core.dll
+Qt5Gui.dll
+Qt5Widgets.dll
+
+platforms/qminimal.dll
+platforms/qoffscreen.dll
+platforms/qwindows.dll
