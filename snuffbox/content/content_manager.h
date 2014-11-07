@@ -90,6 +90,38 @@ namespace snuffbox
 		/// Unloads all loaded content
 		void UnloadAll();
 
+		/**
+		* @brief Parses a package from a relative path
+		* @param[in] contentPath (std::string) The relative path
+		*/
+		void ParsePackage(std::string contentPath);
+
+		/**
+		* @brief Skips white spaces of a string
+		* @param[in] i (int&) The index we're currently at
+		* @param[in] str (std::string&) The string to consume whitespaces of
+		* @param[in] curChar (char&) The character to change
+		*/
+		void SkipWhiteSpaces(int& i, std::string& str, char& curChar);
+
+		/**
+		* @brief Consumes a keyword
+		* @param[in] i (int&) The current index in the string
+		* @param[in] str (std::string&) The current string being parsed
+		* @param[in] toConsume (std::string) The string to consume
+		* @return (bool) Was the right keyword found?
+		*/
+		bool Consume(int& i, std::string& str, std::string toConsume);
+
+		/**
+		* @brief Retrieves a value
+		* @param[in] i (int&) The current index in the string
+		* @param[in] str (std::string&) The current string being parsed
+		* @param[in] endAt (std::string) The character to stop at
+		* @return (std::string) The value
+		*/
+		std::string GetValue(int& i, std::string& str, std::string endAt);
+
 	private:
 		std::map<std::string, SharedPtr<Content<Texture>>>	loaded_textures_; //!< A map by path of all loaded textures
 		std::map<std::string, SharedPtr<Content<Shader>>>		loaded_shaders_; //!< A map by path of all loaded shaders

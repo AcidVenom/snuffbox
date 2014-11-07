@@ -1,5 +1,6 @@
 Game.Initialise = function()
 {
+	ContentManager.load("box", "test.box");
 	ContentManager.load("texture", "tex.png");
 	ContentManager.load("texture", "tex2.png");
 
@@ -8,7 +9,7 @@ Game.Initialise = function()
 	RenderSettings.setVsync(false);
 	RenderSettings.setFullscreen(false);
 	RenderSettings.setCullMode(RenderSettings.CullFront);
-	RenderSettings.setBackBufferColour(0,0,0,1);
+	RenderSettings.setBackBufferColour(0,0,0.8,1);
 	RenderSettings.setWindowSize(640,480);
 	RenderSettings.setYDown(false);
 	Game.camera = Camera.new("orthographic");
@@ -45,6 +46,7 @@ Game.onLeave = function(callee)
 {
 	callee.setAlpha(1);
 }
+
 Game.Update = function(dt)
 {	
 	if(Keyboard.isReleased("F9"))
@@ -62,6 +64,9 @@ Game.Update = function(dt)
 	Game.widget3.setScale(0.5,0.5);
 	Game.widget3.setRotation(0,0,0);
 	Game.widget3.setOffset(0.5,0.5);
+
+	Game.widget2.setTranslation(16,-16, 2);
+	Game.widget3.setTranslation(8,-8, 3);
 }
 
 Game.Draw = function(dt)

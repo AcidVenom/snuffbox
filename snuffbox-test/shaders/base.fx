@@ -12,7 +12,7 @@ cbuffer ConstantBuffer : register(b0)
 
 cbuffer Uniforms : register(b1)
 {
-
+	
 }
 
 struct VOut

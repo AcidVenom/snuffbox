@@ -7,6 +7,8 @@
 #include "../../snuffbox/fbx/fbx_loader.h"
 #include "../../snuffbox/win32/win32_file_watch.h"
 
+#include <fstream>
+
 namespace snuffbox
 {
 	namespace environment
@@ -266,10 +268,165 @@ namespace snuffbox
 			environment::content_manager().Load<Font>(contentPath);
 		}
 
+		if (strcmp(contentType.c_str(), "box") == 0)
+		{
+			isContent = true;
+			environment::content_manager().ParsePackage(contentPath);
+		}
+
 		if (!isContent)
 		{
 			SNUFF_LOG_ERROR(std::string("Content type '" + contentType + "' does not exist").c_str());
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void ContentManager::ParsePackage(std::string contentPath)
+	{
+		std::fstream content(environment::js_state_wrapper().path() + "/" + contentPath);
+
+		if (content)
+		{
+			std::string package;
+			char ch;
+
+			while (content >> std::noskipws >> ch)
+			{
+				package += ch;
+			}
+
+			std::string current = "";
+			std::string expected = "load";
+
+			std::map<std::string, std::vector<std::string>> parsedValues;
+			bool checkType = true;
+
+			for (int i = 0; i < package.length(); ++i)
+			{
+				ch = package.at(i);
+
+				SkipWhiteSpaces(i, package, ch);
+
+				bool result = Consume(i, package, expected);
+
+				if (result == false)
+				{
+					return;
+				}
+				else if (expected == "load")
+				{
+					expected = "(";
+				}
+				else if (expected == "(")
+				{
+					expected = "\"";
+				}
+				else if (expected == "\"")
+				{
+					++i;
+					std::string val = GetValue(i, package, "\"");
+
+					if (checkType == true)
+					{
+						SkipWhiteSpaces(i, package, ch);
+						++i;
+						result = Consume(i, package, ",");
+
+						if (result == true)
+						{
+							SkipWhiteSpaces(i, package, ch);
+							++i;
+							result = Consume(i, package, "\"");
+
+							if (result == true)
+							{
+								++i;
+								std::string val2 = GetValue(i, package, "\"");
+								auto it = parsedValues.find(val);
+
+								if (it == parsedValues.end())
+								{
+									std::vector<std::string> vec;
+									vec.push_back(val2);
+									parsedValues.emplace(val, vec);
+								}
+								else
+								{
+									it->second.push_back(val2);
+								}
+								++i;
+
+								bool result = Consume(i, package, ")");
+
+								if (result == true)
+								{
+									expected = "load";
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			SNUFF_LOG_ERROR(std::string("Could not open box file " + contentPath).c_str());
+		}
+
+		content.close();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void ContentManager::SkipWhiteSpaces(int& i, std::string& str, char& curChar)
+	{
+		char ch = str.at(i);
+		while (i < str.length() && ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t')
+		{
+			++i;
+			curChar = ch;
+			ch = str.at(i);
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	bool ContentManager::Consume(int& i, std::string& str, std::string toConsume)
+	{
+		int idx = 0;
+		std::string result = "";
+		char ch = str.at(i);
+
+		while (i < str.length() && idx < toConsume.length() && str.at(i) == toConsume.at(idx))
+		{
+			result += str.at(i);
+			++idx;
+			++i;
+		}
+
+		if (result != toConsume)
+		{
+			result += str.at(i);
+			SNUFF_LOG_ERROR(std::string("Expected ' " + toConsume + " ' but found ' " + result + " '").c_str());
+			return false;
+		}
+
+		--i;
+		return true;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	std::string ContentManager::GetValue(int& i, std::string& str, std::string endAt)
+	{
+		char ch = str.at(i);
+		std::string val = "";
+
+		while (ch != endAt.at(0))
+		{
+			val += ch;
+			++i;
+			ch = str.at(i);
+		}
+
+		return val;
 	}
 
 	//-------------------------------------------------------------------------------------------

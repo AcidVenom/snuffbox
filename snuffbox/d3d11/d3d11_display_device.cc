@@ -147,7 +147,7 @@ namespace snuffbox
 
 		HRESULT result = S_OK;
 
-		D3D_FEATURE_LEVEL featureLevelsRequested = D3D_FEATURE_LEVEL_11_0;
+		D3D_FEATURE_LEVEL featureLevelsRequested = D3D_FEATURE_LEVEL_10_0;
 		D3D_FEATURE_LEVEL featureLevelsSupported;
 
 		UINT deviceFlags = 0;
@@ -353,20 +353,21 @@ namespace snuffbox
 		HRESULT result = S_OK;
 		std::string file_path = environment::game().path() + "/" + path;
 		
-		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "VS", "vs_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &vs_buffer_, &errors, 0);
+		result = D3DX10CompileFromFileA(file_path.c_str(), 0, 0, "VS", "vs_4_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &vs_buffer_, &errors, 0);
 		if (errors != nullptr)
 		{
 			SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
 			return Shaders{ nullptr, nullptr };
 		}
-		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + file_path).c_str()).c_str());
-		result = D3DX11CompileFromFileA(file_path.c_str(), 0, 0, "PS", "ps_5_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &ps_buffer_, &errors, 0);
+
+		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Vertex Shader ") + file_path).c_str()).c_str());
+		result = D3DX10CompileFromFileA(file_path.c_str(), 0, 0, "PS", "ps_4_0", D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, 0, 0, &ps_buffer_, &errors, 0);
 		if (errors != nullptr)
 		{
 			SNUFF_LOG_ERROR(static_cast<const char*>(errors->GetBufferPointer()));
 			return Shaders{ nullptr, nullptr };
 		}
-		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Shader ") + file_path).c_str()).c_str());
+		SNUFF_XASSERT(result == S_OK, HRToString(result, (std::string("Pixel Shader ") + file_path).c_str()).c_str());
 
 		result = device_->CreateVertexShader(vs_buffer_->GetBufferPointer(), vs_buffer_->GetBufferSize(), NULL, &vs);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
