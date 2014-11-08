@@ -233,55 +233,121 @@ namespace snuffbox
 		loaded_fonts_.clear();
 	}
 
+  //-------------------------------------------------------------------------------------------
+  void ContentManager::Unload(std::string contentType, std::string contentPath)
+  {
+    bool isContent = false;
+
+    if (strcmp(contentType.c_str(), "texture") == 0)
+    {
+      isContent = true;
+      Unload<Texture>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "shader") == 0)
+    {
+      isContent = true;
+      Unload<Shader>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "model") == 0)
+    {
+      isContent = true;
+      Unload<FBXModel>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "font") == 0)
+    {
+      isContent = true;
+      Unload<Font>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "box") == 0)
+    {
+      isContent = true;
+      auto values = ParsePackage(contentPath);
+
+      SNUFF_LOG_INFO(std::string("Unloading box " + contentPath).c_str());
+      for (auto it = values.begin(); it != values.end(); ++it)
+      {
+        for (auto path : it->second)
+        {
+          Unload(it->first, path);
+        }
+      }
+    }
+
+    if (!isContent)
+    {
+      SNUFF_LOG_ERROR(std::string("Content type '" + contentType + "' does not exist!").c_str());
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------
+  void ContentManager::Load(std::string contentType, std::string contentPath)
+  {
+    bool isContent = false;
+    PendingContent content;
+    content.path = contentPath;
+
+    if (strcmp(contentType.c_str(), "texture") == 0)
+    {
+      isContent = true;
+      Load<Texture>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "shader") == 0)
+    {
+      isContent = true;
+      Load<Shader>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "model") == 0)
+    {
+      isContent = true;
+      Load<FBXModel>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "font") == 0)
+    {
+      isContent = true;
+     Load<Font>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "box") == 0)
+    {
+      isContent = true;
+      SNUFF_LOG_INFO(std::string("Loading box " + contentPath).c_str());
+      auto values = ParsePackage(contentPath);
+
+      for (auto it = values.begin(); it != values.end(); ++it)
+      {
+        for (auto path : it->second)
+        {
+          Load(it->first, path);
+        }
+      }
+    }
+
+    if (!isContent)
+    {
+      SNUFF_LOG_ERROR(std::string("Content type '" + contentType + "' does not exist").c_str());
+    }
+  }
+
 	//-------------------------------------------------------------------------------------------
 	void ContentManager::JSLoad(JS_ARGS)
 	{
 		JS_CHECK_PARAMS("SS");
 
-		bool isContent = false;
-		std::string contentType = wrapper.GetString(0).c_str();
-		std::string contentPath = wrapper.GetString(1).c_str();
-		PendingContent content;
-		content.path = contentPath;
-
-		if (strcmp(contentType.c_str(), "texture") == 0)
-		{
-			isContent = true;
-			environment::content_manager().Load<Texture>(contentPath);
-		}
-
-		if (strcmp(contentType.c_str(), "shader") == 0)
-		{
-			isContent = true;
-			environment::content_manager().Load<Shader>(contentPath);
-		}
-
-		if (strcmp(contentType.c_str(), "model") == 0)
-		{
-			isContent = true;
-			environment::content_manager().Load<FBXModel>(contentPath);
-		}
-
-		if (strcmp(contentType.c_str(), "font") == 0)
-		{
-			isContent = true;
-			environment::content_manager().Load<Font>(contentPath);
-		}
-
-		if (strcmp(contentType.c_str(), "box") == 0)
-		{
-			isContent = true;
-			environment::content_manager().ParsePackage(contentPath);
-		}
-
-		if (!isContent)
-		{
-			SNUFF_LOG_ERROR(std::string("Content type '" + contentType + "' does not exist").c_str());
-		}
+		std::string contentType = wrapper.GetString(0);
+		std::string contentPath = wrapper.GetString(1);
+		
+    environment::content_manager().Load(contentType, contentPath);
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void ContentManager::ParsePackage(std::string contentPath)
+	std::map<std::string,std::vector<std::string>> ContentManager::ParsePackage(std::string contentPath)
 	{
 		std::fstream content(environment::js_state_wrapper().path() + "/" + contentPath);
 
@@ -311,7 +377,7 @@ namespace snuffbox
 
 				if (result == false)
 				{
-					return;
+          return std::map<std::string, std::vector<std::string>>();
 				}
 				else if (expected == "load")
 				{
@@ -326,19 +392,31 @@ namespace snuffbox
 					++i;
 					std::string val = GetValue(i, package, "\"");
 
-					if (checkType == true)
+          if (checkType == false)
+          {
+            return std::map<std::string, std::vector<std::string>>();
+          }
+          else
 					{
 						SkipWhiteSpaces(i, package, ch);
 						++i;
 						result = Consume(i, package, ",");
 
-						if (result == true)
+            if (result == false)
+            {
+              return std::map<std::string, std::vector<std::string>>();
+            }
+            else
 						{
 							SkipWhiteSpaces(i, package, ch);
 							++i;
 							result = Consume(i, package, "\"");
 
-							if (result == true)
+              if (result == false)
+              {
+                return std::map<std::string, std::vector<std::string>>();
+              }
+              else
 							{
 								++i;
 								std::string val2 = GetValue(i, package, "\"");
@@ -358,15 +436,23 @@ namespace snuffbox
 
 								bool result = Consume(i, package, ")");
 
-								if (result == true)
+								if (result == false)
 								{
-									expected = "load";
+                  return std::map<std::string, std::vector<std::string>>();
 								}
+                else
+                {
+                  expected = "load";
+                }
 							}
 						}
 					}
 				}
 			}
+
+      content.close();
+
+      return parsedValues;
 		}
 		else
 		{
@@ -374,6 +460,8 @@ namespace snuffbox
 		}
 
 		content.close();
+
+    return std::map<std::string, std::vector<std::string>>();
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -433,39 +521,10 @@ namespace snuffbox
 	void ContentManager::JSUnload(JS_ARGS)
 	{
 		JS_CHECK_PARAMS("SS");
-
-		bool isContent = false;
-		std::string contentType = wrapper.GetString(0).c_str();
-		std::string contentPath = wrapper.GetString(1).c_str();
-
-		if (strcmp(contentType.c_str(), "texture") == 0)
-		{
-			isContent = true;
-			environment::content_manager().Unload<Texture>(contentPath);
-		}
-
-		if (strcmp(contentType.c_str(), "shader") == 0)
-		{
-			isContent = true;
-			environment::content_manager().Unload<Shader>(contentPath);
-		}
-
-		if (strcmp(contentType.c_str(), "model") == 0)
-		{
-			isContent = true;
-			environment::content_manager().Unload<FBXModel>(contentPath);
-		}
-
-		if (strcmp(contentType.c_str(), "font") == 0)
-		{
-			isContent = true;
-			environment::content_manager().Unload<Font>(contentPath);
-		}
-
-		if (!isContent)
-		{
-			SNUFF_LOG_ERROR(std::string("Content type '" + contentType + "' does not exist!").c_str());
-		}
+    std::string contentType = wrapper.GetString(0).c_str();
+    std::string contentPath = wrapper.GetString(1).c_str();
+		
+    environment::content_manager().Unload(contentType, contentPath);
 	}
 
 	//-------------------------------------------------------------------------------------------

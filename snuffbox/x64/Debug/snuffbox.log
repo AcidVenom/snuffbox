@@ -1,8 +1,8 @@
-﻿Build started 11/7/2014 5:38:45 PM.
+﻿Build started 08/11/2014 02:59:55 AM.
      1>Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /IC:\V8\include /I"C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\\Include" /IC:\FBX\2015.1\include /IC:\FreeType\include /IC:\FreeType\include\config /IC:\FreeType\include\internal /IC:\FreeType\include\internal\services /Zi /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt /DNOMINMAX console\moc_console_widget.cc content\content_manager.cc freetype\freetype_font.cc freetype\freetype_wrapper.cc game.cc input\keyboard.cc input\mouse.cc input\mouse_area.cc io\io_manager.cc js\js_state_wrapper.cc js\js_wrapper.cc memory\allocated_memory.cc win32\win32_file_watch.cc win32\win32_window.cc
-         content_manager.cc
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /IC:\V8\include /I"C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\\Include" /IC:\FBX\2015.1\include /IC:\FreeType\include /IC:\FreeType\include\config /IC:\FreeType\include\internal /IC:\FreeType\include\internal\services /Zi /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt /DNOMINMAX console\moc_console_widget.cc content\content_manager.cc d3d11\d3d11_display_device.cc d3d11\d3d11_settings.cc d3d11\elements\render_element.cc d3d11\elements\widget_element.cc fbx\fbx_model.cc freetype\freetype_font.cc freetype\freetype_font_atlas.cc freetype\freetype_wrapper.cc game.cc input\keyboard.cc input\mouse.cc input\mouse_area.cc io\io_manager.cc js\js_state_wrapper.cc js\js_wrapper.cc memory\allocated_memory.cc win32\win32_file_watch.cc win32\win32_window.cc
+         game.cc
          moc_console_widget.cc
          Generating Code...
          Skipping... (no relevant changes detected)
@@ -15,9 +15,15 @@
          mouse_area.cc
          mouse.cc
          keyboard.cc
-         game.cc
          freetype_wrapper.cc
+         freetype_font_atlas.cc
          freetype_font.cc
+         fbx_model.cc
+         widget_element.cc
+         render_element.cc
+         d3d11_settings.cc
+         d3d11_display_device.cc
+         content_manager.cc
        CustomBuildStep:
          moc -o console/moc_console_widget.cc console/console_widget.h
          uic -o console/console_ui.h console/console_ui.ui
@@ -60,4 +66,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:08.29
+Time Elapsed 00:00:07.50

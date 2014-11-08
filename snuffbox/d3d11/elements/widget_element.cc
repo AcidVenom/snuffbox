@@ -107,23 +107,28 @@ namespace snuffbox
 		if (parent_ != nullptr)
 		{
 			Widget* parent = parent_;
+      XMVECTOR t = XMVectorSet(0,0,0,0);
+      XMMATRIX rot = XMMatrixIdentity();
+      XMMATRIX s = XMMatrixIdentity();
 
-			while (parent->parent() != nullptr)
-			{
-				parent = parent->parent();
-			}
-			XMMATRIX parentTrans = XMMatrixTranslationFromVector(parent->translation());
+      while (parent->parent() != nullptr)
+      {
+        t += parent->translation();
+        rot *= parent->rotation();
+        s *= parent->scaling_2d_no_size();
+        parent = parent->parent();
+      }
 
-			if (parent_->parent() != nullptr)
-			{
-				parentTrans = XMMatrixTranslationFromVector(parent_->translation());
-			}
+			
+      XMMATRIX parentTrans = XMMatrixTranslationFromVector(t);
+      XMMATRIX rootTrans = XMMatrixTranslationFromVector(parent->translation());
 			if (environment::render_settings().y_down() == false)
 			{
 				parentTrans._42 = -parentTrans._42;
+        rootTrans._42 = -rootTrans._42;
 			}
 
-			world_ *= trans * parentTrans * parent->scaling_2d_no_size() * parent->rotation();
+      world_ *= trans * s * rot * parentTrans * parent->scaling_2d_no_size() * parent->rotation() * rootTrans;
 
 		}
 		else

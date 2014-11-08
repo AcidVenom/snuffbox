@@ -1,8 +1,6 @@
 Game.Initialise = function()
 {
 	ContentManager.load("box", "test.box");
-	ContentManager.load("texture", "tex.png");
-	ContentManager.load("texture", "tex2.png");
 
 	Game.setName("Snuffbox Test Project");
 	RenderSettings.setResolution(640,480);
@@ -15,11 +13,11 @@ Game.Initialise = function()
 	Game.camera = Camera.new("orthographic");
 	Game.camera.setTranslation(0,0,0);
 	Game.widget = Widget.new();
-	Game.widget.setSize(32,32);
+	Game.widget.setSize(64,64);
 	Game.widget.spawn();
 
 	Game.widget2 = Widget.new(Game.widget);
-	Game.widget2.setSize(16,16);
+	Game.widget2.setSize(32,32);
 	Game.widget2.setTranslation(0,0,1);
 	Game.widget2.spawn();
 
@@ -55,18 +53,17 @@ Game.Update = function(dt)
 	}
 	
 	Game.timer += dt;
-	Game.widget.setTranslation(0,0,0);
-	Game.widget.setOffset(0.5,0.5);
-	Game.widget2.setTranslation(0,0,1);
-	Game.widget2.setOffset(0.5,0.5);
-	Game.widget3.setTranslation(0,0,2);
-	Game.widget3.setOffset(0.5,0.5);
-	Game.widget3.setScale(0.5,0.5);
-	Game.widget3.setRotation(0,0,0);
-	Game.widget3.setOffset(0.5,0.5);
 
-	Game.widget2.setTranslation(16,-16, 2);
-	Game.widget3.setTranslation(8,-8, 3);
+	Game.widget2.setTranslation(48,0,2);
+	Game.widget2.setScale(1.5,1.5);
+	Game.widget2.setRotation(0,0,0.5);
+
+	Game.widget.setTranslation(30,30,0)
+	Game.widget.setScale(2,2);
+	Game.widget.setRotation(0,0,0.5);
+
+	Game.widget3.setTranslation(35,0,3);
+	Game.widget3.setRotation(0,0,0.5);
 }
 
 Game.Draw = function(dt)
