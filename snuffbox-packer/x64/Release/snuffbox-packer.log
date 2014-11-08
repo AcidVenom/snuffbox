@@ -1,0 +1,19 @@
+﻿Build started 08/11/2014 10:09:09 AM.
+     1>Project "C:\Snuff\src\snuffbox-packer\snuffbox-packer.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt main.cc qt\moc_packer_widget.cc qt\packer_widget.cc
+         main.cc
+         moc_packer_widget.cc
+         packer_widget.cc
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Snuff\src\snuffbox-packer\x64\Release\snuffbox-packer.exe" /INCREMENTAL:NO /NOLOGO C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Gui.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Core.lib C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgets.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Snuff\src\snuffbox-packer\x64\Release\snuffbox-packer.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Snuff\src\snuffbox-packer\x64\Release\snuffbox-packer.lib" /MACHINE:X64 x64\Release\main.obj
+         x64\Release\moc_packer_widget.obj
+         x64\Release\packer_widget.obj
+         Generating code
+         Finished generating code
+         snuffbox-packer.vcxproj -> C:\Snuff\src\snuffbox-packer\x64\Release\snuffbox-packer.exe
+     1>Done Building Project "C:\Snuff\src\snuffbox-packer\snuffbox-packer.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:03.42
