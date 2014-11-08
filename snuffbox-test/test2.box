@@ -1,3 +1,0 @@
-load("texture","tex.png")
-load("texture","tex2.png")
-load("box","test.box")

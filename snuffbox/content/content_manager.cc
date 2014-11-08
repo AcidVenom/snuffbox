@@ -373,6 +373,12 @@ namespace snuffbox
 
 				SkipWhiteSpaces(i, package, ch);
 
+        if (i >= package.length())
+        {
+          content.close();
+          return parsedValues;
+        }
+
 				bool result = Consume(i, package, expected);
 
 				if (result == false)
@@ -468,12 +474,19 @@ namespace snuffbox
 	void ContentManager::SkipWhiteSpaces(int& i, std::string& str, char& curChar)
 	{
 		char ch = str.at(i);
-		while (i < str.length() && ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t')
-		{
-			++i;
-			curChar = ch;
-			ch = str.at(i);
-		}
+
+    while (ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t')
+    {
+      ++i;
+      curChar = ch;
+
+      if (i >= str.length())
+      {
+        break;
+      }
+
+      ch = str.at(i);
+    }
 	}
 
 	//-------------------------------------------------------------------------------------------

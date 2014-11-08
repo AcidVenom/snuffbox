@@ -3,11 +3,14 @@
 #include <qobject.h>
 
 #include "main_window_ui.h"
+#include <string>
+#include <map>
 
 class QFileSystemModel;
 
 namespace snuffboxpacker
 {
+  typedef std::map<std::string, std::vector<std::string>> Package;
   static int ContentItem = 100005;
 
   enum ContentTypes
@@ -34,10 +37,17 @@ namespace snuffboxpacker
     void OnContentMenuRequested(QPoint point);
     void OnSave();
     void OnSaveAs();
+    void OnOpen();
+    void OnNew();
+    void OnQuit();
 
   private:
     QString DeduceType(QString path);
     ContentTypes GetContentType(QString type);
+    void SkipWhiteSpaces(int& i, std::string& str, char& curChar);
+    bool Consume(int& i, std::string& str, std::string toConsume);
+    std::string GetValue(int& i, std::string& str, std::string endAt);
+    Package ParsePackage(std::string& contentPath, bool* failed);
 
   private:
     QString path_;

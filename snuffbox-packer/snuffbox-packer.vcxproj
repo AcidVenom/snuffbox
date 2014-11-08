@@ -103,11 +103,13 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Guid.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Cored.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,11 +143,12 @@
       <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Gui.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Core.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
