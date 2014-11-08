@@ -139,7 +139,7 @@ namespace snuffbox
 			{
 				MouseAreaMetrics metrics = mouseArea->metrics();
 				
-				if (x >= metrics.x && y <= metrics.y && x <= metrics.x + metrics.w && y >= metrics.y - metrics.h)
+				if (x >= metrics.x-1 && y <= metrics.y-1 && x <= metrics.x + metrics.w && y >= metrics.y - metrics.h)
 				{
 					if (!mouseArea->hovered())
 					{

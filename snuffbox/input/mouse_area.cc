@@ -44,21 +44,20 @@ namespace snuffbox
 	{
 		if (parent_ != nullptr)
 		{
-			XMVECTOR size = parent_->scale() * parent_->size();
-			metrics_.w = XMVectorGetX(size);
-			metrics_.h = XMVectorGetZ(size);
+			XMMATRIX& world = parent_->world_matrix(nullptr);
 
-			XMMATRIX& trans = parent_->world_matrix(nullptr);
-
-			metrics_.x = trans._41;
+      metrics_.x = world._41;
 			if (environment::render_settings().y_down() == false)
 			{
-				metrics_.y = -trans._42;
+        metrics_.y = -world._42;
 			}
 			else
 			{
-				metrics_.y = trans._42;
+        metrics_.y = world._42;
 			}
+
+      metrics_.w = world._11;
+      metrics_.h = world._22;
 		}
 	}
 
