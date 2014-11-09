@@ -57,11 +57,6 @@ namespace snuffbox
 
 		XMMATRIX trans = XMMatrixTranslationFromVector(translation());
 
-		if (environment::render_settings().y_down() == true)
-		{
-			trans._42 = -trans._42;
-		}
-
 		world_ = scaling() * offset() * XMMatrixRotationX(-XM_PI / 2) * baseMatrix * trans;
 
 		return world_;

@@ -122,11 +122,6 @@ namespace snuffbox
 			
       XMMATRIX parentTrans = XMMatrixTranslationFromVector(t);
       XMMATRIX rootTrans = XMMatrixTranslationFromVector(parent->translation());
-			if (environment::render_settings().y_down() == false)
-			{
-				parentTrans._42 = -parentTrans._42;
-        rootTrans._42 = -rootTrans._42;
-			}
 
       world_ *= trans * s * rot * parentTrans * parent->scaling_2d_no_size() * parent->rotation() * rootTrans;
 

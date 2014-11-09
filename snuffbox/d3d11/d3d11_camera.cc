@@ -22,6 +22,7 @@ namespace snuffbox
 		roll_ = 0.0f;
 		cam_forward_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		cam_right_ = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+    rotation_ = XMMatrixIdentity();
 		view_matrix_ = XMMatrixIdentity();
 		zoom_ = 1;
 

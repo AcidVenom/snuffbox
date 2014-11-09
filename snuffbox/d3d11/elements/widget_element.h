@@ -31,7 +31,7 @@ namespace snuffbox
 		/**
 		* @return (snuffbox::VertexBufferType) The vertex buffer type
 		*/
-		VertexBufferType type(){ return VertexBufferType::kQuad; }
+    VertexBufferType type(){ return VertexBufferType::kQuad2D; }
 
 		/**
 		* @brief Override the world matrix to use our own ui world matrix

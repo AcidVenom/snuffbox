@@ -46,7 +46,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	Quad2D::Quad2D(JS_ARGS) : RenderElement(RenderElement::ElementTypes::kQuad)
+	Quad2D::Quad2D(JS_ARGS) : RenderElement(RenderElement::ElementTypes::kQuad2D)
 	{
 		Create();
 	}
@@ -78,10 +78,12 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	XMMATRIX& Quad2D::world_matrix(Camera* camera)
 	{
-		return scaling_2d() *
+    world_matrix_ = scaling_2d() *
 			offset_2d() *
 			rotation() *
 			XMMatrixTranslationFromVector(translation());
+
+    return world_matrix_;
 	}
 
 	//-------------------------------------------------------------------------------------------

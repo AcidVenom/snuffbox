@@ -43,6 +43,7 @@ namespace snuffbox
   {
     kNone,
     kQuad,
+    kQuad2D,
     kTerrain,
 		kMesh,
 		kLine

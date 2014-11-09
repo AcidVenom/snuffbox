@@ -59,6 +59,7 @@ namespace snuffbox
 		{
 			kTerrain,
 			kQuad,
+      kQuad2D,
 			kBillboard,
 			kWidget,
 			kMesh
