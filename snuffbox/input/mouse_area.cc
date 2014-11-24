@@ -47,19 +47,18 @@ namespace snuffbox
 			XMMATRIX& world = parent_->world_matrix(nullptr);
 
       metrics_.x = world._41;
-			if (environment::render_settings().y_down() == false)
-			{
-        metrics_.y = -world._42;
-			}
-			else
-			{
-        metrics_.y = world._42;
-			}
+      metrics_.y = -world._42;
 
       metrics_.w = world._11;
       metrics_.h = world._22;
 		}
 	}
+
+  //----------------------------------------------------------------------------------
+  void MouseArea::SetParent(Widget* parent)
+  {
+    parent_ = parent;
+  }
 
 	//----------------------------------------------------------------------------------
 	MouseAreaMetrics MouseArea::metrics()
