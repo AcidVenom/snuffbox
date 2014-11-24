@@ -17,9 +17,8 @@
 
 #include "../snuffbox/fbx/fbx_loader.h"
 
+#include "../snuffbox/freetype/freetype_wrapper.h"
 #include "../snuffbox/io/io_manager.h"
-
-#include "../snuffbox/freetype/freetype_font_manager.h"
 
 
 #include <QtCore>
@@ -27,7 +26,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 610
+#define SNUFF_VERSION_MINOR 592
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -133,14 +132,7 @@ void Game::Update()
 
 	if (shouldReload_)
 	{
-    environment::mouse().ClearAreas();
-
-    JS_CREATE_SCOPE;
-    Local<Value> argv[1] = {
-      String::NewFromUtf8(JS_ISOLATE, environment::file_watcher().last_reloaded().c_str())
-    };
-
-		onReload_.Call(1, argv);
+		onReload_.Call(0);
 		shouldReload_ = false;
 	}
 }
@@ -337,8 +329,7 @@ void Game::RegisterJS(JS_TEMPLATE)
 		JSFunctionRegister("clearRenderer", JSClearRenderer),
     JSFunctionRegister("cleanUp", JSCleanUp),
 		JSFunctionRegister("setName", JSSetName),
-		JSFunctionRegister("showConsole", JSShowConsole),
-    JSFunctionRegister("quit", JSQuit)
+		JSFunctionRegister("showConsole", JSShowConsole)
 	};
 
 	JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
@@ -366,13 +357,6 @@ void Game::JSSetName(JS_ARGS)
 	SetWindowTextA(environment::game().window()->handle(), std::string(environment::game().window()->params().name + " " + wrapper.GetString(0)).c_str());
 }
 
-//------------------------------------------------------------------------------------------------------
-void Game::JSQuit(JS_ARGS)
-{
-  environment::game().NotifyEvent(GameEvents::kQuit);
-}
-
-//------------------------------------------------------------------------------------------------------
 void Game::CreateCallbacks()
 {
 	JS_CREATE_SCOPE;
@@ -428,6 +412,7 @@ int SNUFF_MAIN
 	JSStateWrapper js_state_wrapper;
 	SharedPtr<FileWatcher> file_watcher = environment::memory().ConstructShared<FileWatcher>();
 	SharedPtr<FBXLoader> fbx_loader = environment::memory().ConstructShared<FBXLoader>();
+	SharedPtr<FreeTypeWrapper> free_type_wrapper = environment::memory().ConstructShared<FreeTypeWrapper>();
 	SharedPtr<IOManager> io_manager = environment::memory().ConstructShared<IOManager>();
 	SharedPtr<ContentManager> content_manager = environment::memory().ConstructShared<ContentManager>();
 	SharedPtr<D3D11Settings> render_settings = environment::memory().ConstructShared<D3D11Settings>();
@@ -447,10 +432,9 @@ int SNUFF_MAIN
 		console_window.show();
 	}
 	
+	free_type_wrapper->Initialise();
 	environment::render_device().Initialise();
 	js_state_wrapper.Initialise();
-
-  SharedPtr<FontManager> font_manager = environment::memory().ConstructShared<FontManager>();
 
 	game->Initialise();
 
