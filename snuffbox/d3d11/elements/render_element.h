@@ -29,6 +29,17 @@ namespace snuffbox
 		kFloat4
 	};
 
+  /**
+  * @enum snuffbox::RenderMessage
+  * @brief Render messages to interact with
+  * @author Daniël Konings
+  */
+  enum RenderMessage
+  {
+    kAlpha,
+    kBlend
+  };
+
 	/**
 	* @struct snuffbox::ShaderUniform
 	* @brief Holds data about a uniform for use with a shader
@@ -59,9 +70,11 @@ namespace snuffbox
 		{
 			kTerrain,
 			kQuad,
+      kQuad2D,
 			kBillboard,
 			kWidget,
-			kMesh
+			kMesh,
+      kText
 		};
 
 		/**
@@ -250,7 +263,7 @@ namespace snuffbox
 		* @brief Sets the alpha of this element
 		* @param[in] alpha (float) The alpha to set
 		*/
-		void set_alpha(float alpha){ alpha_ = alpha; }
+    void set_alpha(float alpha){ alpha_ = alpha; OnChange(RenderMessage::kAlpha); }
 
 		/**
 		* @return (float) The alpha of this element
@@ -309,6 +322,12 @@ namespace snuffbox
 
 		/// Sets the render texture
 		void set_texture(Texture* texture){ texture_ = texture; }
+
+    /**
+    * @brief When this render element changes, callback to this function
+    * @param[in] msg (snuffbox::RenderMessage) The message type
+    */
+    virtual void OnChange(RenderMessage msg){}
 
 	private:
 		std::vector<Vertex>										vertices_; //!< The vertices

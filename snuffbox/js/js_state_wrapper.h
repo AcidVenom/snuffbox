@@ -24,6 +24,7 @@ using namespace v8;
 #define JS_SETUP_CALLBACKS Handle<Function> cb; Handle<Value> func;
 #define JS_OBJECT_CALLBACK(name,obj) func = obj->Get(String::NewFromUtf8(JS_ISOLATE, name));cb = Handle<Function>::Cast(func);
 #define JS_SETUP(type,format) Local<Object> obj = args.This();Local<Value> ptr = obj->Get(String::NewFromUtf8(JS_ISOLATE, "__ptr"));Local<External> external = ptr.As<External>();type* self = static_cast<type*>(external->Value()); JS_CHECK_PARAMS(format);
+#define JS_REGISTER_OBJECT_FUNCTIONS_EXTRA(obj, func) for (unsigned int i = 0; i < ARRAYSIZE(func); ++i){ obj->Set(String::NewFromUtf8(JS_ISOLATE, funcs[i].name), Function::New(JS_ISOLATE, funcs[i].cb)); }
 
 namespace snuffbox
 {
@@ -170,6 +171,9 @@ namespace snuffbox
 
 		/// JavaScript require
 		static void JSRequire(JS_ARGS);
+
+    /// JavaScript log RGB
+    static void JSLogRGB(JS_ARGS);
 
     /// JavaScript assert
     static void JSAssert(JS_ARGS);

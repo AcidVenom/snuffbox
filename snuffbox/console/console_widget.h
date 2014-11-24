@@ -62,7 +62,8 @@ namespace snuffbox
 		kSuccess,
 		kError,
 		kFatal,
-		kWarning
+		kWarning,
+    kRgb
 	};
 
 	/**
@@ -91,11 +92,17 @@ namespace snuffbox
 		void Hide();
 
 		/**
-		* @brief Adds a line to the console
+		* @brief Adds a line to the console (RGB values are defaulted to 255, not always used)
 		* @param[in] sev (snuffbox::LogSeverity) The severity of the message
 		* @param[in] msg (const char*) The actual message
+    * @param[in] r1 (float) Red foreground
+    * @param[in] g1 (float) Green foreground
+    * @param[in] b1 (float) Blue foreground
+    * @param[in] r2 (float) Red background
+    * @param[in] g2 (float) Red background
+    * @param[in] b2 (float) Red background
 		*/
-		void AddLine(LogSeverity sev, const char* msg);
+    void AddLine(LogSeverity sev, const char* msg, float r1 = 255.0f, float g1 = 255.0f, float b1 = 255.0f, float r2 = 125.0f, float g2 = 125.0f, float b2 = 125.0f);
 
 		/**
 		* @brief Adds a value to the watch tree

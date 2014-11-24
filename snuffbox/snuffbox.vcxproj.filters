@@ -28,11 +28,11 @@
     <Filter Include="fbx">
       <UniqueIdentifier>{a4f4d101-3b7a-4ed9-80d8-716b8a93d721}</UniqueIdentifier>
     </Filter>
-    <Filter Include="freetype">
-      <UniqueIdentifier>{69a8b7a0-d7b4-43cc-9f89-f54b9285d0fd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="io">
       <UniqueIdentifier>{fec9ed50-21bb-4b62-8316-71ec0bb42946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="freetype">
+      <UniqueIdentifier>{45b2fca2-9ce1-402c-9cbe-549197bc42ea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -118,8 +118,8 @@
     <ClCompile Include="input\mouse_area.cc">
       <Filter>input</Filter>
     </ClCompile>
-    <ClCompile Include="freetype\freetype_wrapper.cc">
-      <Filter>freetype</Filter>
+    <ClCompile Include="io\io_manager.cc">
+      <Filter>io</Filter>
     </ClCompile>
     <ClCompile Include="freetype\freetype_font.cc">
       <Filter>freetype</Filter>
@@ -127,8 +127,11 @@
     <ClCompile Include="freetype\freetype_font_atlas.cc">
       <Filter>freetype</Filter>
     </ClCompile>
-    <ClCompile Include="io\io_manager.cc">
-      <Filter>io</Filter>
+    <ClCompile Include="freetype\freetype_font_manager.cc">
+      <Filter>freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d11\elements\text_element.cc">
+      <Filter>d3d11\elements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -225,8 +228,11 @@
     <ClInclude Include="input\mouse_area.h">
       <Filter>input</Filter>
     </ClInclude>
-    <ClInclude Include="freetype\freetype_wrapper.h">
-      <Filter>freetype</Filter>
+    <ClInclude Include="content\content_manager.h">
+      <Filter>d3d11\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="io\io_manager.h">
+      <Filter>io</Filter>
     </ClInclude>
     <ClInclude Include="freetype\freetype_font.h">
       <Filter>freetype</Filter>
@@ -234,11 +240,11 @@
     <ClInclude Include="freetype\freetype_font_atlas.h">
       <Filter>freetype</Filter>
     </ClInclude>
-    <ClInclude Include="content\content_manager.h">
-      <Filter>d3d11\elements</Filter>
+    <ClInclude Include="freetype\freetype_font_manager.h">
+      <Filter>freetype</Filter>
     </ClInclude>
-    <ClInclude Include="io\io_manager.h">
-      <Filter>io</Filter>
+    <ClInclude Include="d3d11\elements\text_element.h">
+      <Filter>d3d11\elements</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,85 +1,107 @@
 #pragma once
 
-#include <map>
-#include <vector>
+#include "../../snuffbox/d3d11/d3d11_display_device.h"
 #include "../../snuffbox/memory/shared_ptr.h"
+
+#include <vector>
 
 namespace snuffbox
 {
-	class Texture;
+  /**
+  * @struct snuffbox::FontAtlasNode
+  * @brief Basically just contains an int3
+  * @author Daniël Konings
+  */
+  struct FontAtlasNode
+  {
+    FontAtlasNode() : x(0), y(0), z(0){}
+    FontAtlasNode(int xx, int yy, int zz) : x(xx), y(yy), z(zz){}
+    int x, y, z;
+  };
 
-	/**
-	* @struct snuffbox::FontAtlasRegion
-	* @brief An atlas region, used to put glyphs into the atlas
-	* @author Daniël Konings
-	*/
-	struct FontAtlasRegion
-	{
-		int w = 0, h = 0, x = 0, y = 0;
+  /**
+  * @struct snuffbox::FontAtlasRegion
+  * @brief Contains information for a region, X, Y, width and height
+  * @author Daniël Konings
+  */
+  struct FontAtlasRegion
+  {
+    FontAtlasRegion(int xx, int yy, int w, int h) : x(xx), y(yy), width(w), height(h) {}
+    int width, height;
+    int x, y;
+  };
 
-		FontAtlasRegion(int _x, int _y, int _w, int _h) : 
-			x(_x),
-			y(_y),
-			w(_w),
-			h(_h){}
-	};
+  /**
+  * @class snuffbox::FontAtlas
+  * @brief A font atlas that contains pixel information provided by snuffbox::Font
+  * @author Daniël Konings
+  */
+  class FontAtlas
+  {
+  public:
+    /**
+    * @brief Construct a font atlas with a size
+    * @param[in] size (int) The size of the atlas
+    * @param[in] depth (int) The depth of the atlas
+    */
+    FontAtlas(int size, int depth);
 
-	/**
-	* @class snuffbox::FontAtlas
-	* @brief A font texture atlas to store glyphs in and to use as a texture
-	* @author Daniël Konings
-	*/
-	class FontAtlas
-	{
-	public:
+    /// Default destructor
+    ~FontAtlas();
 
-		///Default constructor
-		FontAtlas();
+    /// Returns the size of this atlas
+    int size();
 
-		/**
-		* @brief Construct a font atlas
-		* @param[in] w (int) The width of the atlas
-		* @param[in] h (int) The height of the atlas
-		*/
-		FontAtlas(int w, int h);
+    /// Returns the depth of this atlas
+    int depth();
 
-		/// Default destructor
-		~FontAtlas();
+    /**
+    * @brief Creates a font atlas region with a given width and height
+    * @param[in] width (int) The width of the new region
+    * @param[in] height (int) The height of the new region
+    */
+    FontAtlasRegion CreateRegion(int width, int height);
 
-		/**
-		* @param[in] character (char) The character to check
-		* @return (bool) Does this atlas contain a specific character already?
-		*/
-		bool ContainsGlyph(char character);
+    /**
+    * @brief Tests if a region fits
+    * @param[in] idx (int) The index to check from
+    * @param[in] width (int) The width to check
+    * @param[in] height (int) The height to check
+    * @return (int) The best index found to put a region in
+    */
+    int TestFit(int idx, int width, int height);
 
-		/**
-		* @brief Fills an atlas region with pixel data
-		* @param[in] region (const snuffbox::FontAtlasRegion&) The region to fill
-		* @param[in] buffer (const unsigned char*) The buffer to use for filling
-		* @param[in] stride (unsigned short) The stride to use for filling
-		*/
-		void FillRegion(const FontAtlasRegion& region, const unsigned char* buffer, unsigned short stride);
+    /// Merges all layers of the atlas
+    void Merge();
 
-		/**
-		* @brief Creates an atlas region that is automatically fitted
-		* @param[in] w (int) The width of the pixels to put in the atlas
-		* @param[in] h (int) The height of the pixels to put in the atlas
-		* @param[in] character (char) The character to put in the region
-		* @return (snuffbox::FontAtlasRegion&) The region
-		*/
-		FontAtlasRegion& CreateRegion(int w, int h, char character);
+    /**
+    * @brief Fills a region with data
+    * @param[in] region (const snuffbox::FontAtlasRegion&) The region to fill
+    * @param[in] data (const unsigned char*) The data to fill the region with
+    * @param[in] stride (int) The stride of the data
+    */
+    void FillRegion(const FontAtlasRegion& region, const unsigned char* data, int stride);
 
-		/**
-		* @return (snuffbox::Texture*) The atlas texture
-		*/
-		Texture* texture();
+    /**
+    * @brief Clears a region in the atlas
+    * @param[in] region (const snuffbox::FontAtlasRegion&) The region to clear
+    */
+    void ClearRegion(const FontAtlasRegion& region);
 
-	private:
-		std::map<char, bool> glyphs_; //!< List of loaded glyphs
-		std::vector<FontAtlasRegion> regions_; //!< List of font atlas regions
-		std::vector<const unsigned char*> data_; //!< The data in the atlas
-		int	width_; //!< The width of the texture atlas
-		int height_; //!< The height of the texture atlas
-		SharedPtr<Texture> atlas_;	//!< The actual texture of the atlas
-	};
+    /// Clears the entire atlas
+    void Clear();
+
+    /// Creates the texture
+    void CreateTexture();
+
+    Texture* texture(){ return atlas_.get(); }
+
+  private:
+    SharedPtr<Texture>    atlas_; //!< The actual texture of the atlas
+    int                   size_; //!< The size of the atlas for both width and height
+    std::vector<int> data_;
+    std::vector<FontAtlasNode> nodes_;
+    int depth_;
+    int used_;
+  };
 }

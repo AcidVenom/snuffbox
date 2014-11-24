@@ -3,6 +3,7 @@
 #include "../../snuffbox/d3d11/elements/quad_element.h"
 #include "../../snuffbox/d3d11/elements/billboard_element.h"
 #include "../../snuffbox/d3d11/elements/mesh_element.h"
+#include "../../snuffbox/d3d11/elements/widget_element.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
@@ -11,6 +12,8 @@
 #include "../../snuffbox/memory/allocated_memory.h"
 #include "../../snuffbox/content/content_manager.h"
 #include "../../snuffbox/win32/win32_window.h"
+#include "../../snuffbox/freetype/freetype_font.h"
+#include "../../snuffbox/freetype/freetype_font_atlas.h"
 
 #include <fstream>
 #include <comdef.h>
@@ -98,10 +101,10 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	std::basic_string<TCHAR> D3D11DisplayDevice::HRToString(HRESULT hr, const char* subGroup = "")
+  std::string D3D11DisplayDevice::HRToString(HRESULT hr, const char* subGroup = "")
 	{
 		_com_error error(hr);
-		std::basic_string<TCHAR> str = std::string("[D3D11] ") + subGroup + ": " + error.ErrorMessage();
+    std::string str = "REFACTOR THIS";//std::string("[D3D11] ") + subGroup + ": " + error.ErrorMessage();
 		return str;
 	}
 
@@ -273,6 +276,8 @@ namespace snuffbox
 		ZeroMemory(&rasterizer, sizeof(D3D11_RASTERIZER_DESC));
 		rasterizer.CullMode = D3D11_CULL_FRONT;
 		rasterizer.FillMode = D3D11_FILL_SOLID;
+    rasterizer.MultisampleEnable = TRUE;
+    rasterizer.AntialiasedLineEnable = TRUE;
 
 		result = device_->CreateRasterizerState(&rasterizer, &rasterizer_state_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
@@ -563,13 +568,13 @@ namespace snuffbox
 		D3D11_SAMPLER_DESC sDesc;
 
 		ZeroMemory(&sDesc, sizeof(D3D11_SAMPLER_DESC));
-		sDesc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+    sDesc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
 		sDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.MipLODBias = 0.0f;
-		sDesc.MaxAnisotropy = 1;
-		sDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		sDesc.MaxAnisotropy = 4;
+    sDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 		sDesc.BorderColor[0] = 0;
 		sDesc.BorderColor[1] = 0;
 		sDesc.BorderColor[2] = 0;
@@ -594,7 +599,7 @@ namespace snuffbox
 		whiteTexture.ArraySize = 1;
 		whiteTexture.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		whiteTexture.CPUAccessFlags = 0;
-		whiteTexture.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    whiteTexture.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		whiteTexture.Height = 1;
 		whiteTexture.MipLevels = 1;
 		whiteTexture.MiscFlags = 0;
@@ -621,7 +626,7 @@ namespace snuffbox
 		normalTexture.ArraySize = 1;
 		normalTexture.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		normalTexture.CPUAccessFlags = 0;
-		normalTexture.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    normalTexture.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		normalTexture.Height = 1;
 		normalTexture.MipLevels = 1;
 		normalTexture.MiscFlags = 0;
@@ -743,6 +748,33 @@ namespace snuffbox
 			}
 		}
 	}
+
+  //---------------------------------------------------------------------------------
+  void D3D11DisplayDevice::Clear()
+  {
+    for (auto it : render_elements_)
+    {
+      it->set_destroyed(true);
+    }
+    render_elements_.clear();
+    
+    for (auto it : opaque_elements_)
+    {
+      it->set_destroyed(true);
+    }
+    opaque_elements_.clear();
+
+    for (auto it : ui_elements_)
+    {
+      it->set_destroyed(true);
+    }
+    ui_elements_.clear();
+
+    while (!render_queue_.empty())
+    {
+      render_queue_.pop();
+    }
+  }
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::DrawRenderElement(RenderElement* it)
@@ -1046,7 +1078,7 @@ namespace snuffbox
 			{
 				environment::render_device().opaque_elements().push_back(it);
 			}
-			else if (it->element_type() == RenderElement::ElementTypes::kWidget)
+      else if (it->element_type() == RenderElement::ElementTypes::kWidget || it->element_type() == RenderElement::ElementTypes::kText)
 			{
 				environment::render_device().ui_elements().push_back(it);
 			}
@@ -1065,6 +1097,44 @@ namespace snuffbox
 		}
 	}
 
+  //---------------------------------------------------------------------------------
+  ID3D11ShaderResourceView* D3D11DisplayDevice::CreateTexture2D(int width, int height, DXGI_FORMAT pixelFormat, const void* buffer, const unsigned short stride)
+  {
+    ID3D11Texture2D* texture = nullptr;
+    ID3D11ShaderResourceView* resource = nullptr;
+
+    D3D11_TEXTURE2D_DESC desc;
+    desc.Width = static_cast<UINT>(width);
+    desc.Height = static_cast<UINT>(height);
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = pixelFormat;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
+    desc.MiscFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA initData;
+
+    initData.pSysMem = buffer;
+    initData.SysMemPitch = stride;
+    initData.SysMemSlicePitch = stride;
+
+    HRESULT hr = S_OK;
+
+    hr = device_->CreateTexture2D(&desc, &initData, &texture);
+    SNUFF_XASSERT(hr == S_OK, "Failed creating a texture!");
+
+    hr = device_->CreateShaderResourceView(texture, NULL, &resource);
+    SNUFF_XASSERT(hr == S_OK, "Failed creating a texture!");
+
+    SNUFF_SAFE_RELEASE(texture);
+
+    return resource;
+  }
+
 	//---------------------------------------------------------------------------------
 	std::queue<RenderElement*>& D3D11DisplayDevice::render_queue()
 	{
@@ -1076,7 +1146,6 @@ namespace snuffbox
 	{
 		HRESULT result = S_OK;
 
-		context_->OMSetRenderTargets(0, 0, 0);
 		SNUFF_SAFE_RELEASE(depth_stencil_buffer_);
 		SNUFF_SAFE_RELEASE(render_target_view_);
 		SNUFF_SAFE_RELEASE(depth_stencil_view_);
@@ -1090,7 +1159,7 @@ namespace snuffbox
 		unsigned int w = environment::game().window()->params().w;
 		unsigned int h = environment::game().window()->params().h;
 
-		result = swap_chain_->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0);
+		result = swap_chain_->ResizeBuffers(1, w, h, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		CreateBackBuffer();

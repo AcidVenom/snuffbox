@@ -34,7 +34,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -185,12 +185,13 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClCompile Include="d3d11\elements\quad_element.cc" />
     <ClCompile Include="d3d11\elements\render_element.cc" />
     <ClCompile Include="d3d11\elements\terrain_element.cc" />
+    <ClCompile Include="d3d11\elements\text_element.cc" />
     <ClCompile Include="d3d11\elements\widget_element.cc" />
     <ClCompile Include="fbx\fbx_loader.cc" />
     <ClCompile Include="fbx\fbx_model.cc" />
     <ClCompile Include="freetype\freetype_font.cc" />
     <ClCompile Include="freetype\freetype_font_atlas.cc" />
-    <ClCompile Include="freetype\freetype_wrapper.cc" />
+    <ClCompile Include="freetype\freetype_font_manager.cc" />
     <ClCompile Include="game.cc" />
     <ClCompile Include="input\keyboard.cc" />
     <ClCompile Include="input\mouse.cc" />
@@ -219,13 +220,14 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClInclude Include="d3d11\elements\quad_element.h" />
     <ClInclude Include="d3d11\elements\render_element.h" />
     <ClInclude Include="d3d11\elements\terrain_element.h" />
+    <ClInclude Include="d3d11\elements\text_element.h" />
     <ClInclude Include="d3d11\elements\widget_element.h" />
     <ClInclude Include="environment.h" />
     <ClInclude Include="fbx\fbx_loader.h" />
     <ClInclude Include="fbx\fbx_model.h" />
     <ClInclude Include="freetype\freetype_font.h" />
     <ClInclude Include="freetype\freetype_font_atlas.h" />
-    <ClInclude Include="freetype\freetype_wrapper.h" />
+    <ClInclude Include="freetype\freetype_font_manager.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="input\key.h" />
     <ClInclude Include="input\keyboard.h" />

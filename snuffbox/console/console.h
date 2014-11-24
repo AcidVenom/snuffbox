@@ -36,7 +36,7 @@ namespace snuffbox
 		* @param[in] severity (snuffbox::LogSeverity) The severity this message has
 		* @param[in] msg (const char*) The actual message
 		*/
-		void Receive(LogSeverity severity, const char* msg);
+    void Receive(LogSeverity severity, const char* msg, float r1, float g1, float b1, float r2, float g2, float b2);
 
 		/**
 		* @brief Watches a variable under a name

@@ -63,9 +63,9 @@ namespace snuffbox
 	}
 
 	//----------------------------------------------------------------------
-	void Console::Receive(LogSeverity sev, const char* msg)
+  void Console::Receive(LogSeverity sev, const char* msg, float r1, float g1, float b1, float r2, float g2, float b2)
 	{
-		console_widget_.AddLine(sev, msg);
+		console_widget_.AddLine(sev, msg, r1, g1, b1, r2, g2, b2);
 	}
 
 	//----------------------------------------------------------------------

@@ -43,9 +43,11 @@ namespace snuffbox
   {
     kNone,
     kQuad,
+    kQuad2D,
     kTerrain,
 		kMesh,
-		kLine
+		kLine,
+    kText
   };
 
 	/**
@@ -190,7 +192,7 @@ namespace snuffbox
 		* @param[in] sub (const char*) The subgroup to add to the string (used for error logging)
 		* @return (std::basic_string<TCHAR>) The actual string
 		*/
-		std::basic_string<TCHAR> HRToString(HRESULT hr, const char* subGroup);
+    std::string HRToString(HRESULT hr, const char* subGroup);
 
 		/**
 		* @return (ID3D11InputLayout*) The input layout
@@ -212,7 +214,9 @@ namespace snuffbox
 		/**
 		* @return (std::vector<RenderElement*>&) The list of normal render elements
 		*/
-		std::vector<RenderElement*>& render_elements(){ return render_elements_; }
+		std::vector<RenderElement*>& render_elements(){ 
+      return render_elements_; 
+    }
 
 		/**
 		* @return (std::vector<RenderElement*>&) The list of opaque render elements
@@ -250,7 +254,7 @@ namespace snuffbox
 		void CreateBlendState();
 
 		/// Clears the renderer for new use
-		void Clear(){ render_elements_.clear(); opaque_elements_.clear(); ui_elements_.clear(); }
+    void Clear();
 
 		/**
 		* @brief Draws a given render element
@@ -297,6 +301,8 @@ namespace snuffbox
 		* @return (std::queue<RenderElement*>) Returns the render queue
 		*/
 		std::queue<RenderElement*>& render_queue();
+
+    ID3D11ShaderResourceView* CreateTexture2D(int width, int height, DXGI_FORMAT pixelFormat, const void* buffer, const unsigned short stride);
 
 	private:
 		SwapChainDescription					swap_desc_;							//!< The swap chain description to create the chain

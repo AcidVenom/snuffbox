@@ -8,16 +8,6 @@
 #include <comdef.h>
 
 #define PRINT_RESULTS false
-#define JS_LOG(severity)                                  \
-bool first = true;                                        \
-for (int i = 0; i < args.Length(); i++) {                 \
-  HandleScope handle_scope(args.GetIsolate());						\
-  if (first) {                                            \
-    first = false;                                        \
-  }                                                       \
-	String::Utf8Value str(args[i]);													\
-  log(severity, *str);                                    \
-}                                                         \
 
 namespace snuffbox
 {
@@ -41,38 +31,67 @@ namespace snuffbox
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSLogDebug(JS_ARGS)
 	{
-		JS_LOG(LogSeverity::kDebug);
+    JSWrapper wrapper(args);
+    SNUFF_LOG_DEBUG(wrapper.GetString(0).c_str());
 	}
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSLogInfo(JS_ARGS)
 	{
-		JS_LOG(LogSeverity::kInfo);
+    JSWrapper wrapper(args);
+    SNUFF_LOG_INFO(wrapper.GetString(0).c_str());
 	}
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSLogWarning(JS_ARGS)
 	{
-		JS_LOG(LogSeverity::kWarning);
+    JSWrapper wrapper(args);
+    SNUFF_LOG_WARNING(wrapper.GetString(0).c_str());
 	}
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSLogSuccess(JS_ARGS)
 	{
-		JS_LOG(LogSeverity::kSuccess);
+    JSWrapper wrapper(args);
+    SNUFF_LOG_SUCCESS(wrapper.GetString(0).c_str());
 	}
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSLogError(JS_ARGS)
 	{
-		JS_LOG(LogSeverity::kError);
+    JSWrapper wrapper(args);
+    SNUFF_LOG_ERROR(wrapper.GetString(0).c_str());
 	}
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSLogFatal(JS_ARGS)
 	{
-		JS_LOG(LogSeverity::kFatal);
+    JSWrapper wrapper(args);
+    SNUFF_LOG_FATAL(wrapper.GetString(0).c_str());
 	}
+
+  //---------------------------------------------------------------------------
+  void JSStateWrapper::JSLogRGB(JS_ARGS)
+  {
+    JSWrapper wrapper(args);
+
+    float r1 = wrapper.GetNumber<float>(1);
+    float g1 = wrapper.GetNumber<float>(2);
+    float b1 = wrapper.GetNumber<float>(3);
+
+    float r2 = r1 / 2;
+    float g2 = g1 / 2;
+    float b2 = b1 / 2;
+
+    if (wrapper.argLength() > 4)
+    {
+      r2 = wrapper.GetNumber<float>(4);
+      g2 = wrapper.GetNumber<float>(5);
+      b2 = wrapper.GetNumber<float>(6);
+    }
+    
+    SNUFF_LOG_RGB(wrapper.GetString(0).c_str(), r1, g1, b1, r2, g2, b2);
+  }
 
 	//---------------------------------------------------------------------------
 	void JSStateWrapper::JSLogWatch(JS_ARGS)
@@ -124,6 +143,7 @@ namespace snuffbox
 			JSFunctionRegister("success", JSLogSuccess),
 			JSFunctionRegister("error", JSLogError),
 			JSFunctionRegister("fatal", JSLogFatal),
+      JSFunctionRegister("rgb", JSLogRGB),
 			JSFunctionRegister("watch", JSLogWatch)
 		};
 

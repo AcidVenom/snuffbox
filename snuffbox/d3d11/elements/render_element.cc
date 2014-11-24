@@ -50,7 +50,7 @@ namespace snuffbox
 				}
 			}
 		}
-		else if (element_type() == ElementTypes::kWidget)
+		else if (element_type() == ElementTypes::kWidget || element_type() == ElementTypes::kText)
 		{
 			vec = &environment::render_device().ui_elements();
 
@@ -202,6 +202,8 @@ namespace snuffbox
 		blend_.x = x;
 		blend_.y = y;
 		blend_.z = z;
+
+    OnChange(RenderMessage::kBlend);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -410,9 +412,16 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::JSSetTexture(JS_ARGS)
 	{
-		JS_SETUP(RenderElement, "S");
+		JS_SETUP(RenderElement, "V");
 
-		self->texture_ = environment::content_manager().Get<Texture>(wrapper.GetString(0)).get();
+    if (wrapper.GetValue(0).IsEmpty() || wrapper.GetValue(0)->IsUndefined())
+    {
+      self->texture_ = nullptr;
+    }
+    else
+    {
+      self->texture_ = environment::content_manager().Get<Texture>(wrapper.GetString(0)).get();
+    }
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -547,7 +556,7 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::JSDestroyed(JS_ARGS)
 	{
-		JS_SETUP(RenderElement, "NN");
+		JS_SETUP(RenderElement, "V");
 		wrapper.ReturnBool(self->destroyed_);
 	}
 

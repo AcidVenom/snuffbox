@@ -129,6 +129,7 @@ namespace snuffbox
 		}
 		Local<Object> object = obj->ToObject();
 		Local<Value> val = object->Get(String::NewFromUtf8(environment::js_state_wrapper().isolate(), "__ptr"));
+    SNUFF_XASSERT(!val.IsEmpty() && !val->IsUndefined(), "__ptr field does not exist!");
 		Local<External> ptr = val.As<External>();
 
 		return static_cast<T*>(ptr->Value());

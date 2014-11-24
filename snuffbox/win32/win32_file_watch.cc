@@ -111,13 +111,24 @@ namespace snuffbox
 					case FileType::kModel:
 						ReloadModelFile(it);
 						break;
+          case FileType::kUnknown:
+            SNUFF_LOG_INFO(std::string("Hot reloaded custom file: " + it.path).c_str());
+            environment::game().NotifyEvent(GameEvents::kReload);
+            break;
 					}
 					it.lastTime = lastTime;
+          last_reloaded_ = it.relativePath;
 					break;
 				}
 			}
 		}
 	}
+
+  //-------------------------------------------------------------------
+  std::string& FileWatcher::last_reloaded()
+  {
+    return last_reloaded_;
+  }
 
 	//-------------------------------------------------------------------
 	void FileWatcher::ReloadJSFile(WatchedFile& file)
@@ -185,7 +196,7 @@ namespace snuffbox
 			*failed = true;
 			LPTSTR msg = nullptr;
 			DWORD err = GetLastError();
-			FormatMessageA(
+			FormatMessage(
 				FORMAT_MESSAGE_ALLOCATE_BUFFER |
 				FORMAT_MESSAGE_FROM_SYSTEM |
 				FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -194,8 +205,6 @@ namespace snuffbox
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 				(LPTSTR)&msg,
 				0, NULL);
-
-			SNUFF_LOG_ERROR(msg);
 
 			LocalFree(msg);
 			FILETIME error = {};

@@ -9,7 +9,7 @@
 #include "../../snuffbox/d3d11/elements/terrain_element.h"
 #include "../../snuffbox/d3d11/elements/quad_element.h"
 #include "../../snuffbox/d3d11/elements/billboard_element.h"
-#include "../../snuffbox/d3d11/elements/widget_element.h"
+#include "../../snuffbox/d3d11/elements/text_element.h"
 #include "../../snuffbox/d3d11/elements/mesh_element.h"
 #include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/d3d11/d3d11_line.h"
@@ -30,6 +30,7 @@ namespace snuffbox
 		JSRegister<Quad2D, true>::Register();
 		JSRegister<Billboard, true>::Register();
 		JSRegister<Widget, true>::Register();
+    JSRegister<Text, true>::Register();
 		JSRegister<MouseArea, true>::Register();
 		JSRegister<Mesh, true>::Register();
 		JSRegister<ContentManager, false>::Register();

@@ -46,7 +46,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	Quad2D::Quad2D(JS_ARGS) : RenderElement(RenderElement::ElementTypes::kQuad)
+	Quad2D::Quad2D(JS_ARGS) : RenderElement(RenderElement::ElementTypes::kQuad2D)
 	{
 		Create();
 	}
@@ -54,15 +54,15 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Quad2D::Create()
 	{
-		vertices().push_back({ 0.0f, 0.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
-		vertices().push_back({ 1.0f, 1.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
-		vertices().push_back({ 0.0f, 1.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
-		vertices().push_back({ 1.0f, 0.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
+		vertices().push_back({ 0.0f, -1.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
+		vertices().push_back({ 0.0f, 0.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
+		vertices().push_back({ 1.0f, -1.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
+		vertices().push_back({ 1.0f, 0.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) });
 
-		indices().push_back(2);
-		indices().push_back(0);
 		indices().push_back(1);
+		indices().push_back(0);
 		indices().push_back(3);
+		indices().push_back(2);
 
 		vertex_buffer_ = environment::render_device().CreateVertexBuffer(vertices());
 		index_buffer_ = environment::render_device().CreateIndexBuffer(indices());
@@ -78,10 +78,12 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	XMMATRIX& Quad2D::world_matrix(Camera* camera)
 	{
-		return scaling_2d() *
+    world_matrix_ = scaling_2d() *
 			offset_2d() *
 			rotation() *
 			XMMatrixTranslationFromVector(translation());
+
+    return world_matrix_;
 	}
 
 	//-------------------------------------------------------------------------------------------

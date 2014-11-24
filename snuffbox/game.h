@@ -120,5 +120,6 @@ namespace snuffbox
     static void JSCleanUp(JS_ARGS); //!< Forces a garabage collection
 		static void JSSetName(JS_ARGS); //!< Sets the window name
 		static void JSShowConsole(JS_ARGS); //!< Shows the console
+    static void JSQuit(JS_ARGS); //!< Quits the game
 	};
 }

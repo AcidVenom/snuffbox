@@ -347,7 +347,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------
-	void ConsoleWidget::AddLine(LogSeverity sev, const char* msg)
+	void ConsoleWidget::AddLine(LogSeverity sev, const char* msg, float r1, float g1, float b1, float r2, float g2, float b2)
 	{
 		if (msg == nullptr) return;
 
@@ -433,6 +433,10 @@ namespace snuffbox
 			fg = QColor(255, 255, 255);
 			bg = QColor(255, 0, 0);
 			break;
+    case LogSeverity::kRgb:
+      fg = QColor(r1, g1, b1);
+      bg = QColor(r2, g2, b2);
+      break;
 		}
 
 		QTextCursor cursor = ui_->terminal->textCursor();
@@ -447,7 +451,7 @@ namespace snuffbox
 
 		std::string prefix = "";
 
-		if (sev != LogSeverity::kDebug)
+		if (sev != LogSeverity::kDebug && sev != LogSeverity::kRgb)
 		{
 			cursor.insertText((timeStamp + std::string(" [") + SeverityToString(sev) + "] " + std::string(msg)).c_str());
 		}

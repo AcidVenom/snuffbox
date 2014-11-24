@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cc" />
+    <ClCompile Include="qt\packer_widget.cc">
+      <Filter>qt</Filter>
+    </ClCompile>
+    <ClCompile Include="qt\moc_packer_widget.cc">
+      <Filter>qt</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="qt">
+      <UniqueIdentifier>{8cc93622-5d5b-464c-82a1-40bd13febf74}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="qt\main_window_ui.h">
+      <Filter>qt</Filter>
+    </ClInclude>
+    <ClInclude Include="qt\packer_widget.h">
+      <Filter>qt</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="qt\main_window_ui.ui">
+      <Filter>qt</Filter>
+    </None>
+  </ItemGroup>
+</Project>

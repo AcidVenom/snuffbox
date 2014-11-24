@@ -115,6 +115,12 @@ namespace snuffbox
 		/// Clears all JavaScript handles from the callbacks to prevent leaking
 		void ClearHandles();
 
+    /**
+    * @brief Sets the parent of this mouse area
+    * @param[in] widget (snuffbox::Widget*) The widget to parent
+    */
+    void SetParent(Widget* widget);
+
 	private:
 		Widget* parent_; //!< The widget parent of this mouse area
 		MouseAreaMetrics metrics_; //!< The metrics of this mouse area

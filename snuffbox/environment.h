@@ -13,8 +13,8 @@ namespace snuffbox
 	class ContentManager;
 	class D3D11Settings;
 	class FBXLoader;
-	class FreeTypeWrapper;
 	class IOManager;
+  class FontManager;
 
 	namespace environment
 	{
@@ -51,8 +51,8 @@ namespace snuffbox
 		/// Returns the FBX loader
 		FBXLoader& fbx_loader();
 
-		/// Returns the FreeType wrapper
-		FreeTypeWrapper& free_type_wrapper();
+		/// Returns the font manager
+		FontManager& font_manager();
 
 		/// Returns the IO manager
 		IOManager& io_manager();
@@ -90,8 +90,8 @@ namespace snuffbox
 		/// Returns if there is an FBX loader or not
 		bool has_fbx_loader();
 
-		/// Returns if there is a FreeType wrapper or not
-		bool has_free_type_wrapper();
+		/// Returns if there is a font manager or not
+		bool has_font_manager();
 
 		/// Returns if there is an IO manager or not
 		bool has_io_manager();

@@ -55,7 +55,7 @@ namespace snuffbox
 		/**
 		* @return (snuffbox::VertexBufferType) The vertex buffer type
 		*/
-		VertexBufferType type(){ return VertexBufferType::kQuad; }
+    VertexBufferType type(){ return VertexBufferType::kQuad2D; }
 
 		/**
 		* @return (XMMATRIX&) The world matrix of this quad
@@ -65,6 +65,7 @@ namespace snuffbox
 	private:
 		ID3D11Buffer* vertex_buffer_; //!< The vertex buffer
 		ID3D11Buffer* index_buffer_; //!< The index buffer
+    XMMATRIX world_matrix_; //!< The world matrix
 	public:
 		JS_NAME(Quad2D);
 	};

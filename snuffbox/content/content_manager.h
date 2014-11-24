@@ -7,7 +7,6 @@
 #include "../../snuffbox/d3d11/d3d11_texture.h"
 #include "../../snuffbox/d3d11/d3d11_shader.h"
 #include "../../snuffbox/fbx/fbx_model.h"
-#include "../../snuffbox/freetype/freetype_font.h"
 
 namespace snuffbox
 {
@@ -32,7 +31,6 @@ namespace snuffbox
 			kTexture,
 			kShader,
 			kModel,
-			kFont
 		};
 
 		/**
@@ -93,8 +91,9 @@ namespace snuffbox
 		/**
 		* @brief Parses a package from a relative path
 		* @param[in] contentPath (std::string) The relative path
+    * @return (std::map<std::string,std::vector<std::string>>) The parsed package as a table
 		*/
-		void ParsePackage(std::string contentPath);
+    std::map<std::string,std::vector<std::string>> ParsePackage(std::string contentPath);
 
 		/**
 		* @brief Skips white spaces of a string
@@ -122,11 +121,24 @@ namespace snuffbox
 		*/
 		std::string GetValue(int& i, std::string& str, std::string endAt);
 
+    /**
+    * @brief Loads content using a content type
+    * @param[in] contentType (std::string) The content type to load
+    * @param[in] contentPath (std::string) The path to load
+    */
+    void Load(std::string contentType, std::string contentPath);
+
+    /**
+    * @brief Unloads content using a content type
+    * @param[in] contentType (std::string) The content type to unload
+    * @param[in] contentPath (std::string) The path to unload
+    */
+    void Unload(std::string contentType, std::string contentPath);
+
 	private:
 		std::map<std::string, SharedPtr<Content<Texture>>>	loaded_textures_; //!< A map by path of all loaded textures
 		std::map<std::string, SharedPtr<Content<Shader>>>		loaded_shaders_; //!< A map by path of all loaded shaders
 		std::map<std::string, SharedPtr<Content<FBXModel>>> loaded_models_; //!< A map by path of all loaded models
-		std::map<std::string, SharedPtr<Content<Font>>>			loaded_fonts_; //!< A map by path of all loaded models
 		std::queue<PendingContent>													pending_content_; //!< A queue for pending content
 	
 	public:
@@ -138,5 +150,6 @@ namespace snuffbox
 		static void JSUnload(JS_ARGS);
 		static void JSIdle(JS_ARGS);
 		static void JSUnloadAll(JS_ARGS);
+    static void JSWatch(JS_ARGS);
 	};
 }

@@ -1,92 +1,187 @@
 #include "../../snuffbox/freetype/freetype_font_atlas.h"
 #include "../../snuffbox/d3d11/d3d11_texture.h"
-#include "../../snuffbox/d3d11/d3d11_display_device.h"
 
 namespace snuffbox
 {
-	//---------------------------------------------------------------------------------------
-	FontAtlas::FontAtlas() : width_(0), height_(0)
-	{
+  //------------------------------------------------------------------------------------------------
+  FontAtlas::FontAtlas(int size, int depth) :
+    size_(size),
+    depth_(depth),
+    used_(0)
+  {
+    data_.resize(size*size*depth, 0);
+    nodes_.emplace_back(1u, 1u, size - 2u);
+  }
 
-	}
+  //------------------------------------------------------------------------------------------------
+  int FontAtlas::TestFit(int idx, int width, int height)
+  {
+    const FontAtlasNode& node = nodes_.at(idx);
+    int x = node.x;
+    int y = node.y;
+    int widthLeft = width;
 
-	//---------------------------------------------------------------------------------------
-	FontAtlas::FontAtlas(int w, int h) : width_(w), height_(h)
-	{
+    if (x + width > size_ - 1)
+      return std::numeric_limits<int>::max();
 
-	}
+    while (widthLeft > 0)
+    {
+      const FontAtlasNode& n = nodes_.at(idx);
 
-	//---------------------------------------------------------------------------------------
-	bool FontAtlas::ContainsGlyph(char character)
-	{
-		if (glyphs_.find(character) != glyphs_.end())
-		{
-			return true;
-		}
+      if (n.y > y) y = n.y;
+      if ((y + height) > (size_ - 1)) return std::numeric_limits<int>::max();
 
-		return false;
-	}
+      widthLeft -= n.z;
+      ++idx;
+    }
 
-	//---------------------------------------------------------------------------------------
-	void FontAtlas::FillRegion(const FontAtlasRegion& region, const unsigned char* buffer, unsigned short stride)
-	{
+    return y;
+  }
 
-	}
+  //------------------------------------------------------------------------------------------------
+  FontAtlasRegion FontAtlas::CreateRegion(int width, int height)
+  {
+    FontAtlasRegion region(0, 0, width, height);
 
-	//---------------------------------------------------------------------------------------
-	FontAtlasRegion& FontAtlas::CreateRegion(int w, int h, char character)
-	{
-		if (regions_.size() == 0)
-		{
-			regions_.push_back(FontAtlasRegion(0, 0, w, h));
-			return regions_.at(0);
-		}
+    int bestHeight = std::numeric_limits<int>::max();
+    int bestWidth = std::numeric_limits<int>::max();
+    int bestIndex = std::numeric_limits<int>::max();
 
-		int maxX = 0;
-		int maxY = 0;
+    for (int i = 0; i < nodes_.size(); ++i)
+    {
+      int y = TestFit(i, width, height);
+      if (y < std::numeric_limits<int>::max())
+      {
+        const FontAtlasNode& node = nodes_[i];
+        if (((y + height) < bestHeight) ||
+          (y + height == bestHeight && node.z < bestWidth))
+        {
+          bestHeight = y + height;
+          bestIndex = i;
+          bestWidth = node.z;
+          region.x = node.x;
+          region.y = y;
+        }
+      }
+    }
 
-		for (int i = 0; i < regions_.size(); ++i)
-		{
-			const FontAtlasRegion& region = regions_.at(i);
+    if (bestIndex == std::numeric_limits<int>::max())
+    {
+      region.x = region.y = std::numeric_limits<int>::max();
+      region.width = region.height = 0;
+      return region;
+    }
 
-			if (region.x + region.w > maxX)
-			{
-				maxX = region.x + region.w;
-			}
+    FontAtlasNode node;
+    node.x = region.x;
+    node.y = region.y + height;
+    node.z = width;
+    nodes_.insert(nodes_.begin() + bestIndex, node);
 
-			if (region.y + region.h > maxY)
-			{
-				maxY = region.y + region.h;
-			}
-		}
+    for (int i = bestIndex + 1; i < nodes_.size(); ++i)
+    {
+      FontAtlasNode &node = nodes_[i];
+      FontAtlasNode &prev = nodes_[i - 1];
 
-		if (maxX + w > width_)
-		{
-			maxY += h;
-			maxX = -1;
-		}
+      if (node.x < (prev.x + prev.z))
+      {
+        int shrink = prev.x + prev.z - node.x;
+        node.x += shrink;
+        if (node.z <= shrink)
+        {
+          nodes_.erase(nodes_.begin() + i);
+          --i;
+        }
+        else
+        {
+          node.z -= shrink;
+          break;
+        }
+      }
+      else
+        break;
+    }
 
-		regions_.push_back(FontAtlasRegion(0, 0, w, h));
+    Merge();
 
-		FontAtlasRegion& region = regions_.at(regions_.size() - 1);
+    used_ += width*height;
+    return region;
+  }
 
-		region.x = maxX + 1;
-		region.y = maxY + 1;
+  //-------------------------------------------------------------------------------------------------
+  void FontAtlas::Merge()
+  {
+    for (int i = 0; i < nodes_.size() - 1; ++i)
+    {
+      FontAtlasNode &node = nodes_[i];
+      FontAtlasNode &next = nodes_[i + 1];
 
-		glyphs_.emplace(character, true);
+      if (node.y == next.y)
+      {
+        node.z += next.z;
+        nodes_.erase(nodes_.begin() + i + 1);
+        --i;
+      }
+    }
+  }
 
-		return region;
-	}
+  //------------------------------------------------------------------------------------------------
+  void FontAtlas::FillRegion(const FontAtlasRegion& region, const unsigned char* data, int stride)
+  {
+    SNUFF_XASSERT(region.x > 0 && region.y > 0 && region.x + region.width < size_ - 1 && region.y + region.height < size_ - 1, "The region does not fit in the atlas");
 
-	//---------------------------------------------------------------------------------------
-	Texture* FontAtlas::texture()
-	{
-		return atlas_.get();
-	}
+    for (int y = 0; y < region.height; ++y)
+    {
+      for (int x = 0; x < region.width; ++x)
+      {
+        unsigned char luminance = data[y*stride + x];
+        int color = (luminance << 0) | (luminance << 8) | (luminance << 16) | (luminance << 24);
+        data_[(region.y + y) * size_ + region.x + x] = color;
+      }
+    }
+  }
 
-	//---------------------------------------------------------------------------------------
-	FontAtlas::~FontAtlas()
-	{
 
-	}
+  //-------------------------------------------------------------------------------------------------
+  void FontAtlas::ClearRegion(const FontAtlasRegion& region)
+  {
+    for (int y = 0; y < region.height; ++y)
+    {
+      for (int x = 0; x < region.width; ++x)
+      {
+        data_[(region.y + y) * size_ + region.x + x] = 0;
+      }
+    }
+  }
+
+  //------------------------------------------------------------------------------------------------
+  void FontAtlas::Clear()
+  {
+    nodes_.clear();
+    nodes_.emplace_back(1u, 1u, size_ - 2u);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  int FontAtlas::size()
+  {
+    return size_;
+  }
+
+  //------------------------------------------------------------------------------------------------
+  int FontAtlas::depth()
+  {
+    return depth_;
+  }
+
+  //------------------------------------------------------------------------------------------------
+  void FontAtlas::CreateTexture()
+  {
+    atlas_ = environment::memory().ConstructShared<Texture>(environment::render_device().CreateTexture2D(size_, size_, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM, &data_[0], size_ * depth_));
+  }
+
+  //------------------------------------------------------------------------------------------------
+  FontAtlas::~FontAtlas()
+  {
+
+  }
 }
