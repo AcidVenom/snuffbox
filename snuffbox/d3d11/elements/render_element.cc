@@ -593,6 +593,10 @@ namespace snuffbox
 			JSFunctionRegister("destroyed", JSDestroyed)
 		};
 
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Left"), Number::New(JS_ISOLATE, 0));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Right"), Number::New(JS_ISOLATE, 1));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Center"), Number::New(JS_ISOLATE, 2));
+
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);
 	}
 }

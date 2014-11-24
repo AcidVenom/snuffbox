@@ -23,8 +23,8 @@ namespace snuffbox
     enum TextAlignment
     {
       kLeft,
-      kCenter,
-      kRight
+      kRight,
+			kCenter
     };
 
 		/// Default constructor
@@ -98,5 +98,6 @@ namespace snuffbox
     static void JSFont(JS_ARGS);
     static void JSSpacing(JS_ARGS);
     static void JSMetrics(JS_ARGS);
+		static void JSSetAlignment(JS_ARGS);
 	};
 }

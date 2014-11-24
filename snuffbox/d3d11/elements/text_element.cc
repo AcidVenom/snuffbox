@@ -278,7 +278,8 @@ namespace snuffbox
       JSFunctionRegister("fontFamily", JSFont),
       JSFunctionRegister("fontSize", JSFontSize),
       JSFunctionRegister("spacing", JSSpacing),
-      JSFunctionRegister("metrics", JSMetrics)
+      JSFunctionRegister("metrics", JSMetrics),
+			JSFunctionRegister("setAlignment", JSSetAlignment)
     };
 
     JS_REGISTER_OBJECT_FUNCTIONS_EXTRA(obj, funcs);
@@ -355,6 +356,15 @@ namespace snuffbox
 
     wrapper.ReturnTuple<float>(self->width_, self->height_, "width", "height");
   }
+
+	//-------------------------------------------------------------------------------------------
+	void Text::JSSetAlignment(JS_ARGS)
+	{
+		JS_SETUP(Text, "N");
+
+		self->alignment_ = static_cast<Text::TextAlignment>(wrapper.GetNumber<int>(0));
+		self->SetText(self->text_);
+	}
 
   //-------------------------------------------------------------------------------------------
   Text::~Text()
