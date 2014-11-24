@@ -1,8 +1,0 @@
-﻿Build started 11/7/2014 5:18:35 PM.
-     1>Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" on node 2 (Build target(s)).
-     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppCommon.targets(341,5): error MSB6003: The specified task executable "CL.exe" could not be run. The process cannot access the file 'C:\SNUFF\SRC\SNUFFBOX\X64\RELEASE\CONSOLE_WIDGET.OBJ' because it is being used by another process.
-     1>Done Building Project "C:\Snuff\src\snuffbox\snuffbox.vcxproj" (Build target(s)) -- FAILED.
-
-Build FAILED.
-
-Time Elapsed 00:00:00.43
