@@ -783,7 +783,7 @@ namespace snuffbox
 		{
 			RenderElement::ElementTypes elementType = it->element_type();
 			VertexBufferType type = it->type();
-			if (type != vb_type_ || type == VertexBufferType::kMesh)
+			if (type != vb_type_ || type == VertexBufferType::kMesh || type == VertexBufferType::kText)
 			{
         if (type == VertexBufferType::kMesh)
         {

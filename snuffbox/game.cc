@@ -27,7 +27,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 610
+#define SNUFF_VERSION_MINOR 615
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
