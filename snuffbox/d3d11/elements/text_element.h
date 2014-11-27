@@ -108,7 +108,7 @@ namespace snuffbox
 		void Reset(XMFLOAT3 blend, float alpha);
 
 		/// Creates a vertex buffer and an index buffer
-		void CreateBuffers(std::wstring& buffer);
+		void FillBuffers(std::wstring& buffer);
 
 	private:
 		ID3D11Buffer*							vertex_buffer_; //!< The vertex buffer of this element
@@ -116,6 +116,7 @@ namespace snuffbox
 		
     std::string               text_; //!< The string of this text
     Font*                     current_font_; //!< The font this text uses
+		XMFLOAT4									current_colour_; //!< The current font colour
     float                     spacing_y_; //!< The vertical spacing
     float                     spacing_x_; //!< The horizontal spacing
     float                     font_size_; //!< The current font size

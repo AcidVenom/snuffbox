@@ -24,7 +24,8 @@ namespace snuffbox
 		alignment_(TextAlignment::kLeft),
 		shadow_set_(false),
 		shadow_offset_(0.0f, 0.0f),
-		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f)
+		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f),
+		current_colour_(1.0f, 1.0f, 1.0f, 1.0f)
 	{
     current_font_ = environment::font_manager().default_font();
     font_ = "fonts/arial.ttf";
@@ -40,7 +41,8 @@ namespace snuffbox
     alignment_(TextAlignment::kLeft),
 		shadow_set_(false),
 		shadow_offset_(0.0f, 0.0f),
-		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f)
+		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f),
+		current_colour_(1.0f, 1.0f, 1.0f, 1.0f)
 	{
 		JSWrapper wrapper(args);
 		Create();
@@ -70,11 +72,8 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Text::CreateBuffers(std::wstring& buffer)
+	void Text::FillBuffers(std::wstring& buffer)
 	{
-		vertices().clear();
-		indices().clear();
-
 		float x = 0.0f, y = 0.0f, w = 0.0f, h = 0.0f;
 
 		float tx, ty, tw, th;
@@ -82,7 +81,7 @@ namespace snuffbox
 
 		RichTextMarkup markup;
 		markup.font = current_font_;
-		markup.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		markup.colour = current_colour_;;
 
 		for (int i = 0; i < buffer.size(); ++i)
 		{
@@ -129,9 +128,6 @@ namespace snuffbox
 			pen_.x += (glyph->x_advance) + spacing_x_;
 			++index_offset;
 		}
-
-		vertex_buffer_ = environment::render_device().CreateVertexBuffer(vertices());
-		index_buffer_ = environment::render_device().CreateIndexBuffer(indices());
 	}
 
   //-------------------------------------------------------------------------------------------
@@ -143,13 +139,13 @@ namespace snuffbox
 			SNUFF_SAFE_RELEASE(index_buffer_);
 		}
 
+		vertices().clear();
+		indices().clear();
+
 		if (text.size() == 0)
 		{
 			text = " ";
 		}
-
-		pen_.x = 0.0f;
-		pen_.y = 0.0f;
 
     text_ = text;
 
@@ -161,7 +157,65 @@ namespace snuffbox
 
     SNUFF_XASSERT(current_font_ != nullptr, "Text widget has no font set!");
 
-		CreateBuffers(std::wstring(widestr));
+		std::wstring buffer(widestr);
+		MarkupOperations operations = RichTextParser::Parse(&buffer);
+
+		Font* defaultFont = current_font_;
+		float defaultSize = font_size_;
+
+		bool isBold = false;
+		bool isItalic = false;
+
+		for (auto& it : operations)
+		{
+			if (it.isDefault)
+			{
+				FillBuffers(it.text);
+				current_font_ = defaultFont;
+				current_colour_ = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+				isBold = false;
+				isItalic = false;
+				font_size_ = defaultSize;
+			}
+			else if (it.doColour)
+			{
+				current_colour_ = XMFLOAT4(it.colour[0], it.colour[1], it.colour[2], 1.0f);
+			}
+			else if (it.bold)
+			{
+				isBold = true;
+				if (isItalic == false)
+				{
+					current_font_ = environment::font_manager().GetFont(font_ + 'b', font_size_);
+				}
+				else
+				{
+					current_font_ = environment::font_manager().GetFont(font_ + 'z', font_size_);
+				}
+			}
+			else if (it.italic)
+			{
+				isItalic = true;
+				if (isBold == false)
+				{
+					current_font_ = environment::font_manager().GetFont(font_ + 'i', font_size_);
+				}
+				else
+				{
+					current_font_ = environment::font_manager().GetFont(font_ + 'z', font_size_);
+				}
+			}
+			else if (it.doSize)
+			{
+				font_size_ = it.size;
+			}
+		}
+
+		vertex_buffer_ = environment::render_device().CreateVertexBuffer(vertices());
+		index_buffer_ = environment::render_device().CreateIndexBuffer(indices());
+
+		pen_.x = 0.0f;
+		pen_.y = 0.0f;
 
     delete[] widestr;
   }

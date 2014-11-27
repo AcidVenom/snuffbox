@@ -15,7 +15,7 @@ Game.Initialise = function()
 
 	Game.rich = Text.new();
 	Game.rich.setFontSize(24);
-	Game.rich.setText("[b]This[/b]is[i]a[/i][size=32][colour=FF00000]test[/size][/colour]");
+	Game.rich.setText("Oh hello.\n[b]This[/b]is[i]a[/i][size=32][colour=FF00000]test[/colour][/size]");
 	Game.rich.setTranslation(0,0,1);
 	Game.rich.spawn();
 }
@@ -28,7 +28,6 @@ Game.Update = function(dt)
 	}
 	
 	Game.timer += dt;
-
 }
 
 Game.Draw = function(dt)
