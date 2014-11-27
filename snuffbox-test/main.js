@@ -15,9 +15,16 @@ Game.Initialise = function()
 
 	Game.rich = Text.new();
 	Game.rich.setFontSize(24);
-	Game.rich.setText("Oh hello.\n[b]This[/b]is[i]a[/i][size=32][colour=FF00000]test[/colour][/size]");
+	Game.rich.setText("[size=32][b]Oh hello.[/b][/size]\n\n[colour=FFFF00][i]I'm just testing rich text![/i][/colour]\n__________________\nIt's working [b][size=24]quite[/size][/b] well..\n[i][b][font=fonts/times.ttf]Have some funny characters ▲▼^&@[/font][/b][/i]");
 	Game.rich.setTranslation(0,0,1);
 	Game.rich.spawn();
+
+	var metrics = Game.rich.metrics();
+
+	Game.box = Widget.new();
+	Game.box.setSize(metrics.width,metrics.height);
+	Game.box.spawn();
+	Game.box.setBlend(0.3,0.3,0.3);
 }
 
 Game.Update = function(dt)

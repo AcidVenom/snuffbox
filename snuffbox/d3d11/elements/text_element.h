@@ -107,8 +107,11 @@ namespace snuffbox
 		/// Resets the text after drawing the shadow
 		void Reset(XMFLOAT3 blend, float alpha);
 
-		/// Creates a vertex buffer and an index buffer
+		/// Fills a vertex buffer and an index buffer
 		void FillBuffers(std::wstring& buffer);
+
+		/// Aligns the text
+		void Align();
 
 	private:
 		ID3D11Buffer*							vertex_buffer_; //!< The vertex buffer of this element

@@ -89,6 +89,24 @@ namespace snuffbox
 
 					nested = true;
 				}
+				else if (ConsumeRaw(L"font", &tag))
+				{
+					RemoveWhitespaces(&tag);
+					SplitValue(&tag);
+
+					markup.newFont = true;
+
+					int size = WideCharToMultiByte(CP_UTF8, 0, tag.c_str(), -1, NULL, 0, 0, 0);
+
+					char* multistr = new char[size];
+					WideCharToMultiByte(CP_UTF8, 0, tag.c_str(), -1, multistr, size, 0, 0);
+
+					markup.font = multistr;
+
+					delete multistr;
+
+					toClose = L"[/font]";
+				}
 
 				if (nested == false)
 				{
@@ -117,7 +135,16 @@ namespace snuffbox
 							}
 							break;
 						}
+						if (i >= buffer->size())
+						{
 
+							int size = WideCharToMultiByte(CP_UTF8, 0, buffer->c_str(), -1, NULL, 0, 0, 0);
+
+							char* multistr = new char[size];
+							WideCharToMultiByte(CP_UTF8, 0, buffer->c_str(), -1, multistr, size, 0, 0);
+
+							SNUFF_ASSERT("RichText formatting error! Aborting\n\n\t" + std::string(multistr));
+						}
 						encapsulated += buffer->at(i);
 					}
 				}
@@ -180,7 +207,7 @@ namespace snuffbox
 		int start = i;
 		while (i - start < toConsume.size() && i - start < buffer->size())
 		{
-			if (toConsume.at(i - start) != buffer->at(i))
+			if (i >= buffer->size() || toConsume.at(i - start) != buffer->at(i))
 			{
 				return false;
 			}

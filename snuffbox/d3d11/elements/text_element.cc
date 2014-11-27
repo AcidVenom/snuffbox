@@ -77,11 +77,11 @@ namespace snuffbox
 		float x = 0.0f, y = 0.0f, w = 0.0f, h = 0.0f;
 
 		float tx, ty, tw, th;
-		int index_offset = 0;
+		int index_offset = static_cast<int>(vertices().size()) / 4;
 
 		RichTextMarkup markup;
 		markup.font = current_font_;
-		markup.colour = current_colour_;;
+		markup.colour = current_colour_;
 
 		for (int i = 0; i < buffer.size(); ++i)
 		{
@@ -99,7 +99,7 @@ namespace snuffbox
 			w = static_cast<float>(glyph->width);
 			h = static_cast<float>(glyph->height);
 			x = pen_.x + glyph->x_offset;
-			y = pen_.y - (h - glyph->y_offset) + markup.font->ascender() * 100.0f;
+			y = pen_.y - (h - glyph->y_offset) - markup.font->ascender();
 
 			tx = glyph->tex_coords.left;
 			th = glyph->tex_coords.top;
@@ -165,6 +165,7 @@ namespace snuffbox
 
 		bool isBold = false;
 		bool isItalic = false;
+		std::string fontString = font_;
 
 		for (auto& it : operations)
 		{
@@ -176,6 +177,7 @@ namespace snuffbox
 				isBold = false;
 				isItalic = false;
 				font_size_ = defaultSize;
+				fontString = font_;
 			}
 			else if (it.doColour)
 			{
@@ -187,10 +189,12 @@ namespace snuffbox
 				if (isItalic == false)
 				{
 					current_font_ = environment::font_manager().GetFont(font_ + 'b', font_size_);
+					fontString = font_ + 'b';
 				}
 				else
 				{
 					current_font_ = environment::font_manager().GetFont(font_ + 'z', font_size_);
+					fontString = font_ + 'z';
 				}
 			}
 			else if (it.italic)
@@ -199,17 +203,49 @@ namespace snuffbox
 				if (isBold == false)
 				{
 					current_font_ = environment::font_manager().GetFont(font_ + 'i', font_size_);
+					fontString = font_ + 'i';
 				}
 				else
 				{
 					current_font_ = environment::font_manager().GetFont(font_ + 'z', font_size_);
+					fontString = font_ + 'z';
 				}
 			}
 			else if (it.doSize)
 			{
 				font_size_ = it.size;
+				current_font_ = environment::font_manager().GetFont(fontString, font_size_);
+			}
+			else if (it.newFont)
+			{
+				fontString = it.font;
+				
+				if (isItalic)
+				{
+					fontString = it.font + 'i';
+				}
+				else if (isBold)
+				{
+					fontString = it.font + 'b';
+				}
+
+				if (isItalic && isBold)
+				{
+					fontString = it.font + 'z';
+				}
+
+				current_font_ = environment::font_manager().GetFont(fontString, font_size_);
 			}
 		}
+
+		current_font_ = defaultFont;
+		current_colour_ = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		isBold = false;
+		isItalic = false;
+		font_size_ = defaultSize;
+		fontString = font_;
+
+		Align();
 
 		vertex_buffer_ = environment::render_device().CreateVertexBuffer(vertices());
 		index_buffer_ = environment::render_device().CreateIndexBuffer(indices());
@@ -263,6 +299,43 @@ namespace snuffbox
 	bool Text::shadow_set()
 	{
 		return shadow_set_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Text::Align()
+	{
+		float highest_x;
+		float highest_y;
+		bool set = false;
+
+		for (auto& it : vertices())
+		{
+			it.y -= (current_font_->line_gap() * 100.0f + current_font_->line_height() * 100.0f);
+		}
+
+		for (auto& it : vertices())
+		{
+			if (set == false)
+			{
+				highest_x = it.x;
+				highest_y = it.y;
+				set = true;
+				continue;
+			}
+
+			if (it.x > highest_x)
+			{
+				highest_x = it.x;
+			}
+
+			if (it.y < highest_y)
+			{
+				highest_y = it.y;
+			}
+		}
+
+		width_ = highest_x;
+		height_ = abs(highest_y);
 	}
 
 	//-------------------------------------------------------------------------------------------
