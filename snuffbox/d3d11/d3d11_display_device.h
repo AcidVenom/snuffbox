@@ -64,9 +64,7 @@ namespace snuffbox
 		XMFLOAT3 normal; //!< The vertex normal
 		XMFLOAT2 tex_coord; //!< The vertex texture coordinates
 		XMFLOAT4 colour; //!< The vertex colour
-		XMFLOAT3 tangent; //!< The vertex tangent
-		XMFLOAT3 binormal; //!< The vertex binormal
-		const static UINT stride_size = static_cast<UINT>(sizeof(float)* 4 + (sizeof(XMFLOAT3)*3)+sizeof(XMFLOAT2)+sizeof(XMFLOAT4)); //!< The stride size
+		const static UINT stride_size = static_cast<UINT>(sizeof(float) * 4 + sizeof(XMFLOAT3) + sizeof(XMFLOAT2) + sizeof(XMFLOAT4)); //!< The stride size
 	};
 
 	/**

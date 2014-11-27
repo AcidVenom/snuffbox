@@ -4,7 +4,7 @@
 namespace snuffbox
 {
   //------------------------------------------------------------------------------------------------
-  FontAtlas::FontAtlas(int size, int depth) :
+  FontAtlas::FontAtlas(int size, unsigned char depth) :
     size_(size),
     depth_(depth),
     used_(0)
@@ -168,7 +168,7 @@ namespace snuffbox
   }
 
   //------------------------------------------------------------------------------------------------
-  int FontAtlas::depth()
+	unsigned char FontAtlas::depth()
   {
     return depth_;
   }

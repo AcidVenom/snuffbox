@@ -156,12 +156,6 @@ namespace snuffbox
 					vert.normal.x = normal.mData[0];
 					vert.normal.z = -normal.mData[1];
 					vert.normal.y = normal.mData[2];
-					vert.tangent.x = tangent.mData[0];
-					vert.tangent.y = -tangent.mData[1];
-					vert.tangent.z = tangent.mData[2];
-					vert.binormal.x = binormal.mData[0];
-					vert.binormal.z = -binormal.mData[1];
-					vert.binormal.y = binormal.mData[2];
 					vert.colour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 					vertsOut->push_back(vert);

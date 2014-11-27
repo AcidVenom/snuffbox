@@ -1,5 +1,6 @@
 #include "../../snuffbox/freetype/freetype_font.h"
 #include "../../snuffbox/freetype/freetype_font_atlas.h"
+#include "../../snuffbox/freetype/freetype_font_manager.h"
 #include "../../snuffbox/game.h"
 #include "../../snuffbox/d3d11/d3d11_texture.h"
 
@@ -41,10 +42,8 @@ namespace snuffbox
   }
 
   //------------------------------------------------------------------------------------------------
-  void Font::Load(std::string relativePath, float size, SharedPtr<FontAtlas>& atlas)
+  void Font::Load(std::string relativePath, float size)
   {
-    SNUFF_ASSERT_NOTNULL(atlas.get());
-
     FT_Error error;
 
     FT_Matrix matrix = {
@@ -68,38 +67,17 @@ namespace snuffbox
 
     FT_Set_Transform(face_, &matrix, nullptr);
 
-    atlas_.Swap(atlas);
     size_ = size;
 
     height_ = 0.0f;
     ascender_ = 0.0f;
     descender_ = 0.0f;
 
-    outline_type_ = FontOutline::kNone;
-    outline_thickness_ = 0.0f;
-    hinting_ = true;
-    kerning_ = true;
-    filtering_ = true;
-
     lcd_weights_[0] = 0x10; 
     lcd_weights_[1] = 0x40;
     lcd_weights_[2] = 0x70;
     lcd_weights_[3] = 0x40;
     lcd_weights_[4] = 0x10;
-
-    underline_position_ = face_->underline_position / (float)(HRESf*HRESf) * size_;
-    underline_position_ = std::round(underline_position_);
-    if (underline_position_ > -2)
-    {
-      underline_position_ = -2.0f;
-    }
-
-    underline_thickness_ = face_->underline_thickness / (float)(HRESf*HRESf) * size_;
-    underline_thickness_ = std::round(underline_thickness_);
-    if (underline_thickness_ < 1)
-    {
-      underline_thickness_ = 1.0f;
-    }
     
     FT_Size_Metrics metrics;
     metrics = face_->size->metrics;
@@ -111,15 +89,14 @@ namespace snuffbox
     LoadGlyph(-1);
   }
 
-  FontAtlas* Font::atlas(){ return atlas_.get(); }
-
   //------------------------------------------------------------------------------------------------
   FontGlyph* Font::LoadGlyph(wchar_t charcode)
   {
+		FontAtlas* atlas = environment::font_manager().atlas();
     for (auto it = glyphs_.find(charcode); it != glyphs_.end() && it->second->charcode == charcode; ++it)
     {
       FontGlyph* glyph = it->second.get();
-      if (glyph->charcode == (wchar_t)(-1) || (glyph->outline_type == outline_type_ && glyph->outline_thickness == outline_thickness_))
+      if (glyph->charcode == (wchar_t)(-1))
       {
         return it->second.get();
       }
@@ -127,9 +104,9 @@ namespace snuffbox
 
     if (charcode == (wchar_t)(-1))
     {
-      int width = atlas_->size();
-      int height = atlas_->size();
-      FontAtlasRegion region = atlas_->CreateRegion(5, 5);
+			int width = atlas->size();
+			int height = atlas->size();
+			FontAtlasRegion region = atlas->CreateRegion(5, 5);
       SharedPtr<FontGlyph> glyph = environment::memory().ConstructShared<FontGlyph>();
       static signed char data[4 * 4 * 3] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -138,7 +115,7 @@ namespace snuffbox
 
       SNUFF_XASSERT(region.x > 0, "Font Texture Atlas is full!");
 
-      atlas_->FillRegion(region, reinterpret_cast<const unsigned char*>(data), 0);
+			atlas->FillRegion(region, reinterpret_cast<const unsigned char*>(data), 0);
       glyph->charcode = (wchar_t)(-1);
       glyph->tex_coords.left = region.x / (float)width;
       glyph->tex_coords.top = region.y / (float)height;
@@ -162,7 +139,8 @@ namespace snuffbox
   //------------------------------------------------------------------------------------------------
   int Font::LoadGlyphs(wchar_t* str)
   {
-    int atlasSize = atlas_->size();
+		FontAtlas* atlas = environment::font_manager().atlas();
+		int atlasSize = atlas->size();
 
     const int count = static_cast<int>(std::char_traits<wchar_t>::length(str));
     for (int i = 0; i < count; ++i)
@@ -176,24 +154,8 @@ namespace snuffbox
 
       FT_UInt glyphIndex = FT_Get_Char_Index(face_, c);
 
-      FT_Int32 flags = 0;
-      if (outline_type_ != FontOutline::kNone)
-      {
-        flags |= FT_LOAD_NO_BITMAP;
-      }
-      else
-      {
-        flags |= FT_LOAD_RENDER;
-      }
-
-      if (!hinting_)
-      {
-        flags |= FT_LOAD_NO_HINTING | FT_LOAD_NO_AUTOHINT;
-      }
-      else
-      {
-        flags |= FT_LOAD_FORCE_AUTOHINT;
-      }
+			FT_Library_SetLcdFilterWeights(library_, lcd_weights_);
+			FT_Int32 flags = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT;
 
       FT_Error error = FT_Load_Glyph(face_, glyphIndex, flags);
       SNUFF_XASSERT(!error, "Unable to load glyph");
@@ -202,29 +164,24 @@ namespace snuffbox
       FT_Bitmap ftBitmap;
       int ftGlyphTop = 0, ftGlyphLeft = 0;
 
-      if (outline_type_ == FontOutline::kNone)
-      {
-        slot = face_->glyph;
-        ftBitmap = slot->bitmap;
-        ftGlyphTop = slot->bitmap_top;
-        ftGlyphLeft = slot->bitmap_left;
-      }
+      slot = face_->glyph;
+      ftBitmap = slot->bitmap;
+      ftGlyphTop = slot->bitmap_top;
+      ftGlyphLeft = slot->bitmap_left;
 
-      int width = ftBitmap.width;
+      int width = ftBitmap.width + 1;
       int height = ftBitmap.rows + 1;
-      FontAtlasRegion region = atlas_->CreateRegion(width, height);
+			FontAtlasRegion region = atlas->CreateRegion(width, height);
       SNUFF_XASSERT(region.x > 0, "Texture font atlas is full!");
 
       region.width -= 1;
       region.height -= 1;
-      atlas_->FillRegion(region, ftBitmap.buffer, ftBitmap.pitch);
+			atlas->FillRegion(region, ftBitmap.buffer, ftBitmap.pitch);
 
       SharedPtr<FontGlyph> glyph = environment::memory().ConstructShared<FontGlyph>();
       glyph->charcode = c;
       glyph->width = width - 1;
       glyph->height = height - 1;
-      glyph->outline_type = outline_type_;
-      glyph->outline_thickness = outline_thickness_;
       glyph->x_offset = ftGlyphLeft;
       glyph->y_offset = ftGlyphTop;
       glyph->tex_coords.left = region.x / (float)atlasSize;
@@ -232,52 +189,35 @@ namespace snuffbox
       glyph->tex_coords.right = glyph->tex_coords.left + glyph->width / (float)atlasSize;
       glyph->tex_coords.bottom = glyph->tex_coords.top + glyph->height / (float)atlasSize;
 
-      FT_Load_Glyph(face_, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
+			FT_Load_Glyph(face_, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
       slot = face_->glyph;
       glyph->x_advance = slot->advance.x / HRESf;
       glyph->y_advance = slot->advance.y / HRESf;
 
       glyphs_.emplace(c, glyph);
     }
-    GenerateKerning();
 
-    atlas_->CreateTexture();
+		atlas->CreateTexture();
     return 0;
   }
 
-  //-------------------------------------------------------------------------------------------------
-  void Font::GenerateKerning()
-  {
-    for (auto it : glyphs_)
-    {
-      FontGlyph* glyph = it.second.get();
-      if (glyph->charcode == (wchar_t)(-1))
-      {
-        continue;
-      }
+	//------------------------------------------------------------------------------------------------
+	float Font::ascender()
+	{
+		return ascender_;
+	}
 
-      FT_UInt glyphIndex = FT_Get_Char_Index(face_, glyph->charcode);
-      glyph->kerning.clear();
+	//------------------------------------------------------------------------------------------------
+	float Font::line_gap()
+	{
+		return linegap_;
+	}
 
-      for (auto other : glyphs_)
-      {
-        FontGlyph* otherGlyph = other.second.get();
-        if (otherGlyph == glyph || otherGlyph->charcode == (wchar_t)(-1))
-        {
-          continue;
-        }
-
-        FT_UInt otherGlyphIndex = FT_Get_Char_Index(face_, otherGlyph->charcode);
-
-        FT_Vector kerning;
-        FT_Get_Kerning(face_, otherGlyphIndex, glyphIndex, FT_KERNING_UNFITTED, &kerning);
-        if (kerning.x)
-        {
-          glyph->kerning.emplace(otherGlyph->charcode, kerning.x / (float)(HRESf*HRESf));
-        }
-      }
-    }
-  }
+	//------------------------------------------------------------------------------------------------
+	float Font::line_height()
+	{
+		return height_;
+	}
 
   //------------------------------------------------------------------------------------------------
   FontGlyph* Font::glyph(wchar_t charcode)
@@ -293,11 +233,5 @@ namespace snuffbox
     }
 
     return glyph->second.get();
-  }
-
-  //------------------------------------------------------------------------------------------------
-  Texture* Font::texture()
-  {
-    return atlas_->texture();
   }
 }

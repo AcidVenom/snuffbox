@@ -44,7 +44,7 @@ namespace snuffbox
     * @param[in] size (int) The size of the atlas
     * @param[in] depth (int) The depth of the atlas
     */
-    FontAtlas(int size, int depth);
+		FontAtlas(int size, unsigned char depth);
 
     /// Default destructor
     ~FontAtlas();
@@ -53,7 +53,7 @@ namespace snuffbox
     int size();
 
     /// Returns the depth of this atlas
-    int depth();
+		unsigned char depth();
 
     /**
     * @brief Creates a font atlas region with a given width and height
@@ -101,7 +101,7 @@ namespace snuffbox
     int                   size_; //!< The size of the atlas for both width and height
     std::vector<int> data_;
     std::vector<FontAtlasNode> nodes_;
-    int depth_;
+		unsigned char depth_;
     int used_;
   };
 }

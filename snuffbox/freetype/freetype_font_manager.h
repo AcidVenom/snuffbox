@@ -31,8 +31,14 @@ namespace snuffbox
     */
     Font* default_font();
 
+		/**
+		* @return (snuffbox::FontAtlas*) The pointer to the font atlas used
+		*/
+		FontAtlas* atlas();
+
   private:
     FontMap map_; //!< Contains all font name <-> font size mappings
     Font* default_font_; //!< The default font
+		SharedPtr<FontAtlas> atlas_; //!< The atlas to hold all fonts
   };
 }

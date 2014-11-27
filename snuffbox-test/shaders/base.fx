@@ -12,7 +12,7 @@ cbuffer ConstantBuffer : register(b0)
 
 cbuffer Uniforms : register(b1)
 {
-	
+
 }
 
 struct VOut
@@ -21,17 +21,13 @@ struct VOut
 	float4 colour : COLOUR;
 	float3 normal : NORMAL;
 	float2 texcoord : TEXCOORD0;
-	float3 tangent : TANGENT;
-	float3 binormal : BINORMAL;
 };
 
-VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 colour : COLOUR, float3 tangent : TANGENT, float3 binormal : BINORMAL)
+VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 colour : COLOUR)
 {
 	VOut output;
 	output.position = mul(position, WorldViewProjection);
 	output.normal = normalize(mul(float4(normal, 0), InvWorld).xyz);
-	output.tangent = normalize(mul(float4(normal, 0), InvWorld).xyz);
-	output.binormal = normalize(mul(float4(normal, 0), InvWorld).xyz);
 	output.texcoord = texcoord;
 	output.colour = colour;
 	return output;

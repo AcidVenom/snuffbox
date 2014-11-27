@@ -7,30 +7,17 @@ Game.Initialise = function()
 	RenderSettings.setVsync(false);
 	RenderSettings.setFullscreen(false);
 	RenderSettings.setCullMode(RenderSettings.CullFront);
-	RenderSettings.setBackBufferColour(0.3,0.3,0.3,1);
+	RenderSettings.setBackBufferColour(0,0,0,1);
 	RenderSettings.setWindowSize(800,600);
 	RenderSettings.setYDown(false);
 	Game.camera = Camera.new("orthographic");
 	Game.camera.setTranslation(0,0,0);
 
-	Game.text = Text.new();
-	Game.text.setText("This is a test text\nWith very proper alignment, hooray\n(Yes really)");
-	Game.text.setFontSize(28);
-	Game.text.spawn();
-	Game.text.setBlend(0,0,0);
-	Game.text.setAlignment(Text.Center);
-
-	var metrics = Game.text.metrics();
-
-	Game.text.setTranslation(0,-metrics.height/2,0);
-
-	Game.textStupid = Text.new();
-	Game.textStupid.setText("Couldn't leave this ugly one out, could I?");
-	Game.textStupid.setFontFamily("comicz.ttf");
-	Game.textStupid.setFontSize(24);
-	Game.textStupid.setBlend(1,0,0);
-	Game.textStupid.setTranslation(-400,-300, 1);
-	Game.textStupid.spawn();
+	Game.rich = Text.new();
+	Game.rich.setFontSize(24);
+	Game.rich.setText("[b]This[/b]is[i]a[/i][size=32][colour=FF00000]test[/size][/colour]");
+	Game.rich.setTranslation(0,0,1);
+	Game.rich.spawn();
 }
 
 Game.Update = function(dt)
@@ -41,6 +28,7 @@ Game.Update = function(dt)
 	}
 	
 	Game.timer += dt;
+
 }
 
 Game.Draw = function(dt)

@@ -5,6 +5,7 @@
 namespace snuffbox
 {
   class Font;
+	struct RichTextOperation;
 
 	/**
 	* @class snuffbox::Widget
@@ -14,6 +15,12 @@ namespace snuffbox
 	class Text : public Widget
 	{
 	public:
+
+		struct RichTextMarkup
+		{
+			Font* font;
+			XMFLOAT4 colour;
+		};
 
     /**
     * @enum snuffbox::TextAlignment
@@ -72,9 +79,41 @@ namespace snuffbox
     */
     void SetSpacing(float x, float y);
 
+		/**
+		* @brief Sets the shadow offset of this text element
+		* @param[in] x (float) The X offset
+		* @param[in] y (float) The Y offset
+		*/
+		void SetShadowOffset(float x, float y);
+
+		/**
+		* @brief Sets the shadow colour of this text element
+		* @param[in] r (float) The red value
+		* @param[in] g (float) The green value
+		* @param[in] b (float) The blue value
+		* @param[in] a (float) The alpha value
+		*/
+		void SetShadowColour(float r, float g, float b, float a);
+
+		/// Clears the shadow of this element
+		void ClearShadow();
+
+		/// Returns if this element has a shadow set
+		bool shadow_set();
+
+		/// Prepares the shadow before drawing
+		void PrepareShadow();
+
+		/// Resets the text after drawing the shadow
+		void Reset(XMFLOAT3 blend, float alpha);
+
+		/// Creates a vertex buffer and an index buffer
+		void CreateBuffers(std::wstring& buffer);
+
 	private:
 		ID3D11Buffer*							vertex_buffer_; //!< The vertex buffer of this element
 		ID3D11Buffer*							index_buffer_; //!< The index buffer of this element
+		
     std::string               text_; //!< The string of this text
     Font*                     current_font_; //!< The font this text uses
     float                     spacing_y_; //!< The vertical spacing
@@ -84,6 +123,10 @@ namespace snuffbox
     TextAlignment             alignment_; //!< The text alignment of this text object
     float                     width_; //!< The width of this element
     float                     height_; //!< The height of this element
+		bool											shadow_set_; //!< Does this font have a shadow set?
+		XMFLOAT4									shadow_colour_; //!< The shadow colour of this text element
+		XMFLOAT2									shadow_offset_; //!< The shadow offset of this text element
+		XMFLOAT2									pen_; //!< The pen position
 
 	public:
 		JS_NAME(Text);
@@ -99,5 +142,8 @@ namespace snuffbox
     static void JSSpacing(JS_ARGS);
     static void JSMetrics(JS_ARGS);
 		static void JSSetAlignment(JS_ARGS);
+		static void JSSetShadowOffset(JS_ARGS);
+		static void JSSetShadowColour(JS_ARGS);
+		static void JSClearShadow(JS_ARGS);
 	};
 }

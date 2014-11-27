@@ -27,6 +27,7 @@ namespace snuffbox
   FontManager::FontManager()
   {
     environment::globalInstance = this;
+		atlas_ = environment::memory().ConstructShared<FontAtlas>(4096, 4);
     default_font_ = GetFont("fonts/arial.ttf", 16);
   }
 
@@ -46,11 +47,9 @@ namespace snuffbox
       }
       else
       {
-        int size = std::floor(sqrt((fontSize * 1.5) * (fontSize * 1.5) * 128));
-        SharedPtr<FontAtlas> atlas = environment::memory().ConstructShared<FontAtlas>(size, 4);
         SharedPtr<Font> font = environment::memory().ConstructShared<Font>();
 
-        font->Load(path, fontSize, atlas);
+        font->Load(path, fontSize);
         font->LoadGlyphs(BASE_WCHAR);
 
         Font* f = font.get();
@@ -64,10 +63,9 @@ namespace snuffbox
     }
     else
     {
-      SharedPtr<FontAtlas> atlas = environment::memory().ConstructShared<FontAtlas>(2048, 4);
       SharedPtr<Font> font = environment::memory().ConstructShared<Font>();
 
-      font->Load(path, fontSize, atlas);
+      font->Load(path, fontSize);
       font->LoadGlyphs(BASE_WCHAR);
 
       std::map<float, SharedPtr<Font>> map;
@@ -81,6 +79,12 @@ namespace snuffbox
       return f;
     }
   }
+
+	//------------------------------------------------------------------------------------------------
+	FontAtlas* FontManager::atlas()
+	{
+		return atlas_.get();
+	}
 
   //------------------------------------------------------------------------------------------------
   Font* FontManager::default_font()

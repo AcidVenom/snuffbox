@@ -3,7 +3,7 @@
 #include "../../snuffbox/d3d11/elements/quad_element.h"
 #include "../../snuffbox/d3d11/elements/billboard_element.h"
 #include "../../snuffbox/d3d11/elements/mesh_element.h"
-#include "../../snuffbox/d3d11/elements/widget_element.h"
+#include "../../snuffbox/d3d11/elements/text_element.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
@@ -14,6 +14,7 @@
 #include "../../snuffbox/win32/win32_window.h"
 #include "../../snuffbox/freetype/freetype_font.h"
 #include "../../snuffbox/freetype/freetype_font_atlas.h"
+#include "../../snuffbox/freetype/freetype_font_manager.h"
 
 #include <fstream>
 #include <comdef.h>
@@ -41,17 +42,13 @@ struct VOut\n\
 \tfloat4 colour : COLOUR;\n\
 \tfloat3 normal : NORMAL;\n\
 \tfloat2 texcoord : TEXCOORD0;\n\
-\tfloat3 tangent : TANGENT;\n\
-\tfloat3 binormal : BINORMAL;\n\
 };\n\
 \n\
-VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 colour : COLOUR, float3 tangent : TANGENT, float3 binormal : BINORMAL)\n\
+VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 colour : COLOUR)\n\
 {\n\
 \tVOut output;\n\
 \toutput.position = mul(position, WorldViewProjection);\n\
 \toutput.normal = normalize(mul(float4(normal, 0), InvWorld).xyz);\n\
-\toutput.tangent = normalize(mul(float4(normal, 0), InvWorld).xyz);\n\
-\toutput.binormal = normalize(mul(float4(normal, 0), InvWorld).xyz);\n\
 \toutput.texcoord = texcoord;\n\
 \toutput.colour = colour;\n\
 \treturn output;\n\
@@ -261,12 +258,10 @@ namespace snuffbox
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		result = device_->CreateInputLayout(layout, 6, vs_buffer_->GetBufferPointer(),vs_buffer_->GetBufferSize(), &input_layout_);
+		result = device_->CreateInputLayout(layout, 4, vs_buffer_->GetBufferPointer(),vs_buffer_->GetBufferSize(), &input_layout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "Input Layout").c_str());
 
 		context_->IASetInputLayout(input_layout_);
@@ -879,7 +874,6 @@ namespace snuffbox
 					context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 				}
 				 
-
 				context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 
         topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
@@ -1017,8 +1011,28 @@ namespace snuffbox
 		for (int idx = static_cast<int>(ui_elements_.size() - 1); idx >= 0; --idx)
 		{
 			it = ui_elements_[idx];
+			if (it->type() == RenderElement::ElementTypes::kText)
+			{
+				Text* ptr = static_cast<Text*>(it);
+				
+				ptr->set_texture(environment::font_manager().atlas()->texture());
 
-			DrawRenderElement(it);
+				if (ptr->shadow_set() == true)
+				{
+					XMFLOAT3 pre_blend = ptr->blend();
+					float pre_alpha = ptr->alpha();
+
+					ptr->PrepareShadow();
+					DrawRenderElement(ptr);
+					ptr->Reset(pre_blend, pre_alpha);
+				}
+
+				DrawRenderElement(ptr);
+			}
+			else
+			{
+				DrawRenderElement(it);
+			}
 
 			if (it->destroyed())
 			{

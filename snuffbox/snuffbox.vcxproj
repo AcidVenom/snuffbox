@@ -74,8 +74,10 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
-    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
-    <CustomBuildAfterTargets>Compile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
+    <CustomBuildAfterTargets>
+    </CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -122,11 +124,14 @@
       <EntryPointSymbol>WinMainCRTStartup</EntryPointSymbol>
     </Link>
     <CustomBuildStep>
-      <Command>moc -o console/moc_console_widget.cc console/console_widget.h
-uic -o console/console_ui.h console/console_ui.ui</Command>
-      <Message>Compiling Qt files</Message>
-      <Outputs>console/moc_console_widget.cc</Outputs>
-      <Inputs>$(QTDIR)\bin\moc.exe;</Inputs>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
+      <Outputs>
+      </Outputs>
+      <Inputs>
+      </Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -193,6 +198,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClCompile Include="freetype\freetype_font.cc" />
     <ClCompile Include="freetype\freetype_font_atlas.cc" />
     <ClCompile Include="freetype\freetype_font_manager.cc" />
+    <ClCompile Include="freetype\freetype_rich_text.cc" />
     <ClCompile Include="game.cc" />
     <ClCompile Include="input\keyboard.cc" />
     <ClCompile Include="input\mouse.cc" />
@@ -229,6 +235,7 @@ uic -o console/console_ui.h console/console_ui.ui</Command>
     <ClInclude Include="freetype\freetype_font.h" />
     <ClInclude Include="freetype\freetype_font_atlas.h" />
     <ClInclude Include="freetype\freetype_font_manager.h" />
+    <ClInclude Include="freetype\freetype_rich_text.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="input\key.h" />
     <ClInclude Include="input\keyboard.h" />

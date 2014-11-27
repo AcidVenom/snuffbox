@@ -20,20 +20,6 @@ namespace snuffbox
   class Font
   {
   public:
-    /**
-    * @enum snuffbox::FontOutline
-    * @brief The outline type for a glyph
-    * @author Daniël Konings
-    */
-    enum FontOutline
-    {
-      kNone,
-      kLine,
-      kInner,
-      kOuter
-    };
-
-  public:
     /// Default constructor
     Font();
 
@@ -44,9 +30,8 @@ namespace snuffbox
     * @brief Loads a font from a relative path and stores its information in this class
     * @param[in] relativePath (std::string) The relative path to the font file
     * @param[in] size (float) The font size to load
-    * @param[in] atlas (snuffbox::SharedPtr<FontAtlas>) The font atlas to store texture information in
     */
-    void Load(std::string relativePath, float size, SharedPtr<FontAtlas>& atlas);
+    void Load(std::string relativePath, float size);
 
     /**
     * @brief Loads a glyph from a given charcode
@@ -62,43 +47,36 @@ namespace snuffbox
     */
     int LoadGlyphs(wchar_t *str);
 
-    FontAtlas* atlas();
-    
-    /**
-    * @return (snuffbox::Texture*) The texture atlas of this font
-    */
-    Texture* texture();
-
     /**
     * @return (snuffbox::FontGlyph*) The glyph for the specific charcode
     */
     FontGlyph* glyph(wchar_t charcode);
 
-    /// Generates kerning for each glyph
-    void GenerateKerning();
+		/**
+		* @return (float) The ascender of this font
+		*/
+		float ascender();
 
-    float ascender(){ return ascender_; }
-    float line_gap(){ return linegap_; }
-    float line_height(){ return height_; }
+		/**
+		* @return (float) The line gap of this font
+		*/
+		float line_gap();
+
+		/**
+		* @return (float) The line height of this font
+		*/
+		float line_height();
 
   private:
     std::map<wchar_t, SharedPtr<FontGlyph>>   glyphs_; //!< The loaded font glyphs
     FT_LibraryRec_*             library_; //!< The freetype library
     FT_FaceRec_*                face_; //!< The freetype face
     float                       size_;
-    int                         hinting_;
-    Font::FontOutline           outline_type_;
-    float                       outline_thickness_;
-    int                         filtering_;
-    int                         kerning_;
-    int                         lcd_weights_[5];
+    unsigned char               lcd_weights_[5];
     float                       height_;
     float                       linegap_;
     float                       ascender_;
     float                       descender_;
-    float                       underline_position_;
-    float                       underline_thickness_;
-    SharedPtr<FontAtlas>        atlas_;
   };
 
 
@@ -128,8 +106,5 @@ namespace snuffbox
     float x_advance; //!< Pen X advance distance
     float y_advance; //!< Pen Y advance distance
     FontTexCoords tex_coords; //!< Texture coordinates of this glyph in the atlas
-    std::map<wchar_t, float> kerning; //!< Kerning information
-    Font::FontOutline outline_type; //!< The glyph outline type
-    float outline_thickness; //!< The outline thickness (if applicable)
   };
 }
