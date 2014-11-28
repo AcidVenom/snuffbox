@@ -13,10 +13,15 @@ Game.Initialise = function()
 	Game.camera = Camera.new("orthographic");
 	Game.camera.setTranslation(0,0,0);
 
-	Game.rich = Text.new();
+	Game.box = Widget.new();
+	Game.box.spawn();
+	Game.box.setBlend(0.1,0.1,0.1);
+	Game.box.setOffset(0.5,0.5);
+
+	Game.rich = Text.new(Game.box);
 	Game.rich.setFontSize(24);
 	Game.rich.setAlignment(Text.Center);
-	Game.rich.setText("[size=32][b]Oh hello [icon=textures/smiley.png].[/b][/size]\n\n[colour=FFFF00][i]I'm just testing rich text![/i][/colour]\n____________________________\nIt's working [b][size=24]quite[/size][/b] well..\n[i][b][font=fonts/times.ttf]Have some funny characters ▲▼^&@[/font][/b][/i]\n[b][colour=CCCCCC]Text metrics[/colour][/b] do their [i][colour=00FF00]job[/colour][/i] too\n\n[size=48](Icons also work [icon=textures/smiley.png] yay!)[/size]");
+	Game.rich.setText("[size=32][b]Oh hello[icon=textures/smiley_1.tif].[/b][/size]\n\n[colour=FFFF00][i]I'm just testing rich text![/i][/colour]\n____________________________\nIt's working [b][size=24]quite[/size][/b] well..\n[i][b][font=fonts/times.ttf]Have some funny characters ▲▼^&[/font][/b][/i]\n[b][colour=CCCCCC]Text metrics[/colour][/b] do their [i][colour=00FF00]job[/colour][/i] too\n\n[size=48](Icons also work [icon=textures/smiley_2.tif] yay!)[/size]");
 	Game.rich.setTranslation(0,0,1);
 	Game.rich.setShadowOffset(1,1);
 	Game.rich.setShadowColour(0.5,0.5,0.2,1);
@@ -25,11 +30,7 @@ Game.Initialise = function()
 
 	var metrics = Game.rich.metrics();
 
-	Game.box = Widget.new();
 	Game.box.setSize(metrics.width + 80,metrics.height + 80);
-	Game.box.spawn();
-	Game.box.setBlend(0.1,0.1,0.1);
-	Game.box.setOffset(0.5,0.5);
 
 	Game.FPS = Text.new();
 	Game.FPS.setTranslation(-620,-340, 0);
@@ -37,6 +38,8 @@ Game.Initialise = function()
 	Game.FPS.spawn();
 
 	Game.deltas = [];
+
+	Game.timer = 0;
 }
 
 Game.Update = function(dt)
@@ -70,6 +73,11 @@ Game.Update = function(dt)
 		fps = 60;
 	}
 	Game.FPS.setText("FPS: " + fps + "/60");
+
+	var x = Math.cos(Game.timer)*20;
+	var y = Math.sin(Game.timer)*20;
+	Game.box.setTranslation(x,y,0);
+	Game.box.setRotation(0,0,Math.sin(Game.timer)/7);
 }
 
 Game.Draw = function(dt)

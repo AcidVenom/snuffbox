@@ -1,1 +1,2 @@
-load("texture","textures/smiley.png")
+load("texture","textures/smiley_1.tif")
+load("texture","textures/smiley_2.tif")

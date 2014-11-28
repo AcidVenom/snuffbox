@@ -61,7 +61,7 @@ float4 PS(VOut input) : SV_TARGET\n\
 {\n\
 \tfloat4 textureColour = textures[0].Sample(SampleType, input.texcoord);\n\
 \tfloat4 colour = float4(textureColour.rgb * Blend * input.colour.rgb, textureColour.a);\n\
-\tcolour.a *= Alpha;\n\
+\tcolour.rgb *= colour.a * Alpha;\n\
 \treturn colour;\n\
 }"
 
@@ -570,12 +570,12 @@ namespace snuffbox
 		D3D11_SAMPLER_DESC sDesc;
 
 		ZeroMemory(&sDesc, sizeof(D3D11_SAMPLER_DESC));
-    sDesc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+		sDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
 		sDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.MipLODBias = 0.0f;
-		sDesc.MaxAnisotropy = 4;
+		sDesc.MaxAnisotropy = 1;
     sDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 		sDesc.BorderColor[0] = 0;
 		sDesc.BorderColor[1] = 0;
@@ -671,8 +671,7 @@ namespace snuffbox
 		result = device_->CreateBlendState(&bDesc, &blend_state_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
-		float factor[4] = { 1, 1, 1, 1 };
-		context_->OMSetBlendState(blend_state_,factor,0xFFFFFFFF);
+		context_->OMSetBlendState(blend_state_, NULL, 0xFFFFFFFF);
 	}
 
 	//---------------------------------------------------------------------------------

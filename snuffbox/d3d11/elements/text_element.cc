@@ -136,9 +136,9 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void Text::FillIconBuffer(TextIcon& icon)
 	{
-		int size = icon.size;
-		int x = icon.position.x;
-		int y = icon.position.y;
+		float size = floor(icon.size);
+		float x = floor(icon.position.x) + 0.5f;
+		float y = floor(icon.position.y) + 0.5f;
 
 		Vertex verts[] = {
 			{ x, y, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
@@ -309,7 +309,7 @@ namespace snuffbox
 
 				icon.position = XMFLOAT2(pen_.x, pen_.y);
 
-				float size = current_font_->glyph(L'A')->x_advance*1.5;
+				float size = current_font_->glyph(L'A')->x_advance * 1.2f;
 				pen_.x += size + spacing_x_;
 				icon.size = size;
 

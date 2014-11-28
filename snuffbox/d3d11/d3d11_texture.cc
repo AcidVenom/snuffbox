@@ -55,6 +55,7 @@ namespace snuffbox
 		std::string file_path = std::string(environment::game().path() + "/" + path).c_str();
 
 		HRESULT result = S_OK;
+
 		result = D3DX11CreateShaderResourceViewFromFileA(
 			environment::render_device().device(),
 			file_path.c_str(),
