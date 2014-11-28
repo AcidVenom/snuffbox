@@ -3,12 +3,12 @@ Game.Initialise = function()
 	ContentManager.load("box", "test.box");
 
 	Game.setName("Snuffbox Test Project");
-	RenderSettings.setResolution(800,600);
-	RenderSettings.setVsync(false);
+	RenderSettings.setResolution(1280,720);
+	RenderSettings.setVsync(true);
 	RenderSettings.setFullscreen(false);
 	RenderSettings.setCullMode(RenderSettings.CullFront);
 	RenderSettings.setBackBufferColour(0,0,0,1);
-	RenderSettings.setWindowSize(800,600);
+	RenderSettings.setWindowSize(1280,720);
 	RenderSettings.setYDown(false);
 	Game.camera = Camera.new("orthographic");
 	Game.camera.setTranslation(0,0,0);
@@ -30,6 +30,13 @@ Game.Initialise = function()
 	Game.box.spawn();
 	Game.box.setBlend(0.1,0.1,0.1);
 	Game.box.setOffset(0.5,0.5);
+
+	Game.FPS = Text.new();
+	Game.FPS.setTranslation(-620,-340, 0);
+	Game.FPS.setFontSize(24);
+	Game.FPS.spawn();
+
+	Game.deltas = [];
 }
 
 Game.Update = function(dt)
@@ -40,6 +47,24 @@ Game.Update = function(dt)
 	}
 	
 	Game.timer += dt;
+
+	Game.deltas.push(dt);
+
+	if (Game.deltas > 100)
+	{
+		Game.deltas = [];
+	}
+
+	var sum = 0;
+
+	for (var i = 0; i < Game.deltas.length; ++i)
+	{
+		sum += Game.deltas[i];
+	}
+
+	var average = sum / Game.deltas.length;
+
+	Game.FPS.setText("FPS: " + Math.floor(1/average + 0.5) + "/60");
 }
 
 Game.Draw = function(dt)
