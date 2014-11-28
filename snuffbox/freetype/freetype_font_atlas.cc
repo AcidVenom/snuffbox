@@ -128,7 +128,7 @@ namespace snuffbox
   //------------------------------------------------------------------------------------------------
   void FontAtlas::FillRegion(const FontAtlasRegion& region, const unsigned char* data, int stride)
   {
-    SNUFF_XASSERT(region.x > 0 && region.y > 0 && region.x + region.width < size_ - 1 && region.y + region.height < size_ - 1, "The region does not fit in the atlas");
+    SNUFF_XASSERT(region.x > 0 && region.y > 0 && region.x + region.width <= size_ - 1 && region.y + region.height <= size_ - 1, "The region does not fit in the atlas");
 
     for (int y = 0; y < region.height; ++y)
     {

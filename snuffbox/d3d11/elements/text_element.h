@@ -40,7 +40,10 @@ namespace snuffbox
 			Texture* icon;
 			std::wstring path;
 			XMFLOAT2 position;
+			std::vector<Vertex> vertices;
+			std::vector<unsigned int> indices;
 			float size;
+			int line;
 		};
 
     /**
@@ -161,6 +164,7 @@ namespace snuffbox
 		bool											align_vertical_; //!< Should this text be vertically aligned?
 
 		std::vector<TextIcon>			icon_buffer_; //!< All icons that need to be rendered
+		int												line_; //!< The current line
 	public:
 		JS_NAME(Text);
     void RegisterExtraFunctions(JS_EXTRA);

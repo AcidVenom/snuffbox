@@ -93,6 +93,7 @@ namespace snuffbox
 			{
 				pen_.y -= (markup.font->line_gap() * 100.0f + markup.font->line_height() * 100.0f);
 				pen_.x = 0.0f;
+				++line_;
 				continue;
 			}
 
@@ -146,17 +147,11 @@ namespace snuffbox
 			{ x + size, y - size, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) }
 		};
 
-		std::vector<Vertex> iconVerts;
-		std::vector<unsigned int> iconIndices;
-
 		for (int j = 0; j < 4; ++j)
 		{
-			iconVerts.push_back(verts[j]);
-			iconIndices.push_back(j);
+			icon.vertices.push_back(verts[j]);
+			icon.indices.push_back(j);
 		}
-
-		icon.vertex_buffer = environment::render_device().CreateVertexBuffer(iconVerts);
-		icon.index_buffer = environment::render_device().CreateIndexBuffer(iconIndices);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -175,6 +170,8 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   void Text::SetText(std::string text)
   {
+		line_ = 0;
+
 		if (vertex_buffer_ != nullptr && index_buffer_ != nullptr)
 		{
 			SNUFF_SAFE_RELEASE(vertex_buffer_);
@@ -243,6 +240,10 @@ namespace snuffbox
 					isItalic = false;
 					font_size_ = defaultSize;
 					fontString = font_;
+				}
+				else
+				{
+					wasNested = false;
 				}
 			}
 			else if (it.doColour)
@@ -318,6 +319,7 @@ namespace snuffbox
 				WideCharToMultiByte(CP_UTF8, 0, it.iconPath.c_str(), -1, multistr, s, 0, 0);
 
 				icon.icon = environment::content_manager().Get<Texture>(std::string(multistr)).get();
+				icon.line = line_;
 				delete[] multistr;
 
 				icon_buffer_.push_back(icon);
@@ -336,13 +338,14 @@ namespace snuffbox
 		vertex_buffer_ = environment::render_device().CreateVertexBuffer(vertices());
 		index_buffer_ = environment::render_device().CreateIndexBuffer(indices());
 
-		pen_.x = 0.0f;
-		pen_.y = 0.0f;
-
 		for (auto& it : icon_buffer_)
 		{
-			FillIconBuffer(it);
+			it.vertex_buffer = environment::render_device().CreateVertexBuffer(it.vertices);
+			it.index_buffer = environment::render_device().CreateIndexBuffer(it.indices);
 		}
+
+		pen_.x = 0.0f;
+		pen_.y = 0.0f;
 
     delete[] widestr;
   }
@@ -425,6 +428,21 @@ namespace snuffbox
 			}
 		}
 
+		for (auto& it : icon_buffer_)
+		{
+			FillIconBuffer(it);
+
+			if (it.position.x > highest_x)
+			{
+				highest_x = it.position.x;
+			}
+
+			if (it.position.y < highest_y)
+			{
+				highest_y = it.position.y;
+			}
+		}
+
 		width_ = highest_x;
 		height_ = abs(highest_y);
 
@@ -433,11 +451,13 @@ namespace snuffbox
 			return;
 		}
 
+		auto& verts = vertices();
+		line_ = 0;
+
 		if (alignment_ != TextAlignment::kLeft)
 		{
 			int offset = 0;
 			int index = -1;
-			auto& verts = vertices();
 
 			for (int i = 0; i < buffer->size(); ++i)
 			{
@@ -463,19 +483,50 @@ namespace snuffbox
 						{
 							verts.at(j).x += delta;
 						}
+
+						for (auto& it : icon_buffer_)
+						{
+							if (it.line == line_)
+							{
+								for (Vertex& vert : it.vertices)
+								{
+									vert.x += delta;
+								}
+							}
+						}
 					}
 
 					offset = index + 1;
+					++line_;
 				}
 			}
+		}
 
-			for (Vertex& it : verts)
+		for (Vertex& it : verts)
+		{
+			if (alignment_ != TextAlignment::kLeft)
 			{
 				it.x -= alignment_ == TextAlignment::kRight ? width_ : width_ / 2;
+			}
+
+			if (align_vertical_ == true)
+			{
+				it.y += height_ / 2;
+			}
+		}
+
+		for (auto& it : icon_buffer_)
+		{
+			for (Vertex& vert : it.vertices)
+			{
+				if (alignment_ != TextAlignment::kLeft)
+				{
+					vert.x -= alignment_ == TextAlignment::kRight ? width_ : width_ / 2;
+				}
 
 				if (align_vertical_ == true)
 				{
-					it.y += height_ / 2;
+					vert.y += height_ / 2;
 				}
 			}
 		}
