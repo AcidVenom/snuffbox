@@ -131,7 +131,7 @@ namespace snuffbox
 		/**
 		* @return (XMMATRIX) The 2D offset matrix
 		*/
-		XMMATRIX offset_2d(){ return XMMatrixTranslation(ox_*sx_*size_[0], oy_*sy_*size_[1], oy_*sz_); }
+		XMMATRIX offset_2d(){ return XMMatrixTranslation(ox_*sx_*size_[0], -oy_*sy_*size_[1], oy_*sz_); }
 
 		/**
 		* @return (XMVECTOR) The scaling vector

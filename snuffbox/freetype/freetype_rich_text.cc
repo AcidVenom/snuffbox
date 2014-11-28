@@ -107,6 +107,15 @@ namespace snuffbox
 
 					toClose = L"[/font]";
 				}
+				else
+				{
+					int size = WideCharToMultiByte(CP_UTF8, 0, tag.c_str(), -1, NULL, 0, 0, 0);
+
+					char* multistr = new char[size];
+					WideCharToMultiByte(CP_UTF8, 0, tag.c_str(), -1, multistr, size, 0, 0);
+
+					SNUFF_ASSERT("Unknown rich text tag found! Aborting\n\n\t" + std::string(multistr));
+				}
 
 				if (nested == false)
 				{

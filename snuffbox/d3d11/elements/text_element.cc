@@ -25,7 +25,8 @@ namespace snuffbox
 		shadow_set_(false),
 		shadow_offset_(0.0f, 0.0f),
 		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f),
-		current_colour_(1.0f, 1.0f, 1.0f, 1.0f)
+		current_colour_(1.0f, 1.0f, 1.0f, 1.0f),
+		align_vertical_(false)
 	{
     current_font_ = environment::font_manager().default_font();
     font_ = "fonts/arial.ttf";
@@ -33,16 +34,17 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-  Text::Text(JS_ARGS) :
-    Widget(RenderElement::ElementTypes::kText),
-    current_font_(nullptr),
-    spacing_y_(0.0f),
-    spacing_x_(0.0f),
-    alignment_(TextAlignment::kLeft),
+	Text::Text(JS_ARGS) :
+		Widget(RenderElement::ElementTypes::kText),
+		current_font_(nullptr),
+		spacing_y_(0.0f),
+		spacing_x_(0.0f),
+		alignment_(TextAlignment::kLeft),
 		shadow_set_(false),
 		shadow_offset_(0.0f, 0.0f),
 		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f),
-		current_colour_(1.0f, 1.0f, 1.0f, 1.0f)
+		current_colour_(1.0f, 1.0f, 1.0f, 1.0f),
+		align_vertical_(false)
 	{
 		JSWrapper wrapper(args);
 		Create();
@@ -141,13 +143,13 @@ namespace snuffbox
 
 		vertices().clear();
 		indices().clear();
+		
+    text_ = text;
 
 		if (text.size() == 0)
 		{
-			text = " ";
+			return;
 		}
-
-    text_ = text;
 
     const int buffsize = MultiByteToWideChar(CP_UTF8, NULL, text.c_str(), -1, NULL, NULL);
 
@@ -166,11 +168,13 @@ namespace snuffbox
 		bool isBold = false;
 		bool isItalic = false;
 		std::string fontString = font_;
+		std::wstring parsed = L"";
 
 		for (auto& it : operations)
 		{
 			if (it.isDefault)
 			{
+				parsed += it.text;
 				FillBuffers(it.text);
 				current_font_ = defaultFont;
 				current_colour_ = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -245,7 +249,7 @@ namespace snuffbox
 		font_size_ = defaultSize;
 		fontString = font_;
 
-		Align();
+		Align(&parsed);
 
 		vertex_buffer_ = environment::render_device().CreateVertexBuffer(vertices());
 		index_buffer_ = environment::render_device().CreateIndexBuffer(indices());
@@ -302,7 +306,7 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void Text::Align()
+	void Text::Align(std::wstring* buffer)
 	{
 		float highest_x;
 		float highest_y;
@@ -336,6 +340,58 @@ namespace snuffbox
 
 		width_ = highest_x;
 		height_ = abs(highest_y);
+
+		if (buffer->size() == 1)
+		{
+			return;
+		}
+
+		if (alignment_ != TextAlignment::kLeft)
+		{
+			int offset = 0;
+			int index = -1;
+			auto& verts = vertices();
+
+			for (int i = 0; i < buffer->size(); ++i)
+			{
+				wchar_t ch = buffer->at(i);
+
+				if (ch != L'\n')
+				{
+					index += 4;
+				}
+
+				if (ch == L'\n' || (i == buffer->size() - 1 && buffer->size() != 1))
+				{
+					float x = verts.at(index).x;
+					if (x < highest_x)
+					{
+						int delta = highest_x - x;
+
+						if (alignment_ == TextAlignment::kCenter)
+						{
+							delta = static_cast<int>(delta / 2);
+						}
+						for (int j = offset; j <= index; ++j)
+						{
+							verts.at(j).x += delta;
+						}
+					}
+
+					offset = index + 1;
+				}
+			}
+
+			for (Vertex& it : verts)
+			{
+				it.x -= alignment_ == TextAlignment::kRight ? width_ : width_ / 2;
+
+				if (align_vertical_ == true)
+				{
+					it.y += height_ / 2;
+				}
+			}
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -378,7 +434,8 @@ namespace snuffbox
 			JSFunctionRegister("setAlignment", JSSetAlignment),
 			JSFunctionRegister("setShadowOffset", JSSetShadowOffset),
 			JSFunctionRegister("setShadowColour", JSSetShadowColour),
-			JSFunctionRegister("clearShadow", JSClearShadow)
+			JSFunctionRegister("clearShadow", JSClearShadow),
+			JSFunctionRegister("alignVertical", JSAlignVertical)
     };
 
     JS_REGISTER_OBJECT_FUNCTIONS_EXTRA(obj, funcs);
@@ -487,6 +544,15 @@ namespace snuffbox
 		JS_SETUP(Text, "V");
 
 		self->ClearShadow();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Text::JSAlignVertical(JS_ARGS)
+	{
+		JS_SETUP(Text, "B");
+
+		self->align_vertical_ = wrapper.GetBool(0);
+		self->SetText(self->text_);
 	}
 
   //-------------------------------------------------------------------------------------------

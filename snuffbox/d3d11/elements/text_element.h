@@ -111,7 +111,7 @@ namespace snuffbox
 		void FillBuffers(std::wstring& buffer);
 
 		/// Aligns the text
-		void Align();
+		void Align(std::wstring* buffer);
 
 	private:
 		ID3D11Buffer*							vertex_buffer_; //!< The vertex buffer of this element
@@ -131,6 +131,7 @@ namespace snuffbox
 		XMFLOAT4									shadow_colour_; //!< The shadow colour of this text element
 		XMFLOAT2									shadow_offset_; //!< The shadow offset of this text element
 		XMFLOAT2									pen_; //!< The pen position
+		bool											align_vertical_; //!< Should this text be vertically aligned?
 
 	public:
 		JS_NAME(Text);
@@ -149,5 +150,6 @@ namespace snuffbox
 		static void JSSetShadowOffset(JS_ARGS);
 		static void JSSetShadowColour(JS_ARGS);
 		static void JSClearShadow(JS_ARGS);
+		static void JSAlignVertical(JS_ARGS);
 	};
 }
