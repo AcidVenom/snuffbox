@@ -108,7 +108,7 @@ namespace snuffbox
 		WideCharToMultiByte(CP_UTF8, 0, error.ErrorMessage(), -1, multistr, size, 0, 0);
 
 		std::string str = std::string("[D3D11] ") + subGroup + ": " + multistr;
-		delete multistr;
+		delete[] multistr;
 		return str;
 	}
 
@@ -779,6 +779,23 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::SetCurrentTexture(Texture* texture)
+	{
+		current_texture_ = texture->resource();
+		ID3D11ShaderResourceView* textures[2];
+		textures[0] = current_texture_;
+		textures[1] = default_normal_;
+
+		context_->PSSetShaderResources(0, 2, textures);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::DrawCurrent(int indices)
+	{
+		context_->DrawIndexed(static_cast<UINT>(indices), 0, 0);
+	}
+
+	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::DrawRenderElement(RenderElement* it)
 	{
 		if (it && it->visible())
@@ -880,10 +897,15 @@ namespace snuffbox
 				{
 					context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 				}
-				 
+			
 				context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 
         topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+
+				if (elementType == RenderElement::ElementTypes::kText)
+				{
+					static_cast<Text*>(it)->DrawIcons();
+				}
 			}
 			else
 			{

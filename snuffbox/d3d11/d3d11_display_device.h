@@ -302,6 +302,9 @@ namespace snuffbox
 
     ID3D11ShaderResourceView* CreateTexture2D(int width, int height, DXGI_FORMAT pixelFormat, const void* buffer, const unsigned short stride);
 
+		void DrawCurrent(int indices);
+
+		void SetCurrentTexture(Texture* texture);
 	private:
 		SwapChainDescription					swap_desc_;							//!< The swap chain description to create the chain
 		SwapChain*										swap_chain_;						//!< The swap chain for this device

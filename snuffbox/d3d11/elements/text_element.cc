@@ -132,6 +132,46 @@ namespace snuffbox
 		}
 	}
 
+	//-------------------------------------------------------------------------------------------
+	void Text::FillIconBuffer(TextIcon& icon)
+	{
+		int size = icon.size;
+		int x = icon.position.x;
+		int y = icon.position.y;
+
+		Vertex verts[] = {
+			{ x, y, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+			{ x, y - size, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+			{ x + size, y, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+			{ x + size, y - size, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) }
+		};
+
+		std::vector<Vertex> iconVerts;
+		std::vector<unsigned int> iconIndices;
+
+		for (int j = 0; j < 4; ++j)
+		{
+			iconVerts.push_back(verts[j]);
+			iconIndices.push_back(j);
+		}
+
+		icon.vertex_buffer = environment::render_device().CreateVertexBuffer(iconVerts);
+		icon.index_buffer = environment::render_device().CreateIndexBuffer(iconIndices);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void Text::DrawIcons()
+	{
+		for (auto& it : icon_buffer_)
+		{
+			environment::render_device().SetVertexBuffer(it.vertex_buffer);
+			environment::render_device().SetIndexBuffer(it.index_buffer);
+
+			environment::render_device().SetCurrentTexture(it.icon);
+			environment::render_device().DrawCurrent(4);
+		}
+	}
+
   //-------------------------------------------------------------------------------------------
   void Text::SetText(std::string text)
   {
@@ -141,8 +181,15 @@ namespace snuffbox
 			SNUFF_SAFE_RELEASE(index_buffer_);
 		}
 
+		for (auto& it : icon_buffer_)
+		{
+			SNUFF_SAFE_RELEASE(it.vertex_buffer);
+			SNUFF_SAFE_RELEASE(it.index_buffer);
+		}
+
 		vertices().clear();
 		indices().clear();
+		icon_buffer_.clear();
 		
     text_ = text;
 
@@ -167,21 +214,36 @@ namespace snuffbox
 
 		bool isBold = false;
 		bool isItalic = false;
+		bool wasNested = false;
 		std::string fontString = font_;
 		std::wstring parsed = L"";
 
-		for (auto& it : operations)
+		for (int i = 0; i < operations.size(); ++i)
 		{
+			auto& it = operations.at(i);
+
+			if (i + 1 < operations.size())
+			{
+				if (operations.at(i + 1).icon == true)
+				{
+					wasNested = true;
+				}
+			}
+
 			if (it.isDefault)
 			{
 				parsed += it.text;
 				FillBuffers(it.text);
-				current_font_ = defaultFont;
-				current_colour_ = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-				isBold = false;
-				isItalic = false;
-				font_size_ = defaultSize;
-				fontString = font_;
+
+				if (wasNested == false)
+				{
+					current_font_ = defaultFont;
+					current_colour_ = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+					isBold = false;
+					isItalic = false;
+					font_size_ = defaultSize;
+					fontString = font_;
+				}
 			}
 			else if (it.doColour)
 			{
@@ -240,6 +302,26 @@ namespace snuffbox
 
 				current_font_ = environment::font_manager().GetFont(fontString, font_size_);
 			}
+			else if (it.icon)
+			{
+				TextIcon icon;
+
+				icon.position = XMFLOAT2(pen_.x, pen_.y);
+
+				float size = current_font_->glyph(L'A')->x_advance*1.5;
+				pen_.x += size + spacing_x_;
+				icon.size = size;
+
+				int s = WideCharToMultiByte(CP_UTF8, 0, it.iconPath.c_str(), -1, NULL, 0, 0, 0);
+
+				char* multistr = new char[s];
+				WideCharToMultiByte(CP_UTF8, 0, it.iconPath.c_str(), -1, multistr, s, 0, 0);
+
+				icon.icon = environment::content_manager().Get<Texture>(std::string(multistr)).get();
+				delete[] multistr;
+
+				icon_buffer_.push_back(icon);
+			}
 		}
 
 		current_font_ = defaultFont;
@@ -256,6 +338,11 @@ namespace snuffbox
 
 		pen_.x = 0.0f;
 		pen_.y = 0.0f;
+
+		for (auto& it : icon_buffer_)
+		{
+			FillIconBuffer(it);
+		}
 
     delete[] widestr;
   }
@@ -560,5 +647,11 @@ namespace snuffbox
 	{
 		SNUFF_SAFE_RELEASE(vertex_buffer_);
 		SNUFF_SAFE_RELEASE(index_buffer_);
+
+		for (auto& it : icon_buffer_)
+		{
+			SNUFF_SAFE_RELEASE(it.vertex_buffer);
+			SNUFF_SAFE_RELEASE(it.index_buffer);
+		}
 	}
 }

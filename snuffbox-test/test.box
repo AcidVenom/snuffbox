@@ -1,2 +1,1 @@
-load("texture","tex.png")
-load("texture","tex2.png")
+load("texture","textures/smiley.png")

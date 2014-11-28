@@ -5,6 +5,7 @@
 
 namespace snuffbox
 {
+	//-----------------------------------------------------------------------------------------------------------
 	MarkupOperations RichTextParser::Parse(std::wstring* buffer)
 	{
 		MarkupOperations operations;
@@ -88,6 +89,9 @@ namespace snuffbox
 					markup.iconPath = tag;
 
 					nested = true;
+
+					operations.push_back(markup);
+					inTag = false;
 				}
 				else if (ConsumeRaw(L"font", &tag))
 				{
@@ -103,7 +107,7 @@ namespace snuffbox
 
 					markup.font = multistr;
 
-					delete multistr;
+					delete[] multistr;
 
 					toClose = L"[/font]";
 				}
@@ -179,6 +183,7 @@ namespace snuffbox
 		return operations;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	bool RichTextParser::Consume(std::wstring toConsume, int& i, std::wstring* buffer)
 	{
 		int start = i;
@@ -195,6 +200,7 @@ namespace snuffbox
 		return true;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	bool RichTextParser::ConsumeRaw(std::wstring toConsume, std::wstring* buffer)
 	{
 		int i = 0;
@@ -211,6 +217,7 @@ namespace snuffbox
 		return true;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	bool RichTextParser::ConsumeRawIndex(std::wstring toConsume, int i, std::wstring* buffer)
 	{
 		int start = i;
@@ -227,6 +234,7 @@ namespace snuffbox
 		return true;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	bool RichTextParser::Contains(wchar_t value, std::wstring* buffer)
 	{
 		for (int i = 0; i < buffer->size(); ++i)
@@ -240,6 +248,7 @@ namespace snuffbox
 		return false;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	std::wstring RichTextParser::GetTag(int& i, std::wstring* buffer)
 	{
 		std::wstring result;
@@ -262,6 +271,7 @@ namespace snuffbox
 		return result;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	void RichTextParser::SkipWhitespaces(int& i, std::wstring* buffer)
 	{
 		while (IS_WHITESPACE_CHAR(buffer->at(i)))
@@ -270,6 +280,7 @@ namespace snuffbox
 		}
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	void RichTextParser::RemoveWhitespaces(std::wstring* buffer)
 	{
 		std::wstring result;
@@ -287,6 +298,7 @@ namespace snuffbox
 		*buffer = result;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	void RichTextParser::SplitValue(std::wstring* buffer)
 	{
 		std::wstring result = L"";
@@ -309,6 +321,7 @@ namespace snuffbox
 		*buffer = result;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	std::vector<float> RichTextParser::GetColour(std::wstring* buffer)
 	{
 		std::wstring hex = L"0x" + *buffer;
@@ -322,6 +335,7 @@ namespace snuffbox
 		return col;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
 	float RichTextParser::GetSize(std::wstring* buffer)
 	{
 		return wcstof(buffer->c_str(), NULL);

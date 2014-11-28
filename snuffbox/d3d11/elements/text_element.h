@@ -16,10 +16,31 @@ namespace snuffbox
 	{
 	public:
 
+		/**
+		* @struct snuffbox::RichTextMarkup
+		* @brief The current markup being used
+		* @author Daniël Konings
+		*/
 		struct RichTextMarkup
 		{
 			Font* font;
 			XMFLOAT4 colour;
+		};
+
+		/**
+		* @struct snuffbox::TextIcon
+		* @brief Holds all information required to render an icon on the right position in the text
+		* @author Daniël Konings
+		*/
+		struct TextIcon
+		{
+			TextIcon() : vertex_buffer(nullptr), index_buffer(nullptr), icon(nullptr), path(L""), position(0.0f, 0.0f), size(0.0f){}
+			ID3D11Buffer* vertex_buffer;
+			ID3D11Buffer* index_buffer;
+			Texture* icon;
+			std::wstring path;
+			XMFLOAT2 position;
+			float size;
 		};
 
     /**
@@ -110,8 +131,14 @@ namespace snuffbox
 		/// Fills a vertex buffer and an index buffer
 		void FillBuffers(std::wstring& buffer);
 
+		/// Fills the vertex and index buffer of an icon
+		void FillIconBuffer(TextIcon& icon);
+
 		/// Aligns the text
 		void Align(std::wstring* buffer);
+
+		/// Draws the icons
+		void DrawIcons();
 
 	private:
 		ID3D11Buffer*							vertex_buffer_; //!< The vertex buffer of this element
@@ -133,6 +160,7 @@ namespace snuffbox
 		XMFLOAT2									pen_; //!< The pen position
 		bool											align_vertical_; //!< Should this text be vertically aligned?
 
+		std::vector<TextIcon>			icon_buffer_; //!< All icons that need to be rendered
 	public:
 		JS_NAME(Text);
     void RegisterExtraFunctions(JS_EXTRA);
