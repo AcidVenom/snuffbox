@@ -101,7 +101,14 @@ namespace snuffbox
   std::string D3D11DisplayDevice::HRToString(HRESULT hr, const char* subGroup = "")
 	{
 		_com_error error(hr);
-    std::string str = "REFACTOR THIS";//std::string("[D3D11] ") + subGroup + ": " + error.ErrorMessage();
+
+		int size = WideCharToMultiByte(CP_UTF8, 0, error.ErrorMessage(), -1, NULL, 0, 0, 0);
+
+		char* multistr = new char[size];
+		WideCharToMultiByte(CP_UTF8, 0, error.ErrorMessage(), -1, multistr, size, 0, 0);
+
+		std::string str = std::string("[D3D11] ") + subGroup + ": " + multistr;
+		delete multistr;
 		return str;
 	}
 

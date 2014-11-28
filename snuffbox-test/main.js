@@ -16,18 +16,7 @@ Game.Initialise = function()
 	Game.rich = Text.new();
 	Game.rich.setFontSize(24);
 	Game.rich.setAlignment(Text.Center);
-	Game.rich.setText("[size=32][b]Oh hello.[/b][/size]\n
-		\n
-		[colour=FFFF00][i]I'm just testing rich text![/i][/colour]\n
-		____________________________\n
-		It's working [b][size=24]quite[/size][/b] well..\n
-		[i][b][font=fonts/times.ttf]Have some funny characters ▲▼^&@[/font][/b][/i]\n
-		[b][colour=CCCCCC]Text metrics[/colour][/b] do their [i][colour=00FF00]job[/colour][/i] too\n
-		\n
-		(This line is the default font, by the way)[colour=FFFF00]\n
-		\n
-		▲\n
-		▲ ▲[/colour]");
+	Game.rich.setText("[size=32][b]Oh hello.[/b][/size]\n\n[colour=FFFF00][i]I'm just testing rich text![/i][/colour]\n____________________________\nIt's working [b][size=24]quite[/size][/b] well..\n[i][b][font=fonts/times.ttf]Have some funny characters ▲▼^&@[/font][/b][/i]\n[b][colour=CCCCCC]Text metrics[/colour][/b] do their [i][colour=00FF00]job[/colour][/i] too\n\n(This line is the default font, by the way)[colour=FFFF00]\n\n▲\n▲ ▲[/colour]");
 	Game.rich.setTranslation(0,0,1);
 	Game.rich.setShadowOffset(1,1);
 	Game.rich.setShadowColour(0.5,0.5,0.2,1);
