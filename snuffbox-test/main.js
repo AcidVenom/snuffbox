@@ -21,7 +21,7 @@ Game.Initialise = function()
 	Game.rich = Text.new(Game.box);
 	Game.rich.setFontSize(24);
 	Game.rich.setAlignment(Text.Center);
-	Game.rich.setText("[size=32][b]Oh hello[icon=textures/smiley_1.tif].[/b][/size]\n\n[colour=FFFF00][i]I'm just testing rich text![/i][/colour]\n____________________________\nIt's working [b][size=24]quite[/size][/b] well..\n[i][b][font=fonts/times.ttf]Have some funny characters ▲▼^&[/font][/b][/i]\n[b][colour=CCCCCC]Text metrics[/colour][/b] do their [i][colour=00FF00]job[/colour][/i] too\n\n[size=48](Icons also work [icon=textures/smiley_2.tif] yay!)[/size]");
+	Game.rich.setText("[size=32][b]Oh hello[icon=textures/smiley_1.tif].[/b][/size]\n\n[colour=FFFF00][i]I'm just testing rich text![/i][/colour]\n____________________________\nIt's working [b][size=24]quite[/size][/b] well..\n[i][b][font=fonts/times.ttf]Have some funny characters ▲▼^&[/font][/b][/i]\n[b][colour=CCCCCC]Text metrics[/colour][/b] do their [i][colour=00FF00]job[/colour][/i] too\n\n[size=48](Icons also work[icon=textures/smiley_2.tif]yay!)[/size]");
 	Game.rich.setTranslation(0,0,1);
 	Game.rich.setShadowOffset(1,1);
 	Game.rich.setShadowColour(0.5,0.5,0.2,1);
@@ -73,7 +73,6 @@ Game.Update = function(dt)
 		fps = 60;
 	}
 	Game.FPS.setText("FPS: " + fps + "/60");
-
 	var x = Math.cos(Game.timer)*20;
 	var y = Math.sin(Game.timer)*20;
 	Game.box.setTranslation(x,y,0);

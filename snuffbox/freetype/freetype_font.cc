@@ -81,9 +81,9 @@ namespace snuffbox
     
     FT_Size_Metrics metrics;
     metrics = face_->size->metrics;
-    ascender_ = (metrics.ascender >> 6) / 100.0f;
-    descender_ = (metrics.descender >> 6) / 100.0f;
-    height_ = (metrics.height >> 6) / 100.0f;
+    ascender_ = (float)(metrics.ascender >> 6);
+    descender_ = (float)(metrics.descender >> 6);
+    height_ = (float)(metrics.height >> 6);
     linegap_ = height_ - ascender_ + descender_;
 
     LoadGlyph(-1);

@@ -91,7 +91,7 @@ namespace snuffbox
 
 			if (ch == L'\n')
 			{
-				pen_.y -= (markup.font->line_gap() * 100.0f + markup.font->line_height() * 100.0f);
+				pen_.y -= (markup.font->line_gap() + markup.font->line_height());
 				pen_.x = 0.0f;
 				++line_;
 				continue;
@@ -101,8 +101,8 @@ namespace snuffbox
 
 			w = static_cast<float>(glyph->width);
 			h = static_cast<float>(glyph->height);
-			x = pen_.x + glyph->x_offset;
-			y = pen_.y - (h - glyph->y_offset) - markup.font->ascender();
+			x = std::roundf(pen_.x + glyph->x_offset);
+			y = std::roundf(pen_.y + glyph->y_offset - current_font_->ascender());
 
 			tx = glyph->tex_coords.left;
 			th = glyph->tex_coords.top;
@@ -110,10 +110,10 @@ namespace snuffbox
 			ty = glyph->tex_coords.bottom;
 
 			Vertex verts[] = {
-				{ x, y + h, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(tx, th), markup.colour },
-				{ x, y, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(tx, ty), markup.colour },
-				{ x + w, y + h, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(tw, th), markup.colour },
-				{ x + w, y, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(tw, ty), markup.colour },
+				{ x, y, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(tx, th), markup.colour },
+				{ x, y - h, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(tx, ty), markup.colour },
+				{ x + w, y, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(tw, th), markup.colour },
+				{ x + w, y - h, 0.0f, 1.0f, XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(tw, ty), markup.colour }
 			};
 
 			for (int j = 0; j < 4; ++j)
@@ -307,9 +307,9 @@ namespace snuffbox
 			{
 				TextIcon icon;
 
-				icon.position = XMFLOAT2(pen_.x, pen_.y);
+				icon.position = XMFLOAT2(pen_.x, std::roundf(pen_.y + current_font_->glyph(L'A')->y_offset - current_font_->ascender()));
 
-				float size = current_font_->glyph(L'A')->x_advance * 1.2f;
+				float size = current_font_->glyph(L'A')->height;
 				pen_.x += size + spacing_x_;
 				icon.size = size;
 
@@ -401,11 +401,6 @@ namespace snuffbox
 		float highest_x;
 		float highest_y;
 		bool set = false;
-
-		for (auto& it : vertices())
-		{
-			it.y -= (current_font_->line_gap() * 100.0f + current_font_->line_height() * 100.0f);
-		}
 
 		for (auto& it : vertices())
 		{

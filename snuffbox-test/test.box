@@ -1,2 +1,5 @@
 load("texture","textures/smiley_1.tif")
 load("texture","textures/smiley_2.tif")
+load("texture","textures/smiley_2.png")
+load("texture","textures/flare.tif")
+load("texture","textures/flare.png")
