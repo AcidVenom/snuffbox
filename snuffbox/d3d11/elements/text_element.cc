@@ -6,8 +6,6 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include FT_STROKER_H
-#include FT_LCD_FILTER_H
 
 #define HRES  64
 #define HRESf 64.f
@@ -25,8 +23,7 @@ namespace snuffbox
 		shadow_set_(false),
 		shadow_offset_(0.0f, 0.0f),
 		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f),
-		current_colour_(1.0f, 1.0f, 1.0f, 1.0f),
-		align_vertical_(false)
+		current_colour_(1.0f, 1.0f, 1.0f, 1.0f)
 	{
     current_font_ = environment::font_manager().default_font();
     font_ = "fonts/arial.ttf";
@@ -43,8 +40,7 @@ namespace snuffbox
 		shadow_set_(false),
 		shadow_offset_(0.0f, 0.0f),
 		shadow_colour_(0.0f, 0.0f, 0.0f, 1.0f),
-		current_colour_(1.0f, 1.0f, 1.0f, 1.0f),
-		align_vertical_(false)
+		current_colour_(1.0f, 1.0f, 1.0f, 1.0f)
 	{
 		JSWrapper wrapper(args);
 		Create();
@@ -503,11 +499,6 @@ namespace snuffbox
 			{
 				it.x -= alignment_ == TextAlignment::kRight ? width_ : width_ / 2;
 			}
-
-			if (align_vertical_ == true)
-			{
-				it.y += height_ / 2;
-			}
 		}
 
 		for (auto& it : icon_buffer_)
@@ -517,11 +508,6 @@ namespace snuffbox
 				if (alignment_ != TextAlignment::kLeft)
 				{
 					vert.x -= alignment_ == TextAlignment::kRight ? width_ : width_ / 2;
-				}
-
-				if (align_vertical_ == true)
-				{
-					vert.y += height_ / 2;
 				}
 			}
 		}
@@ -551,6 +537,12 @@ namespace snuffbox
 		set_alpha(alpha);
 	}
 
+	//-------------------------------------------------------------------------------------------
+	XMMATRIX Text::offset_2d()
+	{
+		return XMMatrixTranslation(ox_ * sx_ * width_, -oy_ * sy_ * height_, 0.0f);
+	}
+
   //-------------------------------------------------------------------------------------------
   void Text::RegisterExtraFunctions(JS_EXTRA)
   {
@@ -567,8 +559,7 @@ namespace snuffbox
 			JSFunctionRegister("setAlignment", JSSetAlignment),
 			JSFunctionRegister("setShadowOffset", JSSetShadowOffset),
 			JSFunctionRegister("setShadowColour", JSSetShadowColour),
-			JSFunctionRegister("clearShadow", JSClearShadow),
-			JSFunctionRegister("alignVertical", JSAlignVertical)
+			JSFunctionRegister("clearShadow", JSClearShadow)
     };
 
     JS_REGISTER_OBJECT_FUNCTIONS_EXTRA(obj, funcs);
@@ -677,15 +668,6 @@ namespace snuffbox
 		JS_SETUP(Text, "V");
 
 		self->ClearShadow();
-	}
-
-	//-------------------------------------------------------------------------------------------
-	void Text::JSAlignVertical(JS_ARGS)
-	{
-		JS_SETUP(Text, "B");
-
-		self->align_vertical_ = wrapper.GetBool(0);
-		self->SetText(self->text_);
 	}
 
   //-------------------------------------------------------------------------------------------

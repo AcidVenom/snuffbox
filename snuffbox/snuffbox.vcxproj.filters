@@ -136,6 +136,9 @@
     <ClCompile Include="freetype\freetype_rich_text.cc">
       <Filter>freetype</Filter>
     </ClCompile>
+    <ClCompile Include="d3d11\elements\polygon_element.cc">
+      <Filter>d3d11\elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -251,6 +254,9 @@
     </ClInclude>
     <ClInclude Include="freetype\freetype_rich_text.h">
       <Filter>freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\elements\polygon_element.h">
+      <Filter>d3d11\elements</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

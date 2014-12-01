@@ -25,8 +25,8 @@ Game.Initialise = function()
 	Game.rich.setTranslation(0,0,1);
 	Game.rich.setShadowOffset(1,1);
 	Game.rich.setShadowColour(0.5,0.5,0.2,1);
+	Game.rich.setOffset(0,0.5);
 	Game.rich.spawn();
-	Game.rich.alignVertical(true);
 
 	var metrics = Game.rich.metrics();
 

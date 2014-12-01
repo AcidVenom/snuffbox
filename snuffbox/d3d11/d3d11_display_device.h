@@ -47,7 +47,8 @@ namespace snuffbox
     kTerrain,
 		kMesh,
 		kLine,
-    kText
+    kText,
+		kPolygon
   };
 
 	/**

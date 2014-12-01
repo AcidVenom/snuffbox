@@ -74,7 +74,8 @@ namespace snuffbox
 			kBillboard,
 			kWidget,
 			kMesh,
-      kText
+      kText,
+			kPolygon
 		};
 
 		/**
@@ -131,7 +132,7 @@ namespace snuffbox
 		/**
 		* @return (XMMATRIX) The 2D offset matrix
 		*/
-		XMMATRIX offset_2d(){ return XMMatrixTranslation(ox_*sx_*size_[0], -oy_*sy_*size_[1], oy_*sz_); }
+		virtual XMMATRIX offset_2d(){ return XMMatrixTranslation(ox_*sx_*size_[0], -oy_*sy_*size_[1], oy_*sz_); }
 
 		/**
 		* @return (XMVECTOR) The scaling vector
@@ -329,7 +330,7 @@ namespace snuffbox
     */
     virtual void OnChange(RenderMessage msg){}
 
-	private:
+	protected:
 		std::vector<Vertex>										vertices_; //!< The vertices
 		std::vector<unsigned int>							indices_; //!< The indices
 		XMMATRIX															world_matrix_; //!< The world matrix

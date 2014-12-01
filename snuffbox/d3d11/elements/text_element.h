@@ -128,20 +128,38 @@ namespace snuffbox
 		/// Prepares the shadow before drawing
 		void PrepareShadow();
 
-		/// Resets the text after drawing the shadow
+		/**
+		* @brief Resets the text after drawing the shadow
+		* @param[in] blend (XMFLOAT3) The old blend value
+		* @param[in] alpha (float) The old alpha value
+		*/
 		void Reset(XMFLOAT3 blend, float alpha);
 
-		/// Fills a vertex buffer and an index buffer
+		/**
+		* @brief Fills the vertex buffer and index buffer from a given string of text
+		* @param[in] buffer (std::wstring&) The text buffer
+		*/
 		void FillBuffers(std::wstring& buffer);
 
-		/// Fills the vertex and index buffer of an icon
+		/*
+		* @brief Fills the vertex and index buffer of an icon
+		* @param[in] icon (snuffbox::TextIcon&) A reference to the text icon structure to fill the buffer with
+		*/
 		void FillIconBuffer(TextIcon& icon);
 
-		/// Aligns the text
+		/**
+		* @brief Aligns the text using a string to check how to align all buffers
+		* @param[in] buffer (std::wstring*) The text buffer to check from
+		*/
 		void Align(std::wstring* buffer);
 
 		/// Draws the icons
 		void DrawIcons();
+
+		/**
+		* @return (XMMATRIX) The overriden 2D offset matrix
+		*/
+		XMMATRIX offset_2d();
 
 	private:
 		ID3D11Buffer*							vertex_buffer_; //!< The vertex buffer of this element
@@ -161,7 +179,6 @@ namespace snuffbox
 		XMFLOAT4									shadow_colour_; //!< The shadow colour of this text element
 		XMFLOAT2									shadow_offset_; //!< The shadow offset of this text element
 		XMFLOAT2									pen_; //!< The pen position
-		bool											align_vertical_; //!< Should this text be vertically aligned?
 
 		std::vector<TextIcon>			icon_buffer_; //!< All icons that need to be rendered
 		int												line_; //!< The current line
@@ -182,6 +199,5 @@ namespace snuffbox
 		static void JSSetShadowOffset(JS_ARGS);
 		static void JSSetShadowColour(JS_ARGS);
 		static void JSClearShadow(JS_ARGS);
-		static void JSAlignVertical(JS_ARGS);
 	};
 }

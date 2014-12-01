@@ -188,6 +188,7 @@
     <ClCompile Include="d3d11\d3d11_texture.cc" />
     <ClCompile Include="d3d11\elements\billboard_element.cc" />
     <ClCompile Include="d3d11\elements\mesh_element.cc" />
+    <ClCompile Include="d3d11\elements\polygon_element.cc" />
     <ClCompile Include="d3d11\elements\quad_element.cc" />
     <ClCompile Include="d3d11\elements\render_element.cc" />
     <ClCompile Include="d3d11\elements\terrain_element.cc" />
@@ -224,6 +225,7 @@
     <ClInclude Include="d3d11\d3d11_texture.h" />
     <ClInclude Include="d3d11\elements\billboard_element.h" />
     <ClInclude Include="d3d11\elements\mesh_element.h" />
+    <ClInclude Include="d3d11\elements\polygon_element.h" />
     <ClInclude Include="d3d11\elements\quad_element.h" />
     <ClInclude Include="d3d11\elements\render_element.h" />
     <ClInclude Include="d3d11\elements\terrain_element.h" />
