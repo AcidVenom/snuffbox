@@ -4,7 +4,7 @@ namespace snuffbox
 {
 	//-----------------------------------------------------------------------------------------
 	Polygon::Polygon() : 
-		topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP),
+		topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP),
 		RenderElement(ElementTypes::kPolygon)
 	{
 		Create();
@@ -14,7 +14,7 @@ namespace snuffbox
 
 	//-----------------------------------------------------------------------------------------
 	Polygon::Polygon(JS_ARGS) :
-		topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP),
+		topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP),
 		RenderElement(ElementTypes::kPolygon)
 	{
 		Create();

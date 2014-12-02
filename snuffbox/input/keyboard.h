@@ -94,9 +94,21 @@ namespace snuffbox
 		/// Updates the entire keyboard
 		void Update();
 
+		/**
+		* @return (std::string) The last key pressed as a string
+		*/
+		std::string GetLastPressed();
+
+		/**
+		* @return (std::string) The last key released as a string
+		*/
+		std::string GetLastReleased();
+
 	private:
 		KeyState key_states_[255]; //!< All the states of every key
 		std::queue<KeyData> queue_; //!< The queue with key events
+		Key last_pressed_; //!< The last key that was pressed
+		Key last_released_; //!< The last key that was released
 
 	public:
 		JS_NAME(Keyboard);
@@ -104,5 +116,7 @@ namespace snuffbox
 		static void JSIsPressed(JS_ARGS); //!< Checks if a key is pressed
 		static void JSIsDown(JS_ARGS); //!< Checks if a key is down
 		static void JSIsReleased(JS_ARGS); //!< Checks if a key is released
+		static void JSLastPressed(JS_ARGS);
+		static void JSLastReleased(JS_ARGS);
 	};
 }

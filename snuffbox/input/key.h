@@ -182,5 +182,12 @@ namespace snuffbox
 	* @param[in] name (const char*) The key name
 	* @return (snuffbox::Key) The actual converted key
 	*/
-	Key StringToKey(const char* name);
+	static Key StringToKey(const char* name);
+
+	/**
+	* @brief Converts a key to a string
+	* @param[in] key (snuffbox::Key) The key to convert
+	* @return (snuffbox::std::string) The converted string
+	*/
+	static std::string KeyToString(Key key);
 }

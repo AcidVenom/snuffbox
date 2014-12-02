@@ -52,8 +52,6 @@ Game.Initialise = function()
 	Game.polygon.addIndex(2);
 	Game.polygon.addIndex(3);
 
-	Game.polygon.setTopology(Polygon.LineStrip);
-
 	Game.polygon.flush();
 
 	Game.polygon.spawn();

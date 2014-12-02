@@ -87,16 +87,30 @@ namespace snuffbox
 					key_states_[evt.key].pressed = true;
 				
 				key_states_[evt.key].down = true;
+				last_pressed_ = evt.key;
 				break;
 
 			case KeyboardEnums::KeyEvent::kReleased:
 				key_states_[evt.key].down = false;
 				key_states_[evt.key].released = true;
+				last_released_ = evt.key;
 				break;
 			}
 
 			queue_.pop();
 		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	std::string Keyboard::GetLastPressed()
+	{
+		return KeyToString(last_pressed_);
+	}
+
+	//--------------------------------------------------------------------------------------
+	std::string Keyboard::GetLastReleased()
+	{
+		return KeyToString(last_released_);
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -114,7 +128,9 @@ namespace snuffbox
 		{
 			JSFunctionRegister("isPressed", JSIsPressed),
 			JSFunctionRegister("isDown", JSIsDown),
-			JSFunctionRegister("isReleased", JSIsReleased)
+			JSFunctionRegister("isReleased", JSIsReleased),
+			JSFunctionRegister("lastPressed", JSLastPressed),
+			JSFunctionRegister("lastReleased", JSLastReleased)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
@@ -154,6 +170,28 @@ namespace snuffbox
 
 		bool check = environment::keyboard().IsReleased(key);
 		wrapper.ReturnBool(check);
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Keyboard::JSLastPressed(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		JS_CHECK_PARAMS("V");
+
+		Keyboard& keyboard = environment::keyboard();
+
+		wrapper.ReturnString(keyboard.GetLastPressed().c_str());
+	}
+
+	//--------------------------------------------------------------------------------------
+	void Keyboard::JSLastReleased(JS_ARGS)
+	{
+		JS_CREATE_ARGUMENT_SCOPE;
+		JS_CHECK_PARAMS("V");
+
+		Keyboard& keyboard = environment::keyboard();
+
+		wrapper.ReturnString(keyboard.GetLastReleased().c_str());
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -266,7 +304,7 @@ namespace snuffbox
 		if (strcmp(name, "F23") == 0)						return Key::kF23;
 		if (strcmp(name, "F24") == 0)						return Key::kF24;
 		if (strcmp(name, "Numlock") == 0)				return Key::kNumlock;
-		if (strcmp(name, "Scroll lock") == 0)		return Key::kScrollLock;
+		if (strcmp(name, "Scroll Lock") == 0)		return Key::kScrollLock;
 		if (strcmp(name, "Left Shift") == 0)		return Key::kLeftShift;
 		if (strcmp(name, "Right Shift") == 0)		return Key::kRightShift;
 		if (strcmp(name, "Left Control") == 0)	return Key::kLeftControl;
@@ -316,6 +354,169 @@ namespace snuffbox
 		if (strcmp(name, "OEM Clear") == 0)			return Key::kOEMClear;
 
 		return Key::kBackspace;
+	}
+
+	//--------------------------------------------------------------------------------------
+	std::string KeyToString(Key key)
+	{
+		switch (key)
+		{
+		case Key::kBackspace:						return "Backspace";
+		case Key::kTab:									return "Tab";
+		case Key::kClear:								return "Clear";
+		case Key::kEnter:								return "Enter";
+		case Key::kShift:								return "Shift";
+		case Key::kControl:							return "Control";
+		case Key::kAlt:									return "Alt";
+		case Key::kPause:								return "Pause";
+		case Key::kCapsLock:						return "Caps Lock";
+		case Key::kEscape:							return "Escape";
+		case Key::kSpace:								return "Space";
+		case Key::kPageUp:							return "Page Up";
+		case Key::kEnd:									return "End";
+		case Key::kHome:								return "Home";
+		case Key::kLeft:								return "Left";
+		case Key::kUp:									return "Up";
+		case Key::kRight:								return "Right";
+		case Key::kDown:								return "Down";
+		case Key::kSelect:							return "Select";
+		case Key::kPrint:								return "Print";
+		case Key::kExecute:							return "Execute";
+		case Key::kPrintScreen:					return "Print Screen";
+		case Key::kInsert:							return "Insert";
+		case Key::kDelete:							return "Delete";
+		case Key::kHelp:								return "Help";
+		case Key::kZero:								return "0";
+		case Key::kOne:									return "1";
+		case Key::kTwo:									return "2";
+		case Key::kThree:								return "3";
+		case Key::kFour:								return "4";
+		case Key::kFive:								return "5";
+		case Key::kSix:									return "6";
+		case Key::kSeven:								return "7";
+		case Key::kEight:								return "8";
+		case Key::kNine:								return "9";
+		case Key::kA:										return "A";
+		case Key::kB:										return "B";
+		case Key::kC:										return "C";
+		case Key::kD:										return "D";
+		case Key::kE:										return "E";
+		case Key::kF:										return "F";
+		case Key::kG:										return "G";
+		case Key::kH:										return "H";
+		case Key::kI:										return "I";
+		case Key::kJ:										return "J";
+		case Key::kK:										return "K";
+		case Key::kL:										return "L";
+		case Key::kM:										return "M";
+		case Key::kN:										return "N";
+		case Key::kO:										return "O";
+		case Key::kP:										return "P";
+		case Key::kQ:										return "Q";
+		case Key::kR:										return "R";
+		case Key::kS:										return "S";
+		case Key::kT:										return "T";
+		case Key::kU:										return "U";
+		case Key::kV:										return "V";
+		case Key::kW:										return "W";
+		case Key::kX:										return "X";
+		case Key::kY:										return "Y";
+		case Key::kZ:										return "Z";
+		case Key::kLeftWindowsKey:			return "Left Windows";
+		case Key::kRightWindowsKey:			return "Right Windows";
+		case Key::kApplicationsKey:			return "Applications";
+		case Key::kSleep:								return "Sleep";
+		case Key::kNumPad0:							return "Numpad0";
+		case Key::kNumPad1:							return "Numpad1";
+		case Key::kNumPad2:							return "Numpad2";
+		case Key::kNumPad3:							return "Numpad3";
+		case Key::kNumPad4:							return "Numpad4";
+		case Key::kNumPad5:							return "Numpad5";
+		case Key::kNumPad6:							return "Numpad6";
+		case Key::kNumPad7:							return "Numpad7";
+		case Key::kNumPad8:							return "Numpad8";
+		case Key::kNumPad9:							return "Numpad9";
+		case Key::kMultiply:						return "Multiply";
+		case Key::kPlus:								return "Plus";
+		case Key::kSeperator:						return "Seperator";
+		case Key::kMinus:								return "Minus";
+		case Key::kDecimal:							return "Decimal";
+		case Key::kDivide:							return "Divide";
+		case Key::kF1:									return "F1";
+		case Key::kF2:									return "F2";
+		case Key::kF3:									return "F3";
+		case Key::kF4:									return "F4";
+		case Key::kF5:									return "F5";
+		case Key::kF6:									return "F6";
+		case Key::kF7:									return "F7";
+		case Key::kF8:									return "F8";
+		case Key::kF9:									return "F9";
+		case Key::kF10:									return "F10";
+		case Key::kF11:									return "F11";
+		case Key::kF12:									return "F12";
+		case Key::kF13:									return "F13";
+		case Key::kF14:									return "F14";
+		case Key::kF15:									return "F15";
+		case Key::kF16:									return "F16";
+		case Key::kF17:									return "F17";
+		case Key::kF18:									return "F18";
+		case Key::kF19:									return "F19";
+		case Key::kF20:									return "F20";
+		case Key::kF21:									return "F21";
+		case Key::kF22:									return "F22";
+		case Key::kF23:									return "F23";
+		case Key::kF24:									return "F24";
+		case Key::kNumlock:							return "Numlock";
+		case Key::kScrollLock:					return "Scroll Lock";
+		case Key::kLeftShift:						return "Left Shift";
+		case Key::kRightShift:					return "Right Shift";
+		case Key::kLeftControl:					return "Left Control";
+		case Key::kRightControl:				return "Right Control";
+		case Key::kLeftMenu:						return "Left Menu";
+		case Key::kRightMenu:						return "Right Menu";
+		case Key::kBrowserBack:					return "Browser Back";
+		case Key::kBrowserForward:			return "Browser Forward";
+		case Key::kBrowserRefresh:			return "Browser Refresh";
+		case Key::kBrowserStop:					return "Browser Stop";
+		case Key::kBrowserSearch:				return "Browser Search";
+		case Key::kBrowserFavorites:		return "Browser Fave";
+		case Key::kBrowserHome:					return "Browser Home";
+		case Key::kVolumeMute:					return "Volume Mute";
+		case Key::kVolumeDown:					return "Volume Down";
+		case Key::kVolumeUp:						return "Volume Up";
+		case Key::kNextTrack:						return "Next Track";
+		case Key::kPreviousTrack:				return "Previous Track";
+		case Key::kStopMedia:						return "Stop Media";
+		case Key::kPlayPause:						return "Play Pause";
+		case Key::kLaunchMail:					return "Mail";
+		case Key::kSelectMedia:					return "Select Media";
+		case Key::kLaunchApp1:					return "Launch App 1";
+		case Key::kLaunchApp2:					return "Launch App 2";
+		case Key::kOEM1:								return "OEM1";
+		case Key::kOEMPlus:							return "OEM Plus";
+		case Key::kOEMComma:						return "OEM Comma";
+		case Key::kOEMMinus:						return "OEM Minus";
+		case Key::kOEMPeriod:						return "OEM Period";
+		case Key::kOEM2:								return "OEM2";
+		case Key::kOEM3:								return "OEM3";
+		case Key::kOEM4:								return "OEM4";
+		case Key::kOEM5:								return "OEM5";
+		case Key::kOEM6:								return "OEM6";
+		case Key::kOEM7:								return "OEM7";
+		case Key::kOEM8:								return "OEM8";
+		case Key::kOEM102:							return "OEM102";
+		case Key::kProcess:							return "Process";
+		case Key::kPacket:							return "Packet";
+		case Key::kAttn:								return "Attn";
+		case Key::kCrSel:								return "CrSel";
+		case Key::kExSel:								return "ExSel";
+		case Key::kEraseEOF:						return "Erase EOF";
+		case Key::kPlay:								return "Play";
+		case Key::kZoom:								return "Zoom";
+		case Key::kPA1:									return "PA1";
+		case Key::kOEMClear:						return "OEM Clear";
+		default:												return "None";
+		}
 	}
 
 	// *dead* I pity the creator of the enum more than myself. Jesus.
