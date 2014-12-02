@@ -157,7 +157,7 @@ namespace snuffbox
 		* @brief Increases the elapsed time by a given value
 		* @param[in] dt (float) The delta time, or any value to increment with
 		*/
-		void IncrementTime(float dt){ time_ += dt; }
+		void IncrementTime(float dt){ time_ += dt; if (time_ > XM_PI * 2){ time_ = 0; } }
 
 		/// Creates the depth stencil view/buffer
 		void CreateDepthStencil();
@@ -306,6 +306,9 @@ namespace snuffbox
 		void DrawCurrent(int indices);
 
 		void SetCurrentTexture(Texture* texture);
+
+		void DrawPasses(RenderElement* it, ID3D11ShaderResourceView*const* textures, bool indexed = true);
+
 	private:
 		SwapChainDescription					swap_desc_;							//!< The swap chain description to create the chain
 		SwapChain*										swap_chain_;						//!< The swap chain for this device

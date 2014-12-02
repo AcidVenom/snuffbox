@@ -330,6 +330,11 @@ namespace snuffbox
     */
     virtual void OnChange(RenderMessage msg){}
 
+		/**
+		* @return (std::vector<snuffbox::Shader*>&) A list of shader passe
+		*/
+		std::vector<Shader*>& passes(){ return passes_; }
+
 	protected:
 		std::vector<Vertex>										vertices_; //!< The vertices
 		std::vector<unsigned int>							indices_; //!< The indices
@@ -357,6 +362,7 @@ namespace snuffbox
 		Texture*															texture_;	//!< The texture of this render element
 		Texture*															normal_map_; //!< The normal map of this render element
 		Shader*																shader_; //!< The current shader used by this element
+		std::vector<Shader*>									passes_; //!< Shader passes used by this element
 		ElementTypes													element_type_;	//!< The type of this render element
 		bool																	destroyed_; //!< Is this element destroyed?
 		float																	distance_from_camera_; //!< The distance from the camera
@@ -396,5 +402,7 @@ namespace snuffbox
 		static void JSSize(JS_ARGS);
 		static void JSDestroyed(JS_ARGS);
 		static void JSSetToTexture(JS_ARGS);
+		static void JSAddPass(JS_ARGS);
+		static void JSClearPasses(JS_ARGS);
 	};
 }

@@ -52,6 +52,8 @@ Game.Initialise = function()
 	Game.polygon.addIndex(2);
 	Game.polygon.addIndex(3);
 
+	Game.polygon.addPass("shaders/pass.fx");
+
 	Game.polygon.flush();
 
 	Game.polygon.spawn();

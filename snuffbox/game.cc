@@ -27,7 +27,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 625
+#define SNUFF_VERSION_MINOR 628
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -124,6 +124,7 @@ void Game::Update()
 	if (gameTime_ % 20 == 0 && doReload_)
 	{
 		environment::file_watcher().WatchFiles();
+		gameTime_ = 0;
 	}
 
 	if (shouldQuit_)

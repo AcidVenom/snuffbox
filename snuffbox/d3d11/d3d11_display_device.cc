@@ -884,7 +884,7 @@ namespace snuffbox
 			{
 				if (current_shader_ != it->shader())
 				{
-					auto shaders = it->shader()->shaders();
+					auto& shaders = it->shader()->shaders();
 					context_->PSSetShader(shaders.ps, 0, 0);
 					context_->VSSetShader(shaders.vs, 0, 0);
 					current_shader_ = it->shader();
@@ -897,8 +897,11 @@ namespace snuffbox
 				{
 					context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 				}
-			
+				
+				
 				context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+
+				DrawPasses(it, textures);
 
         topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 
@@ -918,6 +921,8 @@ namespace snuffbox
 
 					Mesh* mesh = static_cast<Mesh*>(it);
 					context_->Draw(mesh->model()->vertex_count(), 0);
+
+					DrawPasses(it, textures, false);
 					topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 				}
 				else
@@ -930,9 +935,40 @@ namespace snuffbox
 					}
 
 					context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+
+					DrawPasses(it, textures);
 					topology_ = polygon->topology();
 				}
 			}
+		}
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::DrawPasses(RenderElement* it, ID3D11ShaderResourceView*const* textures, bool indexed)
+	{
+		for (int i = 0; i < it->passes().size(); ++i)
+		{
+			Shader* pass = it->passes().at(i);
+
+			Shaders& shaders = pass->shaders();
+
+			context_->VSSetShader(shaders.vs, 0, 0);
+			context_->PSSetShader(shaders.ps, 0, 0);
+			context_->PSSetShaderResources(0, 2, textures);
+
+			if (indexed == true)
+			{
+				context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+			}
+			else
+			{
+				Mesh* mesh = static_cast<Mesh*>(it);
+				context_->Draw(static_cast<UINT>(mesh->model()->vertex_count()), 0);
+			}
+
+			current_shader_ = pass;
+			context_->VSSetConstantBuffers(0, 1, &constant_buffer_);
+			context_->PSSetConstantBuffers(0, 1, &constant_buffer_);
 		}
 	}
 

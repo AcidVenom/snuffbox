@@ -575,6 +575,23 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSAddPass(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+
+		Shader* pass = environment::content_manager().Get<Shader>(wrapper.GetString(0)).get();
+		self->passes().push_back(pass);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSClearPasses(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "V");
+
+		self->passes().clear();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -605,7 +622,9 @@ namespace snuffbox
 			JSFunctionRegister("setSize", JSSetSize),
 			JSFunctionRegister("size", JSSize),
 			JSFunctionRegister("destroyed", JSDestroyed),
-			JSFunctionRegister("setToTexture", JSSetToTexture)
+			JSFunctionRegister("setToTexture", JSSetToTexture),
+			JSFunctionRegister("addPass", JSAddPass),
+			JSFunctionRegister("clearPasses", JSClearPasses)
 		};
 
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Left"), Number::New(JS_ISOLATE, 0));
