@@ -4,6 +4,7 @@
 #include "../../snuffbox/d3d11/elements/billboard_element.h"
 #include "../../snuffbox/d3d11/elements/mesh_element.h"
 #include "../../snuffbox/d3d11/elements/text_element.h"
+#include "../../snuffbox/d3d11/elements/polygon_element.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
@@ -801,7 +802,7 @@ namespace snuffbox
 		{
 			RenderElement::ElementTypes elementType = it->element_type();
 			VertexBufferType type = it->type();
-			if (type != vb_type_ || type == VertexBufferType::kMesh || type == VertexBufferType::kText)
+			if (type != vb_type_ || type == VertexBufferType::kMesh || type == VertexBufferType::kText || type == VertexBufferType::kPolygon)
 			{
         if (type == VertexBufferType::kMesh)
         {
@@ -890,7 +891,7 @@ namespace snuffbox
 				}
 			}
 
-			if (elementType != RenderElement::ElementTypes::kMesh)
+			if (elementType != RenderElement::ElementTypes::kMesh && elementType != RenderElement::ElementTypes::kPolygon)
 			{
 				if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
 				{
@@ -908,14 +909,29 @@ namespace snuffbox
 			}
 			else
 			{
-				if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
+				if (elementType == RenderElement::ElementTypes::kMesh)
 				{
-					context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				}
+					if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
+					{
+						context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					}
 
-				Mesh* mesh = static_cast<Mesh*>(it);
-        context_->Draw(mesh->model()->vertex_count(), 0);
-        topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+					Mesh* mesh = static_cast<Mesh*>(it);
+					context_->Draw(mesh->model()->vertex_count(), 0);
+					topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+				}
+				else
+				{
+					Polygon* polygon = static_cast<Polygon*>(it);
+
+					if (topology_ != polygon->topology())
+					{
+						context_->IASetPrimitiveTopology(polygon->topology());
+					}
+
+					context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
+					topology_ = polygon->topology();
+				}
 			}
 		}
 	}

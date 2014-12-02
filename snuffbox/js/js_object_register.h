@@ -11,6 +11,7 @@
 #include "../../snuffbox/d3d11/elements/billboard_element.h"
 #include "../../snuffbox/d3d11/elements/text_element.h"
 #include "../../snuffbox/d3d11/elements/mesh_element.h"
+#include "../../snuffbox/d3d11/elements/polygon_element.h"
 #include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/d3d11/d3d11_line.h"
 #include "../../snuffbox/content/content_manager.h"
@@ -31,6 +32,7 @@ namespace snuffbox
 		JSRegister<Billboard, true>::Register();
 		JSRegister<Widget, true>::Register();
     JSRegister<Text, true>::Register();
+		JSRegister<Polygon, true>::Register();
 		JSRegister<MouseArea, true>::Register();
 		JSRegister<Mesh, true>::Register();
 		JSRegister<ContentManager, false>::Register();

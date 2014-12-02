@@ -9,7 +9,7 @@ Game.Initialise = function()
 	RenderSettings.setCullMode(RenderSettings.CullFront);
 	RenderSettings.setBackBufferColour(0,0,0,1);
 	RenderSettings.setWindowSize(1280,720);
-	RenderSettings.setYDown(false);
+	RenderSettings.setYDown(true);
 	Game.camera = Camera.new("orthographic");
 	Game.camera.setTranslation(0,0,0);
 
@@ -40,6 +40,23 @@ Game.Initialise = function()
 	Game.deltas = [];
 
 	Game.timer = 0;
+
+	Game.polygon = Polygon.new();
+	Game.polygon.addVertex(-640, -360, 0, 1,0,0,1, 0,0,1, 0,0);
+	Game.polygon.addVertex(-640, 360, 0, 0,1,0,1, 0,0,1, 0,1);
+	Game.polygon.addVertex(640, -360, 0, 0,0,1,1, 0,0,1, 1,0);
+	Game.polygon.addVertex(640, 360, 0, 1,1,1,1, 0,0,1, 1,1);
+
+	Game.polygon.addIndex(0);
+	Game.polygon.addIndex(1);
+	Game.polygon.addIndex(2);
+	Game.polygon.addIndex(3);
+
+	Game.polygon.setTopology(Polygon.LineStrip);
+
+	Game.polygon.flush();
+
+	Game.polygon.spawn();
 }
 
 Game.Update = function(dt)

@@ -597,6 +597,11 @@ namespace snuffbox
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Right"), Number::New(JS_ISOLATE, 1));
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Center"), Number::New(JS_ISOLATE, 2));
 
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "LineList"), Number::New(JS_ISOLATE, 2));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "LineStrip"), Number::New(JS_ISOLATE, 3));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "TriangleList"), Number::New(JS_ISOLATE, 4));
+		obj->Set(String::NewFromUtf8(JS_ISOLATE, "TriangleStrip"), Number::New(JS_ISOLATE, 5));
+
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);
 	}
 }
