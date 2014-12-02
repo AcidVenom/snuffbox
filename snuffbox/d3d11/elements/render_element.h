@@ -395,5 +395,6 @@ namespace snuffbox
 		static void JSSetSize(JS_ARGS);
 		static void JSSize(JS_ARGS);
 		static void JSDestroyed(JS_ARGS);
+		static void JSSetToTexture(JS_ARGS);
 	};
 }

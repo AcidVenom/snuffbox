@@ -38,7 +38,13 @@ namespace snuffbox
 		*/
 		ID3D11ShaderResourceView* resource(){ return texture_; }
 
+		int width(){ return width_; }
+
+		int height(){ return height_; }
+
 	private:
 		ID3D11ShaderResourceView* texture_; //!< The actual texture
+		int	width_; //!< The width of the texture
+		int height_; //!< The height of the texture
 	};
 }

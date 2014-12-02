@@ -561,6 +561,20 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSSetToTexture(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "V");
+
+		if (self->texture_ == nullptr)
+		{
+			return;
+		}
+
+		self->size_[0] = self->texture_->width();
+		self->size_[1] = self->texture_->height();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -590,7 +604,8 @@ namespace snuffbox
 			JSFunctionRegister("name", JSName),
 			JSFunctionRegister("setSize", JSSetSize),
 			JSFunctionRegister("size", JSSize),
-			JSFunctionRegister("destroyed", JSDestroyed)
+			JSFunctionRegister("destroyed", JSDestroyed),
+			JSFunctionRegister("setToTexture", JSSetToTexture)
 		};
 
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Left"), Number::New(JS_ISOLATE, 0));
