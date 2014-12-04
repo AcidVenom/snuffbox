@@ -227,12 +227,23 @@ namespace snuffbox
 
 		result = device_->CreateTexture2D(&desc, NULL, &render_target_);
 
-		SNUFF_XASSERT(result == S_OK, HRToString(result))
+		SNUFF_XASSERT(result == S_OK, HRToString(result));
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+
+		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		viewDesc.Texture2D.MipLevels = 1;
+		viewDesc.Texture2D.MostDetailedMip = 0;
+
+		result = device_->CreateShaderResourceView(render_target_, &viewDesc, &render_target_resource_);
+		
+		SNUFF_XASSERT(result == S_OK, HRToString(result));
 
 		result = device_->CreateRenderTargetView(render_target_, NULL,
 			&render_target_view_);
 
-		SNUFF_XASSERT(result == S_OK, HRToString(result))
+		SNUFF_XASSERT(result == S_OK, HRToString(result));
 	}
 
 	//---------------------------------------------------------------------------------
@@ -1263,6 +1274,7 @@ namespace snuffbox
 		HRESULT result = S_OK;
 
 		SNUFF_SAFE_RELEASE(depth_stencil_buffer_);
+		SNUFF_SAFE_RELEASE(render_target_resource_);
 		SNUFF_SAFE_RELEASE(render_target_view_);
 		SNUFF_SAFE_RELEASE(render_target_);
 		SNUFF_SAFE_RELEASE(back_buffer_view_);
@@ -1305,6 +1317,7 @@ namespace snuffbox
 			SNUFF_SAFE_RELEASE(it);
 		}
 		SNUFF_SAFE_RELEASE(render_target_);
+		SNUFF_SAFE_RELEASE(render_target_resource_);
 		SNUFF_SAFE_RELEASE(render_target_view_);
 		SNUFF_SAFE_RELEASE(back_buffer_);
 		SNUFF_SAFE_RELEASE(input_layout_);
