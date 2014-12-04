@@ -38,5 +38,6 @@ SamplerState SampleType;
 
 float4 PS(VOut input) : SV_TARGET
 {
-	return input.colour*3 - 0.7 + abs(sin(Time/2));
+	float4 col = input.colour*3 - 0.7 + abs(sin(Time/2));
+	return float4(col.r,col.g,col.b,Alpha);
 }

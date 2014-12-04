@@ -2,6 +2,9 @@
 
 #define SNUFF_SAFE_RELEASE(ptr) SNUFF_ASSERT_NOTNULL(ptr); ptr->Release(); ptr = NULL;
 
+
+#include "../../snuffbox/d3d11/d3d11_post_processing.h"
+
 #include <dxgi.h>
 #include <d3d11.h>
 #include <d3dcommon.h>
@@ -315,6 +318,9 @@ namespace snuffbox
 
 		void DrawPasses(RenderElement* it, ID3D11ShaderResourceView*const* textures, bool indexed = true);
 
+		/// Creates the full screen quad
+		void CreateScreenQuad();
+
 	private:
 		SwapChainDescription					swap_desc_;							//!< The swap chain description to create the chain
 		SwapChain*										swap_chain_;						//!< The swap chain for this device
@@ -360,5 +366,8 @@ namespace snuffbox
 		D3DTexture2D*									render_target_;					//!< The texture that will be rendered to
 		ID3D11RenderTargetView*				render_target_view_;		//!< The render target view
 		ID3D11ShaderResourceView*			render_target_resource_;//!< The shader resource of the render target texture
+		ID3D11Buffer*									screen_quad_vertices_;  //!< The full screen quad vertices
+		ID3D11Buffer*									screen_quad_indices_;		//!< The full screen quad indices
+		SharedPtr<PostProcessing>			post_processing_;				//!< The post processing object
 	};
 }

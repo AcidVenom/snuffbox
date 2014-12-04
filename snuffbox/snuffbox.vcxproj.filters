@@ -142,6 +142,9 @@
     <ClCompile Include="d3d11\elements\polygon_element.cc">
       <Filter>d3d11\elements</Filter>
     </ClCompile>
+    <ClCompile Include="d3d11\d3d11_post_processing.cc">
+      <Filter>d3d11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -266,6 +269,9 @@
     </ClInclude>
     <ClInclude Include="d3d11\shaders\d3d11_post_process_shader.h">
       <Filter>d3d11\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\d3d11_post_processing.h">
+      <Filter>d3d11</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

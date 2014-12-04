@@ -15,7 +15,7 @@ struct VOut
 	float2 texcoord : TEXCOORD0;
 };
 
-VOut VS(float4 position : POSITION, float2 texcoord : TEXCOORD0, float4 colour : COLOUR)
+VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 colour : COLOUR)
 {
 	VOut output;
 	output.position = position;
@@ -29,5 +29,6 @@ SamplerState SampleType;
 
 float4 PS(VOut input) : SV_TARGET
 {
-	return tex2D.Sample(SampleType, input.texcoord);
+	float4 colour = tex2D.Sample(SampleType, input.texcoord);
+	return float4(colour.rgb, 1);
 }

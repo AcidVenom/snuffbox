@@ -7,7 +7,7 @@ Game.Initialise = function()
 	RenderSettings.setVsync(true);
 	RenderSettings.setFullscreen(false);
 	RenderSettings.setCullMode(RenderSettings.CullFront);
-	RenderSettings.setBackBufferColour(0,0,0,1);
+	RenderSettings.setBackBufferColour(0,0,0.4,1);
 	RenderSettings.setWindowSize(1280,720);
 	RenderSettings.setYDown(true);
 	Game.camera = Camera.new("orthographic");
@@ -57,6 +57,8 @@ Game.Initialise = function()
 	Game.polygon.flush();
 
 	Game.polygon.spawn();
+
+	PostProcessing.addPass("shaders/gray.fx");
 }
 
 Game.Update = function(dt)

@@ -15,6 +15,7 @@ namespace snuffbox
 	class FBXLoader;
 	class IOManager;
   class FontManager;
+	class PostProcessing;
 
 	namespace environment
 	{
@@ -57,6 +58,9 @@ namespace snuffbox
 		/// Returns the IO manager
 		IOManager& io_manager();
 
+		/// Returns the post processing
+		PostProcessing& post_processing();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -95,5 +99,8 @@ namespace snuffbox
 
 		/// Returns if there is an IO manager or not
 		bool has_io_manager();
+
+		/// Returns if there is post processing or not
+		bool has_post_processing();
 	}
 }

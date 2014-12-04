@@ -183,6 +183,7 @@
     <ClCompile Include="d3d11\d3d11_camera.cc" />
     <ClCompile Include="d3d11\d3d11_display_device.cc" />
     <ClCompile Include="d3d11\d3d11_line.cc" />
+    <ClCompile Include="d3d11\d3d11_post_processing.cc" />
     <ClCompile Include="d3d11\d3d11_settings.cc" />
     <ClCompile Include="d3d11\d3d11_shader.cc" />
     <ClCompile Include="d3d11\d3d11_texture.cc" />
@@ -220,6 +221,7 @@
     <ClInclude Include="d3d11\d3d11_camera.h" />
     <ClInclude Include="d3d11\d3d11_display_device.h" />
     <ClInclude Include="d3d11\d3d11_line.h" />
+    <ClInclude Include="d3d11\d3d11_post_processing.h" />
     <ClInclude Include="d3d11\d3d11_settings.h" />
     <ClInclude Include="d3d11\d3d11_shader.h" />
     <ClInclude Include="d3d11\d3d11_texture.h" />

@@ -76,7 +76,6 @@ namespace snuffbox
 		CreateDevice();
 		GetAdapters();
 		CreateBackBuffer();
-		CreateRenderTarget();
 		CreateViewport();
 		CreateBaseShader();
 		CreatePostProcessingShader();
@@ -86,6 +85,9 @@ namespace snuffbox
 		CreateSamplerState();
 		CreateDefaultTexture();
 		CreateBlendState();
+		CreateScreenQuad();
+
+		CreateRenderTarget();
 		
 		SNUFF_LOG_SUCCESS("Succesfully initialised the D3D11 display device");
 	}
@@ -222,7 +224,6 @@ namespace snuffbox
 		
 		D3D11_TEXTURE2D_DESC desc;
 		back_buffer_->GetDesc(&desc);
-
 		desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
 		result = device_->CreateTexture2D(&desc, NULL, &render_target_);
@@ -356,6 +357,7 @@ namespace snuffbox
 		fin.close();
 
 		environment::content_manager().Load<Shader>("shaders/post_processing.fx");
+		post_processing_ = environment::memory().ConstructShared<PostProcessing>();
 	}
 
 	//---------------------------------------------------------------------------------
@@ -730,6 +732,16 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::StartDraw()
 	{
+		D3D11_VIEWPORT viewport;
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = environment::game().window()->params().w;
+		viewport.Height = environment::game().window()->params().h;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		context_->RSSetViewports(1, &viewport);
+		context_->OMSetBlendState(blend_state_, NULL, 0xFFFFFFFF);
 		if (camera_ && camera_->type() == Camera::CameraType::kPerspective)
 		{
 			context_->OMSetRenderTargets(1, &render_target_view_, depth_stencil_view_);
@@ -738,8 +750,8 @@ namespace snuffbox
 		{
 			context_->OMSetRenderTargets(1, &render_target_view_, NULL);
 		}
-		context_->ClearRenderTargetView(back_buffer_view_, environment::render_settings().settings().buffer_colour);
-		context_->ClearRenderTargetView(render_target_view_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
+		context_->ClearRenderTargetView(back_buffer_view_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
+		context_->ClearRenderTargetView(render_target_view_, environment::render_settings().settings().buffer_colour);
 		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		struct RenderSorterByZ
@@ -1187,7 +1199,76 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::EndDraw()
 	{
+		context_->RSSetViewports(1, &viewport_);
+		Resolution resolution = environment::render_settings().settings().resolution;
+		projection_matrix_ = XMMatrixIdentity();
+
+		context_->OMSetRenderTargets(1, &back_buffer_view_, NULL);
+		context_->OMSetBlendState(blend_state_, NULL, 0xFFFFFFFF);
+		SetCullMode(D3D11_CULL_FRONT);
+
+		Shaders shaders = environment::post_processing().shader()->shaders();
+
+		context_->VSSetShader(shaders.vs, 0, 0);
+		context_->PSSetShader(shaders.ps, 0, 0);
+
+		SetVertexBuffer(screen_quad_vertices_);
+		SetIndexBuffer(screen_quad_indices_);
+		context_->PSSetShaderResources(0, 1, &render_target_resource_);
+
+		D3D11_MAPPED_SUBRESOURCE cbData;
+		ShaderConstantBuffer* mappedData;
+
+		context_->VSSetConstantBuffers(0, 1, &constant_buffer_);
+		context_->PSSetConstantBuffers(0, 1, &constant_buffer_);
+
+		context_->Map(constant_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+		mappedData = static_cast<ShaderConstantBuffer*>(cbData.pData);
+
+		mappedData->Alpha = 0.0f;
+		mappedData->Blend = XMFLOAT3(1.0f, 1.0f, 1.0f);
+		mappedData->InvWorld = XMMatrixIdentity();
+		mappedData->Projection = projection_matrix_;
+		mappedData->Time = time_;
+		mappedData->View = XMMatrixIdentity();
+		mappedData->World = XMMatrixIdentity();
+		mappedData->WorldViewProjection = XMMatrixIdentity();
+
+		context_->Unmap(constant_buffer_, 0);
+
+		context_->VSSetConstantBuffers(1, 1, &uniform_buffer_);
+		context_->PSSetConstantBuffers(1, 1, &uniform_buffer_);
+
+		context_->DrawIndexed(4, 0, 0);
+
+		auto& passes = environment::post_processing().passes();
+		for (int i = 0; i < passes.size(); ++i)
+		{
+			shaders = passes.at(i)->shaders();
+
+			context_->VSSetShader(shaders.vs, 0, 0);
+			context_->PSSetShader(shaders.ps, 0, 0);
+
+			context_->VSSetConstantBuffers(0, 1, &constant_buffer_);
+			context_->PSSetConstantBuffers(0, 1, &constant_buffer_);
+
+			context_->DrawIndexed(4, 0, 0);
+		}
+
 		swap_chain_->Present(environment::render_settings().settings().vsync, 0);
+
+		ID3D11ShaderResourceView* null[] = { NULL };
+		context_->PSSetShaderResources(0, 1, null);
+
+		current_texture_ = nullptr;
+		current_shader_ = nullptr;
+		current_model_ = nullptr;
+		current_normal_ = nullptr;
+
+		vb_type_ = VertexBufferType::kNone;
+		
+		SetCullMode(environment::render_settings().settings().cull_mode);
+
 		std::map<RenderElement*, bool> exists;
 		while (!render_queue_.empty())
 		{
@@ -1293,7 +1374,6 @@ namespace snuffbox
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		CreateBackBuffer();
-		CreateRenderTarget();
 		CreateViewport();
 		CreateLayout();
 		CreateDepthStencil();
@@ -1301,7 +1381,32 @@ namespace snuffbox
 		CreateBlendState();
     SetCullMode(environment::render_settings().settings().cull_mode);
 
+		CreateRenderTarget();
+
 		context_->OMSetRenderTargets(1, &render_target_view_, depth_stencil_view_);
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateScreenQuad()
+	{
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+
+		Vertex verts[] = {
+			{ -1.0f, 1.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+			{ -1.0f, -1.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+			{ 1.0f, 1.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+			{ 1.0f, -1.0f, 0.0f, 1.0f, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) }
+		};
+
+		for (unsigned int i = 0; i < 4; ++i)
+		{
+			vertices.push_back(verts[i]);
+			indices.push_back(i);
+		}
+
+		screen_quad_vertices_ = CreateVertexBuffer(vertices);
+		screen_quad_indices_ = CreateIndexBuffer(indices);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -1336,6 +1441,8 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(default_normal_);
 		SNUFF_SAFE_RELEASE(blend_state_);
 		SNUFF_SAFE_RELEASE(back_buffer_view_);
+		SNUFF_SAFE_RELEASE(screen_quad_vertices_);
+		SNUFF_SAFE_RELEASE(screen_quad_indices_);
 
 		if (line_buffer_)
 		{
