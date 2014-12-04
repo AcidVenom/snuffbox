@@ -29,8 +29,7 @@ SamplerState SampleType;
 
 float4 PS(VOut input) : SV_TARGET
 {
-	input.texcoord.y += sin(input.texcoord.x * 10 + Time/10)/7;
-	float4 colour = tex2D.Sample(SampleType, input.texcoord);
-	float gray = (colour.r + colour.g + colour.b) / 3.0f;
-	return float4(gray, gray, gray, Multiplier);
+	input.texcoord.y += sin(input.texcoord.x*20 * input.texcoord.x / 10 + Time * 10) / sin(Time*2) / 5;
+    float4 colour = tex2D.Sample(SampleType, input.texcoord);
+    return float4(colour.rgb, 1);
 }

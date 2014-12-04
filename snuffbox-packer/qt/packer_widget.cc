@@ -78,6 +78,10 @@ namespace snuffboxpacker
     item->setText(0, "shaders");
     ui_->packageTable->addTopLevelItem(item);
 
+    item = new QTreeWidgetItem(ContentTypes::kSound);
+    item->setText(0, "sounds");
+    ui_->packageTable->addTopLevelItem(item);
+
     item = new QTreeWidgetItem(ContentTypes::kUnknown);
     item->setText(0, "unknown");
     ui_->packageTable->addTopLevelItem(item);
@@ -218,6 +222,10 @@ namespace snuffboxpacker
     {
       return "box";
     }
+    else if (extension == "mp3" || extension == "wav" || extension == "ogg")
+    {
+      return "sound";
+    }
     else if (extension == "fbx")
     {
       return "model";
@@ -242,6 +250,10 @@ namespace snuffboxpacker
     else if (type == "shader")
     {
       return ContentTypes::kShader;
+    }
+    else if (type == "sound")
+    {
+      return ContentTypes::kSound;
     }
     else if (type == "box")
     {

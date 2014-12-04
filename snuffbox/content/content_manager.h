@@ -7,6 +7,7 @@
 #include "../../snuffbox/d3d11/d3d11_texture.h"
 #include "../../snuffbox/d3d11/d3d11_shader.h"
 #include "../../snuffbox/fbx/fbx_model.h"
+#include "../../snuffbox/fmod/fmod_sound.h"
 
 namespace snuffbox
 {
@@ -31,6 +32,7 @@ namespace snuffbox
 			kTexture,
 			kShader,
 			kModel,
+      kSound
 		};
 
 		/**
@@ -139,6 +141,7 @@ namespace snuffbox
 		std::map<std::string, SharedPtr<Content<Texture>>>	loaded_textures_; //!< A map by path of all loaded textures
 		std::map<std::string, SharedPtr<Content<Shader>>>		loaded_shaders_; //!< A map by path of all loaded shaders
 		std::map<std::string, SharedPtr<Content<FBXModel>>> loaded_models_; //!< A map by path of all loaded models
+    std::map<std::string, SharedPtr<Content<Sound>>>    loaded_sounds_; //!< A map by path of all loaded sounds
 		std::queue<PendingContent>													pending_content_; //!< A queue for pending content
 	
 	public:

@@ -17,6 +17,7 @@
 #include "../../snuffbox/content/content_manager.h"
 #include "../../snuffbox/io/io_manager.h"
 #include "../../snuffbox/d3d11/d3d11_post_processing.h"
+#include "../../snuffbox/fmod/fmod_sound_system.h"
 
 namespace snuffbox
 {
@@ -41,5 +42,6 @@ namespace snuffbox
 		JSRegister<D3D11Line, false>::Register();
 		JSRegister<IOManager, false>::Register();
 		JSRegister<PostProcessing, false>::Register();
+    JSRegister<SoundSystem, false>::Register();
 	}
 }

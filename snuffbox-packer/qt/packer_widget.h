@@ -20,7 +20,8 @@ namespace snuffboxpacker
     kModel = 10001,
     kBox = 10002,
     kShader = 10003,
-    kUnknown = 10004
+    kSound = 10004,
+    kUnknown = 10005
   };
 
   class PackerWidget : public QObject

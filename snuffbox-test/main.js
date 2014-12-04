@@ -59,6 +59,9 @@ Game.Initialise = function()
 	Game.polygon.spawn();
 
 	PostProcessing.addPass("shaders/gray.fx");
+	SoundSystem.addChannelGroup("master");
+
+	SoundSystem.play("test.mp3", "master", true);
 }
 
 Game.Update = function(dt)
@@ -97,7 +100,15 @@ Game.Update = function(dt)
 	Game.box.setTranslation(x,y,0);
 	Game.box.setRotation(0,0,Math.sin(Game.timer)/7);
 
-	PostProcessing.setUniform("float", "Multiplier", 0);
+	PostProcessing.setUniform("float", "Multiplier", 0.5+Math.sin(Game.timer/2)/2);
+	//SoundSystem.setChannelGroupVolume("master", 1 );
+
+	var pause = SoundSystem.isPaused("master");
+
+	if (Keyboard.isReleased("P"))
+	{
+		pause == false ? SoundSystem.pause("master") : SoundSystem.resume("master");
+	}
 }
 
 Game.Draw = function(dt)

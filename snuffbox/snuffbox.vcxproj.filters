@@ -37,6 +37,9 @@
     <Filter Include="d3d11\shaders">
       <UniqueIdentifier>{f33ca619-e2f0-401e-a3ad-6b404294011f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="fmod">
+      <UniqueIdentifier>{474bfb8f-7acb-416e-87cd-4fd32b9e2c24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -144,6 +147,12 @@
     </ClCompile>
     <ClCompile Include="d3d11\d3d11_post_processing.cc">
       <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="fmod\fmod_sound_system.cc">
+      <Filter>fmod</Filter>
+    </ClCompile>
+    <ClCompile Include="fmod\fmod_sound.cc">
+      <Filter>fmod</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -272,6 +281,12 @@
     </ClInclude>
     <ClInclude Include="d3d11\d3d11_post_processing.h">
       <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod\fmod_sound_system.h">
+      <Filter>fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod\fmod_sound.h">
+      <Filter>fmod</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

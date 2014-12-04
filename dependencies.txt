@@ -7,6 +7,7 @@ libGLESv2.dll
 Qt5Core.dll
 Qt5Gui.dll
 Qt5Widgets.dll
+fmod64.dll
 
 platforms/qminimal.dll
 platforms/qoffscreen.dll

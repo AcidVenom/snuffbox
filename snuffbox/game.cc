@@ -21,13 +21,15 @@
 
 #include "../snuffbox/freetype/freetype_font_manager.h"
 
+#include "../snuffbox/fmod/fmod_sound_system.h"
+
 
 #include <QtCore>
 #include <stdio.h>
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 628
+#define SNUFF_VERSION_MINOR 630
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -412,6 +414,7 @@ void Game::CreateCallbacks()
 //------------------------------------------------------------------------------------------------------
 void Game::Run()
 {
+  environment::sound_system().Update();
   Update();
 	Draw();
 }
@@ -451,6 +454,7 @@ int SNUFF_MAIN
 	environment::render_device().Initialise();
 	js_state_wrapper.Initialise();
 
+  SharedPtr<SoundSystem> sound_system = environment::memory().ConstructShared<SoundSystem>();
   SharedPtr<FontManager> font_manager = environment::memory().ConstructShared<FontManager>();
 
 	game->Initialise();

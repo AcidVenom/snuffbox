@@ -16,6 +16,7 @@ namespace snuffbox
 	class IOManager;
   class FontManager;
 	class PostProcessing;
+  class SoundSystem;
 
 	namespace environment
 	{
@@ -61,6 +62,9 @@ namespace snuffbox
 		/// Returns the post processing
 		PostProcessing& post_processing();
 
+    /// Returns the sound system
+    SoundSystem& sound_system();
+
     /// Returns if the environment owns a game
     bool has_game();
 
@@ -102,5 +106,8 @@ namespace snuffbox
 
 		/// Returns if there is post processing or not
 		bool has_post_processing();
+
+    /// Returns if there is a sound system or not
+    bool has_sound_system();
 	}
 }

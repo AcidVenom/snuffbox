@@ -5,6 +5,7 @@
 #include "../../snuffbox/game.h"
 #include "../../snuffbox/js/js_wrapper.h"
 #include "../../snuffbox/fbx/fbx_loader.h"
+#include "../../snuffbox/fmod/fmod_sound.h"
 #include "../../snuffbox/win32/win32_file_watch.h"
 
 #include <fstream>
@@ -85,6 +86,21 @@ namespace snuffbox
 		return true;
 	}
 
+  //-------------------------------------------------------------------------------------------
+  template<>
+  bool ContentManager::Load<Sound>(std::string path)
+  {
+    if (loaded_sounds_.find(path) != loaded_sounds_.end())
+      return false;
+
+    SNUFF_LOG_INFO(std::string("Loading sound " + path).c_str());
+    SharedPtr<Sound> sound = environment::memory().ConstructShared<Sound>(path);
+    SharedPtr<Content<Sound>> content = environment::memory().ConstructShared<Content<Sound>>(ContentTypes::kSound, sound);
+
+    loaded_sounds_.emplace(path, content);
+    return true;
+  }
+
 	//-------------------------------------------------------------------------------------------
 	template<>
 	void ContentManager::Unload<Texture>(std::string path)
@@ -117,6 +133,16 @@ namespace snuffbox
 		environment::file_watcher().RemoveWatchedFile(path);
 		SNUFF_LOG_INFO(std::string("Unloaded model " + path).c_str());
 	}
+
+  //-------------------------------------------------------------------------------------------
+  template<>
+  void ContentManager::Unload<Sound>(std::string path)
+  {
+    SNUFF_XASSERT(loaded_sounds_.find(path) != loaded_sounds_.end(), "The sound '" + path + "' was never loaded!");
+
+    loaded_sounds_.erase(loaded_sounds_.find(path));
+    SNUFF_LOG_INFO(std::string("Unloaded sound " + path).c_str());
+  }
 
 	//-------------------------------------------------------------------------------------------
 	template<>
@@ -157,6 +183,19 @@ namespace snuffbox
 		return contentPtr->Get();
 	}
 
+  //-------------------------------------------------------------------------------------------
+  template<>
+  SharedPtr<Sound>& ContentManager::Get<Sound>(std::string path)
+  {
+    Content<Sound>* contentPtr = nullptr;
+
+    SNUFF_XASSERT(loaded_sounds_.find(path) != loaded_sounds_.end(), std::string("Sound not loaded '" + path + "'!"));
+
+    contentPtr = loaded_sounds_.find(path)->second.get();
+
+    return contentPtr->Get();
+  }
+
 	//-------------------------------------------------------------------------------------------
 	void ContentManager::RegisterJS(JS_TEMPLATE)
 	{
@@ -192,6 +231,8 @@ namespace snuffbox
 			environment::file_watcher().RemoveWatchedFile(it->first);
 		}
 		loaded_models_.clear();
+
+    loaded_sounds_.clear();
 	}
 
   //-------------------------------------------------------------------------------------------
@@ -215,6 +256,12 @@ namespace snuffbox
     {
       isContent = true;
       Unload<FBXModel>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "sound") == 0)
+    {
+      isContent = true;
+      Unload<Sound>(contentPath);
     }
 
     if (strcmp(contentType.c_str(), "box") == 0)
@@ -261,6 +308,12 @@ namespace snuffbox
     {
       isContent = true;
       Load<FBXModel>(contentPath);
+    }
+
+    if (strcmp(contentType.c_str(), "sound") == 0)
+    {
+      isContent = true;
+      Load<Sound>(contentPath);
     }
 
     if (strcmp(contentType.c_str(), "box") == 0)

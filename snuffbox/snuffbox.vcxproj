@@ -111,7 +111,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE;C:\V8\include;$(DXSDK_DIR)\Include;C:\FBX\2015.1\include;C:\FreeType\include;C:\FreeType\include\config;C:\FreeType\include\internal;C:\FreeType\include\internal\services</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE;C:\V8\include;$(DXSDK_DIR)\Include;C:\FBX\2015.1\include;C:\FreeType\include;C:\FreeType\include\config;C:\FreeType\include\internal;C:\FreeType\include\internal\services;C:\Program Files (x86)\FMOD\API\api\lowlevel\inc</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -120,7 +120,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>Ws2_32.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgetsd.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Cored.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Guid.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmaind.lib;WINMM.lib;C:/V8/build/Debug/lib/icui18n.lib;C:/V8/build/Debug/lib/icuuc.lib;C:/V8/build/Debug/lib/v8_snapshot.lib;C:/V8/build/Debug/lib/v8_nosnapshot.x64.lib;C:/V8/build/Debug/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;C:\FBX\2015.1\lib\vs2013\x64\debug\libfbxsdk-mt.lib;C:\FreeType\lib\freetype253_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgetsd.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Cored.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Guid.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmaind.lib;WINMM.lib;C:/V8/build/Debug/lib/icui18n.lib;C:/V8/build/Debug/lib/icuuc.lib;C:/V8/build/Debug/lib/v8_snapshot.lib;C:/V8/build/Debug/lib/v8_nosnapshot.x64.lib;C:/V8/build/Debug/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;C:\FBX\2015.1\lib\vs2013\x64\debug\libfbxsdk-mt.lib;C:\FreeType\lib\freetype253_D.lib;C:\Program Files (x86)\FMOD\API\api\lowlevel\lib\fmod64_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>WinMainCRTStartup</EntryPointSymbol>
     </Link>
     <CustomBuildStep>
@@ -162,7 +162,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE;C:\V8\include;$(DXSDK_DIR)\Include;C:\FBX\2015.1\include;C:\FreeType\include;C:\FreeType\include\config;C:\FreeType\include\internal;C:\FreeType\include\internal\services</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtNetwork;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE;C:\V8\include;$(DXSDK_DIR)\Include;C:\FBX\2015.1\include;C:\FreeType\include;C:\FreeType\include\config;C:\FreeType\include\internal;C:\FreeType\include\internal\services;C:\Program Files (x86)\FMOD\API\api\lowlevel\inc</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -171,7 +171,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Ws2_32.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgets.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Core.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Gui.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmain.lib;WINMM.lib;C:/V8/build/Release/lib/icui18n.lib;C:/V8/build/Release/lib/icuuc.lib;C:/V8/build/Release/lib/v8_snapshot.lib;C:/V8/build/Release/lib/v8_nosnapshot.x64.lib;C:/V8/build/Release/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;C:\FBX\2015.1\lib\vs2013\x64\debug\libfbxsdk.lib;C:\FreeType\lib\freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Widgets.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Core.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\Qt5Gui.lib;C:\Qt\Qt5.1.1\5.1.1\msvc2012_64\lib\qtmain.lib;WINMM.lib;C:/V8/build/Release/lib/icui18n.lib;C:/V8/build/Release/lib/icuuc.lib;C:/V8/build/Release/lib/v8_snapshot.lib;C:/V8/build/Release/lib/v8_nosnapshot.x64.lib;C:/V8/build/Release/lib/v8_base.x64.lib;$(DXSDK_DIR)\Lib\x64\d3d11.lib;$(DXSDK_DIR)\Lib\x64\dxgi.lib;$(DXSDK_DIR)\Lib\x64\d3dx11.lib;$(DXSDK_DIR)\Lib\x64\d3dx10.lib;C:\FBX\2015.1\lib\vs2013\x64\debug\libfbxsdk.lib;C:\FreeType\lib\freetype253.lib;C:\Program Files (x86)\FMOD\API\api\lowlevel\lib\fmod64_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -197,6 +197,8 @@
     <ClCompile Include="d3d11\elements\widget_element.cc" />
     <ClCompile Include="fbx\fbx_loader.cc" />
     <ClCompile Include="fbx\fbx_model.cc" />
+    <ClCompile Include="fmod\fmod_sound.cc" />
+    <ClCompile Include="fmod\fmod_sound_system.cc" />
     <ClCompile Include="freetype\freetype_font.cc" />
     <ClCompile Include="freetype\freetype_font_atlas.cc" />
     <ClCompile Include="freetype\freetype_font_manager.cc" />
@@ -238,6 +240,8 @@
     <ClInclude Include="environment.h" />
     <ClInclude Include="fbx\fbx_loader.h" />
     <ClInclude Include="fbx\fbx_model.h" />
+    <ClInclude Include="fmod\fmod_sound.h" />
+    <ClInclude Include="fmod\fmod_sound_system.h" />
     <ClInclude Include="freetype\freetype_font.h" />
     <ClInclude Include="freetype\freetype_font_atlas.h" />
     <ClInclude Include="freetype\freetype_font_manager.h" />
