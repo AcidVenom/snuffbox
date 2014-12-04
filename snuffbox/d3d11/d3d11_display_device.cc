@@ -20,51 +20,8 @@
 #include <fstream>
 #include <comdef.h>
 
-#define SNUFF_BASE_SHADER "cbuffer ConstantBuffer : register(b0)\n\
-{\n\
-\tfloat Time;\n\
-\tfloat4x4 World;\n\
-\tfloat4x4 View;\n\
-\tfloat4x4 Projection;\n\
-\tfloat4x4 WorldViewProjection;\n\
-\tfloat Alpha;\n\
-\tfloat3 Blend;\n\
-\tfloat4x4 InvWorld;\n\
-}\n\
-\n\
-cbuffer Uniforms : register(b1)\n\
-{\n\
-\n\
-}\n\
-\n\
-struct VOut\n\
-{\n\
-\tfloat4 position : SV_POSITION;\n\
-\tfloat4 colour : COLOUR;\n\
-\tfloat3 normal : NORMAL;\n\
-\tfloat2 texcoord : TEXCOORD0;\n\
-};\n\
-\n\
-VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TEXCOORD0, float4 colour : COLOUR)\n\
-{\n\
-\tVOut output;\n\
-\toutput.position = mul(position, WorldViewProjection);\n\
-\toutput.normal = normalize(mul(float4(normal, 0), InvWorld).xyz);\n\
-\toutput.texcoord = texcoord;\n\
-\toutput.colour = colour;\n\
-\treturn output;\n\
-}\n\
-\n\
-Texture2D textures[2];\n\
-SamplerState SampleType;\n\
-\n\
-float4 PS(VOut input) : SV_TARGET\n\
-{\n\
-\tfloat4 textureColour = textures[0].Sample(SampleType, input.texcoord);\n\
-\tfloat4 colour = float4(textureColour.rgb * Blend * input.colour.rgb, textureColour.a);\n\
-\tcolour.rgb *= colour.a * Alpha;\n\
-\treturn colour;\n\
-}"
+#include "../../snuffbox/d3d11/shaders/d3d11_base_shader.h"
+#include "../../snuffbox/d3d11/shaders/d3d11_post_process_shader.h"
 
 namespace snuffbox
 {
@@ -93,7 +50,7 @@ namespace snuffbox
 		vb_type_(VertexBufferType::kNone), 
 		camera_(nullptr),
     current_model_(nullptr),
-    topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
+    topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
 	{
 		environment::globalInstance = this;
 	}
@@ -119,15 +76,17 @@ namespace snuffbox
 		CreateDevice();
 		GetAdapters();
 		CreateBackBuffer();
+		CreateRenderTarget();
 		CreateViewport();
 		CreateBaseShader();
+		CreatePostProcessingShader();
 		CreateConstantBuffer();
 		CreateLayout();
 		CreateDepthStencil();
 		CreateSamplerState();
 		CreateDefaultTexture();
 		CreateBlendState();
-
+		
 		SNUFF_LOG_SUCCESS("Succesfully initialised the D3D11 display device");
 	}
 
@@ -251,6 +210,26 @@ namespace snuffbox
 		SNUFF_XASSERT(result == S_OK, HRToString(result));
 
 		result = device_->CreateRenderTargetView(back_buffer_, NULL,
+			&back_buffer_view_);
+
+		SNUFF_XASSERT(result == S_OK, HRToString(result))
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateRenderTarget()
+	{
+		HRESULT result = S_OK;
+		
+		D3D11_TEXTURE2D_DESC desc;
+		back_buffer_->GetDesc(&desc);
+
+		desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+		result = device_->CreateTexture2D(&desc, NULL, &render_target_);
+
+		SNUFF_XASSERT(result == S_OK, HRToString(result))
+
+		result = device_->CreateRenderTargetView(render_target_, NULL,
 			&render_target_view_);
 
 		SNUFF_XASSERT(result == S_OK, HRToString(result))
@@ -263,17 +242,17 @@ namespace snuffbox
 
 		D3D11_INPUT_ELEMENT_DESC layout[] = 
 		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
 		result = device_->CreateInputLayout(layout, 4, vs_buffer_->GetBufferPointer(),vs_buffer_->GetBufferSize(), &input_layout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "Input Layout").c_str());
 
 		context_->IASetInputLayout(input_layout_);
-		context_->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 		D3D11_RASTERIZER_DESC rasterizer;
 		ZeroMemory(&rasterizer, sizeof(D3D11_RASTERIZER_DESC));
@@ -337,6 +316,35 @@ namespace snuffbox
 		fin.close();
 
 		environment::content_manager().Load<Shader>("shaders/base.fx");
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreatePostProcessingShader()
+	{
+		std::fstream fin;
+
+		fin.open(environment::game().path() + "/shaders/post_processing.fx");
+
+		if (!fin)
+		{
+			std::ofstream out;
+			out.open(environment::game().path() + "/shaders/post_processing.fx");
+
+			if (!out)
+			{
+				CreateDirectoryA(std::string(environment::game().path() + "/shaders").c_str(), 0);
+				out.open(environment::game().path() + "/shaders/post_processing.fx");
+
+				SNUFF_XASSERT(out, "Unknown error in creating of the post processing shader");
+			}
+
+			out << SNUFF_POST_PROCESSING_SHADER;
+			out.close();
+		}
+
+		fin.close();
+
+		environment::content_manager().Load<Shader>("shaders/post_processing.fx");
 	}
 
 	//---------------------------------------------------------------------------------
@@ -719,7 +727,8 @@ namespace snuffbox
 		{
 			context_->OMSetRenderTargets(1, &render_target_view_, NULL);
 		}
-		context_->ClearRenderTargetView(render_target_view_, environment::render_settings().settings().buffer_colour);
+		context_->ClearRenderTargetView(back_buffer_view_, environment::render_settings().settings().buffer_colour);
+		context_->ClearRenderTargetView(render_target_view_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
 		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		struct RenderSorterByZ
@@ -1023,9 +1032,9 @@ namespace snuffbox
 				line_buffer_ = nullptr;
 			}
 			line_buffer_ = CreateVertexBuffer(lines_);
-			if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST)
+			if (topology_ != D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST)
 			{
-				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
+				context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			}
 			SetVertexBuffer(line_buffer_);
 
@@ -1066,7 +1075,7 @@ namespace snuffbox
 			context_->PSSetShader(shaders.ps, 0, 0);
 			context_->VSSetShader(shaders.vs, 0, 0);
 
-			topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST;
+			topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 			context_->Draw(static_cast<UINT>(lines_.size()), static_cast<UINT>(0));
 		}
 
@@ -1149,6 +1158,19 @@ namespace snuffbox
 		{
       projection_matrix_ = XMMatrixPerspectiveFovRH(camera->fov(), static_cast<float>(w / h), 1.0f, 1000.0f);
 		}
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::SetVertexBuffer(ID3D11Buffer* buffer)
+	{ 
+		UINT offset = 0; 
+		context_->IASetVertexBuffers(0, 1, &buffer, &Vertex::stride_size, &offset); 
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::SetIndexBuffer(ID3D11Buffer* buffer)
+	{
+		context_->IASetIndexBuffer(buffer, DXGI_FORMAT_R32_UINT, 0);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -1242,6 +1264,8 @@ namespace snuffbox
 
 		SNUFF_SAFE_RELEASE(depth_stencil_buffer_);
 		SNUFF_SAFE_RELEASE(render_target_view_);
+		SNUFF_SAFE_RELEASE(render_target_);
+		SNUFF_SAFE_RELEASE(back_buffer_view_);
 		SNUFF_SAFE_RELEASE(depth_stencil_view_);
 		SNUFF_SAFE_RELEASE(depth_state_);
 		SNUFF_SAFE_RELEASE(sampler_state_);
@@ -1253,10 +1277,11 @@ namespace snuffbox
 		unsigned int w = environment::game().window()->params().w;
 		unsigned int h = environment::game().window()->params().h;
 
-		result = swap_chain_->ResizeBuffers(1, w, h, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+		result = swap_chain_->ResizeBuffers(1, w, h, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
 		CreateBackBuffer();
+		CreateRenderTarget();
 		CreateViewport();
 		CreateLayout();
 		CreateDepthStencil();
@@ -1279,6 +1304,7 @@ namespace snuffbox
 		{
 			SNUFF_SAFE_RELEASE(it);
 		}
+		SNUFF_SAFE_RELEASE(render_target_);
 		SNUFF_SAFE_RELEASE(render_target_view_);
 		SNUFF_SAFE_RELEASE(back_buffer_);
 		SNUFF_SAFE_RELEASE(input_layout_);
@@ -1296,6 +1322,7 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(no_normal_);
 		SNUFF_SAFE_RELEASE(default_normal_);
 		SNUFF_SAFE_RELEASE(blend_state_);
+		SNUFF_SAFE_RELEASE(back_buffer_view_);
 
 		if (line_buffer_)
 		{

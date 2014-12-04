@@ -34,6 +34,9 @@
     <Filter Include="freetype">
       <UniqueIdentifier>{45b2fca2-9ce1-402c-9cbe-549197bc42ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="d3d11\shaders">
+      <UniqueIdentifier>{f33ca619-e2f0-401e-a3ad-6b404294011f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -257,6 +260,12 @@
     </ClInclude>
     <ClInclude Include="d3d11\elements\polygon_element.h">
       <Filter>d3d11\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\shaders\d3d11_base_shader.h">
+      <Filter>d3d11\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11\shaders\d3d11_post_process_shader.h">
+      <Filter>d3d11\shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

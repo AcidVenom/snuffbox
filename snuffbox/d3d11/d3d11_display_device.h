@@ -110,6 +110,9 @@ namespace snuffbox
 
 		/// Creates the backbuffer of this device
 		void CreateBackBuffer();
+
+		/// Creates the render target
+		void CreateRenderTarget();
 		
 		/// Creates a vertex buffer for use with this device
 		void CreateLayout();
@@ -168,6 +171,9 @@ namespace snuffbox
 		/// Creates the base shader
 		void CreateBaseShader();
 
+		/// Creates the post processing shader
+		void CreatePostProcessingShader();
+
 		/// Destroys the device
 		void Destroy();
 
@@ -202,13 +208,13 @@ namespace snuffbox
 		* @brief Sets the vertex buffer to currently use
 		* @param[in] vertexBuffer (ID3D11Buffer*) The vertex buffer to set
 		*/
-		void SetVertexBuffer(ID3D11Buffer* vertexBuffer){ UINT offset = 0; context_->IASetVertexBuffers(0, 1, &vertexBuffer, &Vertex::stride_size, &offset); }
+		void SetVertexBuffer(ID3D11Buffer* vertexBuffer);
 
 		/**
 		* @brief Sets the index buffer to currently use
 		* @param[in] indexBuffer (ID3D11Buffer*) The index buffer to set
 		*/
-		void SetIndexBuffer(ID3D11Buffer* indexBuffer){ context_->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0); }
+		void SetIndexBuffer(ID3D11Buffer* indexBuffer);
 
 		/**
 		* @return (std::vector<RenderElement*>&) The list of normal render elements
@@ -317,7 +323,7 @@ namespace snuffbox
 		std::vector<DisplayAdapter*>	display_adapters_;			//!< The display adapters this device can use
 		DisplayAdapter*								primary_adapter_;				//!< The primary display adapter
 		D3DTexture2D*									back_buffer_;						//!< The backbuffer of this device
-		D3DRenderTargetView*					render_target_view_;		//!< The render target view of this device
+		D3DRenderTargetView*					back_buffer_view_;			//!< The render target view of this device
 		ID3D11Buffer*									constant_buffer_;				//!< The constant buffer
 		ID3D11Buffer*									uniform_buffer_;				//!< The constant buffer for uniforms
 		ID3D11InputLayout*						input_layout_;					//!< The vertex input layout
@@ -350,6 +356,9 @@ namespace snuffbox
 		std::vector<Vertex>						lines_;									//!< The vector for lines to draw
 		ID3D11Buffer*									line_buffer_;						//!< The line vertex buffer
 		D3D11_VIEWPORT								viewport_;							//!< The viewport of the device
-		std::queue<RenderElement*>		render_queue_;						//!< The render queue
+		std::queue<RenderElement*>		render_queue_;					//!< The render queue
+		D3DTexture2D*									render_target_;					//!< The texture that will be rendered to
+		ID3D11RenderTargetView*				render_target_view_;		//!< The render target view
+		ID3D11ShaderResourceView*			render_target_resource_;//!< The shader resource of the render target texture
 	};
 }
