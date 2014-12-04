@@ -163,7 +163,7 @@ namespace snuffbox
 		* @brief Increases the elapsed time by a given value
 		* @param[in] dt (float) The delta time, or any value to increment with
 		*/
-		void IncrementTime(float dt){ time_ += dt; if (time_ > XM_PI * 2){ time_ = 0; } }
+		void IncrementTime(float dt){ time_ += dt; if (time_ > XM_PI * 10000){ time_ = 0; } }
 
 		/// Creates the depth stencil view/buffer
 		void CreateDepthStencil();

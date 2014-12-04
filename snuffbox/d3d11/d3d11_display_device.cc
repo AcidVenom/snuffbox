@@ -5,6 +5,7 @@
 #include "../../snuffbox/d3d11/elements/mesh_element.h"
 #include "../../snuffbox/d3d11/elements/text_element.h"
 #include "../../snuffbox/d3d11/elements/polygon_element.h"
+#include "../../snuffbox/d3d11/d3d11_post_processing.h"
 #include "../../snuffbox/d3d11/d3d11_camera.h"
 #include "../../snuffbox/environment.h"
 #include "../../snuffbox/game.h"
@@ -1236,8 +1237,19 @@ namespace snuffbox
 
 		context_->Unmap(constant_buffer_, 0);
 
-		context_->VSSetConstantBuffers(1, 1, &uniform_buffer_);
-		context_->PSSetConstantBuffers(1, 1, &uniform_buffer_);
+    context_->VSSetConstantBuffers(1, 1, &uniform_buffer_);
+    context_->PSSetConstantBuffers(1, 1, &uniform_buffer_);
+
+    context_->Map(uniform_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
+
+    float* uniforms = static_cast<float*>(cbData.pData);
+    auto vec = environment::post_processing().uniforms();
+    for (unsigned int i = 0; i < vec.size(); ++i)
+    {
+      uniforms[i] = vec[i];
+    }
+
+    context_->Unmap(uniform_buffer_, 0);
 
 		context_->DrawIndexed(4, 0, 0);
 

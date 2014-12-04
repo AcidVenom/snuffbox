@@ -5,7 +5,7 @@ cbuffer ConstantBuffer : register(b0)
 
 cbuffer Uniforms : register(b1)
 {
-
+	float Multiplier;
 }
 
 struct VOut
@@ -29,7 +29,8 @@ SamplerState SampleType;
 
 float4 PS(VOut input) : SV_TARGET
 {
+	input.texcoord.y += sin(input.texcoord.x * 10 + Time/10)/7;
 	float4 colour = tex2D.Sample(SampleType, input.texcoord);
 	float gray = (colour.r + colour.g + colour.b) / 3.0f;
-	return float4(gray, gray, gray, 1);
+	return float4(gray, gray, gray, Multiplier);
 }

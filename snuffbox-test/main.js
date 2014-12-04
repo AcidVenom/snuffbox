@@ -96,6 +96,8 @@ Game.Update = function(dt)
 	var y = Math.sin(Game.timer)*20;
 	Game.box.setTranslation(x,y,0);
 	Game.box.setRotation(0,0,Math.sin(Game.timer)/7);
+
+	PostProcessing.setUniform("float", "Multiplier", 0);
 }
 
 Game.Draw = function(dt)

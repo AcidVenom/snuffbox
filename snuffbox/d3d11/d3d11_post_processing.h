@@ -5,6 +5,9 @@
 namespace snuffbox
 {
 	class Shader;
+  enum UniformType;
+  struct ShaderUniform;
+
 	/**
 	* @class snuffbox::PostProcessing
 	* @brief Handles all post processing shader management, including passes
@@ -37,10 +40,21 @@ namespace snuffbox
 		/// Returns the vector of passes
 		std::vector<Shader*>& passes();
 
+    /// Returns the uniforms of the post processing effects
+    std::vector<float> uniforms();
+
+    /**
+    * @brief Sets a uniform for this element
+    * @param[in] type (snuffbox::UniformType) The type of the uniform
+    * @param[in] name (std::string) The underlying name of this uniform (only used for managing, not actual shader name)
+    * @param[in] _1, _2, _3, _4 (float) Optional starting from _2, this depends on the uniform type that was given as 1st parameter
+    */
+    void SetUniform(UniformType type, std::string name, float _1 = 0.0f, float _2 = 0.0f, float _3 = 0.0f, float _4 = 0.0f);
+
 	private:
-		Shader*												shader_; //!< The current post processing shader
-		std::vector<Shader*>					passes_; //!< The post processing passes
-		std::vector<float>						uniforms_; //!< The uniforms for post processing
+		Shader*												        shader_; //!< The current post processing shader
+		std::vector<Shader*>					        passes_; //!< The post processing passes
+    std::map<std::string, ShaderUniform>	uniforms_;	//!< Uniforms for the constant buffer of the shader
 
 	public:
 		JS_NAME(PostProcessing);
@@ -52,5 +66,6 @@ namespace snuffbox
 		static void JSAddPass(JS_ARGS);
 		static void JSRemovePass(JS_ARGS);
 		static void JSClearPasses(JS_ARGS);
+    static void JSSetUniform(JS_ARGS);
 	};
 }
