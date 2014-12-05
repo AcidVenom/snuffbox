@@ -46,8 +46,6 @@ namespace snuffbox
     result = fmod_system_->getVersion(&version);
     SNUFF_XASSERT(result == FMOD_OK, "Failed retrieving the FMOD version!");
 
-    SNUFF_XASSERT(version >= FMOD_VERSION, "Invalid FMOD version being used!");
-
     SNUFF_LOG_INFO(std::string("Succesfully initialized FMOD v" + std::to_string(version)).c_str());
 
     environment::globalInstance = this;

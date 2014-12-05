@@ -15,7 +15,6 @@ namespace snuffbox
 	class FBXLoader;
 	class IOManager;
   class FontManager;
-	class PostProcessing;
   class SoundSystem;
 
 	namespace environment
@@ -59,9 +58,6 @@ namespace snuffbox
 		/// Returns the IO manager
 		IOManager& io_manager();
 
-		/// Returns the post processing
-		PostProcessing& post_processing();
-
     /// Returns the sound system
     SoundSystem& sound_system();
 
@@ -103,9 +99,6 @@ namespace snuffbox
 
 		/// Returns if there is an IO manager or not
 		bool has_io_manager();
-
-		/// Returns if there is post processing or not
-		bool has_post_processing();
 
     /// Returns if there is a sound system or not
     bool has_sound_system();

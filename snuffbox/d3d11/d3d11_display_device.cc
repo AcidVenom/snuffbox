@@ -17,6 +17,7 @@
 #include "../../snuffbox/freetype/freetype_font.h"
 #include "../../snuffbox/freetype/freetype_font_atlas.h"
 #include "../../snuffbox/freetype/freetype_font_manager.h"
+#include "../../snuffbox/d3d11/d3d11_render_target.h"
 
 #include <fstream>
 #include <comdef.h>
@@ -51,7 +52,8 @@ namespace snuffbox
 		vb_type_(VertexBufferType::kNone), 
 		camera_(nullptr),
     current_model_(nullptr),
-    topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP)
+    topology_(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP),
+		initialised_(false)
 	{
 		environment::globalInstance = this;
 	}
@@ -88,7 +90,7 @@ namespace snuffbox
 		CreateBlendState();
 		CreateScreenQuad();
 
-		CreateRenderTarget();
+		initialised_ = true;
 		
 		SNUFF_LOG_SUCCESS("Succesfully initialised the D3D11 display device");
 	}
@@ -219,36 +221,6 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::CreateRenderTarget()
-	{
-		HRESULT result = S_OK;
-		
-		D3D11_TEXTURE2D_DESC desc;
-		back_buffer_->GetDesc(&desc);
-		desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-		result = device_->CreateTexture2D(&desc, NULL, &render_target_);
-
-		SNUFF_XASSERT(result == S_OK, HRToString(result));
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-
-		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		viewDesc.Texture2D.MipLevels = 1;
-		viewDesc.Texture2D.MostDetailedMip = 0;
-
-		result = device_->CreateShaderResourceView(render_target_, &viewDesc, &render_target_resource_);
-		
-		SNUFF_XASSERT(result == S_OK, HRToString(result));
-
-		result = device_->CreateRenderTargetView(render_target_, NULL,
-			&render_target_view_);
-
-		SNUFF_XASSERT(result == S_OK, HRToString(result));
-	}
-
-	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::CreateLayout()
 	{
 		HRESULT result = S_OK;
@@ -260,6 +232,8 @@ namespace snuffbox
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
+
+		SNUFF_XASSERT(vs_buffer_ != nullptr, "You have to properly load the shader initially, fix the shader and restart");
 
 		result = device_->CreateInputLayout(layout, 4, vs_buffer_->GetBufferPointer(),vs_buffer_->GetBufferSize(), &input_layout_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result, "Input Layout").c_str());
@@ -358,7 +332,6 @@ namespace snuffbox
 		fin.close();
 
 		environment::content_manager().Load<Shader>("shaders/post_processing.fx");
-		post_processing_ = environment::memory().ConstructShared<PostProcessing>();
 	}
 
 	//---------------------------------------------------------------------------------
@@ -673,6 +646,18 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::AddRenderTarget(std::string name, RenderTarget* target)
+	{
+		if (render_targets_.find(name) != render_targets_.end())
+		{
+			SNUFF_LOG_ERROR(std::string("Render target with name " + name + " already exists!").c_str());
+			return;
+		}
+
+		render_targets_.emplace(name, target);
+	}
+
+	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::CreateBlendState()
 	{
 		HRESULT result = S_OK;
@@ -729,9 +714,34 @@ namespace snuffbox
 
 		lines_.push_back(vert);
 	}
+
+	//---------------------------------------------------------------------------------
+	RenderTarget* D3D11DisplayDevice::get_target(std::string name)
+	{
+		auto it = render_targets_.find(name);
+		SNUFF_XASSERT(it != render_targets_.end(), "Render target with name " + name + " does not exist!");
+
+		return it->second;
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::DrawToRenderTargets()
+	{
+		context_->ClearRenderTargetView(back_buffer_view_, environment::render_settings().settings().buffer_colour);
+
+		for (std::map<std::string, RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
+		{
+			StartDraw(it->second);
+			Draw(it->second);
+			EndDraw(it->second);
+		}
+
+		swap_chain_->Present(environment::render_settings().settings().vsync, 0);
+		camera_ = nullptr;
+	}
 	
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::StartDraw()
+	void D3D11DisplayDevice::StartDraw(RenderTarget* target)
 	{
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
@@ -743,16 +753,17 @@ namespace snuffbox
 
 		context_->RSSetViewports(1, &viewport);
 		context_->OMSetBlendState(blend_state_, NULL, 0xFFFFFFFF);
+		ID3D11RenderTargetView* view = target->view();
 		if (camera_ && camera_->type() == Camera::CameraType::kPerspective)
 		{
-			context_->OMSetRenderTargets(1, &render_target_view_, depth_stencil_view_);
+			context_->OMSetRenderTargets(1, &view, depth_stencil_view_);
 		}
 		else
 		{
-			context_->OMSetRenderTargets(1, &render_target_view_, NULL);
+			context_->OMSetRenderTargets(1, &view, NULL);
 		}
-		context_->ClearRenderTargetView(back_buffer_view_, D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
-		context_->ClearRenderTargetView(render_target_view_, environment::render_settings().settings().buffer_colour);
+
+		context_->ClearRenderTargetView(view, D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
 		context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		struct RenderSorterByZ
@@ -775,41 +786,14 @@ namespace snuffbox
 		{
 			if (camera_->type() == Camera::CameraType::kOrthographic)
 			{
-				std::sort(render_elements_.begin(), render_elements_.end(), RenderSorterByZ);
+				std::sort(target->render_elements().begin(), target->render_elements().end(), RenderSorterByZ);
 			}
 			else
 			{
-				std::sort(render_elements_.begin(), render_elements_.end(), RenderSorterDistance);
+				std::sort(target->render_elements().begin(), target->render_elements().end(), RenderSorterDistance);
 			}
 		}
 	}
-
-  //---------------------------------------------------------------------------------
-  void D3D11DisplayDevice::Clear()
-  {
-    for (auto it : render_elements_)
-    {
-      it->set_destroyed(true);
-    }
-    render_elements_.clear();
-    
-    for (auto it : opaque_elements_)
-    {
-      it->set_destroyed(true);
-    }
-    opaque_elements_.clear();
-
-    for (auto it : ui_elements_)
-    {
-      it->set_destroyed(true);
-    }
-    ui_elements_.clear();
-
-    while (!render_queue_.empty())
-    {
-      render_queue_.pop();
-    }
-  }
 
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::SetCurrentTexture(Texture* texture)
@@ -1006,20 +990,20 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::Draw()
+	void D3D11DisplayDevice::Draw(RenderTarget* target)
 	{
 		if (!camera_) return;
 
 		RenderElement* it = nullptr;
 
-		for (int idx = static_cast<int>(opaque_elements_.size()-1); idx >= 0; --idx)
+		for (int idx = static_cast<int>(target->opaque_elements().size()-1); idx >= 0; --idx)
 		{
-			it = opaque_elements_[idx];
+			it = target->opaque_elements().at(idx);
 			DrawRenderElement(it);
 
 			if (it->destroyed())
 			{
-				opaque_elements_.erase(opaque_elements_.begin() + idx);
+				target->opaque_elements().erase(target->opaque_elements().begin() + idx);
 			}
 		}
 
@@ -1028,9 +1012,9 @@ namespace snuffbox
 		XMVECTOR delta;
 		float distance;
 
-		for (int idx = static_cast<int>(render_elements_.size() - 1); idx >= 0; --idx)
+		for (int idx = static_cast<int>(target->render_elements().size() - 1); idx >= 0; --idx)
 		{
-			it = render_elements_[idx];
+			it = target->render_elements().at(idx);
 
 			if (camera_->type() == Camera::CameraType::kPerspective)
 			{
@@ -1044,7 +1028,7 @@ namespace snuffbox
 
 			if (it->destroyed())
 			{
-				render_elements_.erase(render_elements_.begin() + idx);
+				target->render_elements().erase(target->render_elements().begin() + idx);
 			}
 		}
 
@@ -1103,7 +1087,8 @@ namespace snuffbox
 			context_->Draw(static_cast<UINT>(lines_.size()), static_cast<UINT>(0));
 		}
 
-		context_->OMSetRenderTargets(1, &render_target_view_, NULL);
+		ID3D11RenderTargetView* view = target->view();
+		context_->OMSetRenderTargets(1, &view, NULL);
 
 		SwapChainDescription swapDesc;
 		swap_chain_->GetDesc(&swapDesc);
@@ -1119,11 +1104,11 @@ namespace snuffbox
 			}
 		} RenderSorterByZ;
 
-		std::sort(ui_elements_.begin(), ui_elements_.end(), RenderSorterByZ);
+		std::sort(target->ui_elements().begin(), target->ui_elements().end(), RenderSorterByZ);
 
-		for (int idx = static_cast<int>(ui_elements_.size() - 1); idx >= 0; --idx)
+		for (int idx = static_cast<int>(target->ui_elements().size() - 1); idx >= 0; --idx)
 		{
-			it = ui_elements_[idx];
+			it = target->ui_elements().at(idx);
 			if (it->type() == RenderElement::ElementTypes::kText)
 			{
 				Text* ptr = static_cast<Text*>(it);
@@ -1149,11 +1134,9 @@ namespace snuffbox
 
 			if (it->destroyed())
 			{
-				ui_elements_.erase(ui_elements_.begin() + idx);
+				target->ui_elements().erase(target->ui_elements().begin() + idx);
 			}
 		}
-
-		camera_ = nullptr;
 	}
 
 	//---------------------------------------------------------------------------------
@@ -1198,7 +1181,7 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::EndDraw()
+	void D3D11DisplayDevice::EndDraw(RenderTarget* target)
 	{
 		context_->RSSetViewports(1, &viewport_);
 		Resolution resolution = environment::render_settings().settings().resolution;
@@ -1208,14 +1191,16 @@ namespace snuffbox
 		context_->OMSetBlendState(blend_state_, NULL, 0xFFFFFFFF);
 		SetCullMode(D3D11_CULL_FRONT);
 
-		Shaders shaders = environment::post_processing().shader()->shaders();
+		PostProcessing* pp = target->post_processing();
+		Shaders shaders = pp->shader()->shaders();
 
 		context_->VSSetShader(shaders.vs, 0, 0);
 		context_->PSSetShader(shaders.ps, 0, 0);
 
 		SetVertexBuffer(screen_quad_vertices_);
 		SetIndexBuffer(screen_quad_indices_);
-		context_->PSSetShaderResources(0, 1, &render_target_resource_);
+		ID3D11ShaderResourceView* resource = target->resource();
+		context_->PSSetShaderResources(0, 1, &resource);
 
 		D3D11_MAPPED_SUBRESOURCE cbData;
 		ShaderConstantBuffer* mappedData;
@@ -1243,7 +1228,7 @@ namespace snuffbox
     context_->Map(uniform_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbData);
 
     float* uniforms = static_cast<float*>(cbData.pData);
-    auto vec = environment::post_processing().uniforms();
+    auto vec = pp->uniforms();
     for (unsigned int i = 0; i < vec.size(); ++i)
     {
       uniforms[i] = vec[i];
@@ -1253,7 +1238,7 @@ namespace snuffbox
 
 		context_->DrawIndexed(4, 0, 0);
 
-		auto& passes = environment::post_processing().passes();
+		auto& passes = pp->passes();
 		for (int i = 0; i < passes.size(); ++i)
 		{
 			shaders = passes.at(i)->shaders();
@@ -1266,8 +1251,6 @@ namespace snuffbox
 
 			context_->DrawIndexed(4, 0, 0);
 		}
-
-		swap_chain_->Present(environment::render_settings().settings().vsync, 0);
 
 		ID3D11ShaderResourceView* null[] = { NULL };
 		context_->PSSetShaderResources(0, 1, null);
@@ -1282,10 +1265,10 @@ namespace snuffbox
 		SetCullMode(environment::render_settings().settings().cull_mode);
 
 		std::map<RenderElement*, bool> exists;
-		while (!render_queue_.empty())
+		while (!target->render_queue().empty())
 		{
-			RenderElement* it = render_queue_.front();
-			render_queue_.pop();
+			RenderElement* it = target->render_queue().front();
+			target->render_queue().pop();
 
 			if (exists.find(it) != exists.end() || !it->spawned())
 			{
@@ -1296,15 +1279,15 @@ namespace snuffbox
 
 			if (it->element_type() == RenderElement::ElementTypes::kTerrain)
 			{
-				environment::render_device().opaque_elements().push_back(it);
+				target->opaque_elements().push_back(it);
 			}
       else if (it->element_type() == RenderElement::ElementTypes::kWidget || it->element_type() == RenderElement::ElementTypes::kText)
 			{
-				environment::render_device().ui_elements().push_back(it);
+				target->ui_elements().push_back(it);
 			}
 			else
 			{
-				environment::render_device().render_elements().push_back(it);
+				target->render_elements().push_back(it);
 			}
 
 			it->set_destroyed(false);
@@ -1356,20 +1339,12 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------------
-	std::queue<RenderElement*>& D3D11DisplayDevice::render_queue()
-	{
-		return render_queue_;
-	}
-
-	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::ResizeBuffers()
 	{
+		initialised_ = false;
 		HRESULT result = S_OK;
 
 		SNUFF_SAFE_RELEASE(depth_stencil_buffer_);
-		SNUFF_SAFE_RELEASE(render_target_resource_);
-		SNUFF_SAFE_RELEASE(render_target_view_);
-		SNUFF_SAFE_RELEASE(render_target_);
 		SNUFF_SAFE_RELEASE(back_buffer_view_);
 		SNUFF_SAFE_RELEASE(depth_stencil_view_);
 		SNUFF_SAFE_RELEASE(depth_state_);
@@ -1393,9 +1368,12 @@ namespace snuffbox
 		CreateBlendState();
     SetCullMode(environment::render_settings().settings().cull_mode);
 
-		CreateRenderTarget();
+		for (std::map<std::string, RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
+		{
+			it->second->Create();
+		}
 
-		context_->OMSetRenderTargets(1, &render_target_view_, depth_stencil_view_);
+		initialised_ = true;
 	}
 
 	//---------------------------------------------------------------------------------
@@ -1433,9 +1411,6 @@ namespace snuffbox
 		{
 			SNUFF_SAFE_RELEASE(it);
 		}
-		SNUFF_SAFE_RELEASE(render_target_);
-		SNUFF_SAFE_RELEASE(render_target_resource_);
-		SNUFF_SAFE_RELEASE(render_target_view_);
 		SNUFF_SAFE_RELEASE(back_buffer_);
 		SNUFF_SAFE_RELEASE(input_layout_);
 		SNUFF_SAFE_RELEASE(vs_buffer_);

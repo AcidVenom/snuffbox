@@ -1,4 +1,5 @@
 #include "../../../snuffbox/d3d11/elements/render_element.h"
+#include "../../../snuffbox/d3d11/d3d11_render_target.h"
 
 namespace snuffbox
 {
@@ -35,7 +36,7 @@ namespace snuffbox
 		{
 			return;
 		}
-		std::vector<RenderElement*>* vec = &environment::render_device().opaque_elements();
+		std::vector<RenderElement*>* vec = &target_->opaque_elements();
 		Destroy();
 		if (element_type() == ElementTypes::kTerrain)
 		{
@@ -52,7 +53,7 @@ namespace snuffbox
 		}
 		else if (element_type() == ElementTypes::kWidget || element_type() == ElementTypes::kText)
 		{
-			vec = &environment::render_device().ui_elements();
+			vec = &target_->ui_elements();
 
 			for (unsigned int i = 0; i < vec->size(); ++i)
 			{
@@ -67,7 +68,7 @@ namespace snuffbox
 		}
 		else
 		{
-			vec = &environment::render_device().render_elements();
+			vec = &target_->render_elements();
 
 			for (unsigned int i = 0; i < vec->size(); ++i)
 			{
@@ -102,11 +103,12 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void RenderElement::Spawn()
+	void RenderElement::Spawn(std::string target)
 	{
+		target_ = environment::render_device().get_target(target);
 		if (destroyed_ == true)
 		{
-			environment::render_device().render_queue().push(this);
+			target_->render_queue().push(this);
 			spawned_ = true;
 		}
 	}
@@ -277,9 +279,9 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::JSSpawn(JS_ARGS)
 	{
-		JS_SETUP(RenderElement, "V");
+		JS_SETUP(RenderElement, "S");
 
-		self->Spawn();
+		self->Spawn(wrapper.GetString(0));
 	}
 
 	//-------------------------------------------------------------------------------------------

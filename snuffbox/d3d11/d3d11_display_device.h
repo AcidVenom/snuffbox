@@ -35,6 +35,7 @@ namespace snuffbox
 	class Texture;
 	class Shader;
   class FBXModel;
+	class RenderTarget;
 	struct Shaders;
 
   /**
@@ -113,9 +114,6 @@ namespace snuffbox
 
 		/// Creates the backbuffer of this device
 		void CreateBackBuffer();
-
-		/// Creates the render target
-		void CreateRenderTarget();
 		
 		/// Creates a vertex buffer for use with this device
 		void CreateLayout();
@@ -134,10 +132,13 @@ namespace snuffbox
 		void CreateViewport();
 
 		/// Starts the draw
-		void StartDraw();
+		void StartDraw(RenderTarget* target);
+
+		/// Draw to all render targets
+		void DrawToRenderTargets();
 
 		/// Draws every render element
-		void Draw();
+		void Draw(RenderTarget* target);
 
 		/** 
 		* @brief Sets the camera
@@ -157,7 +158,7 @@ namespace snuffbox
 		Camera* camera(){ return camera_; }
 
 		/// Ends the draw
-		void EndDraw();
+		void EndDraw(RenderTarget* target);
 
 		/**
 		* @brief Increases the elapsed time by a given value
@@ -220,23 +221,6 @@ namespace snuffbox
 		void SetIndexBuffer(ID3D11Buffer* indexBuffer);
 
 		/**
-		* @return (std::vector<RenderElement*>&) The list of normal render elements
-		*/
-		std::vector<RenderElement*>& render_elements(){ 
-      return render_elements_; 
-    }
-
-		/**
-		* @return (std::vector<RenderElement*>&) The list of opaque render elements
-		*/
-		std::vector<RenderElement*>& opaque_elements(){ return opaque_elements_; }
-
-		/**
-		* @return (std::vector<RenderElement*>&) The list of ui render elements
-		*/
-		std::vector<RenderElement*>& ui_elements(){ return ui_elements_; }
-
-		/**
 		* @return (snuffbox::VertexBufferType&) The vertex buffer type currently in use
 		*/
     VertexBufferType& vb_type(){ return vb_type_; }
@@ -260,9 +244,6 @@ namespace snuffbox
 		
 		/// Creates the context blend state
 		void CreateBlendState();
-
-		/// Clears the renderer for new use
-    void Clear();
 
 		/**
 		* @brief Draws a given render element
@@ -305,11 +286,6 @@ namespace snuffbox
 		*/
 		D3D11_VIEWPORT& viewport();
 
-		/**
-		* @return (std::queue<RenderElement*>) Returns the render queue
-		*/
-		std::queue<RenderElement*>& render_queue();
-
     ID3D11ShaderResourceView* CreateTexture2D(int width, int height, DXGI_FORMAT pixelFormat, const void* buffer, const unsigned short stride);
 
 		void DrawCurrent(int indices);
@@ -320,6 +296,15 @@ namespace snuffbox
 
 		/// Creates the full screen quad
 		void CreateScreenQuad();
+
+		/// Returns the backbuffer
+		D3DTexture2D* back_buffer(){ return back_buffer_; }
+
+		/// Adds a render target
+		void AddRenderTarget(std::string name, RenderTarget* target);
+
+		/// Returns the render target by name
+		RenderTarget* get_target(std::string name);
 
 	private:
 		SwapChainDescription					swap_desc_;							//!< The swap chain description to create the chain
@@ -340,9 +325,6 @@ namespace snuffbox
 		XMMATRIX											view_matrix_;						//!< The view matrix
 		XMMATRIX											projection_matrix_;			//!< The projection matrix
 		ID3D11RasterizerState*				rasterizer_state_;			//!< The rasterizer state
-		std::vector<RenderElement*>		render_elements_;				//!< The list of render elements
-		std::vector<RenderElement*>		opaque_elements_;				//!< The list of opaque render elements
-		std::vector<RenderElement*>		ui_elements_;						//!< The list of ui render elements
     VertexBufferType              vb_type_;								//!< The vertex buffer type
 		ID3D11DepthStencilView*				depth_stencil_view_;		//!< The depth stencil view
 		ID3D11Texture2D*							depth_stencil_buffer_;	//!< The buffer of the depth stencil
@@ -362,12 +344,9 @@ namespace snuffbox
 		std::vector<Vertex>						lines_;									//!< The vector for lines to draw
 		ID3D11Buffer*									line_buffer_;						//!< The line vertex buffer
 		D3D11_VIEWPORT								viewport_;							//!< The viewport of the device
-		std::queue<RenderElement*>		render_queue_;					//!< The render queue
-		D3DTexture2D*									render_target_;					//!< The texture that will be rendered to
-		ID3D11RenderTargetView*				render_target_view_;		//!< The render target view
-		ID3D11ShaderResourceView*			render_target_resource_;//!< The shader resource of the render target texture
 		ID3D11Buffer*									screen_quad_vertices_;  //!< The full screen quad vertices
 		ID3D11Buffer*									screen_quad_indices_;		//!< The full screen quad indices
-		SharedPtr<PostProcessing>			post_processing_;				//!< The post processing object
+		std::map<std::string, RenderTarget*> render_targets_; //!< All render targets
+		bool													initialised_;						//!< Is the device initialised?
 	};
 }

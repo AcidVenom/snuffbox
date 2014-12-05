@@ -13,8 +13,13 @@ Game.Initialise = function()
 	Game.camera = Camera.new("orthographic");
 	Game.camera.setTranslation(0,0,0);
 
+	Game.renderTarget1 = RenderTarget.new("Default");
+	Game.renderTarget2 = RenderTarget.new("Light");
+
+	Game.renderTarget2.setShader("shaders/lighting.fx");
+
 	Game.box = Widget.new();
-	Game.box.spawn();
+	Game.box.spawn("Default");
 	Game.box.setBlend(0.1,0.1,0.1);
 	Game.box.setOffset(0.5,0.5);
 
@@ -26,7 +31,7 @@ Game.Initialise = function()
 	Game.rich.setShadowOffset(1,1);
 	Game.rich.setShadowColour(0.5,0.5,0.2,1);
 	Game.rich.setOffset(0,0.5);
-	Game.rich.spawn();
+	Game.rich.spawn("Default");
 
 	var metrics = Game.rich.metrics();
 
@@ -35,7 +40,7 @@ Game.Initialise = function()
 	Game.FPS = Text.new();
 	Game.FPS.setTranslation(-620,-340, 0);
 	Game.FPS.setFontSize(24);
-	Game.FPS.spawn();
+	Game.FPS.spawn("Default");
 
 	Game.deltas = [];
 
@@ -56,12 +61,28 @@ Game.Initialise = function()
 
 	Game.polygon.flush();
 
-	Game.polygon.spawn();
+	Game.polygon.spawn("Default");
 
-	PostProcessing.addPass("shaders/gray.fx");
 	SoundSystem.addChannelGroup("master");
 
 	SoundSystem.play("test.mp3", "master", true);
+
+	Game.lights = [];
+
+	for (var i = 0; i < 30; ++i)
+	{
+		var light = Widget.new();
+		light.setTexture("textures/light.tif");
+		light.setToTexture();
+		light.setTranslation(-640+Math.random()*1280, -360+Math.random()*720, 0);
+		light.spawn("Light");
+		light.setBlend(Math.random(),Math.random(),Math.random());
+		var s = Math.random()*2;
+		light.setScale(s,s);
+		light.setOffset(0.5,0.5);
+		Game.lights.push(light);
+	}
+
 }
 
 Game.Update = function(dt)
@@ -100,7 +121,7 @@ Game.Update = function(dt)
 	Game.box.setTranslation(x,y,0);
 	Game.box.setRotation(0,0,Math.sin(Game.timer)/7);
 
-	PostProcessing.setUniform("float", "Multiplier", 0.5+Math.sin(Game.timer/2)/2);
+	Game.renderTarget2.setUniform("float", "Multiplier", 0.75+Math.abs(Math.sin(Game.timer/2)/4));
 	//SoundSystem.setChannelGroupVolume("master", 1 );
 
 	var pause = SoundSystem.isPaused("master");
@@ -108,6 +129,13 @@ Game.Update = function(dt)
 	if (Keyboard.isReleased("P"))
 	{
 		pause == false ? SoundSystem.pause("master") : SoundSystem.resume("master");
+	}
+
+	for (var i = 0; i < Game.lights.length; ++i)
+	{
+		var light = Game.lights[i];
+
+		light.translateBy(Math.sin(Game.timer)*3, Math.cos(Game.timer)*3, 0);
 	}
 }
 

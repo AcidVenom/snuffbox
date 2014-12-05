@@ -228,7 +228,7 @@ namespace snuffbox
 		void Destroy();
 
 		/// Spawns the render element
-		void Spawn();
+		void Spawn(std::string target);
 
 		/**
 		* @return (XMVECTOR) The translation as a vector
@@ -372,6 +372,7 @@ namespace snuffbox
 		bool																	visible_; //!< Is this element visible?
 		std::string														name_;	 //!< The render element name
 		bool																	spawned_; //!< Has this element already been spawned?
+		RenderTarget*													target_; //!< The current target
 
 	public:
 		static void RegisterJS(JS_TEMPLATE);

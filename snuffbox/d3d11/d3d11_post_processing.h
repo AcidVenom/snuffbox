@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../../snuffbox/js/js_state_wrapper.h"
+#include <map>
+#include <vector>
 
 namespace snuffbox
 {
@@ -13,7 +14,7 @@ namespace snuffbox
 	* @brief Handles all post processing shader management, including passes
 	* @author Daniël Konings
 	*/
-	class PostProcessing : public JSObject
+	class PostProcessing
 	{
 	public:
 		/// Default constructor
@@ -55,17 +56,5 @@ namespace snuffbox
 		Shader*												        shader_; //!< The current post processing shader
 		std::vector<Shader*>					        passes_; //!< The post processing passes
     std::map<std::string, ShaderUniform>	uniforms_;	//!< Uniforms for the constant buffer of the shader
-
-	public:
-		JS_NAME(PostProcessing);
-
-		static void RegisterJS(JS_TEMPLATE);
-
-	private:
-		static void JSSetShader(JS_ARGS);
-		static void JSAddPass(JS_ARGS);
-		static void JSRemovePass(JS_ARGS);
-		static void JSClearPasses(JS_ARGS);
-    static void JSSetUniform(JS_ARGS);
 	};
 }

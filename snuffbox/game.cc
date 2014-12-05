@@ -29,7 +29,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 630
+#define SNUFF_VERSION_MINOR 638
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -159,9 +159,7 @@ void Game::Draw()
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 
-	environment::render_device().StartDraw();
-	environment::render_device().Draw();
-	environment::render_device().EndDraw();
+	environment::render_device().DrawToRenderTargets();
 	draw_.Call(1, argv);
 
 	high_resolution_clock::time_point now = high_resolution_clock::now();
@@ -337,7 +335,6 @@ void Game::RegisterJS(JS_TEMPLATE)
 
 	JSFunctionRegister funcs[] = {
 		JSFunctionRegister("render", JSRender),
-		JSFunctionRegister("clearRenderer", JSClearRenderer),
     JSFunctionRegister("cleanUp", JSCleanUp),
 		JSFunctionRegister("setName", JSSetName),
 		JSFunctionRegister("showConsole", JSShowConsole),
@@ -345,12 +342,6 @@ void Game::RegisterJS(JS_TEMPLATE)
 	};
 
 	JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
-}
-
-//------------------------------------------------------------------------------------------------------
-void Game::JSClearRenderer(JS_ARGS)
-{
-	environment::render_device().Clear();
 }
 
 //------------------------------------------------------------------------------------------------------

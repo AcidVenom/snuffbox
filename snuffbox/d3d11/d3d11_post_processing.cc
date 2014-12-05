@@ -6,32 +6,9 @@
 
 namespace snuffbox
 {
-	namespace environment
-	{
-		namespace
-		{
-			PostProcessing* globalInstance = nullptr;
-		}
-
-		PostProcessing& post_processing()
-		{
-			SNUFF_ASSERT_NOTNULL(globalInstance);
-			return *globalInstance;
-		}
-
-		bool has_post_processing()
-		{
-			return globalInstance != nullptr;
-		}
-	}
-}
-
-namespace snuffbox
-{
 	//---------------------------------------------------------------------------------
 	PostProcessing::PostProcessing()
 	{
-		environment::globalInstance = this;
 		shader_ = environment::content_manager().Get<Shader>("shaders/post_processing.fx").get();
 	}
 
@@ -132,110 +109,8 @@ namespace snuffbox
   }
 
 	//---------------------------------------------------------------------------------
-	void PostProcessing::JSSetShader(JS_ARGS)
-	{
-		JS_CHECK_PARAMS("S");
-
-		if (!validParams)
-		{
-			return;
-		}
-
-		environment::post_processing().SetPostProcessingShader(wrapper.GetString(0));
-	}
-
-	//---------------------------------------------------------------------------------
-	void PostProcessing::JSAddPass(JS_ARGS)
-	{
-		JS_CHECK_PARAMS("S");
-
-		if (!validParams)
-		{
-			return;
-		}
-
-		environment::post_processing().AddPostProcessingPass(wrapper.GetString(0));
-	}
-
-	//---------------------------------------------------------------------------------
-	void PostProcessing::JSRemovePass(JS_ARGS)
-	{
-		JS_CHECK_PARAMS("N");
-
-		if (!validParams)
-		{
-			return;
-		}
-
-		environment::post_processing().RemovePostProcessingPass(wrapper.GetNumber<int>(0));
-	}
-
-	//---------------------------------------------------------------------------------
-	void PostProcessing::JSClearPasses(JS_ARGS)
-	{
-		environment::post_processing().ClearPostProcessingPasses();
-	}
-
-  //---------------------------------------------------------------------------------
-  void PostProcessing::JSSetUniform(JS_ARGS)
-  {
-    JS_CHECK_PARAMS("SSN");
-
-    if (!validParams)
-    {
-      return;
-    }
-
-    float* value = 0;
-    std::string type = wrapper.GetString(0);
-    std::string name = wrapper.GetString(1);
-
-    UniformType uniformType = RenderElement::TypeNameToUniformType(type);
-
-    switch (uniformType)
-    {
-    case UniformType::kFloat:
-      environment::post_processing().SetUniform(uniformType, name,
-        wrapper.GetNumber<float>(2));
-      break;
-    case UniformType::kFloat2:
-      environment::post_processing().SetUniform(uniformType, name,
-        wrapper.GetNumber<float>(2),
-        wrapper.GetNumber<float>(3));
-      break;
-    case UniformType::kFloat3:
-      environment::post_processing().SetUniform(uniformType, name,
-        wrapper.GetNumber<float>(2),
-        wrapper.GetNumber<float>(3),
-        wrapper.GetNumber<float>(4));
-      break;
-    case UniformType::kFloat4:
-      environment::post_processing().SetUniform(uniformType, name,
-        wrapper.GetNumber<float>(2),
-        wrapper.GetNumber<float>(3),
-        wrapper.GetNumber<float>(4),
-        wrapper.GetNumber<float>(5));
-      break;
-    }
-  }
-
-	//---------------------------------------------------------------------------------
-	void PostProcessing::RegisterJS(JS_TEMPLATE)
-	{
-		JSFunctionRegister funcs[] = {
-			JSFunctionRegister("setShader", JSSetShader),
-			JSFunctionRegister("addPass", JSAddPass),
-			JSFunctionRegister("removePass", JSRemovePass),
-			JSFunctionRegister("clearPasses", JSClearPasses),
-      JSFunctionRegister("setUniform", JSSetUniform)
-		};
-
-		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
-	}
-
-	//---------------------------------------------------------------------------------
 	PostProcessing::~PostProcessing()
 	{
-		environment::globalInstance = nullptr;
+		
 	}
 }
