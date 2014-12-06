@@ -731,6 +731,11 @@ namespace snuffbox
 
 		for (std::map<std::string, RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
 		{
+      if (camera_ != nullptr)
+      {
+        UpdateCamera(camera_);
+      }
+      
 			StartDraw(it->second);
 			Draw(it->second);
 			EndDraw(it->second);
@@ -838,6 +843,39 @@ namespace snuffbox
 				vb_type_ = type;
 			}
 
+      ID3D11ShaderResourceView* textures[2];
+      textures[0] = default_resource_;
+      textures[1] = default_normal_;
+
+      if (it->normal_map())
+      {
+        textures[1] = it->normal_map()->resource();
+      }
+
+      if (it->texture())
+      {
+        textures[0] = it->texture()->resource();
+      }
+
+      if (current_texture_ != textures[0] || current_normal_ != textures[1])
+      {
+        context_->PSSetShaderResources(0, 2, textures);
+      }
+
+      current_texture_ = textures[0];
+      current_normal_ = textures[1];
+
+      if (it->shader())
+      {
+        if (current_shader_ != it->shader())
+        {
+          auto& shaders = it->shader()->shaders();
+          context_->PSSetShader(shaders.ps, 0, 0);
+          context_->VSSetShader(shaders.vs, 0, 0);
+          current_shader_ = it->shader();
+        }
+      }
+
 			world_matrix_ = it->world_matrix(camera_);
 
 			D3D11_MAPPED_SUBRESOURCE cbData;
@@ -874,39 +912,6 @@ namespace snuffbox
 			}
 
 			context_->Unmap(uniform_buffer_, 0);
-
-			ID3D11ShaderResourceView* textures[2];
-			textures[0] = default_resource_;
-			textures[1] = default_normal_;
-
-			if (it->normal_map())
-			{
-				textures[1] = it->normal_map()->resource();
-			}
-
-			if (it->texture())
-			{
-				textures[0] = it->texture()->resource();
-			}
-
-			if (current_texture_ != textures[0] || current_normal_ != textures[1])
-			{
-				context_->PSSetShaderResources(0, 2, textures);
-			}
-
-			current_texture_ = textures[0];
-			current_normal_ = textures[1];
-
-			if (it->shader())
-			{
-				if (current_shader_ != it->shader())
-				{
-					auto& shaders = it->shader()->shaders();
-					context_->PSSetShader(shaders.ps, 0, 0);
-					context_->VSSetShader(shaders.vs, 0, 0);
-					current_shader_ = it->shader();
-				}
-			}
 
 			if (elementType != RenderElement::ElementTypes::kMesh && elementType != RenderElement::ElementTypes::kPolygon)
 			{
@@ -993,6 +998,9 @@ namespace snuffbox
 	void D3D11DisplayDevice::Draw(RenderTarget* target)
 	{
 		if (!camera_) return;
+
+    ID3D11RenderTargetView* view = target->view();
+    context_->OMSetRenderTargets(1, &view, NULL);
 
 		RenderElement* it = nullptr;
 
@@ -1086,9 +1094,6 @@ namespace snuffbox
 			topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 			context_->Draw(static_cast<UINT>(lines_.size()), static_cast<UINT>(0));
 		}
-
-		ID3D11RenderTargetView* view = target->view();
-		context_->OMSetRenderTargets(1, &view, NULL);
 
 		SwapChainDescription swapDesc;
 		swap_chain_->GetDesc(&swapDesc);
@@ -1214,10 +1219,10 @@ namespace snuffbox
 		mappedData->Alpha = 0.0f;
 		mappedData->Blend = XMFLOAT3(1.0f, 1.0f, 1.0f);
 		mappedData->InvWorld = XMMatrixIdentity();
-		mappedData->Projection = projection_matrix_;
+    mappedData->Projection = XMMatrixIdentity();
 		mappedData->Time = time_;
 		mappedData->View = XMMatrixIdentity();
-		mappedData->World = XMMatrixIdentity();
+		mappedData->World = XMMatrixScaling(0.5,0.5,0);
 		mappedData->WorldViewProjection = XMMatrixIdentity();
 
 		context_->Unmap(constant_buffer_, 0);

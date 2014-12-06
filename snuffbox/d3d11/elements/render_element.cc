@@ -22,7 +22,8 @@ namespace snuffbox
 		visible_(true),
 		yaw_(0.0f),
 		pitch_(0.0f),
-		roll_(0.0f)
+		roll_(0.0f),
+    target_(nullptr)
 	{
 		size_[0] = 1.0f;
 		size_[1] = 1.0f;
@@ -32,7 +33,7 @@ namespace snuffbox
 	//--------------------------------------------------------------------------------------------------
 	void RenderElement::RemoveFromRenderer()
 	{
-		if (!environment::has_render_device())
+		if (!environment::has_render_device() || target_ == nullptr)
 		{
 			return;
 		}
