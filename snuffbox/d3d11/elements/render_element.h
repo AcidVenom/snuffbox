@@ -405,5 +405,6 @@ namespace snuffbox
 		static void JSSetToTexture(JS_ARGS);
 		static void JSAddPass(JS_ARGS);
 		static void JSClearPasses(JS_ARGS);
+		static void JSTextureMetrics(JS_ARGS);
 	};
 }

@@ -32,7 +32,7 @@ namespace snuffbox
 		underlying->GetDesc(&texDesc);
 
 		width_ = texDesc.Width;
-		height_ = texDesc.Width;
+		height_ = texDesc.Height;
 
 		underlying->Release();
 
@@ -93,6 +93,6 @@ namespace snuffbox
 		underlying->Release();
 
 		width_ = texDesc.Width;
-		height_ = texDesc.Width;
+		height_ = texDesc.Height;
 	}
 }

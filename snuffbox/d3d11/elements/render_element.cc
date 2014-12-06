@@ -594,6 +594,14 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSTextureMetrics(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "V");
+
+		wrapper.ReturnTuple<int>(self->texture()->width(), self->texture()->height(), "width", "height");
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -626,7 +634,8 @@ namespace snuffbox
 			JSFunctionRegister("destroyed", JSDestroyed),
 			JSFunctionRegister("setToTexture", JSSetToTexture),
 			JSFunctionRegister("addPass", JSAddPass),
-			JSFunctionRegister("clearPasses", JSClearPasses)
+			JSFunctionRegister("clearPasses", JSClearPasses),
+			JSFunctionRegister("textureMetrics", JSTextureMetrics)
 		};
 
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Left"), Number::New(JS_ISOLATE, 0));

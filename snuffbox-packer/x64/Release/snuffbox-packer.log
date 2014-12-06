@@ -1,4 +1,4 @@
-﻿Build started 05/12/2014 12:44:51 AM.
+﻿Build started 12/5/2014 5:44:09 PM.
      1>Project "C:\Snuff\src\snuffbox-packer\snuffbox-packer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtWidgets /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012_64\include\QtANGLE /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt main.cc qt\moc_packer_widget.cc qt\packer_widget.cc
@@ -16,4 +16,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:03.20
+Time Elapsed 00:00:13.68
