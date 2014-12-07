@@ -154,5 +154,6 @@ namespace snuffbox
 		static void JSIdle(JS_ARGS);
 		static void JSUnloadAll(JS_ARGS);
     static void JSWatch(JS_ARGS);
+    static void JSLoadFont(JS_ARGS);
 	};
 }

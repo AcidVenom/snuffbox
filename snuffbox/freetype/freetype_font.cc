@@ -54,7 +54,7 @@ namespace snuffbox
     };
 
     error = FT_Init_FreeType(&library_);
-    SNUFF_XASSERT(!error, std::string("Error initializing freetype for font " + relativePath).c_str());
+    SNUFF_XASSERT(!error, std::string("Error initialising freetype for font " + relativePath).c_str());
 
     error = FT_New_Face(library_, (environment::game().path() + "/" + relativePath).c_str(), 0, &face_);
     SNUFF_XASSERT(!error, std::string("Failed loading face for font " + relativePath).c_str());

@@ -1,7 +1,7 @@
 #include "../../snuffbox/freetype/freetype_font_manager.h"
 #include "../../snuffbox/freetype/freetype_font_atlas.h"
 
-#define BASE_WCHAR L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+#define BASE_WCHAR L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,-=+\\/()*&^@#!_><?%~:;\"'_באטי`כהüשתהןלםמגךûדסצףעפץ"
 
 namespace snuffbox
 {

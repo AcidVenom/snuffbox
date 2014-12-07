@@ -7,6 +7,7 @@
 #include "../../snuffbox/fbx/fbx_loader.h"
 #include "../../snuffbox/fmod/fmod_sound.h"
 #include "../../snuffbox/win32/win32_file_watch.h"
+#include "../../snuffbox/freetype/freetype_font_manager.h"
 
 #include <fstream>
 
@@ -205,7 +206,8 @@ namespace snuffbox
 			JSFunctionRegister("load", JSLoad),
 			JSFunctionRegister("unload", JSUnload),
 			JSFunctionRegister("unloadAll", JSUnloadAll),
-      JSFunctionRegister("watch", JSWatch)
+      JSFunctionRegister("watch", JSWatch),
+      JSFunctionRegister("loadFont", JSLoadFont)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, false);
@@ -557,4 +559,11 @@ namespace snuffbox
 		JS_CHECK_PARAMS("V");
 		environment::content_manager().UnloadAll();
 	}
+
+  //-------------------------------------------------------------------------------------------
+  void ContentManager::JSLoadFont(JS_ARGS)
+  {
+    JS_CHECK_PARAMS("SN");
+    environment::font_manager().GetFont(wrapper.GetString(0), wrapper.GetNumber<float>(1));
+  }
 }
