@@ -210,7 +210,7 @@ namespace snuffboxpacker
     QStringList splitted = path.split(".");
     QString extension = splitted.at(splitted.size() - 1);
 
-    if (extension == "png" || extension == "jpeg" || extension == "jpg" || extension == "dds" || extension == "tga" || extension == "tiff" || extension == "bmp")
+    if (extension == "png" || extension == "jpeg" || extension == "jpg" || extension == "dds" || extension == "tga" || extension == "tiff" || extension == "tif" || extension == "bmp")
     {
       return "texture";
     }

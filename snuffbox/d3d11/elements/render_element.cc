@@ -23,7 +23,8 @@ namespace snuffbox
 		pitch_(0.0f),
 		roll_(0.0f),
 		animation_(nullptr),
-		anim_coords_(0.0f, 0.0f, 1.0f, 1.0f)
+		anim_coords_(0.0f, 0.0f, 1.0f, 1.0f),
+    target_(nullptr)
 	{
 		size_[0] = 1.0f;
 		size_[1] = 1.0f;
@@ -33,7 +34,7 @@ namespace snuffbox
 	//--------------------------------------------------------------------------------------------------
 	void RenderElement::RemoveFromRenderer()
 	{
-		if (!environment::has_render_device())
+		if (!environment::has_render_device() || target_ == nullptr)
 		{
 			return;
 		}

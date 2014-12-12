@@ -645,7 +645,7 @@ namespace snuffbox
 		bDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		bDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 		bDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		bDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		bDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 		bDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		bDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
@@ -704,6 +704,11 @@ namespace snuffbox
 
 		for (std::map<std::string, RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
 		{
+      if (camera_ != nullptr)
+      {
+        UpdateCamera(camera_);
+      }
+      
 			StartDraw(it->second);
 			Draw(it->second);
 			EndDraw(it->second);
@@ -958,6 +963,9 @@ namespace snuffbox
 	{
 		if (!camera_) return;
 
+    ID3D11RenderTargetView* view = target->view();
+    context_->OMSetRenderTargets(1, &view, NULL);
+
 		RenderElement* it = nullptr;
 
 		for (int idx = static_cast<int>(target->opaque_elements().size()-1); idx >= 0; --idx)
@@ -1047,9 +1055,6 @@ namespace snuffbox
 			topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 			context_->Draw(static_cast<UINT>(lines_.size()), static_cast<UINT>(0));
 		}
-
-		ID3D11RenderTargetView* view = target->view();
-		context_->OMSetRenderTargets(1, &view, NULL);
 
 		SwapChainDescription swapDesc;
 		swap_chain_->GetDesc(&swapDesc);
@@ -1175,10 +1180,10 @@ namespace snuffbox
 		mappedData->Alpha = 0.0f;
 		mappedData->Blend = XMFLOAT3(1.0f, 1.0f, 1.0f);
 		mappedData->InvWorld = XMMatrixIdentity();
-		mappedData->Projection = projection_matrix_;
+    mappedData->Projection = XMMatrixIdentity();
 		mappedData->Time = time_;
 		mappedData->View = XMMatrixIdentity();
-		mappedData->World = XMMatrixIdentity();
+		mappedData->World = XMMatrixScaling(0.5,0.5,0);
 		mappedData->WorldViewProjection = XMMatrixIdentity();
 		mappedData->AnimationCoords = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 		context_->Unmap(constant_buffer_, 0);

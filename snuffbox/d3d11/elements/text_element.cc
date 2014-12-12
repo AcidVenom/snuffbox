@@ -673,8 +673,11 @@ namespace snuffbox
   //-------------------------------------------------------------------------------------------
   Text::~Text()
 	{
-		SNUFF_SAFE_RELEASE(vertex_buffer_);
-		SNUFF_SAFE_RELEASE(index_buffer_);
+    if (vertex_buffer_ != nullptr)
+    {
+      SNUFF_SAFE_RELEASE(vertex_buffer_);
+      SNUFF_SAFE_RELEASE(index_buffer_);
+    }
 
 		for (auto& it : icon_buffer_)
 		{

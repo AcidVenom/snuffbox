@@ -29,7 +29,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 640
+#define SNUFF_VERSION_MINOR 645
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -116,11 +116,6 @@ void Game::Update()
 	};
 	
 	update_.Call(1,argv);
-
-	if (environment::render_device().camera())
-	{
-		environment::render_device().UpdateCamera(environment::render_device().camera());
-	}
 
 
 	if (gameTime_ % 20 == 0 && doReload_)
