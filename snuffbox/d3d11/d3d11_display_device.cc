@@ -616,33 +616,6 @@ namespace snuffbox
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 		result = device_->CreateShaderResourceView(no_texture_, NULL, &default_resource_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-
-		D3DXCOLOR col(0.51f, 0.54f, 0.98f, 1.0f);
-
-		D3D11_TEXTURE2D_DESC normalTexture;
-		ZeroMemory(&normalTexture, sizeof(D3D11_TEXTURE2D_DESC));
-		normalTexture.ArraySize = 1;
-		normalTexture.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		normalTexture.CPUAccessFlags = 0;
-    normalTexture.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		normalTexture.Height = 1;
-		normalTexture.MipLevels = 1;
-		normalTexture.MiscFlags = 0;
-		normalTexture.SampleDesc.Count = 1;
-		normalTexture.SampleDesc.Quality = 0;
-		normalTexture.Usage = D3D11_USAGE_DEFAULT;
-		normalTexture.Width = 1;
-
-		D3D11_SUBRESOURCE_DATA iData;
-		ZeroMemory(&iData, sizeof(D3D11_SUBRESOURCE_DATA));
-		iData.pSysMem = &col;
-		iData.SysMemPitch = sizeof(col);
-		iData.SysMemSlicePitch = sizeof(col);
-
-		result = device_->CreateTexture2D(&normalTexture, &iData, &no_normal_);
-		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
-		result = device_->CreateShaderResourceView(no_normal_, NULL, &default_normal_);
-		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 	}
 
 	//---------------------------------------------------------------------------------
@@ -799,11 +772,8 @@ namespace snuffbox
 	void D3D11DisplayDevice::SetCurrentTexture(Texture* texture)
 	{
 		current_texture_ = texture->resource();
-		ID3D11ShaderResourceView* textures[2];
-		textures[0] = current_texture_;
-		textures[1] = default_normal_;
 
-		context_->PSSetShaderResources(0, 2, textures);
+		context_->PSSetShaderResources(0, 1, &current_texture_);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -817,6 +787,7 @@ namespace snuffbox
 	{
 		if (it && it->visible())
 		{
+			it->UpdateAnimation(environment::game().delta_time());
 			RenderElement::ElementTypes elementType = it->element_type();
 			VertexBufferType type = it->type();
 			if (type != vb_type_ || type == VertexBufferType::kMesh || type == VertexBufferType::kText || type == VertexBufferType::kPolygon)
@@ -858,7 +829,7 @@ namespace snuffbox
       mappedData->InvWorld = XMMatrixTranspose(XMMatrixInverse(&deter, world_matrix_));
 			mappedData->Alpha = it->alpha();
 			mappedData->Blend = it->blend();
-
+			mappedData->AnimationCoords = it->animation_coordinates();
 			context_->Unmap(constant_buffer_, 0);
 
 			context_->VSSetConstantBuffers(1, 1, &uniform_buffer_);
@@ -875,27 +846,20 @@ namespace snuffbox
 
 			context_->Unmap(uniform_buffer_, 0);
 
-			ID3D11ShaderResourceView* textures[2];
-			textures[0] = default_resource_;
-			textures[1] = default_normal_;
-
-			if (it->normal_map())
-			{
-				textures[1] = it->normal_map()->resource();
-			}
+			ID3D11ShaderResourceView* texture;
+			texture = default_resource_;
 
 			if (it->texture())
 			{
-				textures[0] = it->texture()->resource();
+				texture= it->texture()->resource();
 			}
 
-			if (current_texture_ != textures[0] || current_normal_ != textures[1])
+			if (current_texture_ != texture)
 			{
-				context_->PSSetShaderResources(0, 2, textures);
+				context_->PSSetShaderResources(0, 1, &texture);
 			}
 
-			current_texture_ = textures[0];
-			current_normal_ = textures[1];
+			current_texture_ = texture;
 
 			if (it->shader())
 			{
@@ -918,7 +882,7 @@ namespace snuffbox
 				
 				context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 
-				DrawPasses(it, textures);
+				DrawPasses(it, &texture);
 
         topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 
@@ -939,7 +903,7 @@ namespace snuffbox
 					Mesh* mesh = static_cast<Mesh*>(it);
 					context_->Draw(mesh->model()->vertex_count(), 0);
 
-					DrawPasses(it, textures, false);
+					DrawPasses(it, &texture, false);
 					topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 				}
 				else
@@ -953,7 +917,7 @@ namespace snuffbox
 
 					context_->DrawIndexed(static_cast<UINT>(it->indices().size()), 0, 0);
 
-					DrawPasses(it, textures);
+					DrawPasses(it, &texture);
 					topology_ = polygon->topology();
 				}
 			}
@@ -971,7 +935,7 @@ namespace snuffbox
 
 			context_->VSSetShader(shaders.vs, 0, 0);
 			context_->PSSetShader(shaders.ps, 0, 0);
-			context_->PSSetShaderResources(0, 2, textures);
+			context_->PSSetShaderResources(0, 1, textures);
 
 			if (indexed == true)
 			{
@@ -1071,14 +1035,11 @@ namespace snuffbox
 			context_->Unmap(constant_buffer_, 0);
 			Shaders shaders = environment::content_manager().Get<Shader>("shaders/base.fx").get()->shaders();
 
-			ID3D11ShaderResourceView* textures[2];
-			textures[0] = default_resource_;
-			textures[1] = default_normal_;
+			ID3D11ShaderResourceView* texture = default_resource_;
 
-			context_->PSSetShaderResources(0, 2, textures);
+			context_->PSSetShaderResources(0, 1, &texture);
 
 			current_texture_ = nullptr;
-			current_normal_ = nullptr;
 
 			context_->PSSetShader(shaders.ps, 0, 0);
 			context_->VSSetShader(shaders.vs, 0, 0);
@@ -1219,7 +1180,7 @@ namespace snuffbox
 		mappedData->View = XMMatrixIdentity();
 		mappedData->World = XMMatrixIdentity();
 		mappedData->WorldViewProjection = XMMatrixIdentity();
-
+		mappedData->AnimationCoords = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 		context_->Unmap(constant_buffer_, 0);
 
     context_->VSSetConstantBuffers(1, 1, &uniform_buffer_);
@@ -1258,7 +1219,6 @@ namespace snuffbox
 		current_texture_ = nullptr;
 		current_shader_ = nullptr;
 		current_model_ = nullptr;
-		current_normal_ = nullptr;
 
 		vb_type_ = VertexBufferType::kNone;
 		
@@ -1424,8 +1384,6 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(sampler_state_);
 		SNUFF_SAFE_RELEASE(no_texture_);
 		SNUFF_SAFE_RELEASE(default_resource_);
-		SNUFF_SAFE_RELEASE(no_normal_);
-		SNUFF_SAFE_RELEASE(default_normal_);
 		SNUFF_SAFE_RELEASE(blend_state_);
 		SNUFF_SAFE_RELEASE(back_buffer_view_);
 		SNUFF_SAFE_RELEASE(screen_quad_vertices_);

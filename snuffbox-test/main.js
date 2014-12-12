@@ -13,29 +13,7 @@ Game.Initialise = function()
 	Game.camera = Camera.new("orthographic");
 	Game.camera.setTranslation(0,0,0);
 
-	Game.renderTarget1 = RenderTarget.new("Default");
-	Game.renderTarget2 = RenderTarget.new("Light");
-
-	Game.renderTarget2.setShader("shaders/lighting.fx");
-
-	Game.box = Widget.new();
-	Game.box.spawn("Default");
-	Game.box.setBlend(0.1,0.1,0.1);
-	Game.box.setOffset(0.5,0.5);
-
-	Game.rich = Text.new(Game.box);
-	Game.rich.setFontSize(24);
-	Game.rich.setAlignment(Text.Center);
-	Game.rich.setText("[size=32][b]Oh hello[icon=textures/smiley_1.tif].[/b][/size]\n\n[colour=FFFF00][i]I'm just testing rich text![/i][/colour]\n____________________________\nIt's working [b][size=24]quite[/size][/b] well..\n[i][b][font=fonts/times.ttf]Have some funny characters ▲▼^&[/font][/b][/i]\n[b][colour=CCCCCC]Text metrics[/colour][/b] do their [i][colour=00FF00]job[/colour][/i] too\n\n[size=48](Icons also work[icon=textures/smiley_2.tif]yay!)[/size]");
-	Game.rich.setTranslation(0,0,1);
-	Game.rich.setShadowOffset(1,1);
-	Game.rich.setShadowColour(0.5,0.5,0.2,1);
-	Game.rich.setOffset(0,0.5);
-	Game.rich.spawn("Default");
-
-	var metrics = Game.rich.metrics();
-
-	Game.box.setSize(metrics.width + 80,metrics.height + 80);
+	Game.renderTarget = RenderTarget.new("Default");
 
 	Game.FPS = Text.new();
 	Game.FPS.setTranslation(-620,-340, 0);
@@ -45,44 +23,6 @@ Game.Initialise = function()
 	Game.deltas = [];
 
 	Game.timer = 0;
-
-	Game.polygon = Polygon.new();
-	Game.polygon.addVertex(-640, -360, 0, 1,0,0,1, 0,0,1, 0,0);
-	Game.polygon.addVertex(-640, 360, 0, 0,1,0,1, 0,0,1, 0,1);
-	Game.polygon.addVertex(640, -360, 0, 0,0,1,1, 0,0,1, 1,0);
-	Game.polygon.addVertex(640, 360, 0, 1,1,1,1, 0,0,1, 1,1);
-
-	Game.polygon.addIndex(0);
-	Game.polygon.addIndex(1);
-	Game.polygon.addIndex(2);
-	Game.polygon.addIndex(3);
-
-	Game.polygon.addPass("shaders/pass.fx");
-
-	Game.polygon.flush();
-
-	Game.polygon.spawn("Default");
-
-	SoundSystem.addChannelGroup("master");
-
-	SoundSystem.play("test.mp3", "master", true);
-
-	Game.lights = [];
-
-	for (var i = 0; i < 30; ++i)
-	{
-		var light = Widget.new();
-		light.setTexture("textures/light.tif");
-		light.setToTexture();
-		light.setTranslation(-640+Math.random()*1280, -360+Math.random()*720, 0);
-		light.spawn("Light");
-		light.setBlend(Math.random(),Math.random(),Math.random());
-		var s = Math.random()*2;
-		light.setScale(s,s);
-		light.setOffset(0.5,0.5);
-		Game.lights.push(light);
-	}
-
 }
 
 Game.Update = function(dt)
@@ -116,27 +56,6 @@ Game.Update = function(dt)
 		fps = 60;
 	}
 	Game.FPS.setText("FPS: " + fps + "/60");
-	var x = Math.cos(Game.timer)*20;
-	var y = Math.sin(Game.timer)*20;
-	Game.box.setTranslation(x,y,0);
-	Game.box.setRotation(0,0,Math.sin(Game.timer)/7);
-
-	Game.renderTarget2.setUniform("float", "Multiplier", 0.75+Math.abs(Math.sin(Game.timer/2)/4));
-	//SoundSystem.setChannelGroupVolume("master", 1 );
-
-	var pause = SoundSystem.isPaused("master");
-
-	if (Keyboard.isReleased("P"))
-	{
-		pause == false ? SoundSystem.pause("master") : SoundSystem.resume("master");
-	}
-
-	for (var i = 0; i < Game.lights.length; ++i)
-	{
-		var light = Game.lights[i];
-
-		light.translateBy(Math.sin(Game.timer)*3, Math.cos(Game.timer)*3, 0);
-	}
 }
 
 Game.Draw = function(dt)

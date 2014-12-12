@@ -11,7 +11,6 @@ namespace snuffbox
 		sx_(1.0f), sy_(1.0f), sz_(1.0f),
 		rotation_(XMMatrixIdentity()),
 		texture_(nullptr),
-		normal_map_(nullptr),
 		element_type_(type),
 		shader_(environment::content_manager().Get<Shader>("shaders/base.fx").get()),
 		destroyed_(true),
@@ -22,7 +21,9 @@ namespace snuffbox
 		visible_(true),
 		yaw_(0.0f),
 		pitch_(0.0f),
-		roll_(0.0f)
+		roll_(0.0f),
+		animation_(nullptr),
+		anim_coords_(0.0f, 0.0f, 1.0f, 1.0f)
 	{
 		size_[0] = 1.0f;
 		size_[1] = 1.0f;
@@ -277,6 +278,182 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void RenderElement::set_animation_coordinates(const SpriteAnimationFrame& frame)
+	{
+		float width = frame.w / texture_->width();
+		float height = frame.h / texture_->height();
+
+		float offsetX = frame.x / texture_->width();
+		float offsetY = frame.y / texture_->height();
+
+		anim_coords_.x = offsetX;
+		anim_coords_.y = offsetY;
+		anim_coords_.z = width;
+		anim_coords_.w = height;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	XMFLOAT4 RenderElement::animation_coordinates()
+	{
+		return anim_coords_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	SpriteAnimation* RenderElement::animation()
+	{
+		return animation_;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::UpdateAnimation(float dt)
+	{
+		if (animation_ != nullptr)
+		{
+			animation_->Update(dt);
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::AddAnimation(std::string name, std::string texture, std::vector<SpriteAnimationFrame> frames)
+	{
+		if (AnimationExists(name) == true)
+		{
+			SNUFF_LOG_ERROR(std::string("Animation with name '" + name + "' already exists").c_str());
+			return;
+		}
+		
+		animations_.emplace(name, SpriteAnimation(this, frames, texture, name));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::SetAnimation(std::string name)
+	{
+		if (AnimationExists(name) == false)
+		{
+			SNUFF_LOG_ERROR(std::string("Animation with name '" + name + "' does not exist").c_str());
+			return;
+		}
+
+		animation_ = &animations_.find(name)->second;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::TriggerAnimationEvent(std::string name, SpriteAnimation::AnimationEvents evt)
+	{
+		if (AnimationExists(name) == false)
+		{
+			SNUFF_LOG_ERROR(std::string("Animation with name '" + name + "' does not exist").c_str());
+			return;
+		}
+
+		SpriteAnimation* ptr = (&animations_.find(name)->second);
+
+		switch (evt)
+		{
+		case SpriteAnimation::AnimationEvents::kPause:
+			ptr->Pause();
+			break;
+		case SpriteAnimation::AnimationEvents::kPlay:
+			ptr->Play();
+			break;
+		case SpriteAnimation::AnimationEvents::kStop:
+			ptr->Stop();
+			break;
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------
+	std::vector<SpriteAnimationFrame> RenderElement::GetFramesFromArray(Local<Array> arr)
+	{
+		std::vector<SpriteAnimationFrame> temp;
+
+		for (unsigned int i = 0; i < arr->Length(); ++i)
+		{
+			Local<Value> val = arr->Get(i);
+
+			if (val->IsObject())
+			{
+				Local<Object> frame = val->ToObject();
+				Local<Value> x = frame->Get(String::NewFromUtf8(JS_ISOLATE, "x"));
+				Local<Value> y = frame->Get(String::NewFromUtf8(JS_ISOLATE, "y"));
+				Local<Value> width = frame->Get(String::NewFromUtf8(JS_ISOLATE, "width"));
+				Local<Value> height = frame->Get(String::NewFromUtf8(JS_ISOLATE, "height"));
+
+				if (x.IsEmpty() || y.IsEmpty() || width.IsEmpty() || height.IsEmpty())
+				{
+					SNUFF_LOG_ERROR("Not all required fields have been entered for a sprite animation frame");
+					return temp;
+				}
+
+				if (x->IsNumber() && y->IsNumber() && width->IsNumber() && height->IsNumber())
+				{
+					Local<Value> wait = frame->Get(String::NewFromUtf8(JS_ISOLATE, "wait"));
+					float w = 0.0f;
+					if (!wait.IsEmpty() && wait->IsNumber())
+					{
+						w = static_cast<float>(wait->ToNumber()->NumberValue());
+					}
+					SpriteAnimationFrame frame(
+						x->ToNumber()->Int32Value(),
+						y->ToNumber()->Int32Value(),
+						width->ToNumber()->Int32Value(),
+						height->ToNumber()->Int32Value(),
+						w
+						);
+
+					temp.push_back(frame);
+				}
+				else
+				{
+					SNUFF_LOG_ERROR("x, y, width or height is not a number in sprite animation!");
+					return temp;
+				}
+			}
+			else
+			{
+				SNUFF_LOG_ERROR("Wrong formatting for sprite animation!");
+				return temp;
+			}
+		}
+
+		return temp;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	bool RenderElement::AnimationExists(std::string name)
+	{
+		if (animations_.find(name) != animations_.end())
+		{
+			return true;
+		}
+		return false;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::SetAnimationSpeed(std::string name, float speed)
+	{
+		if (AnimationExists(name) == false)
+		{
+			SNUFF_LOG_ERROR(std::string("Animation with name '" + name + "' does not exist").c_str());
+			return;
+		}
+
+		(&animations_.find(name)->second)->set_speed(speed);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	bool RenderElement::IsAnimationPlaying(std::string name)
+	{
+		if (AnimationExists(name) == false)
+		{
+			SNUFF_LOG_ERROR(std::string("Animation with name '" + name + "' does not exist").c_str());
+			return false;
+		}
+
+		return (&animations_.find(name)->second)->started();
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void RenderElement::JSSpawn(JS_ARGS)
 	{
 		JS_SETUP(RenderElement, "S");
@@ -427,14 +604,6 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
-	void RenderElement::JSSetNormalMap(JS_ARGS)
-	{
-		JS_SETUP(RenderElement, "S");
-
-		self->normal_map_ = environment::content_manager().Get<Texture>(wrapper.GetString(0)).get();
-	}
-
-	//-------------------------------------------------------------------------------------------
 	void RenderElement::JSSetShader(JS_ARGS)
 	{
 		JS_SETUP(RenderElement, "S");
@@ -527,6 +696,13 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSVisible(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "V");
+		wrapper.ReturnBool(self->visible());
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void RenderElement::JSSetName(JS_ARGS)
 	{
 		JS_SETUP(RenderElement, "S");
@@ -602,6 +778,73 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSAddAnimation(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "SSA");
+
+		Local<Array> arr = wrapper.GetValue(2).As<Array>();
+		std::vector<SpriteAnimationFrame> frames = self->GetFramesFromArray(arr);
+
+		self->AddAnimation(wrapper.GetString(0), wrapper.GetString(1), frames);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSSetAnimation(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+
+		self->SetAnimation(wrapper.GetString(0));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSStopAnimation(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+
+		self->TriggerAnimationEvent(wrapper.GetString(0), SpriteAnimation::AnimationEvents::kStop);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSPauseAnimation(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+
+		self->TriggerAnimationEvent(wrapper.GetString(0), SpriteAnimation::AnimationEvents::kPause);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSPlayAnimation(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+
+		self->TriggerAnimationEvent(wrapper.GetString(0), SpriteAnimation::AnimationEvents::kPlay);
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSSetAnimationSpeed(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "SN");
+
+		self->SetAnimationSpeed(wrapper.GetString(0), wrapper.GetNumber<float>(1));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSAnimationPlaying(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+
+		wrapper.ReturnBool(self->IsAnimationPlaying(wrapper.GetString(0)));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSCurrentAnimation(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "V");
+
+		wrapper.ReturnString(self->animation_->name().c_str());
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -618,7 +861,6 @@ namespace snuffbox
 			JSFunctionRegister("setScale", JSSetScale),
 			JSFunctionRegister("setOffset", JSSetOffset),
 			JSFunctionRegister("setTexture", JSSetTexture),
-			JSFunctionRegister("setNormalMap", JSSetNormalMap),
 			JSFunctionRegister("setShader", JSSetShader),
 			JSFunctionRegister("destroy", JSDestroy),
 			JSFunctionRegister("spawn", JSSpawn),
@@ -635,7 +877,17 @@ namespace snuffbox
 			JSFunctionRegister("setToTexture", JSSetToTexture),
 			JSFunctionRegister("addPass", JSAddPass),
 			JSFunctionRegister("clearPasses", JSClearPasses),
-			JSFunctionRegister("textureMetrics", JSTextureMetrics)
+			JSFunctionRegister("textureMetrics", JSTextureMetrics),
+			JSFunctionRegister("setVisible", JSSetVisible),
+			JSFunctionRegister("visible", JSVisible),
+			JSFunctionRegister("addAnimation", JSAddAnimation),
+			JSFunctionRegister("setAnimation", JSSetAnimation),
+			JSFunctionRegister("playAnimation", JSPlayAnimation),
+			JSFunctionRegister("stopAnimation", JSStopAnimation),
+			JSFunctionRegister("pauseAnimation", JSPauseAnimation),
+			JSFunctionRegister("setAnimationSpeed", JSSetAnimationSpeed),
+			JSFunctionRegister("animationPlaying", JSAnimationPlaying),
+			JSFunctionRegister("currentAnimation", JSCurrentAnimation)
 		};
 
 		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Left"), Number::New(JS_ISOLATE, 0));

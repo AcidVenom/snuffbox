@@ -40,6 +40,9 @@
     <Filter Include="fmod">
       <UniqueIdentifier>{474bfb8f-7acb-416e-87cd-4fd32b9e2c24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="animation">
+      <UniqueIdentifier>{847c67ba-17f1-4e0e-8a36-f35cd12bfedf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cc" />
@@ -156,6 +159,9 @@
     </ClCompile>
     <ClCompile Include="d3d11\d3d11_render_target.cc">
       <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="animation\sprite_animation.cc">
+      <Filter>animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -293,6 +299,9 @@
     </ClInclude>
     <ClInclude Include="d3d11\d3d11_render_target.h">
       <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="animation\sprite_animation.h">
+      <Filter>animation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@ cbuffer ConstantBuffer : register(b0)
 	float Alpha;
 	float3 Blend;
 	float4x4 InvWorld;
+	float4 AnimationCoords;
 }
 
 cbuffer Uniforms : register(b1)
@@ -33,12 +34,12 @@ VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TE
 	return output;
 }
 
-Texture2D textures[2];
+Texture2D textures[1];
 SamplerState SampleType;
 
 float4 PS(VOut input) : SV_TARGET
 {
-	float4 textureColour = textures[0].Sample(SampleType, input.texcoord);
+	float x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;	float y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;	float4 textureColour = textures[0].Sample(SampleType, float2(x, y));
 	float4 colour = float4(textureColour.rgb * Blend * input.colour.rgb, textureColour.a);
 	colour.a *= Alpha;
 	return colour;

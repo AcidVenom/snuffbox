@@ -92,6 +92,9 @@ namespace snuffbox
 		/// Returns the qt application
 		QApplication& app(){ return qtApp_; }
 
+		/// Returns the delta time of the game
+		float delta_time(){ return deltaTime_; }
+
 	private:
 		SharedPtr<Win32Window> window_; //!< The Win32 window hooked to the game
 		SharedPtr<Mouse> mouse_; //!< The mouse object

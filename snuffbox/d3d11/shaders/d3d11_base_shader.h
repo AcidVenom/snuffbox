@@ -10,6 +10,7 @@
 \tfloat Alpha;\n\
 \tfloat3 Blend;\n\
 \tfloat4x4 InvWorld;\n\
+\tfloat4 AnimationCoords;\n\
 }\n\
 \n\
 cbuffer Uniforms : register(b1)\n\
@@ -35,12 +36,14 @@ VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TE
 \treturn output;\n\
 }\n\
 \n\
-Texture2D textures[2];\n\
+Texture2D textures[1];\n\
 SamplerState SampleType;\n\
 \n\
 float4 PS(VOut input) : SV_TARGET\n\
 {\n\
-\tfloat4 textureColour = textures[0].Sample(SampleType, input.texcoord);\n\
+\tfloat x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;\
+\tfloat y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;\
+\tfloat4 textureColour = textures[0].Sample(SampleType, float2(x, y));\n\
 \tfloat4 colour = float4(textureColour.rgb * Blend * input.colour.rgb, textureColour.a);\n\
 \tcolour.a *= Alpha;\n\
 \treturn colour;\n\

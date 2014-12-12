@@ -1,6 +1,0 @@
-load("texture","textures/smiley_1.tif")
-load("texture","textures/smiley_2.tif")
-load("texture","textures/light.tif")
-load("shader","shaders/pass.fx")
-load("shader","shaders/lighting.fx")
-load("sound","test.mp3")

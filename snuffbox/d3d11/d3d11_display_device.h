@@ -87,6 +87,7 @@ namespace snuffbox
 		float Alpha; //!< The alpha of a render element
 		XMFLOAT3 Blend; //!< The blend of a render element
     XMMATRIX InvWorld; //!< The inverse world, used for lighting etc.
+		XMFLOAT4 AnimationCoords; //!< The animation coordinates for use with sprite animations
 	};
 
 	/**
@@ -330,12 +331,9 @@ namespace snuffbox
 		ID3D11Texture2D*							depth_stencil_buffer_;	//!< The buffer of the depth stencil
 		ID3D11DepthStencilState*			depth_state_;						//!< The depth stencil state
 		ID3D11Texture2D*							no_texture_;						//!< A white rectangular texture as default
-		ID3D11Texture2D*							no_normal_;							//!< A green rectangular texture as default normal
 		ID3D11ShaderResourceView*			default_resource_;			//!< The default shader resource
-		ID3D11ShaderResourceView*     default_normal_;				//!< The default shader normal map
 		ID3D11SamplerState*						sampler_state_;					//!< The texture sampler state
 		ID3D11ShaderResourceView*			current_texture_;				//!< The current texture being used
-		ID3D11ShaderResourceView*			current_normal_;				//!< The current normal map being used
 		Shader*												current_shader_;				//!< The current shader being used
 		Camera*												camera_;								//!< The current camera being used
 		ID3D11BlendState*							blend_state_;						//!< The blend state being used

@@ -175,6 +175,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="animation\sprite_animation.cc" />
     <ClCompile Include="console\console.cc" />
     <ClCompile Include="console\console_widget.cc" />
     <ClCompile Include="console\moc_console_widget.cc" />
@@ -216,6 +217,7 @@
     <ClCompile Include="win32\win32_window.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="animation\sprite_animation.h" />
     <ClInclude Include="console\console.h" />
     <ClInclude Include="console\console_ui.h" />
     <ClInclude Include="console\console_widget.h" />

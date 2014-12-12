@@ -9,6 +9,8 @@
 #include "../../../snuffbox/content/content_manager.h"
 #include "../../../snuffbox/d3d11/d3d11_settings.h"
 
+#include "../../../snuffbox/animation/sprite_animation.h"
+
 namespace snuffbox
 {
 	/// A static unique user ID for Render Elements
@@ -241,11 +243,6 @@ namespace snuffbox
 		Texture* texture(){ return texture_; }
 
 		/**
-		* @return (snuffbox::Texture*) The normal map of this element
-		*/
-		Texture* normal_map(){ return normal_map_; }
-
-		/**
 		* @return (snuffbox::Shader*) The shader of this element
 		*/
 		Shader* shader(){ return shader_; }
@@ -335,6 +332,77 @@ namespace snuffbox
 		*/
 		std::vector<Shader*>& passes(){ return passes_; }
 
+		/**
+		* @brief Sets the animation coordinates of this render element
+		* @param[in] frame (const snuffbox::SpriteAnimationFrame&) The current frame
+		*/
+		void set_animation_coordinates(const SpriteAnimationFrame& frame);
+
+		/**
+		* @return (XMFLOAT4) The animation coordinates of this render element
+		*/
+		XMFLOAT4 animation_coordinates();
+
+		/**
+		* @return (snuffbox::SpriteAnimation*) Returns the current sprite animation
+		*/
+		SpriteAnimation* animation();
+
+		/**
+		* @brief Updates the current animation
+		* @param[in] dt (float) The current delta time
+		*/
+		void UpdateAnimation(float dt);
+
+		/**
+		* @brief Adds an animation if it doesn't already exist
+		* @param[in] name (std::string) The name of the new animation
+		* @param[in] texture (std::string) The name of the texture this animation will use
+		* @param[in] frames (std::vector<snuffbox::SpriteAnimationFrame>) All animation frames for that animation
+		*/
+		void AddAnimation(std::string name, std::string texture, std::vector<SpriteAnimationFrame> frames);
+
+		/**
+		* @brief Sets the current animation
+		* @param[in] name (std::string) The animation name
+		*/
+		void SetAnimation(std::string name);
+
+		/**
+		* @brief Triggers the animation event of an animation (stop/pause/etc.)
+		* @param[in] name (std::string) The name of the animation to trigger an event on
+		* @param[in] evt (snuffbox::AnimationEvents) The actual event to trigger
+		*/
+		void TriggerAnimationEvent(std::string name, SpriteAnimation::AnimationEvents evt);
+
+		/**
+		* @brief Retrieves a C++ vector of animation frames from a JavaScript array
+		* @param[in] arr (v8::Local<v8::Array>) The JavaScript array
+		* @return (std::vector<snuffbox::SpriteAnimationFrame>) The final frames
+		*/
+		std::vector<SpriteAnimationFrame> GetFramesFromArray(Local<Array> arr);
+
+		/**
+		* @brief Checks if an animation exists
+		* @param[in] name (std::string) The name to check for
+		* @return (bool) If it was found or not
+		*/
+		bool AnimationExists(std::string name);
+
+		/**
+		* @brief Sets the speed of an animation
+		* @param[in] name (std::string) The name of the animation
+		* @param[in] speed (float) The new speed
+		*/
+		void SetAnimationSpeed(std::string name, float speed);
+
+		/**
+		* @brief Checks if an animation is playing
+		* @param[in] name (std::string) The animation name
+		* @return (bool) Is the animation playing or not
+		*/
+		bool IsAnimationPlaying(std::string name);
+
 	protected:
 		std::vector<Vertex>										vertices_; //!< The vertices
 		std::vector<unsigned int>							indices_; //!< The indices
@@ -360,7 +428,6 @@ namespace snuffbox
 		float																	size_[2]; //!< The widget's size
 
 		Texture*															texture_;	//!< The texture of this render element
-		Texture*															normal_map_; //!< The normal map of this render element
 		Shader*																shader_; //!< The current shader used by this element
 		std::vector<Shader*>									passes_; //!< Shader passes used by this element
 		ElementTypes													element_type_;	//!< The type of this render element
@@ -373,6 +440,9 @@ namespace snuffbox
 		std::string														name_;	 //!< The render element name
 		bool																	spawned_; //!< Has this element already been spawned?
 		RenderTarget*													target_; //!< The current target
+		XMFLOAT4															anim_coords_; //!< The animation coordinates of this render element
+		std::map<std::string, SpriteAnimation> animations_; //!< The animations of this element
+		SpriteAnimation*											animation_; //!< The current animation
 
 	public:
 		static void RegisterJS(JS_TEMPLATE);
@@ -387,7 +457,6 @@ namespace snuffbox
 		static void JSRotation(JS_ARGS);
 		static void JSTranslation(JS_ARGS);
 		static void JSSetTexture(JS_ARGS);
-		static void JSSetNormalMap(JS_ARGS);
 		static void JSSetShader(JS_ARGS);
 		static void JSDestroy(JS_ARGS);
 		static void JSSpawn(JS_ARGS);
@@ -397,6 +466,7 @@ namespace snuffbox
 		static void JSSetBlend(JS_ARGS);
 		static void JSBlend(JS_ARGS);
 		static void JSSetVisible(JS_ARGS);
+		static void JSVisible(JS_ARGS);
 		static void JSSetName(JS_ARGS);
 		static void JSName(JS_ARGS);
 		static void JSSetSize(JS_ARGS);
@@ -406,5 +476,13 @@ namespace snuffbox
 		static void JSAddPass(JS_ARGS);
 		static void JSClearPasses(JS_ARGS);
 		static void JSTextureMetrics(JS_ARGS);
+		static void JSAddAnimation(JS_ARGS);
+		static void JSSetAnimation(JS_ARGS);
+		static void JSPauseAnimation(JS_ARGS);
+		static void JSStopAnimation(JS_ARGS);
+		static void JSPlayAnimation(JS_ARGS);
+		static void JSSetAnimationSpeed(JS_ARGS);
+		static void JSAnimationPlaying(JS_ARGS);
+		static void JSCurrentAnimation(JS_ARGS);
 	};
 }
