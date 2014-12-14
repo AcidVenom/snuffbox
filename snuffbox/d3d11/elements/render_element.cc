@@ -24,7 +24,8 @@ namespace snuffbox
 		roll_(0.0f),
 		animation_(nullptr),
 		anim_coords_(0.0f, 0.0f, 1.0f, 1.0f),
-    target_(nullptr)
+    target_(nullptr),
+		sampler_type_(SamplerState::kLinear)
 	{
 		size_[0] = 1.0f;
 		size_[1] = 1.0f;
@@ -281,11 +282,11 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::set_animation_coordinates(const SpriteAnimationFrame& frame)
 	{
-		float width = frame.w / texture_->width();
-		float height = frame.h / texture_->height();
+		float width = static_cast<float>(frame.w) / texture_->width();
+		float height = static_cast<float>(frame.h) / texture_->height();
 
-		float offsetX = frame.x / texture_->width();
-		float offsetY = frame.y / texture_->height();
+		float offsetX = static_cast<float>(frame.x) / texture_->width();
+		float offsetY = static_cast<float>(frame.y) / texture_->height();
 
 		anim_coords_.x = offsetX;
 		anim_coords_.y = offsetY;
@@ -452,6 +453,30 @@ namespace snuffbox
 		}
 
 		return (&animations_.find(name)->second)->started();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	int RenderElement::CurrentAnimationFrame(std::string name)
+	{
+		if (AnimationExists(name) == false)
+		{
+			SNUFF_LOG_ERROR(std::string("Animation with name '" + name + "' does not exist").c_str());
+			return false;
+		}
+
+		return (&animations_.find(name)->second)->current_frame();
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::SetFrame(std::string name, int frame)
+	{
+		if (AnimationExists(name) == false)
+		{
+			SNUFF_LOG_ERROR(std::string("Animation with name '" + name + "' does not exist").c_str());
+			return;
+		}
+
+		(&animations_.find(name)->second)->set_frame(frame);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -846,6 +871,30 @@ namespace snuffbox
 	}
 
 	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSCurrentFrame(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "S");
+
+		wrapper.ReturnNumber<int>(self->CurrentAnimationFrame(wrapper.GetString(0)));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSSetFrame(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "SN");
+
+		self->SetFrame(wrapper.GetString(0), wrapper.GetNumber<int>(1));
+	}
+
+	//-------------------------------------------------------------------------------------------
+	void RenderElement::JSSetSampling(JS_ARGS)
+	{
+		JS_SETUP(RenderElement, "N");
+
+		self->sampler_type_ = static_cast<SamplerState>(wrapper.GetNumber<int>(0));
+	}
+
+	//-------------------------------------------------------------------------------------------
 	void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
 		JS_CREATE_SCOPE;
@@ -888,17 +937,11 @@ namespace snuffbox
 			JSFunctionRegister("pauseAnimation", JSPauseAnimation),
 			JSFunctionRegister("setAnimationSpeed", JSSetAnimationSpeed),
 			JSFunctionRegister("animationPlaying", JSAnimationPlaying),
-			JSFunctionRegister("currentAnimation", JSCurrentAnimation)
+			JSFunctionRegister("currentAnimation", JSCurrentAnimation),
+			JSFunctionRegister("currentFrame", JSCurrentFrame),
+			JSFunctionRegister("setFrame", JSSetFrame),
+			JSFunctionRegister("setSampling", JSSetSampling)
 		};
-
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Left"), Number::New(JS_ISOLATE, 0));
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Right"), Number::New(JS_ISOLATE, 1));
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "Center"), Number::New(JS_ISOLATE, 2));
-
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "LineList"), Number::New(JS_ISOLATE, 2));
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "LineStrip"), Number::New(JS_ISOLATE, 3));
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "TriangleList"), Number::New(JS_ISOLATE, 4));
-		obj->Set(String::NewFromUtf8(JS_ISOLATE, "TriangleStrip"), Number::New(JS_ISOLATE, 5));
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);
 	}

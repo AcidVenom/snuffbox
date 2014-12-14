@@ -56,6 +56,17 @@ namespace snuffbox
   };
 
 	/**
+	* @enum snuffbox::SamplerState
+	* @brief An enumerator to sample point or linear
+	* @author Daniël Konings
+	*/
+	enum SamplerState
+	{
+		kLinear,
+		kPoint
+	};
+
+	/**
 	* @struct snuffbox::Vertex
 	* @brief A vertex structure for use with vertex buffers
 	* @author Daniël Konings
@@ -333,6 +344,8 @@ namespace snuffbox
 		ID3D11Texture2D*							no_texture_;						//!< A white rectangular texture as default
 		ID3D11ShaderResourceView*			default_resource_;			//!< The default shader resource
 		ID3D11SamplerState*						sampler_state_;					//!< The texture sampler state
+		ID3D11SamplerState*						sampler_state_linear_;	//!< The texture sampler state (linear)
+		SamplerState									current_sampler_;				//!< The current sampler state used
 		ID3D11ShaderResourceView*			current_texture_;				//!< The current texture being used
 		Shader*												current_shader_;				//!< The current shader being used
 		Camera*												camera_;								//!< The current camera being used

@@ -37,13 +37,13 @@ VOut VS(float4 position : POSITION, float3 normal : NORMAL, float2 texcoord : TE
 }\n\
 \n\
 Texture2D textures[1];\n\
-SamplerState SampleType;\n\
+SamplerState Sampler;\n\
 \n\
 float4 PS(VOut input) : SV_TARGET\n\
 {\n\
-\tfloat x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;\
-\tfloat y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;\
-\tfloat4 textureColour = textures[0].Sample(SampleType, float2(x, y));\n\
+\tfloat x = (input.texcoord.x * AnimationCoords.z) + AnimationCoords.x;\n\
+\tfloat y = (input.texcoord.y * AnimationCoords.w) + AnimationCoords.y;\n\n\
+\tfloat4 textureColour = textures[0].Sample(Sampler, float2(x, y));\n\
 \tfloat4 colour = float4(textureColour.rgb * Blend * input.colour.rgb, textureColour.a);\n\
 \tcolour.a *= Alpha;\n\
 \treturn colour;\n\

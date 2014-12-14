@@ -84,6 +84,12 @@ namespace snuffbox
 		void set_speed(float speed);
 
 		/**
+		* @brief Sets the current frame of this animation
+		* @param[in] frame (int) The frame to set this animation to
+		*/
+		void set_frame(int frame);
+
+		/**
 		* @return (snuffbox::Texture*) The texture this animation is using
 		*/
 		Texture* texture();

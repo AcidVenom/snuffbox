@@ -566,7 +566,7 @@ namespace snuffbox
 		D3D11_SAMPLER_DESC sDesc;
 
 		ZeroMemory(&sDesc, sizeof(D3D11_SAMPLER_DESC));
-		sDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+		sDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 		sDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		sDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -583,7 +583,27 @@ namespace snuffbox
 		result = device_->CreateSamplerState(&sDesc, &sampler_state_);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
-		context_->PSSetSamplers(0, 1, &sampler_state_);
+		ZeroMemory(&sDesc, sizeof(D3D11_SAMPLER_DESC));
+		sDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		sDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		sDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		sDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		sDesc.MipLODBias = 0.0f;
+		sDesc.MaxAnisotropy = 0;
+		sDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		sDesc.BorderColor[0] = 0;
+		sDesc.BorderColor[1] = 0;
+		sDesc.BorderColor[2] = 0;
+		sDesc.BorderColor[3] = 0;
+		sDesc.MinLOD = 0;
+		sDesc.MaxLOD = 0;
+
+		result = device_->CreateSamplerState(&sDesc, &sampler_state_linear_);
+		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
+
+		current_sampler_ = SamplerState::kLinear;
+
+		context_->PSSetSamplers(0, 1, &sampler_state_linear_);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -792,6 +812,20 @@ namespace snuffbox
 	{
 		if (it && it->visible())
 		{
+			if (it->sample_type() != current_sampler_)
+			{
+				if (it->sample_type() == SamplerState::kLinear)
+				{
+					context_->PSSetSamplers(0, 1, &sampler_state_linear_);
+				}
+				else if (it->sample_type() == SamplerState::kPoint)
+				{
+					context_->PSSetSamplers(0, 1, &sampler_state_);
+				}
+			}
+
+			current_sampler_ = it->sample_type();
+
 			it->UpdateAnimation(environment::game().delta_time());
 			RenderElement::ElementTypes elementType = it->element_type();
 			VertexBufferType type = it->type();
@@ -1149,6 +1183,9 @@ namespace snuffbox
 	//---------------------------------------------------------------------------------
 	void D3D11DisplayDevice::EndDraw(RenderTarget* target)
 	{
+		context_->PSSetSamplers(0, 1, &sampler_state_linear_);
+		current_sampler_ = SamplerState::kLinear;
+
 		context_->RSSetViewports(1, &viewport_);
 		Resolution resolution = environment::render_settings().settings().resolution;
 		projection_matrix_ = XMMatrixIdentity();
@@ -1314,6 +1351,7 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(depth_stencil_view_);
 		SNUFF_SAFE_RELEASE(depth_state_);
 		SNUFF_SAFE_RELEASE(sampler_state_);
+		SNUFF_SAFE_RELEASE(sampler_state_linear_);
 		SNUFF_SAFE_RELEASE(blend_state_);
 		SNUFF_SAFE_RELEASE(rasterizer_state_);
 		SNUFF_SAFE_RELEASE(back_buffer_);
@@ -1387,6 +1425,7 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(depth_stencil_view_);
 		SNUFF_SAFE_RELEASE(depth_state_);
 		SNUFF_SAFE_RELEASE(sampler_state_);
+		SNUFF_SAFE_RELEASE(sampler_state_linear_);
 		SNUFF_SAFE_RELEASE(no_texture_);
 		SNUFF_SAFE_RELEASE(default_resource_);
 		SNUFF_SAFE_RELEASE(blend_state_);

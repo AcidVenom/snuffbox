@@ -188,6 +188,8 @@ namespace snuffbox
 
 		CompileAndRun("main");
 		SNUFF_LOG_SUCCESS("Succesfully initialised the JavaScript state");
+
+		RegisterJSEnumerators();
 	}
 
 	//---------------------------------------------------------------------------

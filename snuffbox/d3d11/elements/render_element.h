@@ -403,6 +403,23 @@ namespace snuffbox
 		*/
 		bool IsAnimationPlaying(std::string name);
 
+		/**
+		* @brief Retrieves the current frame an animation is at
+		* @param[in] name (std::string) The name of the animation to retrieve the current frame from
+		* @return (int) The current frame
+		*/
+		int CurrentAnimationFrame(std::string name);
+
+		/**
+		* @brief Sets the current frame an animation is at
+		* @param[in] name (std::string) The name of the animation to set the current frame of
+		* @param[in] frame (int) The frame to set
+		*/
+		void SetFrame(std::string name, int frame);
+
+		/// Returns the sampler type used by this render element
+		SamplerState sample_type(){ return sampler_type_; }
+
 	protected:
 		std::vector<Vertex>										vertices_; //!< The vertices
 		std::vector<unsigned int>							indices_; //!< The indices
@@ -443,6 +460,7 @@ namespace snuffbox
 		XMFLOAT4															anim_coords_; //!< The animation coordinates of this render element
 		std::map<std::string, SpriteAnimation> animations_; //!< The animations of this element
 		SpriteAnimation*											animation_; //!< The current animation
+		SamplerState													sampler_type_; //!< The sampler type of this render element
 
 	public:
 		static void RegisterJS(JS_TEMPLATE);
@@ -484,5 +502,8 @@ namespace snuffbox
 		static void JSSetAnimationSpeed(JS_ARGS);
 		static void JSAnimationPlaying(JS_ARGS);
 		static void JSCurrentAnimation(JS_ARGS);
+		static void JSCurrentFrame(JS_ARGS);
+		static void JSSetFrame(JS_ARGS);
+		static void JSSetSampling(JS_ARGS);
 	};
 }
