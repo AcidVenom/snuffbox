@@ -417,6 +417,9 @@ namespace snuffbox
 		*/
 		void SetFrame(std::string name, int frame);
 
+		/// Sets the size of this render element
+		void set_size(float x, float y){ size_[0] = x; size_[1] = y; }
+
 		/// Returns the sampler type used by this render element
 		SamplerState sample_type(){ return sampler_type_; }
 

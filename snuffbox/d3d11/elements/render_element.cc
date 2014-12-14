@@ -282,11 +282,11 @@ namespace snuffbox
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::set_animation_coordinates(const SpriteAnimationFrame& frame)
 	{
-		float width = static_cast<float>(frame.w) / texture_->width();
-		float height = static_cast<float>(frame.h) / texture_->height();
+		float width = static_cast<float>(frame.w) / animation_->texture()->width();
+		float height = static_cast<float>(frame.h) / animation_->texture()->height();
 
-		float offsetX = static_cast<float>(frame.x) / texture_->width();
-		float offsetY = static_cast<float>(frame.y) / texture_->height();
+		float offsetX = static_cast<float>(frame.x) / animation_->texture()->width();
+		float offsetY = static_cast<float>(frame.y) / animation_->texture()->height();
 
 		anim_coords_.x = offsetX;
 		anim_coords_.y = offsetY;

@@ -79,6 +79,11 @@ namespace snuffbox
 
 		parent_->set_animation_coordinates(frames_.at(current_frame_));
 
+		int w = frames_.at(current_frame_).w;
+		int h = frames_.at(current_frame_).h;
+
+		parent_->set_size(w, h);
+
 		elapsed_time_ += dt * speed_;
 
 		while (elapsed_time_ >= total_time)
