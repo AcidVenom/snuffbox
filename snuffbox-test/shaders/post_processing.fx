@@ -30,5 +30,5 @@ SamplerState SampleType;
 float4 PS(VOut input) : SV_TARGET
 {
 	float4 colour = tex2D.Sample(SampleType, input.texcoord);
-	return float4(colour.rgb, 1);
+	return colour;
 }

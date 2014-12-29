@@ -29,7 +29,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 650
+#define SNUFF_VERSION_MINOR 655
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"

@@ -31,5 +31,5 @@ SamplerState SampleType;\n\
 float4 PS(VOut input) : SV_TARGET\n\
 {\n\
 \tfloat4 colour = tex2D.Sample(SampleType, input.texcoord);\n\
-\treturn float4(colour.rgb, 1);\n\
+\treturn colour;\n\
 }"

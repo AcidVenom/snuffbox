@@ -27,7 +27,7 @@ namespace snuffbox
   FontManager::FontManager()
   {
     environment::globalInstance = this;
-		atlas_ = environment::memory().ConstructShared<FontAtlas>(4096, 4);
+		atlas_ = environment::memory().ConstructShared<FontAtlas>(2048, 3);
     default_font_ = GetFont("fonts/arial.ttf", 16);
   }
 

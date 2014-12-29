@@ -99,7 +99,7 @@ namespace snuffbox
   private:
     SharedPtr<Texture>    atlas_; //!< The actual texture of the atlas
     int                   size_; //!< The size of the atlas for both width and height
-    std::vector<int> data_;
+    std::vector<unsigned char> data_;
     std::vector<FontAtlasNode> nodes_;
 		unsigned char depth_;
     int used_;

@@ -9,6 +9,10 @@ namespace snuffbox
     depth_(depth),
     used_(0)
   {
+		if (depth_ == 3)
+		{
+			depth_ = 4;
+		}
     data_.resize(size*size*depth, 0);
     nodes_.emplace_back(1u, 1u, size - 2u);
   }
@@ -130,28 +134,26 @@ namespace snuffbox
   {
     SNUFF_XASSERT(region.x > 0 && region.y > 0 && region.x + region.width <= size_ - 1 && region.y + region.height <= size_ - 1, "The region does not fit in the atlas");
 
-    for (int y = 0; y < region.height; ++y)
-    {
-      for (int x = 0; x < region.width; ++x)
-      {
-        unsigned char luminance = data[y*stride + x];
-        int color = (luminance << 0) | (luminance << 8) | (luminance << 16) | (luminance << 24);
-        data_[(region.y + y) * size_ + region.x + x] = color;
-      }
-    }
+		for (int y = 0; y < region.height; ++y)
+		{
+			for (int x = 0; x < region.width; ++x)
+			{
+				data_[(region.y + y) * size_ * depth_ + (region.x + x) * depth_ + 0] = data[y*stride + x * 3 + 0];
+				data_[(region.y + y) * size_ * depth_ + (region.x + x) * depth_ + 1] = data[y*stride + x * 3 + 1];
+				data_[(region.y + y) * size_ * depth_ + (region.x + x) * depth_ + 2] = data[y*stride + x * 3 + 2];
+				data_[(region.y + y) * size_ * depth_ + (region.x + x) * depth_ + 3] = 0xff;
+			}
+		}
   }
 
 
   //-------------------------------------------------------------------------------------------------
   void FontAtlas::ClearRegion(const FontAtlasRegion& region)
   {
-    for (int y = 0; y < region.height; ++y)
-    {
-      for (int x = 0; x < region.width; ++x)
-      {
-        data_[(region.y + y) * size_ + region.x + x] = 0;
-      }
-    }
+		for (int y = 0; y < region.height; ++y)
+			for (int x = 0; x < region.width; ++x)
+				for (int i = 0; i < depth_; ++i)
+					data_[(region.y + y) * size_ * depth_ + (region.x + x) * depth_ + i] = 0;
   }
 
   //------------------------------------------------------------------------------------------------
@@ -176,8 +178,14 @@ namespace snuffbox
   //------------------------------------------------------------------------------------------------
   void FontAtlas::CreateTexture()
   {
-    atlas_ = environment::memory().ConstructShared<Texture>(environment::render_device().CreateTexture2D(size_, size_, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM, &data_[0], size_ * depth_));
-  }
+		unsigned char* arr = new unsigned char[2048 * 2048 * 4];
+		for (unsigned int i = 0; i < data_.size(); ++i)
+		{
+			arr[i] = data_[i];
+		}
+    atlas_ = environment::memory().ConstructShared<Texture>(environment::render_device().CreateTexture2D(size_, size_, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM, arr, size_ * depth_));
+		delete arr;
+	}
 
   //------------------------------------------------------------------------------------------------
   FontAtlas::~FontAtlas()

@@ -24,6 +24,7 @@
 
 #include "../../snuffbox/d3d11/shaders/d3d11_base_shader.h"
 #include "../../snuffbox/d3d11/shaders/d3d11_post_process_shader.h"
+#include "../../snuffbox/d3d11/shaders/d3d11_text_shader.h"
 
 namespace snuffbox
 {
@@ -82,6 +83,7 @@ namespace snuffbox
 		CreateViewport();
 		CreateBaseShader();
 		CreatePostProcessingShader();
+		CreateTextShader();
 		CreateConstantBuffer();
 		CreateLayout();
 		CreateDepthStencil();
@@ -332,6 +334,35 @@ namespace snuffbox
 		fin.close();
 
 		environment::content_manager().Load<Shader>("shaders/post_processing.fx");
+	}
+
+	//---------------------------------------------------------------------------------
+	void D3D11DisplayDevice::CreateTextShader()
+	{
+		std::fstream fin;
+
+		fin.open(environment::game().path() + "/shaders/text.fx");
+
+		if (!fin)
+		{
+			std::ofstream out;
+			out.open(environment::game().path() + "/shaders/text.fx");
+
+			if (!out)
+			{
+				CreateDirectoryA(std::string(environment::game().path() + "/shaders").c_str(), 0);
+				out.open(environment::game().path() + "/shaders/text.fx");
+
+				SNUFF_XASSERT(out, "Unknown error in creating of the text shader");
+			}
+
+			out << SNUFF_TEXT_SHADER;
+			out.close();
+		}
+
+		fin.close();
+
+		environment::content_manager().Load<Shader>("shaders/text.fx");
 	}
 
 	//---------------------------------------------------------------------------------

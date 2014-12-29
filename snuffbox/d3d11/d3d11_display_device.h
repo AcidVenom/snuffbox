@@ -187,6 +187,9 @@ namespace snuffbox
 		/// Creates the base shader
 		void CreateBaseShader();
 
+		/// Creates the text shader
+		void CreateTextShader();
+
 		/// Creates the post processing shader
 		void CreatePostProcessingShader();
 

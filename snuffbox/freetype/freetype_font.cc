@@ -8,7 +8,6 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include FT_STROKER_H
 #include FT_LCD_FILTER_H
 
 #define HRES  64
@@ -73,11 +72,11 @@ namespace snuffbox
     ascender_ = 0.0f;
     descender_ = 0.0f;
 
-    lcd_weights_[0] = 0x10; 
-    lcd_weights_[1] = 0x40;
-    lcd_weights_[2] = 0x70;
-    lcd_weights_[3] = 0x40;
-    lcd_weights_[4] = 0x10;
+		lcd_weights_[0] = 0x00;
+		lcd_weights_[1] = 0x55;
+		lcd_weights_[2] = 0x56;
+		lcd_weights_[3] = 0x55;
+		lcd_weights_[4] = 0x00;
     
     FT_Size_Metrics metrics;
     metrics = face_->size->metrics;
@@ -115,7 +114,7 @@ namespace snuffbox
 
       SNUFF_XASSERT(region.x > 0, "Font Texture Atlas is full!");
 
-			atlas->FillRegion(region, reinterpret_cast<const unsigned char*>(data), 0);
+			atlas->FillRegion(region, reinterpret_cast<const unsigned char*>(data), 4 * 3);
       glyph->charcode = (wchar_t)(-1);
       glyph->tex_coords.left = region.x / (float)width;
       glyph->tex_coords.top = region.y / (float)height;
@@ -154,8 +153,10 @@ namespace snuffbox
 
       FT_UInt glyphIndex = FT_Get_Char_Index(face_, c);
 
+			FT_Library_SetLcdFilter(library_, FT_LCD_FILTER_LIGHT);
+			
 			FT_Library_SetLcdFilterWeights(library_, lcd_weights_);
-			FT_Int32 flags = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT;
+			FT_Int32 flags = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LCD;
 
       FT_Error error = FT_Load_Glyph(face_, glyphIndex, flags);
       SNUFF_XASSERT(!error, "Unable to load glyph");
@@ -169,7 +170,7 @@ namespace snuffbox
       ftGlyphTop = slot->bitmap_top;
       ftGlyphLeft = slot->bitmap_left;
 
-      int width = ftBitmap.width + 1;
+      int width = ftBitmap.width / 3 + 1;
       int height = ftBitmap.rows + 1;
 			FontAtlasRegion region = atlas->CreateRegion(width, height);
       SNUFF_XASSERT(region.x > 0, "Texture font atlas is full!");

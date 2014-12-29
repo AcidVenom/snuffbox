@@ -303,5 +303,8 @@
     <ClInclude Include="animation\sprite_animation.h">
       <Filter>animation</Filter>
     </ClInclude>
+    <ClInclude Include="d3d11\shaders\d3d11_text_shader.h">
+      <Filter>d3d11\shaders</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
