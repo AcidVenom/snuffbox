@@ -82,7 +82,6 @@ float4 PS(VOut input) : SV_TARGET\n\
 \t\tb = lerp(current.r, previous.b, z);\n\
 \t}\n\
 \n\
-\tfloat t = max(max(r, g), b);\n\
 \tfloat4 colour = float4(1, 1, 1, (r + g + b) / 3.0);\n\
 \n\
 \tfloat alpha = colour.a * input.colour.a * Alpha;\n\

@@ -1268,6 +1268,9 @@ namespace snuffbox
       uniforms[i] = vec[i];
     }
 
+		topology_ = D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+		context_->IASetPrimitiveTopology(topology_);
+
     context_->Unmap(uniform_buffer_, 0);
 
 		context_->DrawIndexed(4, 0, 0);
