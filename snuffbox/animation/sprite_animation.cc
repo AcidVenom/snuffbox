@@ -13,7 +13,8 @@ namespace snuffbox
 		parent_(parent),
 		frames_(frames),
 		name_(name),
-		elapsed_time_(0)
+		elapsed_time_(0),
+    speed_(1.0f)
 	{
 		texture_ = environment::content_manager().Get<Texture>(texture).get();
 	}
@@ -55,6 +56,7 @@ namespace snuffbox
 	//------------------------------------------------------------------------
 	void SpriteAnimation::Update(float dt)
 	{
+    SNUFF_XASSERT(speed_ >= 0, "Animation speed must be above or equal to 0!");
 		if (started_ == false)
 		{
 			return;

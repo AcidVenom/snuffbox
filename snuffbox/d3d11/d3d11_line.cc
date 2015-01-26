@@ -1,4 +1,5 @@
 #include "../../snuffbox/d3d11/d3d11_display_device.h"
+#include "../../snuffbox/d3d11/d3d11_settings.h"
 #include "../../snuffbox/d3d11/d3d11_line.h"
 #include "../../snuffbox/js/js_wrapper.h"
 
@@ -36,6 +37,12 @@ namespace snuffbox
 		float r2 = wrapper.GetNumber<float>(9);
 		float g2 = wrapper.GetNumber<float>(10);
 		float b2 = wrapper.GetNumber<float>(11);
+
+    if (environment::render_settings().y_down() == true)
+    {
+      y2 = -y2;
+      y1 = -y1;
+    }
 
 		environment::render_device().DrawLine(x1, y1, z1, r1, g1, b1, x2, y2, z2, r2, g2, b2);
 	}
