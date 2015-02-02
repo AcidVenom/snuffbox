@@ -72,11 +72,11 @@ namespace snuffbox
     ascender_ = 0.0f;
     descender_ = 0.0f;
 
-		lcd_weights_[0] = 0x00;
-		lcd_weights_[1] = 0x55;
-		lcd_weights_[2] = 0x56;
-		lcd_weights_[3] = 0x55;
-		lcd_weights_[4] = 0x00;
+		lcd_weights_[0] = 0x10;
+		lcd_weights_[1] = 0x40;
+		lcd_weights_[2] = 0x70;
+		lcd_weights_[3] = 0x40;
+		lcd_weights_[4] = 0x10;
     
     FT_Size_Metrics metrics;
     metrics = face_->size->metrics;
@@ -190,7 +190,6 @@ namespace snuffbox
       glyph->tex_coords.right = glyph->tex_coords.left + glyph->width / (float)atlasSize;
       glyph->tex_coords.bottom = glyph->tex_coords.top + glyph->height / (float)atlasSize;
 
-			FT_Load_Glyph(face_, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
       slot = face_->glyph;
       glyph->x_advance = slot->advance.x / HRESf;
       glyph->y_advance = slot->advance.y / HRESf;

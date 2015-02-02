@@ -67,8 +67,13 @@ namespace snuffbox
 		JS_ENUM_SET(sampler_type, "Linear", 0);
 		JS_ENUM_SET(sampler_type, "Point", 1);
 
+    NEW_JS_ENUM(blend_states);
+    JS_ENUM_SET(blend_states, "Default", 0);
+    JS_ENUM_SET(blend_states, "PreMultiplied", 1);
+
 		JS_REGISTER_ENUM(text_alignment, "TextAlignment");
 		JS_REGISTER_ENUM(topology, "Topology");
 		JS_REGISTER_ENUM(sampler_type, "Sampling");
+    JS_REGISTER_ENUM(blend_states, "BlendStates");
 	}
 }

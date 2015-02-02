@@ -423,6 +423,9 @@ namespace snuffbox
 		/// Returns the sampler type used by this render element
 		SamplerState sample_type(){ return sampler_type_; }
 
+    /// Returns the blend state used by this render element
+    BlendStates blend_state(){ return blend_state_; }
+
 	protected:
 		std::vector<Vertex>										vertices_; //!< The vertices
 		std::vector<unsigned int>							indices_; //!< The indices
@@ -464,6 +467,7 @@ namespace snuffbox
 		std::map<std::string, SpriteAnimation> animations_; //!< The animations of this element
 		SpriteAnimation*											animation_; //!< The current animation
 		SamplerState													sampler_type_; //!< The sampler type of this render element
+    BlendStates                           blend_state_; //!< The blend state for this render element
 
 	public:
 		static void RegisterJS(JS_TEMPLATE);
@@ -508,5 +512,6 @@ namespace snuffbox
 		static void JSCurrentFrame(JS_ARGS);
 		static void JSSetFrame(JS_ARGS);
 		static void JSSetSampling(JS_ARGS);
+    static void JSSetBlendState(JS_ARGS);
 	};
 }

@@ -25,7 +25,8 @@ namespace snuffbox
 		animation_(nullptr),
 		anim_coords_(0.0f, 0.0f, 1.0f, 1.0f),
     target_(nullptr),
-		sampler_type_(SamplerState::kLinear)
+		sampler_type_(SamplerState::kLinear),
+    blend_state_(BlendStates::kDefault)
 	{
 		size_[0] = 1.0f;
 		size_[1] = 1.0f;
@@ -894,6 +895,14 @@ namespace snuffbox
 		self->sampler_type_ = static_cast<SamplerState>(wrapper.GetNumber<int>(0));
 	}
 
+  //-------------------------------------------------------------------------------------------
+  void RenderElement::JSSetBlendState(JS_ARGS)
+  {
+    JS_SETUP(RenderElement, "N");
+
+    self->blend_state_ = static_cast<BlendStates>(wrapper.GetNumber<int>(0));
+  }
+
 	//-------------------------------------------------------------------------------------------
 	void RenderElement::RegisterJS(JS_TEMPLATE)
 	{
@@ -940,7 +949,8 @@ namespace snuffbox
 			JSFunctionRegister("currentAnimation", JSCurrentAnimation),
 			JSFunctionRegister("currentFrame", JSCurrentFrame),
 			JSFunctionRegister("setFrame", JSSetFrame),
-			JSFunctionRegister("setSampling", JSSetSampling)
+			JSFunctionRegister("setSampling", JSSetSampling),
+      JSFunctionRegister("setBlendState", JSSetBlendState)
 		};
 
 		JS_REGISTER_OBJECT_FUNCTIONS(obj, funcs, true);

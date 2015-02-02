@@ -241,6 +241,7 @@
     <ClInclude Include="d3d11\elements\widget_element.h" />
     <ClInclude Include="d3d11\shaders\d3d11_base_shader.h" />
     <ClInclude Include="d3d11\shaders\d3d11_post_process_shader.h" />
+    <ClInclude Include="d3d11\shaders\d3d11_pre_multiplied_shader.h" />
     <ClInclude Include="d3d11\shaders\d3d11_text_shader.h" />
     <ClInclude Include="environment.h" />
     <ClInclude Include="fbx\fbx_loader.h" />

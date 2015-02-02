@@ -66,6 +66,18 @@ namespace snuffbox
 		kPoint
 	};
 
+  /**
+  * @enum snuffbox::BlendStates
+  * @brief A blend states enumeration to control which blend state to use for a render element
+  * @author Daniël Konings
+  */
+  enum BlendStates
+  {
+    kDefault,
+    kPreMultiplied,
+    kTarget
+  };
+
 	/**
 	* @struct snuffbox::Vertex
 	* @brief A vertex structure for use with vertex buffers
@@ -187,11 +199,14 @@ namespace snuffbox
 		/// Creates the base shader
 		void CreateBaseShader();
 
-		/// Creates the text shader
-		void CreateTextShader();
+		/// Creates the premultiplied shader
+    void CreatePreMultipliedShader();
 
 		/// Creates the post processing shader
 		void CreatePostProcessingShader();
+
+    /// Creates the text shader
+    void CreateTextShader();
 
 		/// Destroys the device
 		void Destroy();
@@ -258,7 +273,7 @@ namespace snuffbox
 		void ResetCurrentModel(){ current_model_ = nullptr; }
 		
 		/// Creates the context blend state
-		void CreateBlendState();
+    ID3D11BlendState* CreateBlendState(bool premultiplied = false);
 
 		/**
 		* @brief Draws a given render element
@@ -353,6 +368,7 @@ namespace snuffbox
 		Shader*												current_shader_;				//!< The current shader being used
 		Camera*												camera_;								//!< The current camera being used
 		ID3D11BlendState*							blend_state_;						//!< The blend state being used
+    ID3D11BlendState*							blend_state_pre_;				//!< The pre multiplied blend state being used
     FBXModel*                     current_model_;					//!< The current model being used
     D3D11_PRIMITIVE_TOPOLOGY      topology_;							//!< The current primitive topology
 		std::vector<Vertex>						lines_;									//!< The vector for lines to draw
@@ -362,5 +378,9 @@ namespace snuffbox
 		ID3D11Buffer*									screen_quad_indices_;		//!< The full screen quad indices
 		std::map<std::string, RenderTarget*> render_targets_; //!< All render targets
 		bool													initialised_;						//!< Is the device initialised?
+    BlendStates                   current_blend_state_;   // The current blend state
+
+    static const UINT blendMask = 0xFFFFFFFF;
+    static const UINT blendMaskTarget = 0x000000FF;
 	};
 }

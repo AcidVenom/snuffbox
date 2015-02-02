@@ -24,6 +24,7 @@
 
 #include "../../snuffbox/d3d11/shaders/d3d11_base_shader.h"
 #include "../../snuffbox/d3d11/shaders/d3d11_post_process_shader.h"
+#include "../../snuffbox/d3d11/shaders/d3d11_pre_multiplied_shader.h"
 #include "../../snuffbox/d3d11/shaders/d3d11_text_shader.h"
 
 namespace snuffbox
@@ -83,13 +84,20 @@ namespace snuffbox
 		CreateViewport();
 		CreateBaseShader();
 		CreatePostProcessingShader();
-		CreateTextShader();
+		CreatePreMultipliedShader();
+    CreateTextShader();
 		CreateConstantBuffer();
 		CreateLayout();
 		CreateDepthStencil();
 		CreateSamplerState();
 		CreateDefaultTexture();
-		CreateBlendState();
+
+    blend_state_ = CreateBlendState();
+    blend_state_pre_ = CreateBlendState(true);
+    context_->OMSetBlendState(blend_state_, NULL, blendMask);
+    current_blend_state_ = BlendStates::kDefault;
+    current_sampler_ = SamplerState::kLinear;
+
 		CreateScreenQuad();
 
 		initialised_ = true;
@@ -337,33 +345,62 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::CreateTextShader()
+	void D3D11DisplayDevice::CreatePreMultipliedShader()
 	{
 		std::fstream fin;
 
-		fin.open(environment::game().path() + "/shaders/text.fx");
+		fin.open(environment::game().path() + "/shaders/premultiplied.fx");
 
 		if (!fin)
 		{
 			std::ofstream out;
-			out.open(environment::game().path() + "/shaders/text.fx");
+			out.open(environment::game().path() + "/shaders/premultiplied.fx");
 
 			if (!out)
 			{
 				CreateDirectoryA(std::string(environment::game().path() + "/shaders").c_str(), 0);
-				out.open(environment::game().path() + "/shaders/text.fx");
+				out.open(environment::game().path() + "/shaders/premultiplied.fx");
 
-				SNUFF_XASSERT(out, "Unknown error in creating of the text shader");
+				SNUFF_XASSERT(out, "Unknown error in creating of the premultiplied shader");
 			}
 
-			out << SNUFF_TEXT_SHADER;
+      out << SNUFF_PREMULTIPLIED_SHADER;
 			out.close();
 		}
 
 		fin.close();
 
-		environment::content_manager().Load<Shader>("shaders/text.fx");
+		environment::content_manager().Load<Shader>("shaders/premultiplied.fx");
 	}
+
+  //---------------------------------------------------------------------------------
+  void D3D11DisplayDevice::CreateTextShader()
+  {
+    std::fstream fin;
+
+    fin.open(environment::game().path() + "/shaders/text.fx");
+
+    if (!fin)
+    {
+      std::ofstream out;
+      out.open(environment::game().path() + "/shaders/text.fx");
+
+      if (!out)
+      {
+        CreateDirectoryA(std::string(environment::game().path() + "/shaders").c_str(), 0);
+        out.open(environment::game().path() + "/shaders/text.fx");
+
+        SNUFF_XASSERT(out, "Unknown error in creating of the text shader");
+      }
+
+      out << SNUFF_TEXT_SHADER;
+      out.close();
+    }
+
+    fin.close();
+
+    environment::content_manager().Load<Shader>("shaders/text.fx");
+  }
 
 	//---------------------------------------------------------------------------------
 	Shaders D3D11DisplayDevice::LoadShader(const char* path)
@@ -682,8 +719,10 @@ namespace snuffbox
 	}
 
 	//---------------------------------------------------------------------------------
-	void D3D11DisplayDevice::CreateBlendState()
+  ID3D11BlendState* D3D11DisplayDevice::CreateBlendState(bool premultiplied)
 	{
+    ID3D11BlendState* state;
+
 		HRESULT result = S_OK;
 
 		D3D11_BLEND_DESC bDesc;
@@ -692,18 +731,32 @@ namespace snuffbox
 		bDesc.AlphaToCoverageEnable = false;
 		bDesc.IndependentBlendEnable = false;
 		bDesc.RenderTarget[0].BlendEnable = true;
-		bDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		bDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		bDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		bDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		bDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-		bDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-		bDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-		result = device_->CreateBlendState(&bDesc, &blend_state_);
+    if (premultiplied == true)
+    {
+      bDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+      bDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+      bDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+      bDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+      bDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+      bDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+      bDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    }
+    else
+    {
+      bDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+      bDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+      bDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+      bDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+      bDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+      bDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+      bDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    }
+
+    result = device_->CreateBlendState(&bDesc, &state);
 		SNUFF_XASSERT(result == S_OK, HRToString(result).c_str());
 
-		context_->OMSetBlendState(blend_state_, NULL, 0xFFFFFFFF);
+    return state;
 	}
 
 	//---------------------------------------------------------------------------------
@@ -781,7 +834,6 @@ namespace snuffbox
 		viewport.MaxDepth = 1.0f;
 
 		context_->RSSetViewports(1, &viewport);
-		context_->OMSetBlendState(blend_state_, NULL, 0xFFFFFFFF);
 		ID3D11RenderTargetView* view = target->view();
 		if (camera_ && camera_->type() == Camera::CameraType::kPerspective)
 		{
@@ -843,6 +895,19 @@ namespace snuffbox
 	{
 		if (it && it->visible())
 		{
+      if (it->blend_state() != current_blend_state_)
+      {
+        if (it->blend_state() == BlendStates::kDefault)
+        {
+          context_->OMSetBlendState(blend_state_, NULL, blendMask);
+          current_blend_state_ = BlendStates::kDefault;
+        }
+        else if (it->blend_state() == BlendStates::kPreMultiplied)
+        {
+          context_->OMSetBlendState(blend_state_pre_, NULL, blendMask);
+          current_blend_state_ = BlendStates::kPreMultiplied;
+        }
+      }
 			if (it->sample_type() != current_sampler_)
 			{
 				if (it->sample_type() == SamplerState::kLinear)
@@ -1222,7 +1287,7 @@ namespace snuffbox
 		projection_matrix_ = XMMatrixIdentity();
 
 		context_->OMSetRenderTargets(1, &back_buffer_view_, NULL);
-		context_->OMSetBlendState(blend_state_, NULL, 0xFFFFFFFF);
+    context_->OMSetBlendState(blend_state_, NULL, blendMaskTarget);
 		SetCullMode(D3D11_CULL_FRONT);
 
 		PostProcessing* pp = target->post_processing();
@@ -1334,6 +1399,8 @@ namespace snuffbox
 			line_buffer_->Release();
 			line_buffer_ = nullptr;
 		}
+
+    current_blend_state_ = BlendStates::kTarget;
 	}
 
   //---------------------------------------------------------------------------------
@@ -1387,6 +1454,7 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(sampler_state_);
 		SNUFF_SAFE_RELEASE(sampler_state_linear_);
 		SNUFF_SAFE_RELEASE(blend_state_);
+    SNUFF_SAFE_RELEASE(blend_state_pre_);
 		SNUFF_SAFE_RELEASE(rasterizer_state_);
 		SNUFF_SAFE_RELEASE(back_buffer_);
 		SNUFF_SAFE_RELEASE(input_layout_);
@@ -1402,7 +1470,11 @@ namespace snuffbox
 		CreateLayout();
 		CreateDepthStencil();
 		CreateSamplerState();
-		CreateBlendState();
+		blend_state_ = CreateBlendState();
+    blend_state_pre_ = CreateBlendState(true);
+    context_->OMSetBlendState(blend_state_, NULL, blendMask);
+    current_blend_state_ = BlendStates::kDefault;
+    current_sampler_ = SamplerState::kLinear;
     SetCullMode(environment::render_settings().settings().cull_mode);
 
 		for (std::map<std::string, RenderTarget*>::iterator it = render_targets_.begin(); it != render_targets_.end(); ++it)
@@ -1463,6 +1535,7 @@ namespace snuffbox
 		SNUFF_SAFE_RELEASE(no_texture_);
 		SNUFF_SAFE_RELEASE(default_resource_);
 		SNUFF_SAFE_RELEASE(blend_state_);
+    SNUFF_SAFE_RELEASE(blend_state_pre_);
 		SNUFF_SAFE_RELEASE(back_buffer_view_);
 		SNUFF_SAFE_RELEASE(screen_quad_vertices_);
 		SNUFF_SAFE_RELEASE(screen_quad_indices_);

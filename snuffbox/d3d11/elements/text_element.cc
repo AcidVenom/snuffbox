@@ -28,6 +28,8 @@ namespace snuffbox
     current_font_ = environment::font_manager().default_font();
     font_ = "fonts/arial.ttf";
     font_size_ = 16;
+    sampler_type_ = SamplerState::kPoint;
+    blend_state_ = BlendStates::kPreMultiplied;
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -56,6 +58,8 @@ namespace snuffbox
     font_size_ = 16;
 
 		shader_ = environment::content_manager().Get<Shader>("shaders/text.fx").get();
+    sampler_type_ = SamplerState::kPoint;
+    blend_state_ = BlendStates::kPreMultiplied;
 	}
 
 	//-------------------------------------------------------------------------------------------
