@@ -23,6 +23,11 @@ Game.Initialise = function()
 	Game.speed = 1;
 }
 
+Game.FixedUpdate = function(timeSteps, fixedSteps)
+{
+
+}
+
 Game.Update = function(dt)
 {
 	if (Game.debug == true)

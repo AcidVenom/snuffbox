@@ -59,6 +59,9 @@ namespace snuffbox
 		/// Updates the game
 		void Update();
 
+		/// The fixed update loop
+		void FixedUpdate();
+
 		/// Draws the game
 		void Draw();
 
@@ -95,6 +98,9 @@ namespace snuffbox
 		/// Returns the delta time of the game
 		float delta_time(){ return deltaTime_; }
 
+		/// Sets the fixed step of fixed update
+		void SetFixedStep(float fixedStep);
+
 	private:
 		SharedPtr<Win32Window> window_; //!< The Win32 window hooked to the game
 		SharedPtr<Mouse> mouse_; //!< The mouse object
@@ -106,7 +112,9 @@ namespace snuffbox
 		JSCallback draw_; //!< The JavaScript update callback
 		JSCallback shutdown_; //!< The JavaScript update callback
 		JSCallback onReload_; //!< The JavaScript onReload callback
+		JSCallback fixed_update_; //!< The JavaScript fixed update callback
 		double deltaTime_;	//!< The current delta time
+		double leftOverDelta_; //!< The left over delta time from the previous frame
 		bool consoleEnabled_; //!< Is the console enabled?
 		std::string path_; //!< The path the game is running in
 		int gameTime_; //!< The game time
@@ -115,6 +123,9 @@ namespace snuffbox
 		bool shouldQuit_; //!< If the application should quit
 		bool shouldReload_; //!< If the application should reload
 		bool doReload_; //!< Should all content be reloaded?
+		double accumulatedTime_; //!< The total accumulated time since the last fixed update
+		float fixedStep_; //!< The current fixed update step size
+
 	public:
 		JS_NAME(Game);
 		static void RegisterJS(JS_TEMPLATE); //!< Registers all JavaScript functions

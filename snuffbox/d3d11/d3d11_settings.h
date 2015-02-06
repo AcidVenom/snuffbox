@@ -94,5 +94,6 @@ namespace snuffbox
 		static void JSResolution(JS_ARGS);
 		static void JSSetWindowSize(JS_ARGS);
 		static void JSSetYDown(JS_ARGS);
+		static void JSSetFixedStep(JS_ARGS);
 	};
 }

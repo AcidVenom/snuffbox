@@ -29,7 +29,7 @@
 #include <fstream>
 
 #define SNUFF_VERSION_MAJOR 0
-#define SNUFF_VERSION_MINOR 665
+#define SNUFF_VERSION_MINOR 668
 
 #ifdef _DEBUG
 #define SNUFF_DEBUG_MODE "Debug"
@@ -74,7 +74,10 @@ path_(""),
 gameTime_(0),
 qtApp_(app),
 shouldQuit_(false),
-deltaTime_(0.0)
+deltaTime_(0.0),
+leftOverDelta_(0.0),
+accumulatedTime_(0.0),
+fixedStep_(60.0f)
 {
 	environment::globalInstance = this;
 	ParseCommandLine();
@@ -108,7 +111,6 @@ void Game::Update()
 
 	mouse_->Update();
 	keyboard_->Update();
-	lastTime_ = high_resolution_clock::now();
 
 	JS_CREATE_SCOPE;
 	Handle<Value> argv[1] = {
@@ -144,6 +146,34 @@ void Game::Update()
 }
 
 //------------------------------------------------------------------------------------------------------
+void Game::FixedUpdate()
+{
+	if (!started_)
+	{
+		return;
+	}
+
+	JS_CREATE_SCOPE;
+	accumulatedTime_ += deltaTime_ * 1000;
+	int timeSteps = 0;
+	float fixedDelta = 1000.0f / fixedStep_;
+
+	accumulatedTime_ = std::min(accumulatedTime_, static_cast<double>(fixedDelta * 2));
+	while (accumulatedTime_ > fixedDelta)
+	{
+		++timeSteps;
+		Handle<Value> argv[2] = {
+			Number::New(JS_ISOLATE, timeSteps),
+			Number::New(JS_ISOLATE, fixedDelta)
+		};
+
+		fixed_update_.Call(2, argv);
+
+		accumulatedTime_ -= fixedDelta;
+	}
+}
+
+//------------------------------------------------------------------------------------------------------
 void Game::Draw()
 {
 	if (!started_)
@@ -154,13 +184,12 @@ void Game::Draw()
 		Number::New(JS_ISOLATE, deltaTime_)
 	};
 
-	environment::render_device().DrawToRenderTargets();
 	draw_.Call(1, argv);
+	environment::render_device().DrawToRenderTargets();
 
 	high_resolution_clock::time_point now = high_resolution_clock::now();
 	duration<double, std::milli> dtDuration = duration_cast<duration<double, std::milli>>(now - lastTime_);
 	deltaTime_ = dtDuration.count() * 1e-3f;
-	lastTime_ = now;
 
 	environment::render_device().IncrementTime(deltaTime_);
 }
@@ -308,6 +337,12 @@ void Game::NotifyEvent(GameEvents evt)
 }
 
 //------------------------------------------------------------------------------------------------------
+void Game::SetFixedStep(float fixedStep)
+{
+	fixedStep_ = fixedStep;
+}
+
+//------------------------------------------------------------------------------------------------------
 void Game::JSRender(JS_ARGS)
 {
 	JS_CHECK_PARAMS("O");
@@ -384,6 +419,10 @@ void Game::CreateCallbacks()
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Update(dt)' function! Please add it to your main.js");
 	update_.SetFunction(cb);
 
+	JS_OBJECT_CALLBACK("FixedUpdate", obj);
+	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.FixedUpdate()' function! Please add it to your main.js");
+	fixed_update_.SetFunction(cb);
+
 	JS_OBJECT_CALLBACK("Draw", obj);
 	SNUFF_XASSERT(cb->IsFunction(), "Could not find 'Game.Draw(dt)' function! Please add it to your main.js");
 	draw_.SetFunction(cb);
@@ -400,8 +439,10 @@ void Game::CreateCallbacks()
 //------------------------------------------------------------------------------------------------------
 void Game::Run()
 {
+	lastTime_ = high_resolution_clock::now();
   environment::sound_system().Update();
   Update();
+	FixedUpdate();
 	Draw();
 }
 

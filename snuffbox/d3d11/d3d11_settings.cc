@@ -123,7 +123,8 @@ namespace snuffbox
 			JSFunctionRegister("setBackBufferColour", JSSetBackBufferColour),
 			JSFunctionRegister("resolution", JSResolution),
 			JSFunctionRegister("setWindowSize", JSSetWindowSize),
-			JSFunctionRegister("setYDown", JSSetYDown)
+			JSFunctionRegister("setYDown", JSSetYDown),
+			JSFunctionRegister("setFixedStep", JSSetFixedStep)
 		};
 
 		obj->Set(JS_ISOLATE, "CullNone", Number::New(JS_ISOLATE, 1));
@@ -177,5 +178,12 @@ namespace snuffbox
 		SetWindowPos(environment::game().window()->handle(), HWND_TOP, (GetSystemMetrics(SM_CXSCREEN) - actualWidth) / 2, (GetSystemMetrics(SM_CYSCREEN) - actualHeight) / 2, actualWidth, actualHeight, NULL);
 
 		environment::render_device().ResizeBuffers();
+	}
+
+	//-------------------------------------------------------------------------------
+	void D3D11Settings::JSSetFixedStep(JS_ARGS)
+	{
+		JSWrapper wrapper(args);
+		environment::game().SetFixedStep(wrapper.GetNumber<float>(0));
 	}
 }
